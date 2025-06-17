@@ -10,6 +10,7 @@ import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import TestPage from './pages/testPage';
 // import CasesPage from './pages/CasesPage';
 // import InventoryPage from './pages/InventoryPage';
 // import ProfilePage from './pages/ProfilePage';
@@ -43,13 +44,14 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Routes>
           {/* Публичные маршруты */}
+          <Route path="/" element={<TestPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          
 
           {/* Защищенные маршруты */}
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-           
+          <Route path="/app" element={<Layout />}>
+            {/* Protected routes go here */}
           </Route>
         </Routes>
       </div>

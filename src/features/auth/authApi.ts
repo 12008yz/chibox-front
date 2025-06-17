@@ -9,16 +9,43 @@ import type {
 // Расширяем базовый API для авторизации
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Тестовые эндпоинты для диагностики
+    testConnection: builder.query<any, void>({
+      query: () => '/v1/test',
+    }),
+
+    testPost: builder.mutation<any, { testData: string }>({
+      query: (data) => ({
+        url: '/v1/test-post',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+
     // Вход в систему
     login: builder.mutation<
       ApiResponse<{ user: User; token: string }>,
       LoginRequest
     >({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: '/v1/login',
         method: 'POST',
         body: credentials,
       }),
+      transformResponse: (response: any) => {
+        // Трансформируем ответ бэкенда к ожидаемому формату
+        if (response.success && response.token && response.user) {
+          return {
+            success: response.success,
+            data: {
+              user: response.user,
+              token: response.token
+            },
+            message: response.message
+          };
+        }
+        return response;
+      },
       invalidatesTags: ['User', 'Profile'],
     }),
 
@@ -28,17 +55,31 @@ export const authApi = baseApi.injectEndpoints({
       RegisterRequest
     >({
       query: (userData) => ({
-        url: '/auth/register',
+        url: '/v1/register',
         method: 'POST',
         body: userData,
       }),
+      transformResponse: (response: any) => {
+        // Трансформируем ответ бэкенда к ожидаемому формату
+        if (response.success && response.token && response.user) {
+          return {
+            success: response.success,
+            data: {
+              user: response.user,
+              token: response.token
+            },
+            message: response.message
+          };
+        }
+        return response;
+      },
       invalidatesTags: ['User', 'Profile'],
     }),
 
     // Выход из системы
     logout: builder.mutation<ApiResponse<null>, void>({
       query: () => ({
-        url: '/auth/logout',
+        url: '/v1/logout',
         method: 'POST',
       }),
       invalidatesTags: ['User', 'Profile', 'Inventory', 'Balance'],
@@ -46,7 +87,7 @@ export const authApi = baseApi.injectEndpoints({
 
     // Получение текущего пользователя (проверка токена)
     getCurrentUser: builder.query<ApiResponse<User>, void>({
-      query: () => '/user/profile',
+      query: () => '/v1/profile',
       providesTags: ['User', 'Profile'],
     }),
 
@@ -55,7 +96,7 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ redirectUrl: string }>,
       void
     >({
-      query: () => '/auth/steam',
+      query: () => '/v1/auth/steam',
     }),
 
     // Обновление профиля
@@ -64,7 +105,7 @@ export const authApi = baseApi.injectEndpoints({
       Partial<Pick<User, 'username' | 'email'>>
     >({
       query: (updateData) => ({
-        url: '/user/profile',
+        url: '/v1/profile',
         method: 'PUT',
         body: updateData,
       }),
@@ -75,6 +116,8 @@ export const authApi = baseApi.injectEndpoints({
 
 // Экспортируем хуки для использования в компонентах
 export const {
+  useTestConnectionQuery,
+  useTestPostMutation,
   useLoginMutation,
   useRegisterMutation,
   useLogoutMutation,

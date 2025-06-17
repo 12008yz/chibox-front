@@ -31,8 +31,29 @@ const RegisterPage = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+    // Валидация пароля в соответствии с требованиями сервера
+    if (password.length < 8) {
+      setError('Пароль должен содержать минимум 8 символов');
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError('Пароль должен содержать хотя бы одну заглавную букву');
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError('Пароль должен содержать хотя бы одну строчную букву');
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError('Пароль должен содержать хотя бы одну цифру');
+      return;
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setError('Пароль должен содержать хотя бы один специальный символ');
       return;
     }
 
