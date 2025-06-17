@@ -99,6 +99,23 @@ export const authApi = baseApi.injectEndpoints({
       query: () => '/v1/auth/steam',
     }),
 
+    // Проверка статуса авторизации
+    getAuthStatus: builder.query<
+      ApiResponse<{ authenticated: boolean; user: any }>,
+      void
+    >({
+      query: () => '/v1/auth/status',
+      providesTags: ['User', 'Profile'],
+    }),
+
+    // Привязка Steam аккаунта
+    linkSteamAccount: builder.query<
+      ApiResponse<{ redirectUrl: string }>,
+      void
+    >({
+      query: () => '/v1/auth/link-steam',
+    }),
+
     // Обновление профиля
     updateProfile: builder.mutation<
       ApiResponse<User>,
@@ -124,5 +141,7 @@ export const {
   useGetCurrentUserQuery,
   useLazyGetCurrentUserQuery,
   useSteamAuthQuery,
+  useGetAuthStatusQuery,
+  useLinkSteamAccountQuery,
   useUpdateProfileMutation,
 } = authApi;
