@@ -42,12 +42,8 @@ function App() {
         token: token,
       }));
     }
-
-    if (error && token) {
-      // Если токен недействителен, выходим
-      dispatch(logout());
-    }
-  }, [currentUserData, error, token, dispatch]);
+    // Ошибки 401 обрабатываются автоматически в baseApi.ts
+  }, [currentUserData, token, dispatch]);
 
   return (
     <Router>
@@ -65,7 +61,7 @@ function App() {
 
           {/* Страницы авторизации без Header */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           {/* Страницы с Header - доступны всем */}
           <Route

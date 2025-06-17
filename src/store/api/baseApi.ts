@@ -30,39 +30,19 @@ const baseQueryWithRetry = retry(baseQuery, {
 // Обертка для обработки ошибок авторизации
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
   const result = await baseQueryWithRetry(args, api, extraOptions);
-  
+
   // Обработка ошибок авторизации
   if (result.error?.status === 401) {
+    console.log('Token expired or invalid, logging out...');
     // Диспатчим logout при 401 ошибке
     api.dispatch({ type: 'auth/logout' });
-    
-    // Диспатчим уведомление об истечении сессии
-    api.dispatch({
-      type: 'ui/addNotification',
-      payload: {
-        type: 'warning',
-        title: 'Сессия истекла',
-        message: 'Пожалуйста, войдите в систему снова',
-        duration: 5000,
-      },
-    });
   }
-  
-  // Обработка сетевых ошибок
+
+  // Логируем сетевые ошибки
   if (result.error?.status === 'FETCH_ERROR' || result.error?.status === 'TIMEOUT_ERROR') {
-    api.dispatch({
-      type: 'error/addNetworkError',
-      payload: {
-        message: 'Ошибка соединения с сервером',
-        severity: 'medium',
-        isRetryable: true,
-        source: 'api',
-        endpoint: typeof args === 'string' ? args : args.url,
-        method: typeof args === 'object' ? args.method : 'GET',
-      },
-    });
+    console.error('Network error:', result.error);
   }
-  
+
   return result;
 };
 
