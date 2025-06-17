@@ -170,4 +170,7 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
+  lastLoginAttempt: number | null;
+  sessionExpiry: number | null;
 }

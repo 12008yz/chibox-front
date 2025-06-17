@@ -14,6 +14,9 @@ const initialState: AuthState = {
   token: getInitialToken(),
   isAuthenticated: !!getInitialToken(),
   isLoading: false,
+  error: null,
+  lastLoginAttempt: null,
+  sessionExpiry: null,
 };
 
 const authSlice = createSlice({
@@ -66,9 +69,37 @@ const authSlice = createSlice({
     },
 
     // Ошибка авторизации
-    authError: (state) => {
+    authError: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
+      state.error = action.payload;
+      state.lastLoginAttempt = Date.now();
       // Не очищаем состояние автоматически, чтобы пользователь мог повторить попытку
+    },
+
+    // Очистить ошибку
+    clearError: (state) => {
+      state.error = null;
+    },
+
+    // Установить время истечения сессии
+    setSessionExpiry: (state, action: PayloadAction<number>) => {
+      state.sessionExpiry = action.payload;
+    },
+
+    // Проверить валидность сессии
+    checkSessionValidity: (state) => {
+      if (state.sessionExpiry && Date.now() > state.sessionExpiry) {
+        // Сессия истекла
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.sessionExpiry = null;
+
+        // Удаляем токен из localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth_token');
+        }
+      }
     },
   },
 });
@@ -80,6 +111,9 @@ export const {
   updateBalance,
   logout,
   authError,
+  clearError,
+  setSessionExpiry,
+  checkSessionValidity,
 } = authSlice.actions;
 
 export default authSlice.reducer;
