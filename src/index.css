@@ -2,62 +2,305 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Основная темная тема в стиле игровых сайтов */
+/* Gambling Theme Variables */
 :root {
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a1d23;
-  --bg-card: #232832;
-  --bg-hover: #2a303a;
-  --accent-gold: #ffbb33;
-  --accent-orange: #ff7b33;
-  --accent-blue: #3b82f6;
+  /* Dark Background Colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2a2a2a;
+  --bg-card: #1e1e1e;
+  --bg-elevated: #252525;
+
+  /* Gambling Colors */
+  --gold: #ffd700;
+  --gold-dark: #b8860b;
+  --neon-green: #39ff14;
+  --neon-blue: #00ffff;
+  --neon-purple: #bf00ff;
+  --neon-pink: #ff1493;
+
+  /* Rarity Colors */
+  --common: #b0bec5;
+  --uncommon: #4caf50;
+  --rare: #2196f3;
+  --epic: #9c27b0;
+  --legendary: #ff9800;
+  --mythical: #f44336;
+
+  /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: #a0a9c0;
-  --text-muted: #6b7280;
-  --border-dark: #374151;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
+
+  /* Border Colors */
+  --border-primary: #333333;
+  --border-secondary: #404040;
+  --border-accent: #555555;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
-/* Градиентные фоны */
-.gradient-bg {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+/* Background Patterns */
+.bg-pattern {
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
 }
 
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Gambling Gradients */
 .gradient-gold {
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
 }
 
-.gradient-card {
-  background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-  border: 1px solid var(--border-dark);
+.gradient-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* Анимации */
-.hover-scale {
-  transition: transform 0.2s ease-in-out;
+.gradient-neon {
+  background: linear-gradient(135deg, #39ff14 0%, #00ffff 50%, #bf00ff 100%);
 }
 
-.hover-scale:hover {
-  transform: scale(1.05);
+.gradient-dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
 }
 
-.glow-effect {
-  box-shadow: 0 0 20px rgba(255, 187, 51, 0.3);
+/* Glow Effects */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
-.glow-effect:hover {
-  box-shadow: 0 0 30px rgba(255, 187, 51, 0.5);
+.glow-neon {
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
 }
 
-/* Кастомные скроллбары */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(191, 0, 255, 0.3);
+}
+
+/* Button Styles */
+.btn-gambling {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, #eab308, #ca8a04);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-gambling:hover {
+  background: linear-gradient(to right, #facc15, #eab308);
+  box-shadow: 0 10px 25px rgba(234, 179, 8, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-gambling:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background-color: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-secondary:hover {
+  background-color: #374151;
+  border-color: #6b7280;
+}
+
+.btn-secondary:active {
+  transform: scale(0.95);
+}
+
+.btn-danger {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, #dc2626, #b91c1c);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(to right, #ef4444, #dc2626);
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:active {
+  transform: scale(0.95);
+}
+
+/* Card Styles */
+.card-gambling {
+  background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+  border: 1px solid #374151;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.card-elevated {
+  background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+  border: 1px solid #374151;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Styles */
+.input-gambling {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #1f2937;
+  border: 1px solid #4b5563;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.input-gambling:focus {
+  border-color: #eab308;
+  outline: none;
+  box-shadow: 0 0 0 1px #eab308;
+}
+
+.input-gambling::placeholder {
+  color: #9ca3af;
+}
+
+/* Rarity Styles */
+.rarity-common {
+  border-color: #9ca3af;
+  color: #9ca3af;
+  box-shadow: 0 0 10px rgba(176, 190, 197, 0.2);
+}
+
+.rarity-uncommon {
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.rarity-rare {
+  border-color: #3b82f6;
+  color: #60a5fa;
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+}
+
+.rarity-epic {
+  border-color: #8b5cf6;
+  color: #a78bfa;
+  box-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+}
+
+.rarity-legendary {
+  border-color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+}
+
+.rarity-mythical {
+  border-color: #ef4444;
+  color: #f87171;
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes case-open {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotateY(180deg);
+  }
+  100% {
+    transform: scale(1) rotateY(360deg);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-case-open {
+  animation: case-open 1s ease-in-out;
+}
+
+/* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -67,142 +310,66 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-gold);
+  background: var(--border-accent);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-orange);
+  background: var(--gold);
 }
 
-/* Стили для карточек кейсов */
-.case-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-dark);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  position: relative;
+/* Selection Styling */
+::selection {
+  background: rgba(255, 215, 0, 0.3);
+  color: white;
 }
 
-.case-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent-gold);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+/* Typography */
+.text-gambling {
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
 }
 
-.case-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange));
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.text-neon {
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: linear-gradient(135deg, #39ff14 0%, #00ffff 100%);
 }
 
-.case-card:hover::before {
-  opacity: 1;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .btn-gambling,
+  .btn-secondary,
+  .btn-danger {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .card-gambling {
+    border-radius: 0.5rem;
+  }
 }
 
-/* Кнопки в игровом стиле */
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
-  border: none;
-  border-radius: 8px;
-  color: #000;
-  font-weight: 600;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Dark theme utilities */
+.dark {
+  color-scheme: dark;
 }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(255, 187, 51, 0.4);
+/* Loading States */
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }
 
-.btn-secondary {
-  background: var(--bg-card);
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  color: var(--text-primary);
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  border-color: var(--accent-gold);
-  background: var(--bg-hover);
-}
-
-/* Live drops лента */
-.live-drops {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.drop-item {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-dark);
-  transition: background 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.drop-item:hover {
-  background: var(--bg-hover);
-}
-
-.drop-item:last-child {
-  border-bottom: none;
-}
-
-/* Редкости предметов */
-.rarity-common { color: #b0b0b0; }
-.rarity-uncommon { color: #1eff00; }
-.rarity-rare { color: #0099ff; }
-.rarity-epic { color: #a335ee; }
-.rarity-legendary { color: #ff8000; }
-.rarity-mythical { color: #e4ae39; }
-
-/* Анимация загрузки */
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--bg-card);
-  border-top: 3px solid var(--accent-gold);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Плавающие элементы */
-.floating {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-/* Пульсирующий эффект */
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-glow {
-  from { box-shadow: 0 0 20px rgba(255, 187, 51, 0.3); }
-  to { box-shadow: 0 0 30px rgba(255, 187, 51, 0.6); }
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
