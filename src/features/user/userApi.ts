@@ -170,11 +170,26 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение таблицы лидеров
     getLeaderboard: builder.query<
-      ApiResponse<any[]>,
-      { type?: string; limit?: number }
+      ApiResponse<{
+        type: string;
+        leaderboard: Array<{
+          rank: number;
+          user_id: string;
+          username: string;
+          level: number;
+          cases_opened?: number;
+          max_item_value?: number;
+          most_expensive_item_name?: string;
+          total_xp_earned?: number;
+        }>;
+        totalItems: number;
+        limit: number;
+      }>,
+      { type?: 'level' | 'cases_opened' | 'most_expensive_item'; limit?: number }
     >({
-      query: ({ type = 'weekly', limit = 10 } = {}) =>
+      query: ({ type = 'level', limit = 10 } = {}) =>
         `v1/leaderboard?type=${type}&limit=${limit}`,
+      providesTags: ['User'],
     }),
 
     // Получение бонусного статуса
