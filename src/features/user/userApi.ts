@@ -177,6 +177,8 @@ export const userApi = baseApi.injectEndpoints({
           user_id: string;
           username: string;
           level: number;
+          subscription_tier: number;
+          subscription_days_left: number;
           cases_opened?: number;
           max_item_value?: number;
           most_expensive_item_name?: string;

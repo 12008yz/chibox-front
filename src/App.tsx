@@ -11,6 +11,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import TestPage from './pages/testPage';
 
 // Компонент для отображения страниц с Header
@@ -280,6 +281,16 @@ function App() {
             element={
               <PageWithHeader>
                 <SubscriptionsPage />
+              </PageWithHeader>
+            }
+          />
+
+          {/* Страница таблицы лидеров */}
+          <Route
+            path="/leaderboard"
+            element={
+              <PageWithHeader>
+                <LeaderboardPage />
               </PageWithHeader>
             }
           />

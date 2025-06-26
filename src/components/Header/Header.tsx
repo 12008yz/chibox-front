@@ -28,6 +28,7 @@ const Header = () => {
 
   const navItems = [
     { name: 'Инвентарь', path: '/inventory', icon: '🎒' },
+    { name: 'Таблица лидеров', path: '/leaderboard', icon: '🏆' },
     { name: 'Профиль', path: '/profile', icon: '👤' },
     { name: 'Баланс', path: '/balance', icon: '💳' },
   ];
