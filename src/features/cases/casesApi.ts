@@ -13,7 +13,7 @@ export const casesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Получение доступных шаблонов кейсов
     getCaseTemplates: builder.query<ApiResponse<CaseTemplate[]>, void>({
-      query: () => '/v1/cases/available',
+      query: () => 'v1/cases/available',
       providesTags: ['CaseTemplates'],
     }),
 
@@ -23,7 +23,7 @@ export const casesApi = baseApi.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 20 } = {}) =>
-        `/v1/cases?page=${page}&limit=${limit}`,
+        `v1/cases?page=${page}&limit=${limit}`,
       providesTags: ['Cases'],
     }),
 
@@ -33,7 +33,7 @@ export const casesApi = baseApi.injectEndpoints({
       BuyCaseRequest
     >({
       query: (caseData) => ({
-        url: '/v1/cases/buy',
+        url: 'v1/cases/buy',
         method: 'POST',
         body: caseData,
       }),
@@ -65,7 +65,7 @@ export const casesApi = baseApi.injectEndpoints({
       OpenCaseRequest
     >({
       query: (caseData) => ({
-        url: '/v1/open-case',
+        url: 'v1/open-case',
         method: 'POST',
         body: caseData,
       }),
@@ -91,7 +91,7 @@ export const casesApi = baseApi.injectEndpoints({
       ApiResponse<any[]>,
       string
     >({
-      query: (caseTemplateId) => `/case-templates/${caseTemplateId}/items`,
+      query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/items`,
     }),
 
     // Получение статистики дропов (последние выпавшие предметы)
@@ -99,7 +99,7 @@ export const casesApi = baseApi.injectEndpoints({
       ApiResponse<any[]>,
       { limit?: number }
     >({
-      query: ({ limit = 10 } = {}) => `/v1/live-drops?limit=${limit}`,
+      query: ({ limit = 10 } = {}) => `v1/live-drops?limit=${limit}`,
     }),
 
     // Получение информации о покупке кейса
@@ -107,7 +107,7 @@ export const casesApi = baseApi.injectEndpoints({
       ApiResponse<any>,
       void
     >({
-      query: () => '/v1/cases/purchase-info',
+      query: () => 'v1/cases/purchase-info',
     }),
   }),
 });

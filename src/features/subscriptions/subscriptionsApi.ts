@@ -34,13 +34,13 @@ export const subscriptionsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Получение доступных тарифов подписки
     getSubscriptionTiers: builder.query<ApiResponse<SubscriptionTier[]>, void>({
-      query: () => '/v1/subscription/tiers',
+      query: () => 'v1/subscription/tiers',
       transformResponse: () => ({
         success: true,
         data: [
           { id: 1, days: 30, max_daily_cases: 1, bonus_percentage: 3.0, name: 'Статус', price: 1210 },
           { id: 2, days: 30, max_daily_cases: 1, bonus_percentage: 5.0, name: 'Статус+', price: 2890 },
-          { id: 3, days: 30, max_daily_cases: 1, bonus_percentage: 7.0, name: 'Статус++', price: 6819 }
+          { id: 3, days: 30, max_daily_cases: 1, bonus_percentage: 8.0, name: 'Статус++', price: 6819 }
         ]
       }),
       providesTags: ['Subscription'],
@@ -48,7 +48,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
 
     // Получение текущего статуса подписки
     getSubscriptionStatus: builder.query<ApiResponse<SubscriptionStatus>, void>({
-      query: () => '/v1/subscription',
+      query: () => 'v1/subscription',
       providesTags: ['Subscription'],
     }),
 
@@ -58,7 +58,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
       BuySubscriptionRequest
     >({
       query: (subscriptionData) => ({
-        url: '/v1/subscription/buy',
+        url: 'v1/subscription/buy',
         method: 'POST',
         body: subscriptionData,
       }),
@@ -85,7 +85,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 20 } = {}) =>
-        `/v1/subscription/history?page=${page}&limit=${limit}`,
+        `v1/subscription/history?page=${page}&limit=${limit}`,
       providesTags: ['Subscription'],
     }),
   }),

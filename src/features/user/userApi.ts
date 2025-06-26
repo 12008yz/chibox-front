@@ -18,7 +18,7 @@ export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Получение баланса пользователя
     getUserBalance: builder.query<ApiResponse<{ balance: number }>, void>({
-      query: () => '/v1/balance',
+      query: () => 'v1/balance',
       providesTags: ['Balance'],
     }),
 
@@ -33,7 +33,7 @@ export const userApi = baseApi.injectEndpoints({
           limit: limit.toString(),
         });
         if (status) params.append('status', status);
-        return `/v1/inventory?${params.toString()}`;
+        return `v1/inventory?${params.toString()}`;
       },
       providesTags: ['Inventory'],
     }),
@@ -44,7 +44,7 @@ export const userApi = baseApi.injectEndpoints({
       SellItemRequest
     >({
       query: (sellData) => ({
-        url: '/v1/sell-item',
+        url: 'v1/sell-item',
         method: 'POST',
         body: sellData,
       }),
@@ -71,7 +71,7 @@ export const userApi = baseApi.injectEndpoints({
       WithdrawItemRequest
     >({
       query: (withdrawData) => ({
-        url: '/v1/withdraw-item',
+        url: 'v1/withdraw-item',
         method: 'POST',
         body: withdrawData,
       }),
@@ -80,7 +80,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение достижений
     getUserAchievements: builder.query<ApiResponse<Achievement[]>, void>({
-      query: () => '/v1/achievements',
+      query: () => 'v1/achievements',
       providesTags: ['Achievements'],
     }),
 
@@ -89,13 +89,13 @@ export const userApi = baseApi.injectEndpoints({
       ApiResponse<any[]>,
       void
     >({
-      query: () => '/v1/achievements/progress',
+      query: () => 'v1/achievements/progress',
       providesTags: ['Achievements'],
     }),
 
     // Получение миссий
     getUserMissions: builder.query<ApiResponse<Mission[]>, void>({
-      query: () => '/v1/missions',
+      query: () => 'v1/missions',
       providesTags: ['Missions'],
     }),
 
@@ -105,7 +105,7 @@ export const userApi = baseApi.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 10 } = {}) =>
-        `/v1/notifications?page=${page}&limit=${limit}`,
+        `v1/notifications?page=${page}&limit=${limit}`,
       providesTags: ['Notifications'],
     }),
 
@@ -115,18 +115,18 @@ export const userApi = baseApi.injectEndpoints({
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 20 } = {}) =>
-        `/v1/transactions?page=${page}&limit=${limit}`,
+        `v1/transactions?page=${page}&limit=${limit}`,
       providesTags: ['Transactions'],
     }),
 
     // Получение статистики пользователя
     getUserStatistics: builder.query<ApiResponse<any>, void>({
-      query: () => '/v1/statistics',
+      query: () => 'v1/statistics',
     }),
 
     // Получение информации о подписке
     getUserSubscription: builder.query<ApiResponse<any>, void>({
-      query: () => '/v1/subscription',
+      query: () => 'v1/subscription',
       providesTags: ['User'],
     }),
 
@@ -136,7 +136,7 @@ export const userApi = baseApi.injectEndpoints({
       ApplyPromoRequest
     >({
       query: (promoData) => ({
-        url: '/v1/promo',
+        url: 'v1/promo',
         method: 'POST',
         body: promoData,
       }),
@@ -149,7 +149,7 @@ export const userApi = baseApi.injectEndpoints({
       DepositRequest
     >({
       query: (depositData) => ({
-        url: '/v1/deposit',
+        url: 'v1/deposit',
         method: 'POST',
         body: depositData,
       }),
@@ -161,7 +161,7 @@ export const userApi = baseApi.injectEndpoints({
       { amount: number; method: string }
     >({
       query: (withdrawData) => ({
-        url: '/v1/withdraw-balance',
+        url: 'v1/withdraw-balance',
         method: 'POST',
         body: withdrawData,
       }),
@@ -174,12 +174,12 @@ export const userApi = baseApi.injectEndpoints({
       { type?: string; limit?: number }
     >({
       query: ({ type = 'weekly', limit = 10 } = {}) =>
-        `/v1/leaderboard?type=${type}&limit=${limit}`,
+        `v1/leaderboard?type=${type}&limit=${limit}`,
     }),
 
     // Получение бонусного статуса
     getBonusStatus: builder.query<ApiResponse<any>, void>({
-      query: () => '/v1/bonus/status',
+      query: () => 'v1/bonus/status',
     }),
 
     // Игра в бонусные квадраты
@@ -188,7 +188,7 @@ export const userApi = baseApi.injectEndpoints({
       { square_id: number }
     >({
       query: (gameData) => ({
-        url: '/v1/bonus/play-squares',
+        url: 'v1/bonus/play-squares',
         method: 'POST',
         body: gameData,
       }),
@@ -201,7 +201,7 @@ export const userApi = baseApi.injectEndpoints({
       { tier: string; duration_days: number }
     >({
       query: (subscriptionData) => ({
-        url: '/v1/subscription/buy',
+        url: 'v1/subscription/buy',
         method: 'POST',
         body: subscriptionData,
       }),
@@ -214,7 +214,7 @@ export const userApi = baseApi.injectEndpoints({
       { user_inventory_item_id: string }
     >({
       query: (exchangeData) => ({
-        url: '/v1/items/exchange-for-subscription',
+        url: 'v1/items/exchange-for-subscription',
         method: 'POST',
         body: exchangeData,
       }),
@@ -223,7 +223,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение информации о бонусах
     getBonusInfo: builder.query<ApiResponse<any>, void>({
-      query: () => '/v1/bonus-info',
+      query: () => 'v1/bonus-info',
     }),
 
     // Steam Bot API
@@ -232,7 +232,7 @@ export const userApi = baseApi.injectEndpoints({
       void
     >({
       query: () => ({
-        url: '/v1/steambot/login',
+        url: 'v1/steambot/login',
         method: 'POST',
       }),
     }),
@@ -242,7 +242,7 @@ export const userApi = baseApi.injectEndpoints({
       { user_inventory_item_ids: string[]; steam_trade_url: string }
     >({
       query: (tradeData) => ({
-        url: '/v1/steambot/send-trade',
+        url: 'v1/steambot/send-trade',
         method: 'POST',
         body: tradeData,
       }),
@@ -252,7 +252,7 @@ export const userApi = baseApi.injectEndpoints({
       ApiResponse<any[]>,
       void
     >({
-      query: () => '/v1/steambot/inventory',
+      query: () => 'v1/steambot/inventory',
     }),
 
     // Получение публичного профиля пользователя
@@ -260,7 +260,7 @@ export const userApi = baseApi.injectEndpoints({
       ApiResponse<any>,
       string
     >({
-      query: (userId) => `/v1/users/${userId}`,
+      query: (userId) => `v1/users/${userId}`,
     }),
 
     // Получение статуса вывода предмета
@@ -268,7 +268,7 @@ export const userApi = baseApi.injectEndpoints({
       ApiResponse<any>,
       string
     >({
-      query: (withdrawalId) => `/v1/withdraw-item/${withdrawalId}`,
+      query: (withdrawalId) => `v1/withdraw-item/${withdrawalId}`,
     }),
   }),
 });

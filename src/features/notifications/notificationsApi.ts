@@ -17,21 +17,21 @@ export const notificationsApi = baseApi.injectEndpoints({
         if (unread_only) {
           params.append('unread_only', 'true');
         }
-        return `/v1/notifications?${params}`;
+        return `v1/notifications?${params}`;
       },
       providesTags: ['Notifications'],
     }),
 
     // Получение количества непрочитанных уведомлений
     getUnreadCount: builder.query<ApiResponse<{ count: number }>, void>({
-      query: () => '/v1/notifications/unread-count',
+      query: () => 'v1/notifications/unread-count',
       providesTags: ['Notifications'],
     }),
 
     // Отметить уведомление как прочитанное
     markAsRead: builder.mutation<ApiResponse<null>, string>({
       query: (notificationId) => ({
-        url: `/v1/notifications/${notificationId}/read`,
+        url: `v1/notifications/${notificationId}/read`,
         method: 'PUT',
       }),
       invalidatesTags: ['Notifications'],
@@ -59,7 +59,7 @@ export const notificationsApi = baseApi.injectEndpoints({
     // Отметить все уведомления как прочитанные
     markAllAsRead: builder.mutation<ApiResponse<null>, void>({
       query: () => ({
-        url: '/v1/notifications/mark-all-read',
+        url: 'v1/notifications/mark-all-read',
         method: 'PUT',
       }),
       invalidatesTags: ['Notifications'],
@@ -68,7 +68,7 @@ export const notificationsApi = baseApi.injectEndpoints({
     // Удалить уведомление
     deleteNotification: builder.mutation<ApiResponse<null>, string>({
       query: (notificationId) => ({
-        url: `/v1/notifications/${notificationId}`,
+        url: `v1/notifications/${notificationId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Notifications'],

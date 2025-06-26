@@ -11,12 +11,12 @@ export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Тестовые эндпоинты для диагностики
     testConnection: builder.query<any, void>({
-      query: () => '/v1/test',
+      query: () => 'v1/test',
     }),
 
     testPost: builder.mutation<any, { testData: string }>({
       query: (data) => ({
-        url: '/v1/test-post',
+        url: 'v1/test-post',
         method: 'POST',
         body: data,
       }),
@@ -28,7 +28,7 @@ export const authApi = baseApi.injectEndpoints({
       LoginRequest
     >({
       query: (credentials) => ({
-        url: '/v1/login',
+        url: 'v1/login',
         method: 'POST',
         body: credentials,
       }),
@@ -55,7 +55,7 @@ export const authApi = baseApi.injectEndpoints({
       RegisterRequest
     >({
       query: (userData) => ({
-        url: '/v1/register',
+        url: 'v1/register',
         method: 'POST',
         body: userData,
       }),
@@ -79,7 +79,7 @@ export const authApi = baseApi.injectEndpoints({
     // Выход из системы
     logout: builder.mutation<ApiResponse<null>, void>({
       query: () => ({
-        url: '/v1/logout',
+        url: 'v1/logout',
         method: 'POST',
       }),
       invalidatesTags: ['User', 'Profile', 'Inventory', 'Balance'],
@@ -87,7 +87,7 @@ export const authApi = baseApi.injectEndpoints({
 
     // Получение текущего пользователя (проверка токена)
     getCurrentUser: builder.query<ApiResponse<User>, void>({
-      query: () => '/v1/profile',
+      query: () => 'v1/profile',
       providesTags: ['User', 'Profile'],
     }),
 
@@ -96,7 +96,7 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ redirectUrl: string }>,
       void
     >({
-      query: () => '/v1/auth/steam',
+      query: () => 'v1/auth/steam',
     }),
 
     // Проверка статуса авторизации
@@ -104,7 +104,7 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ authenticated: boolean; user: any }>,
       void
     >({
-      query: () => '/v1/auth/status',
+      query: () => 'v1/auth/status',
       providesTags: ['User', 'Profile'],
     }),
 
@@ -113,7 +113,7 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ redirectUrl: string }>,
       void
     >({
-      query: () => '/v1/auth/link-steam',
+      query: () => 'v1/auth/link-steam',
     }),
 
     // Обновление профиля
@@ -122,7 +122,7 @@ export const authApi = baseApi.injectEndpoints({
       Partial<Pick<User, 'username' | 'email'>>
     >({
       query: (updateData) => ({
-        url: '/v1/profile',
+        url: 'v1/profile',
         method: 'PUT',
         body: updateData,
       }),
