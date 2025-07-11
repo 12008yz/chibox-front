@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MainButton from "./MainButton";
+import MainButton from "../MainButton";
 
 interface ClaimBonusProps {
   bonusDate: Date | string;

@@ -6,7 +6,7 @@ import { FaHome } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
-import Monetary from "./Monetary";
+import Monetary from "../Monetary";
 
 interface SidebarProps {
     closeSidebar: () => void;

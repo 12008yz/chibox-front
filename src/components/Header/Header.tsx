@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Navbar from "../Navbar";
-import Sidebar from "../Sidebar";
-import CaseOpenedNotification from "../CaseOpenedNotification";
+import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
+import CaseOpenedNotification from "./CaseOpenedNotification";
 import { ImConnection } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
 import { BiArrowBack } from "react-icons/bi";
