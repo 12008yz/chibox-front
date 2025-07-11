@@ -42,7 +42,31 @@ const Avatar: React.FC<AvatarProps> = ({
     useEffect(() => {
         setLoaded(false);
         setImageError(false);
-    }, [image, steamAvatar]);
+
+        // Определяем источник изображения прямо здесь
+        const getImageSource = () => {
+            // Приоритет: Steam аватар > обычное изображение > fallback
+            if (steamAvatar) {
+                return steamAvatar;
+            }
+            if (image) {
+                return image;
+            }
+            return generateFallbackAvatar(id);
+        };
+
+        // Принудительно проверяем загрузку изображения
+        const imgSrc = getImageSource();
+        if (imgSrc) {
+            const img = new Image();
+            img.onload = () => setLoaded(true);
+            img.onerror = () => {
+                setImageError(true);
+                setLoaded(true);
+            };
+            img.src = imgSrc;
+        }
+    }, [image, steamAvatar, id]);
 
     let sizeClasses, skeletonSize;
     switch (size) {
