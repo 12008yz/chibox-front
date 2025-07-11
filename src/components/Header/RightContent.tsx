@@ -5,8 +5,10 @@ import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
 import Monetary from "../Monetary";
 import { useNavigate } from "react-router-dom";
-import Notifications from './Navbar/Notifications';
-import ClaimBonus from './ClaimBonus';
+import { useAppDispatch } from "../../store/hooks";
+import { logout } from "../../features/auth/authSlice";
+import { useLogoutMutation } from "../../features/auth/authApi";
+import Notifications from '../Header/Navbar/Notifications';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -20,12 +22,23 @@ const RightContent: React.FC<RightContentProps> = ({
   user
 }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [notificationCount] = useState(0);
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log('Logout');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Сначала вызываем API logout
+      await logoutApi().unwrap();
+    } catch (error) {
+      // Даже если API недоступен, продолжаем logout
+      console.log('Logout API error (continuing with logout):', error);
+    } finally {
+      // Очищаем Redux state и localStorage
+      dispatch(logout());
+      // Остаемся на главной странице
+      navigate('/');
+    }
   };
 
   const handleProfileClick = () => {
@@ -36,6 +49,11 @@ const RightContent: React.FC<RightContentProps> = ({
     setOpenNotifications(!openNotifications);
   };
 
+  const handleClaimBonus = () => {
+    // TODO: Implement bonus claiming logic
+    console.log('Claiming bonus...');
+  };
+
   if (!user) {
     // Если пользователь не авторизован, показываем кнопки входа
     return (
@@ -44,7 +62,7 @@ const RightContent: React.FC<RightContentProps> = ({
           onClick={() => navigate('/login')}
           className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
         >
-          Войти
+          Sign In
         </button>
         <button
           onClick={() => navigate('/register')}
@@ -59,18 +77,17 @@ const RightContent: React.FC<RightContentProps> = ({
   return (
     <div className="flex items-center space-x-4 relative">
       {/* Получение бонуса */}
-      <ClaimBonus
-        bonusAvailable={true}
-        onClaimBonus={async () => {
-          console.log('Claiming bonus...');
-          // TODO: Implement bonus claim logic
-        }}
-      />
+      <button
+        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+        onClick={handleClaimBonus}
+      >
+        Получить
+      </button>
 
       {/* Баланс */}
       <div className="flex items-center space-x-2 text-green-400">
         <BiWallet className="text-lg" />
-        <Monetary value={user?.walletBalance ?? 0} />
+        <Monetary value={user?.balance ?? 0} />
       </div>
 
       {/* Уведомления */}
@@ -115,7 +132,8 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Кнопка выхода */}
       <button
         onClick={handleLogout}
-        className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+        disabled={isLoggingOut}
+        className={`p-2 text-gray-400 hover:text-red-400 transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
         title="Выйти"
       >
         <IoMdExit className="text-xl" />

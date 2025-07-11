@@ -35,6 +35,11 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const fillTestCredentials = () => {
+    setEmail('test@test.com');
+    setPassword('password');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#151225]">
       <div className="max-w-md w-full space-y-8 p-8">
@@ -42,7 +47,26 @@ const LoginPage: React.FC = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
             Вход в ChiBox
           </h2>
+
+          {/* Тестовые учетные данные */}
+          <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+            <p className="text-sm text-blue-300 text-center mb-2">
+              <strong>Тестовые данные:</strong>
+            </p>
+            <p className="text-xs text-blue-200 text-center mb-2">
+              Email: test@test.com<br />
+              Пароль: password
+            </p>
+            <button
+              type="button"
+              onClick={fillTestCredentials}
+              className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 rounded transition-colors"
+            >
+              Заполнить тестовые данные
+            </button>
+          </div>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>

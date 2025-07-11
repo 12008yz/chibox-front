@@ -31,11 +31,10 @@ const baseQueryWithRetry = retry(baseQuery, {
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
   const result = await baseQueryWithRetry(args, api, extraOptions);
 
-  // Обработка ошибок авторизации
+  // Логируем ошибки авторизации, но НЕ делаем автоматический logout
   if (result.error?.status === 401) {
-    console.log('Token expired or invalid, logging out...');
-    // Диспатчим logout при 401 ошибке
-    api.dispatch({ type: 'auth/logout' });
+    console.log('401 Unauthorized error for:', args);
+    // Автоматический logout теперь будет только в App.tsx для getCurrentUser
   }
 
   // Логируем сетевые ошибки

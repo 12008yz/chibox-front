@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 interface AvatarProps {
     image?: string;
@@ -8,6 +7,7 @@ interface AvatarProps {
     loading?: boolean;
     level?: number;
     showLevel?: boolean;
+    onClick?: () => void;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -16,14 +16,31 @@ const Avatar: React.FC<AvatarProps> = ({
     id,
     size,
     level = 1,
-    showLevel = false
+    showLevel = false,
+    onClick
 }) => {
-    const navigate = useNavigate();
     const [loaded, setLoaded] = useState<boolean>(false);
+    const [imageError, setImageError] = useState<boolean>(false);
+
+    // Генерируем fallback аватар на основе ID
+    const generateFallbackAvatar = (userId: string) => {
+        const colors = [
+            '#6366f1', '#8b5cf6', '#a855f7', '#c084fc', '#ec4899',
+            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+            '#22c55e', '#10b981', '#06b6d4', '#0ea5e9', '#3b82f6'
+        ];
+
+        const colorIndex = userId.length % colors.length;
+        const color = colors[colorIndex];
+        const letter = userId.charAt(0).toUpperCase();
+
+        return `https://ui-avatars.com/api/?name=${letter}&background=${color.replace('#', '')}&color=ffffff&size=128&font-size=0.6`;
+    };
 
     useEffect(() => {
-        console.log("Avatar props updated:", { image, loading, level });
-    }, [image, loading, level]);
+        setLoaded(false);
+        setImageError(false);
+    }, [image]);
 
     let sizeClasses, skeletonSize;
     switch (size) {
@@ -82,20 +99,41 @@ const Avatar: React.FC<AvatarProps> = ({
         />
     );
 
+    const getImageSrc = () => {
+        if (imageError || !image) {
+            return generateFallbackAvatar(id);
+        }
+        return image;
+    };
+
+    const handleImageError = () => {
+        setImageError(true);
+        setLoaded(true); // Показываем fallback как загруженное
+    };
+
+    const handleImageLoad = () => {
+        setLoaded(true);
+    };
+
     return (
         <div className="min-w-[48px]">
             {loading ? (
                 <LoadingSkeleton />
             ) : (
-                <div onClick={() => navigate(`/profile/${id}`)} style={{ cursor: 'pointer' }}>
+                <div
+                    onClick={onClick}
+                    style={{ cursor: onClick ? 'pointer' : 'default' }}
+                    className={onClick ? 'hover:opacity-80 transition-opacity' : ''}
+                >
                     {!loaded && <LoadingSkeleton />}
                     <div className="relative">
                         <img
-                            src={image || "https://i.imgur.com/uUfJSwW.png"}
+                            src={getImageSrc()}
                             alt="avatar"
                             className={`${sizeClasses} rounded-full object-cover border-2 aspect-square ${loaded ? '' : 'hidden'}`}
                             style={{ borderColor: getLevelColor() }}
-                            onLoad={() => setLoaded(true)}
+                            onLoad={handleImageLoad}
+                            onError={handleImageError}
                         />
                         {showLevel && (
                             <div
