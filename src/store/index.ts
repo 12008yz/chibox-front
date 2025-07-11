@@ -5,6 +5,7 @@ import { baseApi } from './api/baseApi';
 import authReducer from '../features/auth/authSlice';
 import uiReducer from './slices/uiSlice';
 import errorReducer from './slices/errorSlice';
+import { authMiddleware } from '../store/middleware/authMiddleware';
 
 // Конфигурация для persist только для auth
 const authPersistConfig = {
@@ -35,7 +36,10 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
       },
-    }).concat(baseApi.middleware),
+    }).concat(
+      baseApi.middleware,
+      authMiddleware.middleware
+    ),
   devTools: process.env.NODE_ENV !== 'production',
 });
 
