@@ -36,8 +36,8 @@ const LoginPage: React.FC = () => {
   };
 
   const fillTestCredentials = () => {
-    setEmail('test@test.com');
-    setPassword('password');
+    setEmail('123@gmail.com');
+    setPassword('Denis71bgr1@2');
   };
 
   return (
@@ -54,8 +54,8 @@ const LoginPage: React.FC = () => {
               <strong>Тестовые данные:</strong>
             </p>
             <p className="text-xs text-blue-200 text-center mb-2">
-              Email: test@test.com<br />
-              Пароль: password
+              Email: 123@gmail.com<br />
+              Пароль: Denis71bgr1@2
             </p>
             <button
               type="button"
