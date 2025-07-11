@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Avatar from "../Avatar";
+import Avatar from "./Avatar";
 import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
-import Monetary from "../Monetary";
-import { useAppDispatch, useCurrentUser, useIsAuthenticated } from '../../store/hooks';
-import { logout } from "../../features/auth/authSlice";
+import Monetary from "./Monetary";
+import { useAppDispatch, useCurrentUser, useIsAuthenticated } from '../store/hooks';
+import { logout } from "../features/auth/authSlice";
 
 const RightContent: React.FC = () => {
     const dispatch = useAppDispatch();
