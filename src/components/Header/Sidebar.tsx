@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                                 className="w-12 h-12 object-contain" // !TODO
                               //   onError={(e) => {
                               //       e.currentTarget.src = '/favicon.ico';
-                              //   }} 
+                              //   }}
                             />
                             <div className="font-normal text-xl text-white">
                                 ChiBox
@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                             <div className="flex items-center space-x-2 text-green-400 mb-3">
                                 <BiWallet className="text-lg" />
                                 <span className="text-sm">Баланс:</span>
-                                <Monetary value={user?.walletBalance ?? 0} />
+                                <Monetary value={user?.balance ?? 0} />
                             </div>
 
                             {/* Информация о пользователе */}
@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                                     className="w-10 h-10 rounded-full" // TODO изменить favicon везде
                                     // onError={(e) => {
                                     //     e.currentTarget.src = '/favicon.ico';
-                                    // }} 
+                                    // }}
                                 />
                                 <div>
                                     <p className="text-white font-medium">{user.username}</p>

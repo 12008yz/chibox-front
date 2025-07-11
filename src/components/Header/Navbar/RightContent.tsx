@@ -68,7 +68,7 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Баланс */}
       <div className="flex items-center space-x-2 text-green-400">
         <BiWallet className="text-lg" />
-        <Monetary value={user?.walletBalance ?? 0} />
+        <Monetary value={user?.balance ?? 0} />
       </div>
 
       {/* Уведомления */}
