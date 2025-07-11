@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterMutation } from '../features/auth/authApi';
-import { useAuthHandlers } from '../hooks/useAuthHandlers';
 import MainButton from '../components/MainButton';
 import SteamLoginButton from '../components/SteamLoginButton';
+import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -12,9 +12,15 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  // Состояние для модального окна
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registrationData, setRegistrationData] = useState<{
+    email: string;
+    previewUrl?: string;
+  } | null>(null);
+
   const navigate = useNavigate();
   const [register, { isLoading }] = useRegisterMutation();
-  const { handleLoginSuccess } = useAuthHandlers();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,11 +40,14 @@ const RegisterPage: React.FC = () => {
       const result = await register({ username, email, password }).unwrap();
 
       if (result.success && result.data) {
-        // Обновляем Redux state
-        handleLoginSuccess(result.data);
+        // Сохраняем данные для модального окна
+        setRegistrationData({
+          email: result.data.email,
+          previewUrl: result.previewUrl
+        });
 
-        // Перенаправляем на главную страницу
-        navigate('/');
+        // Показываем модальное окно
+        setShowSuccessModal(true);
       } else {
         setError('Ошибка регистрации. Попробуйте снова.');
       }
@@ -46,6 +55,13 @@ const RegisterPage: React.FC = () => {
       console.error('Registration error:', err);
       setError(err?.data?.message || 'Ошибка регистрации. Попробуйте снова.');
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setRegistrationData(null);
+    // Перенаправляем на страницу логина
+    navigate('/login?message=Проверьте почту и войдите в систему');
   };
 
   return (
@@ -162,6 +178,16 @@ const RegisterPage: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Модальное окно успешной регистрации */}
+      {registrationData && (
+        <RegistrationSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleCloseSuccessModal}
+          email={registrationData.email}
+          previewUrl={registrationData.previewUrl}
+        />
+      )}
     </div>
   );
 };

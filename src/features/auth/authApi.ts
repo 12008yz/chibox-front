@@ -51,7 +51,7 @@ export const authApi = baseApi.injectEndpoints({
 
     // Регистрация
     register: builder.mutation<
-      ApiResponse<{ user: User; token: string }>,
+      ApiResponse<{ userId: string; email: string; codeExpires: string }> & { previewUrl?: string },
       RegisterRequest
     >({
       query: (userData) => ({
@@ -60,15 +60,17 @@ export const authApi = baseApi.injectEndpoints({
         body: userData,
       }),
       transformResponse: (response: any) => {
-        // Трансформируем ответ бэкенда к ожидаемому формату
-        if (response.success && response.token && response.user) {
+        // Регистрация возвращает другой формат - userId, email, codeExpires
+        if (response.success) {
           return {
             success: response.success,
             data: {
-              user: response.user,
-              token: response.token
+              userId: response.userId,
+              email: response.email,
+              codeExpires: response.codeExpires
             },
-            message: response.message
+            message: response.message,
+            previewUrl: response.previewUrl // для тестового режима
           };
         }
         return response;
