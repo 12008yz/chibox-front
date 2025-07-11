@@ -26,10 +26,18 @@ export interface User {
   subscription_bonus_percentage?: number;
   total_drop_bonus_percentage?: number;
   steam_id?: string;
-  steam_username?: string;
-  steam_avatar?: string;
+  steam_profile?: {
+    personaname?: string;
+    profileurl?: string;
+    avatar?: string;
+    avatarmedium?: string;
+    avatarfull?: string;
+    [key: string]: any; // Для других полей Steam профиля
+  };
+  steam_avatar_url?: string;
   steam_profile_url?: string;
   steam_trade_url?: string;
+  auth_provider?: 'local' | 'steam';
   is_email_verified?: boolean;
   role?: string;
   created_at?: string;

@@ -29,7 +29,7 @@ const ProfilePage: React.FC = () => {
 
             <div className="flex items-center gap-4 mb-6">
               <Avatar
-                steamAvatar={auth.user.steam_avatar}
+                steamAvatar={auth.user.steam_avatar_url}
                 id={auth.user.id}
                 size="large"
                 level={auth.user.level}
@@ -37,7 +37,7 @@ const ProfilePage: React.FC = () => {
               />
               <div>
                 <h3 className="text-xl font-bold">
-                  {auth.user.steam_username || auth.user.username}
+                  {auth.user.steam_profile?.personaname || auth.user.username}
                 </h3>
                 <p className="text-gray-400">{auth.user.email}</p>
               </div>

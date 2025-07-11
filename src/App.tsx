@@ -25,8 +25,8 @@ const App: React.FC = () => {
     username: auth.user?.username
   });
 
-  // Автоматически получаем данные пользователя только если есть токен но нет данных пользователя
-  const shouldFetchUser = auth.token && !auth.user;
+  // Автоматически получаем данные пользователя только если есть токен но нет полных данных пользователя
+  const shouldFetchUser = auth.token && (!auth.user || !auth.user.id);
 
   const {
     data: userData,
@@ -79,7 +79,8 @@ const App: React.FC = () => {
   }, [userError, auth.token, shouldFetchUser, dispatch]);
 
   // Показываем загрузку только при первичной проверке токена
-  if (auth.token && (isLoadingUser || isFetchingUser) && !auth.user) {
+  if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
+    console.log('Showing loading screen - fetching user data...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#151225]">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>

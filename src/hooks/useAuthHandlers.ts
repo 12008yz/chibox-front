@@ -6,8 +6,8 @@ export const useAuthHandlers = () => {
   const dispatch = useAppDispatch();
 
   // Функция для обработки успешного логина
-  const handleLoginSuccess = (data: { user: any; token: string }) => {
-    if (data?.user && data?.token) {
+  const handleLoginSuccess = (data: { user: any | null; token: string }) => {
+    if (data?.token) {
       dispatch(loginSuccess({
         user: data.user,
         token: data.token,

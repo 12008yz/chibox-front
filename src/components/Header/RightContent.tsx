@@ -6,8 +6,8 @@ import { BiWallet } from "react-icons/bi";
 import Monetary from "../Monetary";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
-import { logout } from "../../features/auth/authSlice";
 import { useLogoutMutation } from "../../features/auth/authApi";
+import { performFullLogout } from "../../utils/authUtils";
 import Notifications from '../Header/Navbar/Notifications';
 
 interface RightContentProps {
@@ -28,15 +28,15 @@ const RightContent: React.FC<RightContentProps> = ({
 
   const handleLogout = async () => {
     try {
-      // Сначала вызываем API logout
+      // Сначала вызываем API logout для уведомления сервера
       await logoutApi().unwrap();
     } catch (error) {
       // Даже если API недоступен, продолжаем logout
       console.log('Logout API error (continuing with logout):', error);
     } finally {
-      // Очищаем Redux state и localStorage
-      dispatch(logout());
-      // Остаемся на главной странице
+      // Выполняем полную очистку состояния приложения
+      performFullLogout(dispatch);
+      // Перенаправляем на главную страницу
       navigate('/');
     }
   };
@@ -49,11 +49,6 @@ const RightContent: React.FC<RightContentProps> = ({
     setOpenNotifications(!openNotifications);
   };
 
-  const handleClaimBonus = () => {
-    // TODO: Implement bonus claiming logic
-    console.log('Claiming bonus...');
-  };
-
   if (!user) {
     // Если пользователь не авторизован, показываем кнопки входа
     return (
@@ -62,7 +57,7 @@ const RightContent: React.FC<RightContentProps> = ({
           onClick={() => navigate('/login')}
           className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
         >
-          Sign In
+          Войти
         </button>
         <button
           onClick={() => navigate('/register')}
@@ -79,7 +74,7 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Получение бонуса */}
       <button
         className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-        onClick={handleClaimBonus}
+        onClick={() => console.log('Claiming bonus...')}
       >
         Получить
       </button>
@@ -123,12 +118,12 @@ const RightContent: React.FC<RightContentProps> = ({
       >
         <Avatar
           image={user.profilePicture}
-          steamAvatar={user.steam_avatar}
+          steamAvatar={user.steam_avatar_url}
           id={user.id || user.username}
           size="small"
         />
         <span className="text-white text-sm hidden md:block">
-          {user.steam_username || user.username}
+          {user.steam_profile?.personaname || user.username}
         </span>
       </div>
 

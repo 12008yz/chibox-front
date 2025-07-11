@@ -61,7 +61,7 @@ const SteamProfile: React.FC<SteamProfileProps> = ({ user }) => {
         {/* Steam аватар */}
         <div className="flex-shrink-0">
           <Avatar
-            steamAvatar={user.steam_avatar}
+            steamAvatar={user.steam_avatar_url}
             id={user.steam_id}
             size="large"
             level={user.level}
@@ -73,7 +73,7 @@ const SteamProfile: React.FC<SteamProfileProps> = ({ user }) => {
         <div className="flex-1 space-y-2">
           <div>
             <span className="text-gray-400 text-sm">Steam никнейм:</span>
-            <p className="text-white font-medium">{user.steam_username}</p>
+            <p className="text-white font-medium">{user.steam_profile?.personaname || 'Не указан'}</p>
           </div>
 
           <div>

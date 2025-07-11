@@ -9,30 +9,31 @@ const SteamAuthPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('SteamAuthPage: Processing Steam auth callback');
     const token = searchParams.get('token');
     const provider = searchParams.get('provider');
 
+    console.log('SteamAuthPage: Token present:', !!token);
+    console.log('SteamAuthPage: Provider:', provider);
+
     if (token && provider === 'steam') {
       try {
-        // Декодируем токен, чтобы получить информацию о пользователе
+        // Проверяем что токен валидный (базовая проверка формата)
         const tokenParts = token.split('.');
         if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
+          console.log('SteamAuthPage: Valid JWT token format, processing...');
 
-          // Создаем объект пользователя из токена
+          // Сохраняем только токен, данные пользователя загрузятся через getCurrentUser API
           const userData = {
-            user: {
-              id: payload.id,
-              username: payload.username,
-              auth_provider: payload.auth_provider,
-              // Остальные поля будут загружены через API
-            },
+            user: null, // Не извлекаем данные из токена, пусть API их загрузит
             token
           };
 
+          console.log('SteamAuthPage: Calling handleLoginSuccess with token');
           // Обновляем состояние авторизации
           handleLoginSuccess(userData);
 
+          console.log('SteamAuthPage: Redirecting to home page...');
           // Перенаправляем на главную страницу
           navigate('/', { replace: true });
         } else {
@@ -47,6 +48,7 @@ const SteamAuthPage: React.FC = () => {
       }
     } else {
       // Если нет токена или провайдера, перенаправляем на страницу входа
+      console.error('SteamAuthPage: Missing token or provider');
       setError('Отсутствуют данные авторизации');
       setTimeout(() => {
         navigate('/login?error=missing_token', { replace: true });
