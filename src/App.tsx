@@ -11,6 +11,8 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
+import SteamAuthPage from './pages/SteamAuthPage';
+import ProfilePage from './pages/ProfilePage';
 
 const App: React.FC = () => {
   const auth = useAuth();
@@ -109,28 +111,16 @@ const App: React.FC = () => {
                 auth.isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
               }
             />
+            <Route
+              path="/auth/success"
+              element={<SteamAuthPage />}
+            />
 
             {/* Защищенные маршруты */}
             <Route
               path="/profile"
               element={
-                auth.isAuthenticated ? (
-                  <div className="min-h-screen bg-[#151225] text-white p-8">
-                    <div className="container mx-auto">
-                      <h1 className="text-3xl font-bold mb-4">Профиль пользователя</h1>
-                      {auth.user && (
-                        <div className="bg-[#19172D] rounded-lg p-6 border border-gray-700/50">
-                          <p><strong>ID:</strong> {auth.user.id}</p>
-                          <p><strong>Имя:</strong> {auth.user.username}</p>
-                          <p><strong>Email:</strong> {auth.user.email}</p>
-                          <p><strong>Баланс:</strong> ${auth.user.balance}</p>
-                          <p><strong>Уровень:</strong> {auth.user.level}</p>
-                          <p><strong>Опыт:</strong> {auth.user.xp}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : <Navigate to="/login" replace />
+                auth.isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />
               }
             />
             <Route

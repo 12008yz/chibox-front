@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../features/auth/authApi';
 import { useAuthHandlers } from '../hooks/useAuthHandlers';
 import MainButton from '../components/MainButton';
+import SteamLoginButton from '../components/SteamLoginButton';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -115,6 +116,21 @@ const LoginPage: React.FC = () => {
               loading={isLoading}
               disabled={isLoading}
             />
+          </div>
+
+          {/* Разделитель */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-[#151225] text-gray-400">или</span>
+            </div>
+          </div>
+
+          {/* Кнопка входа через Steam */}
+          <div>
+            <SteamLoginButton />
           </div>
 
           <div className="text-center">

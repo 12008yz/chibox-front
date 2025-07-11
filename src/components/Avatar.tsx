@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 interface AvatarProps {
     image?: string;
+    steamAvatar?: string;
     id: string;
     size: 'small' | 'medium' | 'large' | 'extra-large';
     loading?: boolean;
@@ -12,6 +13,7 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({
     image,
+    steamAvatar,
     loading,
     id,
     size,
@@ -40,7 +42,7 @@ const Avatar: React.FC<AvatarProps> = ({
     useEffect(() => {
         setLoaded(false);
         setImageError(false);
-    }, [image]);
+    }, [image, steamAvatar]);
 
     let sizeClasses, skeletonSize;
     switch (size) {
@@ -100,10 +102,14 @@ const Avatar: React.FC<AvatarProps> = ({
     );
 
     const getImageSrc = () => {
-        if (imageError || !image) {
-            return generateFallbackAvatar(id);
+        // Приоритет: Steam аватар > обычное изображение > fallback
+        if (steamAvatar && !imageError) {
+            return steamAvatar;
         }
-        return image;
+        if (image && !imageError) {
+            return image;
+        }
+        return generateFallbackAvatar(id);
     };
 
     const handleImageError = () => {

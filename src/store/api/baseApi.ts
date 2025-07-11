@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
 
 // Базовый URL для API (подстраивается под ваш backend)
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Базовый query с таймаутом
 const baseQuery = fetchBaseQuery({

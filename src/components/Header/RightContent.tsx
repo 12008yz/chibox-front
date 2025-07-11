@@ -123,10 +123,13 @@ const RightContent: React.FC<RightContentProps> = ({
       >
         <Avatar
           image={user.profilePicture}
+          steamAvatar={user.steam_avatar}
           id={user.id || user.username}
           size="small"
         />
-        <span className="text-white text-sm hidden md:block">{user.username}</span>
+        <span className="text-white text-sm hidden md:block">
+          {user.steam_username || user.username}
+        </span>
       </div>
 
       {/* Кнопка выхода */}
