@@ -1,74 +1,127 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Avatar from "../Avatar";
 import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
 import Monetary from "../Monetary";
-import { useAppDispatch, useCurrentUser, useIsAuthenticated } from '../../store/hooks';
-import { logout } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import Notifications from './Navbar/Notifications';
+import ClaimBonus from './ClaimBonus';
 
-const RightContent: React.FC = () => {
-    const dispatch = useAppDispatch();
-    const isAuthenticated = useIsAuthenticated();
-    const user = useCurrentUser();
+interface RightContentProps {
+  openNotifications: boolean;
+  setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
+  user?: any; // TODO: заменить на правильный тип
+}
 
-    // Состояния для уведомлений
-    const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
-    const [openNotifications, setOpenNotifications] = useState(false);
+const RightContent: React.FC<RightContentProps> = ({
+  openNotifications,
+  setOpenNotifications,
+  user
+}) => {
+  const navigate = useNavigate();
+  const [notificationCount] = useState(0);
 
-    // Обработка выхода
-    const handleLogout = () => {
-        dispatch(logout());
-    };
+  const handleLogout = () => {
+    // TODO: Implement logout logic
+    console.log('Logout');
+    navigate('/login');
+  };
 
-    if (!isAuthenticated || !user) {
-        return null;
-    }
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
+  const toggleNotifications = () => {
+    setOpenNotifications(!openNotifications);
+  };
+
+  if (!user) {
+    // Если пользователь не авторизован, показываем кнопки входа
     return (
-        <div className="flex items-center gap-4">
-            {/* Баланс */}
-            <div className="flex items-center gap-2 text-green-400 font-normal text-lg hover:text-green-300 transition-all">
-                <BiWallet className="text-2xl hidden md:block" />
-                <div className="max-w-[80px] md:max-w-[140px] overflow-hidden text-sm md:text-lg truncate">
-                    <Monetary value={Math.floor(user.balance)} />
-                </div>
-            </div>
-
-            {/* Уведомления */}
-            <div className="relative cursor-pointer" onClick={() => setOpenNotifications(!openNotifications)}>
-                <FaRegBell style={{ fontSize: "20px" }} />
-                {hasUnreadNotifications && !openNotifications && (
-                    <div className="absolute -top-1 -right-[2px] w-3 h-3 bg-red-500 rounded-full" />
-                )}
-            </div>
-
-            {/* Профиль пользователя */}
-            <div className="flex items-center gap-2">
-                <div>
-                    <Avatar
-                        image={user.steam_avatar}
-                        loading={false}
-                        id={user.id}
-                        size="medium"
-                        level={user.level}
-                        showLevel={true}
-                    />
-                </div>
-                <div className="flex flex-col">
-                    <span className="text-sm font-medium">{user.username}</span>
-                </div>
-            </div>
-
-            {/* Выход */}
-            <div
-                className="text-[#625F7E] font-normal text-lg cursor-pointer hover:text-gray-200 transition-all"
-                onClick={handleLogout}
-            >
-                <IoMdExit className="text-2xl" />
-            </div>
-        </div>
+      <div className="flex items-center space-x-3">
+        <button
+          onClick={() => navigate('/login')}
+          className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+        >
+          Войти
+        </button>
+        <button
+          onClick={() => navigate('/register')}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+        >
+          Регистрация
+        </button>
+      </div>
     );
+  }
+
+  return (
+    <div className="flex items-center space-x-4 relative">
+      {/* Получение бонуса */}
+      <ClaimBonus
+        bonusAvailable={true}
+        onClaimBonus={async () => {
+          console.log('Claiming bonus...');
+          // TODO: Implement bonus claim logic
+        }}
+      />
+
+      {/* Баланс */}
+      <div className="flex items-center space-x-2 text-green-400">
+        <BiWallet className="text-lg" />
+        <Monetary value={user?.walletBalance ?? 0} />
+      </div>
+
+      {/* Уведомления */}
+      <div className="relative">
+        <button
+          onClick={toggleNotifications}
+          className="relative p-2 text-gray-400 hover:text-white transition-colors"
+        >
+          {notificationCount > 0 ? (
+            <FaRegBell className="text-xl" />
+          ) : (
+            <FaRegBellSlash className="text-xl" />
+          )}
+          {notificationCount > 0 && (
+            <span className="notification-badge">
+              {notificationCount > 99 ? '99+' : notificationCount}
+            </span>
+          )}
+        </button>
+
+        {openNotifications && (
+          <Notifications
+            openNotifications={openNotifications}
+            setOpenNotifications={setOpenNotifications}
+          />
+        )}
+      </div>
+
+      {/* Аватар и профиль */}
+      <div
+        className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={handleProfileClick}
+      >
+        <Avatar
+          image={user.profilePicture}
+          id={user.id || user.username}
+          size="small"
+        />
+        <span className="text-white text-sm hidden md:block">{user.username}</span>
+      </div>
+
+      {/* Кнопка выхода */}
+      <button
+        onClick={handleLogout}
+        className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+        title="Выйти"
+      >
+        <IoMdExit className="text-xl" />
+      </button>
+    </div>
+  );
 };
 
 export default RightContent;

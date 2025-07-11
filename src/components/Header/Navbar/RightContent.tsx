@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Avatar from "../../Avatar";
 import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
@@ -19,7 +19,7 @@ const RightContent: React.FC<RightContentProps> = ({
   user
 }) => {
   const navigate = useNavigate();
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationCount] = useState(0);
 
   const handleLogout = () => {
     // TODO: Implement logout logic
@@ -38,16 +38,16 @@ const RightContent: React.FC<RightContentProps> = ({
   if (!user) {
     // Если пользователь не авторизован, показываем кнопки входа
     return (
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <button
           onClick={() => navigate('/login')}
-          className="bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm"
+          className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
         >
           Войти
         </button>
         <button
           onClick={() => navigate('/register')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
         >
           Регистрация
         </button>
@@ -57,6 +57,14 @@ const RightContent: React.FC<RightContentProps> = ({
 
   return (
     <div className="flex items-center space-x-4 relative">
+      {/* Получение бонуса */}
+      <button
+        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+        onClick={() => console.log('Claiming bonus...')}
+      >
+        Получить
+      </button>
+
       {/* Баланс */}
       <div className="flex items-center space-x-2 text-green-400">
         <BiWallet className="text-lg" />
@@ -95,9 +103,9 @@ const RightContent: React.FC<RightContentProps> = ({
         onClick={handleProfileClick}
       >
         <Avatar
-          src={user.profilePicture}
-          alt={user.username}
-          size="sm"
+          image={user.profilePicture}
+          id={user.id || user.username}
+          size="small"
         />
         <span className="text-white text-sm hidden md:block">{user.username}</span>
       </div>

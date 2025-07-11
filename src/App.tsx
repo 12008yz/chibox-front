@@ -16,9 +16,20 @@ import RegisterPage from './pages/RegisterPage';
 
 // Компонент для отображения страниц с Header
 const PageWithHeader = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+
+  // Временный фиктивный пользователь для демонстрации
+  const mockUser = user || {
+    id: '1',
+    username: 'TestUser',
+    balance: 1250.50,
+    walletBalance: 1250.50,
+    profilePicture: 'https://avatars.githubusercontent.com/u/1?v=4'
+  };
+
   return (
     <div>
-      <Header onlineUsers={1547} />
+      <Header onlineUsers={1547} user={mockUser} />
       {children}
     </div>
   );
@@ -28,9 +39,9 @@ function App() {
   const { isAuthenticated, token, user } = useAuth();
   const dispatch = useAppDispatch();
 
-  // Проверяем токен при загрузке приложения
+  // Проверяем токен при загрузке приложения (временно отключено для демо)
   const { data: currentUserData, error } = useGetCurrentUserQuery(undefined, {
-    skip: !token || !isAuthenticated,
+    skip: true, // Отключаем API запросы для демонстрации
   });
 
   useEffect(() => {

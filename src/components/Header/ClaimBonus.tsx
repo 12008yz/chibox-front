@@ -87,7 +87,6 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
             onClick={handleClaimBonus}
             loading={isLoading}
             disabled={isLoading}
-            className="text-xs py-1 px-3"
           />
         )}
       </div>
