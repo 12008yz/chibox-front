@@ -13,8 +13,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     // Получаем уведомления из API
     const {
         data: notificationsData,
-        isLoading: notificationsLoading,
-        error: notificationsError,
         refetch: refetchNotifications
     } = useGetUserNotificationsQuery({ limit: 20 });
 
@@ -141,8 +139,9 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                         <div
                             key={notification.id}
                             className={`p-4 border-b border-gray-700 hover:bg-gray-800 transition-colors cursor-pointer ${
-                                !notification.read ? 'bg-blue-900/20' : ''
+                                !notification.is_read ? 'bg-blue-900/20' : ''
                             }`}
+                            onClick={() => handleNotificationClick(notification)}
                         >
                             <div className="flex items-start space-x-3">
                                 <div className="text-2xl">
@@ -150,18 +149,18 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
-                                        <h4 className={`text-sm font-medium ${!notification.read ? 'text-white' : 'text-gray-300'}`}>
+                                        <h4 className={`text-sm font-medium ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
                                             {notification.title}
                                         </h4>
-                                        {!notification.read && (
+                                        {!notification.is_read && (
                                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                         )}
                                     </div>
                                     <p className="text-sm text-gray-400 mt-1 line-clamp-2">
-                                        {notification.content}
+                                        {notification.message}
                                     </p>
                                     <p className="text-xs text-gray-500 mt-2">
-                                        {formatTime(notification.createdAt)}
+                                        {formatTime(notification.created_at)}
                                     </p>
                                 </div>
                             </div>
