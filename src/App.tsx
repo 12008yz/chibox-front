@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth, useAppDispatch } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
+import { cleanupExpiredData } from './utils/authUtils';
 import { useEffect } from 'react';
 import './index.css'
 
@@ -47,17 +48,21 @@ const App: React.FC = () => {
     error: userError
   });
 
-  // Проверяем валидность сессии при загрузке
+  // Проверяем валидность сессии и очищаем устаревшие данные при загрузке
   useEffect(() => {
+    // Очищаем устаревшие данные из localStorage
+    cleanupExpiredData();
+
+    // Проверяем валидность текущей сессии
     dispatch(checkSessionValidity());
   }, [dispatch]);
 
   // Обновляем данные пользователя когда получаем ответ от API
   useEffect(() => {
-    if (userData?.success && userData.data && auth.token) {
-      console.log('Updating user data from getCurrentUser:', userData.data);
+    if (userData?.success && userData.user && auth.token) {
+      console.log('Updating user data from getCurrentUser:', userData.user);
       dispatch(loginSuccess({
-        user: userData.data,
+        user: userData.user,
         token: auth.token
       }));
     }

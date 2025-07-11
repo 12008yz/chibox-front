@@ -5,6 +5,9 @@ import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
 import Monetary from "../../Monetary";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../store/hooks";
+import { useLogoutMutation } from "../../../features/auth/authApi";
+import { performFullLogout } from "../../../utils/authUtils";
 import Notifications from './Notifications';
 
 interface RightContentProps {
@@ -19,12 +22,23 @@ const RightContent: React.FC<RightContentProps> = ({
   user
 }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [notificationCount] = useState(0);
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log('Logout');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Сначала вызываем API logout для уведомления сервера
+      await logoutApi().unwrap();
+    } catch (error) {
+      // Даже если API недоступен, продолжаем logout
+      console.log('Logout API error (continuing with logout):', error);
+    } finally {
+      // Выполняем полную очистку состояния приложения
+      performFullLogout(dispatch);
+      // Перенаправляем на главную страницу
+      navigate('/');
+    }
   };
 
   const handleProfileClick = () => {
@@ -113,7 +127,8 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Кнопка выхода */}
       <button
         onClick={handleLogout}
-        className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+        disabled={isLoggingOut}
+        className={`p-2 text-gray-400 hover:text-red-400 transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
         title="Выйти"
       >
         <IoMdExit className="text-xl" />

@@ -6,6 +6,10 @@ import { FaHome } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../store/hooks";
+import { useLogoutMutation } from "../../features/auth/authApi";
+import { performFullLogout } from "../../utils/authUtils";
 import Monetary from "../Monetary";
 
 interface SidebarProps {
@@ -14,6 +18,25 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+    const handleLogout = async () => {
+        try {
+            // Сначала вызываем API logout для уведомления сервера
+            await logoutApi().unwrap();
+        } catch (error) {
+            // Даже если API недоступен, продолжаем logout
+            console.log('Logout API error (continuing with logout):', error);
+        } finally {
+            // Выполняем полную очистку состояния приложения
+            performFullLogout(dispatch);
+            // Закрываем sidebar и перенаправляем
+            closeSidebar();
+            navigate('/');
+        }
+    };
     const links = [
         {
             name: "Home",
@@ -135,14 +158,11 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                                     Профиль
                                 </Link>
                                 <button
-                                    onClick={() => {
-                                        // TODO: Implement logout
-                                        console.log('Logout');
-                                        closeSidebar();
-                                    }}
-                                    className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors"
+                                    onClick={handleLogout}
+                                    disabled={isLoggingOut}
+                                    className={`w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    Выйти
+                                    {isLoggingOut ? 'Выходим...' : 'Выйти'}
                                 </button>
                             </div>
                         ) : (

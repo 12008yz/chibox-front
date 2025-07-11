@@ -57,14 +57,27 @@ const authSlice = createSlice({
 
     // Выход из системы
     logout: (state) => {
+      // Полностью очищаем состояние авторизации
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.isLoading = false;
+      state.error = null;
+      state.lastLoginAttempt = null;
+      state.sessionExpiry = null;
 
-      // Удаляем токен из localStorage
+      // Очищаем localStorage полностью или только связанные с auth ключи
       if (typeof window !== 'undefined') {
+        // Удаляем основной токен авторизации
         localStorage.removeItem('auth_token');
+
+        // Удаляем другие возможные ключи связанные с пользователем
+        localStorage.removeItem('user_data');
+        localStorage.removeItem('remember_me');
+        localStorage.removeItem('last_login');
+
+        // Можно также очистить весь localStorage если нужно:
+        // localStorage.clear();
       }
     },
 
