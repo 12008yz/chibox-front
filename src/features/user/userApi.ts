@@ -101,12 +101,52 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение уведомлений
     getUserNotifications: builder.query<
-      PaginatedResponse<Notification>,
-      { page?: number; limit?: number }
+      ApiResponse<Notification[]>,
+      { unread_only?: boolean; limit?: number }
     >({
-      query: ({ page = 1, limit = 10 } = {}) =>
-        `v1/notifications?page=${page}&limit=${limit}`,
+      query: ({ unread_only, limit } = {}) => {
+        const params = new URLSearchParams();
+        if (unread_only) params.append('unread_only', 'true');
+        if (limit) params.append('limit', limit.toString());
+        return `v1/notifications${params.toString() ? `?${params.toString()}` : ''}`;
+      },
       providesTags: ['Notifications'],
+    }),
+
+    // Отметить уведомление как прочитанное
+    markNotificationAsRead: builder.mutation<
+      ApiResponse<null>,
+      string
+    >({
+      query: (notificationId) => ({
+        url: `v1/notifications/${notificationId}/read`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Notifications'],
+    }),
+
+    // Отметить все уведомления как прочитанные
+    markAllNotificationsAsRead: builder.mutation<
+      ApiResponse<{ updated_count: number }>,
+      void
+    >({
+      query: () => ({
+        url: 'v1/notifications/mark-all-read',
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Notifications'],
+    }),
+
+    // Удалить уведомление
+    deleteNotification: builder.mutation<
+      ApiResponse<null>,
+      string
+    >({
+      query: (notificationId) => ({
+        url: `v1/notifications/${notificationId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Notifications'],
     }),
 
     // Получение транзакций
@@ -300,6 +340,9 @@ export const {
   useGetAchievementsProgressQuery,
   useGetUserMissionsQuery,
   useGetUserNotificationsQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+  useDeleteNotificationMutation,
   useGetUserTransactionsQuery,
   useGetUserStatisticsQuery,
   useGetUserSubscriptionQuery,

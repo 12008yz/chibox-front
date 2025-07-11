@@ -92,11 +92,18 @@ export interface Mission {
 export interface Notification {
   id: string;
   user_id: string;
-  type: string;
   title: string;
   message: string;
+  type: 'info' | 'success' | 'warning' | 'error' | 'system';
+  category: 'general' | 'case_opening' | 'transaction' | 'achievement' | 'promotion' | 'subscription' | 'withdrawal' | 'bonus' | 'level_up';
+  link?: string;
   is_read: boolean;
+  read_at?: string;
+  expires_at?: string;
+  importance: number;
+  data?: any;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Transaction {

@@ -1,44 +1,65 @@
 import { useEffect, useRef } from 'react';
+import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
+import type { Notification } from '../../../types/api';
 
 interface NotificationsProps {
     openNotifications: boolean;
     setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface Notification {
-    id: string;
-    content: string;
-    createdAt: string;
-    read: boolean;
-    title: string;
-    type: 'friendRequest' | 'message' | 'alert' | 'caseOpen' | 'bonus';
-}
-
 const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpenNotifications }) => {
     const notificationsRef = useRef<HTMLDivElement>(null);
 
-    // Моковые данные уведомлений (позже заменить на реальные)
-    const notifications: Notification[] = [
-        {
-            id: '1',
-            title: 'Добро пожаловать!',
-            content: 'Спасибо за регистрацию в ChiBox Casino',
-            createdAt: new Date().toISOString(),
-            read: false,
-            type: 'message'
-        },
-        {
-            id: '2',
-            title: 'Бонус доступен',
-            content: 'Ваш ежедневный бонус готов к получению',
-            createdAt: new Date(Date.now() - 3600000).toISOString(),
-            read: true,
-            type: 'bonus'
-        }
-    ];
+    // Получаем уведомления из API
+    const {
+        data: notificationsData,
+        isLoading: notificationsLoading,
+        error: notificationsError,
+        refetch: refetchNotifications
+    } = useGetUserNotificationsQuery({ limit: 20 });
+
+    // Мутации для работы с уведомлениями
+    const [markAsRead] = useMarkNotificationAsReadMutation();
+    const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
+
+    const notifications = notificationsData?.data || [];
 
     const handleCloseNotifications = () => {
         setOpenNotifications(false);
+    };
+
+    // Отметить уведомление как прочитанное
+    const handleMarkAsRead = async (notificationId: string) => {
+        try {
+            await markAsRead(notificationId).unwrap();
+            // Рефетчим уведомления для обновления состояния
+            refetchNotifications();
+        } catch (error) {
+            console.error('Ошибка при отметке уведомления как прочитанного:', error);
+        }
+    };
+
+    // Отметить все уведомления как прочитанные
+    const handleMarkAllAsRead = async () => {
+        try {
+            await markAllAsRead().unwrap();
+            refetchNotifications();
+        } catch (error) {
+            console.error('Ошибка при отметке всех уведомлений как прочитанных:', error);
+        }
+    };
+
+    // Обработка клика по уведомлению
+    const handleNotificationClick = async (notification: Notification) => {
+        // Если не прочитано, отмечаем как прочитанное
+        if (!notification.is_read) {
+            await handleMarkAsRead(notification.id);
+        }
+
+        // Если есть ссылка, переходим по ней
+        if (notification.link) {
+            window.location.href = notification.link;
+        }
     };
 
     // Закрытие при клике вне компонента
