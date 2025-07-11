@@ -64,6 +64,11 @@ export const baseApi = createApi({
     'Subscription'
   ],
   endpoints: () => ({}),
+  // extractRehydrationInfo(action, { reducerPath }) {
+  //   if (action.type === 'persist/REHYDRATE') {
+  //     return action.payload?.[reducerPath];
+  //   }
+  // },
 });
 
 // Экспортируем хук для использования в компонентах

@@ -25,8 +25,13 @@ const App: React.FC = () => {
     username: auth.user?.username
   });
 
-  // Автоматически получаем данные пользователя только если есть токен но нет полных данных пользователя
-  const shouldFetchUser = auth.token && (!auth.user || !auth.user.id);
+  // Автоматически получаем данные пользователя если есть токен
+  // И либо нет полных данных пользователя, либо нет Steam данных
+  const shouldFetchUser = auth.token && (
+    !auth.user ||
+    !auth.user.id ||
+    (auth.user.auth_provider === 'steam' && !auth.user.steam_avatar)
+  );
 
   const {
     data: userData,

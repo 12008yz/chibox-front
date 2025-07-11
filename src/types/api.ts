@@ -34,7 +34,7 @@ export interface User {
     avatarfull?: string;
     [key: string]: any; // Для других полей Steam профиля
   };
-  steam_avatar_url?: string;
+  steam_avatar?: string;
   steam_profile_url?: string;
   steam_trade_url?: string;
   auth_provider?: 'local' | 'steam';
