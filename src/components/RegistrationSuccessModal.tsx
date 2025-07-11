@@ -23,11 +23,11 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
         </div>
 
         <p className="text-gray-700">
-          На ваш email <span className="font-semibold text-blue-600">{email}</span> отправлено письмо с кодом подтверждения.
+          Регистрация успешно завершена! На ваш email <span className="font-semibold text-blue-600">{email}</span> отправлено письмо с кодом подтверждения.
         </p>
 
         <p className="text-sm text-gray-500">
-          Проверьте почту и введите код для завершения регистрации.
+          Вы уже можете пользоваться сайтом. Проверьте почту и подтвердите email для полного доступа ко всем функциям.
         </p>
 
         {previewUrl && (
@@ -48,11 +48,9 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
 
         <div className="mt-6">
           <MainButton
+            text="Понятно"
             onClick={onClose}
-            className="w-full"
-          >
-            Понятно
-          </MainButton>
+          />
         </div>
       </div>
     </Modal>

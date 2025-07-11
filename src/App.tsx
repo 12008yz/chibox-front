@@ -107,9 +107,7 @@ const App: React.FC = () => {
             />
             <Route
               path="/register"
-              element={
-                auth.isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
-              }
+              element={<RegisterPage />}
             />
             <Route
               path="/auth/success"

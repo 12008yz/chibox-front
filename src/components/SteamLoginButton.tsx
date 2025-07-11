@@ -13,7 +13,10 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
     if (disabled || isLoading) return;
 
     // Перенаправляем на серверный endpoint для Steam авторизации
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+    console.log('Final serverUrl:', serverUrl);
+    console.log('Redirecting to:', `${serverUrl}/v1/auth/steam`);
     window.location.href = `${serverUrl}/v1/auth/steam`;
   };
 
