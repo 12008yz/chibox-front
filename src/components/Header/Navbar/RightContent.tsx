@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store/hooks";
 import { useLogoutMutation } from "../../../features/auth/authApi";
 import { performFullLogout } from "../../../utils/authUtils";
+import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
 
 interface RightContentProps {
@@ -24,7 +25,14 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
-  const [notificationCount] = useState(0);
+
+  // Получаем количество непрочитанных уведомлений
+  const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
+    skip: !user, // Пропускаем запрос если пользователь не авторизован
+    pollingInterval: 30000, // Обновляем каждые 30 секунд
+  });
+
+  const notificationCount = unreadCountData?.data?.count || 0;
 
   const handleLogout = async () => {
     try {
@@ -91,11 +99,7 @@ const RightContent: React.FC<RightContentProps> = ({
           onClick={toggleNotifications}
           className="relative p-2 text-gray-400 hover:text-white transition-colors"
         >
-          {notificationCount > 0 ? (
-            <FaRegBell className="text-xl" />
-          ) : (
-            <FaRegBellSlash className="text-xl" />
-          )}
+          <FaRegBell className="text-xl" />
           {notificationCount > 0 && (
             <span className="notification-badge">
               {notificationCount > 99 ? '99+' : notificationCount}

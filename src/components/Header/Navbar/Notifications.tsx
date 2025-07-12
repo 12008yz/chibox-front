@@ -14,13 +14,18 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const {
         data: notificationsData,
         refetch: refetchNotifications
-    } = useGetUserNotificationsQuery({ limit: 20 });
+    } = useGetUserNotificationsQuery({ limit: 20 }, {
+        // Обновляем данные когда панель открывается
+        refetchOnMountOrArgChange: true,
+        // Обновляем каждые 10 секунд если панель открыта
+        pollingInterval: openNotifications ? 10000 : 0,
+    });
 
     // Мутации для работы с уведомлениями
     const [markAsRead] = useMarkNotificationAsReadMutation();
     const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
 
-    const notifications = notificationsData?.data || [];
+    const notifications = notificationsData?.data?.items || [];
 
     const handleCloseNotifications = () => {
         setOpenNotifications(false);
@@ -90,6 +95,16 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
     const getNotificationIcon = (type: string) => {
         switch (type) {
+            case 'success':
+                return '✅';
+            case 'info':
+                return 'ℹ️';
+            case 'warning':
+                return '⚠️';
+            case 'error':
+                return '❌';
+            case 'system':
+                return '⚙️';
             case 'friendRequest':
                 return '👥';
             case 'message':
@@ -156,7 +171,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+                                    <p className="text-sm text-gray-400 mt-1">
                                         {notification.message}
                                     </p>
                                     <p className="text-xs text-gray-500 mt-2">
@@ -172,7 +187,10 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             {/* Футер */}
             {notifications.length > 0 && (
                 <div className="p-3 border-t border-gray-700">
-                    <button className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                    <button
+                        onClick={handleMarkAllAsRead}
+                        className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                    >
                         Отметить все как прочитанные
                     </button>
                 </div>

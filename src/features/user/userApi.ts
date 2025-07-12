@@ -101,15 +101,26 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение уведомлений
     getUserNotifications: builder.query<
-      ApiResponse<Notification[]>,
-      { unread_only?: boolean; limit?: number }
+      PaginatedResponse<Notification>,
+      { page?: number; limit?: number; unread_only?: boolean }
     >({
-      query: ({ unread_only, limit } = {}) => {
-        const params = new URLSearchParams();
+      query: ({ page = 1, limit = 20, unread_only } = {}) => {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
+        });
         if (unread_only) params.append('unread_only', 'true');
-        if (limit) params.append('limit', limit.toString());
-        return `v1/notifications${params.toString() ? `?${params.toString()}` : ''}`;
+        return `v1/notifications?${params.toString()}`;
       },
+      providesTags: ['Notifications'],
+    }),
+
+    // Получение количества непрочитанных уведомлений
+    getUnreadNotificationsCount: builder.query<
+      ApiResponse<{ count: number }>,
+      void
+    >({
+      query: () => 'v1/notifications/unread-count',
       providesTags: ['Notifications'],
     }),
 
@@ -340,6 +351,7 @@ export const {
   useGetAchievementsProgressQuery,
   useGetUserMissionsQuery,
   useGetUserNotificationsQuery,
+  useGetUnreadNotificationsCountQuery,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
   useDeleteNotificationMutation,
