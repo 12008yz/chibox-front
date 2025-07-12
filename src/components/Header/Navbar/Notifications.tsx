@@ -52,6 +52,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         }
     };
 
+
     // Обработка клика по уведомлению
     const handleNotificationClick = async (notification: Notification) => {
         // Если не прочитано, отмечаем как прочитанное
@@ -171,9 +172,11 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        {notification.message}
-                                    </p>
+                                    <div className="text-sm text-gray-400 mt-1 whitespace-pre-line">
+                                        {notification.message.split('\n').map((line, index) => (
+                                            <p key={index}>{line}</p>
+                                        ))}
+                                    </div>
                                     <p className="text-xs text-gray-500 mt-2">
                                         {formatTime(notification.created_at)}
                                     </p>
@@ -186,13 +189,14 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
             {/* Футер */}
             {notifications.length > 0 && (
-                <div className="p-3 border-t border-gray-700">
+                <div className="p-3 border-t border-gray-700 space-y-2">
                     <button
                         onClick={handleMarkAllAsRead}
                         className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors"
                     >
                         Отметить все как прочитанные
                     </button>
+                    
                 </div>
             )}
         </div>
