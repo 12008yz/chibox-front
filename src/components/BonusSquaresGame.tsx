@@ -16,6 +16,9 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
   const [isAnimating, setIsAnimating] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
   const [hoveredSquare, setHoveredSquare] = useState<number | null>(null);
+  const [allPrizes, setAllPrizes] = useState<(string | null)[]>([]);
+  const [wonPrize, setWonPrize] = useState<string | null>(null);
+  const [gamePlayedInThisSession, setGamePlayedInThisSession] = useState(false);
 
   const { data: bonusStatus, refetch: refetchBonusStatus, isFetching } = useGetBonusStatusQuery(undefined, {
     // Отключаем кэширование для отладки
@@ -35,6 +38,9 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
       setIsAnimating(false);
       setShowParticles(false);
       setHoveredSquare(null);
+      setAllPrizes([]);
+      setWonPrize(null);
+      setGamePlayedInThisSession(false);
       refetchBonusStatus();
     }
   }, [isOpen, refetchBonusStatus]);
@@ -95,55 +101,64 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
     if (selectedSquare === null) return;
 
     setIsAnimating(true);
+    setGamePlayedInThisSession(true);
 
     try {
       const result = await playBonusSquares({
         chosenCell: selectedSquare
       }).unwrap();
 
-      // Анимация открытия
-      setTimeout(() => {
-        const newRevealedSquares = [...revealedSquares];
-        newRevealedSquares[selectedSquare] = true;
-        setRevealedSquares(newRevealedSquares);
+      // Сразу показываем все результаты без задержек
+      setGameResult(result.message || 'Игра завершена!');
+      setAllPrizes(result.all_prizes || []);
+      setWonPrize(result.won_prize || null);
 
-        setGameResult(result.message || 'Игра завершена!');
-        setGameEnded(true);
-        setIsAnimating(false);
+      // Сразу открываем ВСЕ кубики
+      setRevealedSquares(new Array(9).fill(true));
+      setGameEnded(true);
+      setIsAnimating(false);
 
-        // Проверяем, выиграл ли игрок
-        if (result.message && !result.message.includes('ничего не выиграли')) {
-          playWinSound();
-          setShowParticles(true);
+      // Проверяем, выиграл ли игрок
+      if (result.message && !result.message.includes('ничего не выиграли')) {
+        playWinSound();
+        setShowParticles(true);
 
-          // Убираем частицы через 3 секунды
-          setTimeout(() => setShowParticles(false), 3000);
-        }
+        // Убираем частицы через 3 секунды
+        setTimeout(() => setShowParticles(false), 3000);
+      }
 
-        refetchBonusStatus();
+      // Обновляем статус в фоне, но не мешаем показу результатов
+      refetchBonusStatus();
 
-        // Автоматически закрываем через 4 секунды
-        setTimeout(() => {
-          onClose();
-        }, 4000);
-      }, 1000);
+    } catch (error: any) {
+      console.error('❌ Ошибка при игре в бонусные квадраты:', error);
+      console.error('❌ Детали ошибки:', {
+        status: error?.status,
+        data: error?.data,
+        message: error?.message,
+        error: error?.error
+      });
 
-    } catch (error) {
-      console.error('Ошибка при игре в бонусные квадраты:', error);
-      setGameResult('Произошла ошибка при игре. Попробуйте позже.');
+      // Показываем более информативное сообщение об ошибке
+      const errorMessage = error?.data?.message || error?.message || 'Произошла ошибка при игре. Попробуйте позже.';
+      setGameResult(`Ошибка: ${errorMessage}`);
       setGameEnded(true);
       setIsAnimating(false);
     }
   };
 
-  const isAvailable = bonusStatus?.data?.is_available;
-  const timeUntilNext = bonusStatus?.data?.time_until_next_seconds;
+  const isAvailable = bonusStatus?.is_available;
+  const timeUntilNext = bonusStatus?.time_until_next_seconds;
 
   // Добавим отладочную информацию в консоль
   console.log('🎲 BonusSquaresGame - текущий статус:', {
     isAvailable,
     timeUntilNext,
-    bonusStatus: bonusStatus?.data,
+    gameStarted,
+    gameEnded,
+    gamePlayedInThisSession,
+    allPrizes: allPrizes.length,
+    bonusStatus: bonusStatus,
     isOpen
   });
 
@@ -156,9 +171,26 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
 
   const getSquareIcon = (index: number) => {
     if (revealedSquares[index]) {
-      return gameResult.includes('кейс') ? '📦' :
-             gameResult.includes('подписки') ? '⭐' :
-             gameResult.includes('предмет') ? '🎁' : '💎';
+      // Если игра закончена и у нас есть информация о всех призах
+      if (gameEnded && allPrizes.length > 0) {
+        const prize = allPrizes[index];
+        switch (prize) {
+          case 'item':
+            return '🎁';
+          case 'sub_days':
+            return '⭐';
+          case null:
+            return '💸'; // Пустая клетка
+          default:
+            return '❓';
+        }
+      }
+      // Если показываем только выбранную клетку
+      if (index === selectedSquare) {
+        return wonPrize === 'item' ? '🎁' :
+               wonPrize === 'sub_days' ? '⭐' :
+               wonPrize === null ? '💸' : '❓';
+      }
     }
     return '❓';
   };
@@ -170,7 +202,27 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
     `;
 
     if (revealedSquares[index]) {
-      return `${baseClass} border-green-400 bg-gradient-to-br from-green-500/30 to-emerald-600/30 animate-pulse`;
+      // Если игра закончена и это выбранная клетка
+      if (index === selectedSquare) {
+        const prize = gameEnded && allPrizes.length > 0 ? allPrizes[index] : wonPrize;
+        if (prize === 'item' || prize === 'sub_days') {
+          return `${baseClass} border-yellow-400 bg-gradient-to-br from-yellow-500/40 to-orange-500/40 scale-105 shadow-lg shadow-yellow-500/25 animate-pulse`;
+        } else {
+          return `${baseClass} border-red-400 bg-gradient-to-br from-red-500/30 to-red-600/30 scale-105`;
+        }
+      }
+
+      // Если игра закончена и это не выбранная клетка
+      if (gameEnded && allPrizes.length > 0) {
+        const prize = allPrizes[index];
+        if (prize === 'item' || prize === 'sub_days') {
+          return `${baseClass} border-green-400 bg-gradient-to-br from-green-500/20 to-emerald-600/20`;
+        } else {
+          return `${baseClass} border-gray-500 bg-gradient-to-br from-gray-600/20 to-gray-700/20`;
+        }
+      }
+
+      return `${baseClass} border-green-400 bg-gradient-to-br from-green-500/30 to-emerald-600/30`;
     }
 
     if (selectedSquare === index) {
@@ -216,7 +268,7 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
           </p>
         </div>
 
-        {!isAvailable ? (
+        {!isAvailable && !gameStarted && !gamePlayedInThisSession ? (
           // Бонус недоступен
           <div className="text-center relative z-10">
             <div className="bg-red-900/30 border border-red-500/50 rounded-xl p-6 mb-4 backdrop-blur-sm">
@@ -227,13 +279,13 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
                   Следующий бонус через: <span className="font-mono text-yellow-400">{formatTimeLeft(timeUntilNext)}</span>
                 </div>
               )}
-              {bonusStatus?.data?.debug_info && (
+              {bonusStatus?.debug_info && (
                 <details className="mt-3 text-xs">
                   <summary className="text-gray-500 cursor-pointer hover:text-gray-400">Отладочная информация</summary>
                   <div className="mt-2 text-gray-400 font-mono text-xs bg-gray-800/50 p-2 rounded">
-                    <div>Текущее время: {bonusStatus.data.debug_info.current_time}</div>
-                    <div>Время следующего бонуса: {bonusStatus.data.debug_info.next_bonus_time || 'не установлено'}</div>
-                    <div>Проверка времени пройдена: {bonusStatus.data.debug_info.is_time_check_passed ? 'да' : 'нет'}</div>
+                    <div>Текущее время: {bonusStatus.debug_info.current_time}</div>
+                    <div>Время следующего бонуса: {bonusStatus.debug_info.next_bonus_time || 'не установлено'}</div>
+                    <div>Проверка времени пройдена: {bonusStatus.debug_info.is_time_check_passed ? 'да' : 'нет'}</div>
                   </div>
                 </details>
               )}
@@ -277,7 +329,7 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
             </div>
           </div>
         ) : (
-          // Игра доступна
+          // Игра доступна ИЛИ уже началась/закончилась
           <div className="relative z-10">
             {/* Сетка кубиков */}
             <div className="grid grid-cols-3 gap-3 mb-6">
@@ -331,14 +383,29 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
               )}
 
               {gameResult && (
-                <div className="bg-green-900/30 border border-green-500/50 rounded-xl p-4 backdrop-blur-sm">
-                  <p className="text-green-400 font-medium flex items-center justify-center gap-2">
-                    {gameResult.includes('ничего не выиграли') ? (
-                      <>😔 {gameResult}</>
-                    ) : (
-                      <>🎉 {gameResult}</>
-                    )}
-                  </p>
+                <div className="space-y-3">
+                  <div className="bg-green-900/30 border border-green-500/50 rounded-xl p-4 backdrop-blur-sm">
+                    <p className="text-green-400 font-medium flex items-center justify-center gap-2">
+                      {gameResult.includes('ничего не выиграли') ? (
+                        <>😔 {gameResult}</>
+                      ) : (
+                        <>🎉 {gameResult}</>
+                      )}
+                    </p>
+                  </div>
+
+                  {gameEnded && allPrizes.length > 0 && (
+                    <div className="bg-blue-900/30 border border-blue-500/50 rounded-xl p-3 backdrop-blur-sm">
+                      <p className="text-blue-400 text-sm text-center mb-2">
+                        ✨ Все клетки открыты! Посмотрите, что могло быть:
+                      </p>
+                      <div className="text-xs text-gray-300 text-center">
+                        🎁 Предметы: {allPrizes.filter(p => p === 'item').length} шт. •
+                        ⭐ Подписки: {allPrizes.filter(p => p === 'sub_days').length} шт. •
+                        💸 Пустые: {allPrizes.filter(p => p === null).length} шт.
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -369,11 +436,23 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
                 </button>
               )}
 
+              {gameEnded && (
+                <button
+                  onClick={async () => {
+                    await refetchBonusStatus();
+                    onClose();
+                  }}
+                  className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105"
+                >
+                  🔍 Обновить и закрыть
+                </button>
+              )}
+
               <button
                 onClick={onClose}
                 className="flex-1 py-4 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl font-medium hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
               >
-                {gameEnded ? '✨ Готово' : '❌ Отмена'}
+                {gameEnded ? '❌ Просто закрыть' : '❌ Отмена'}
               </button>
             </div>
 

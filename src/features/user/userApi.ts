@@ -10,7 +10,8 @@ import type {
   ApplyPromoRequest,
   DepositRequest,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
+  BonusStatus
 } from '../../types/api';
 
 // Расширяем базовый API для работы с пользователем
@@ -246,13 +247,19 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
     // Получение бонусного статуса
-    getBonusStatus: builder.query<ApiResponse<any>, void>({
+    getBonusStatus: builder.query<BonusStatus & { debug_info?: any }, void>({
       query: () => 'v1/bonus/status',
     }),
 
     // Игра в бонусные квадраты
     playBonusSquares: builder.mutation<
-      { message: string; next_time: string },
+      {
+        message: string;
+        next_time: string;
+        chosen_cell: number;
+        all_prizes: (string | null)[];
+        won_prize: string | null;
+      },
       { chosenCell: number }
     >({
       query: (gameData) => ({
