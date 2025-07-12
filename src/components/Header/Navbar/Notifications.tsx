@@ -27,6 +27,9 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
     const notifications = notificationsData?.data?.items || [];
 
+    // Подсчитаем непрочитанные уведомления
+    const unreadCount = notifications.filter(n => !n.is_read).length;
+
     const handleCloseNotifications = () => {
         setOpenNotifications(false);
     };
@@ -51,7 +54,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             console.error('Ошибка при отметке всех уведомлений как прочитанных:', error);
         }
     };
-
 
     // Обработка клика по уведомлению
     const handleNotificationClick = async (notification: Notification) => {
@@ -130,8 +132,15 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         >
             {/* Заголовок */}
             <div className="p-4 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-white font-medium">Уведомления</h3>
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                        <h3 className="text-white font-medium">Уведомления</h3>
+                        {unreadCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                {unreadCount}
+                            </span>
+                        )}
+                    </div>
                     <button
                         onClick={handleCloseNotifications}
                         className="text-gray-400 hover:text-white transition-colors"
@@ -141,6 +150,15 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                         </svg>
                     </button>
                 </div>
+                {/* Кнопка "Прочитать все" в заголовке */}
+                {unreadCount > 0 && (
+                    <button
+                        onClick={handleMarkAllAsRead}
+                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                        Прочитать все уведомления
+                    </button>
+                )}
             </div>
 
             {/* Список уведомлений */}
@@ -187,18 +205,28 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                 )}
             </div>
 
-            {/* Футер */}
-            {notifications.length > 0 && (
-                <div className="p-3 border-t border-gray-700 space-y-2">
-                    <button
-                        onClick={handleMarkAllAsRead}
-                        className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                    >
-                        Отметить все как прочитанные
-                    </button>
-                    
-                </div>
-            )}
+            <div className="p-3 border-t border-gray-700">
+                {notifications.length > 0 ? (
+                    <div className="space-y-2">
+                        <div className="text-xs text-gray-400 text-center">
+                            Показано {notifications.length} уведомлений
+                            {unreadCount > 0 && ` • ${unreadCount} непрочитанных`}
+                        </div>
+                        {unreadCount > 0 && (
+                            <button
+                                onClick={handleMarkAllAsRead}
+                                className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors py-2 px-3 rounded border border-blue-400/30 hover:border-blue-300/30 hover:bg-blue-400/10"
+                            >
+                                Отметить все как прочитанные
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="text-xs text-gray-400 text-center">
+                        Новые уведомления появятся здесь
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
