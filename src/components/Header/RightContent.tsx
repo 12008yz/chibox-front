@@ -9,6 +9,8 @@ import { useAppDispatch } from "../../store/hooks";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import Notifications from '../Header/Navbar/Notifications';
+import BonusSquaresGame from '../BonusSquaresGame';
+import { useGetBonusStatusQuery } from "../../features/user/userApi";
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -25,6 +27,11 @@ const RightContent: React.FC<RightContentProps> = ({
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [notificationCount] = useState(0);
+  const [showBonusGame, setShowBonusGame] = useState(false);
+
+  const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
+    pollingInterval: 30000,
+  });
 
   const handleLogout = async () => {
     try {
@@ -49,6 +56,10 @@ const RightContent: React.FC<RightContentProps> = ({
     setOpenNotifications(!openNotifications);
   };
 
+  const handleBonusClick = () => {
+    setShowBonusGame(true);
+  };
+
   if (!user) {
     // Если пользователь не авторизован, показываем кнопки входа
     return (
@@ -69,14 +80,39 @@ const RightContent: React.FC<RightContentProps> = ({
     );
   }
 
+  const isAvailable = bonusStatus?.data?.is_available;
+  const timeUntilNext = bonusStatus?.data?.time_until_next_seconds;
+
+  const formatTimeLeft = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="flex items-center space-x-4 relative">
       {/* Получение бонуса */}
       <button
-        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-        onClick={() => console.log('Claiming bonus...')}
+        onClick={handleBonusClick}
+        disabled={!bonusStatus}
+        className={`
+          relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2
+          ${isAvailable
+            ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white transform hover:scale-105 shadow-lg animate-pulse'
+            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+          }
+        `}
+        title={isAvailable ? "Играть в кубики удачи!" : timeUntilNext ? `Следующий бонус через ${formatTimeLeft(timeUntilNext)}` : "Загрузка..."}
       >
-        Получить
+        <span className="text-lg">🎲</span>
+        <span className="hidden sm:inline">
+          {isAvailable ? 'Играть' : timeUntilNext ? formatTimeLeft(timeUntilNext) : '...'}
+        </span>
+
+        {/* Эффект свечения для доступного бонуса */}
+        {isAvailable && (
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg blur-md opacity-30 animate-pulse" />
+        )}
       </button>
 
       {/* Баланс */}
@@ -136,6 +172,12 @@ const RightContent: React.FC<RightContentProps> = ({
       >
         <IoMdExit className="text-xl" />
       </button>
+
+      {/* Модальное окно бонусной игры */}
+      <BonusSquaresGame
+        isOpen={showBonusGame}
+        onClose={() => setShowBonusGame(false)}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Avatar from "../../Avatar";
-import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
+import { FaRegBell } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
 import Monetary from "../../Monetary";
@@ -8,8 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store/hooks";
 import { useLogoutMutation } from "../../../features/auth/authApi";
 import { performFullLogout } from "../../../utils/authUtils";
-import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
+import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
+import BonusSquaresGame from '../../BonusSquaresGame';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -25,11 +26,18 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const [showBonusGame, setShowBonusGame] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
   const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
     skip: !user, // Пропускаем запрос если пользователь не авторизован
     pollingInterval: 30000, // Обновляем каждые 30 секунд
+  });
+
+  // Получаем статус бонуса
+  const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
+    skip: !user,
+    pollingInterval: 30000,
   });
 
   const notificationCount = unreadCountData?.data?.count || 0;
@@ -82,10 +90,16 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Получение бонуса */}
       <button
         className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-        onClick={() => console.log('Claiming bonus...')}
+        onClick={() => setShowBonusGame(!showBonusGame)}
       >
         Получить
       </button>
+      {showBonusGame && (
+        <BonusSquaresGame
+          isOpen={showBonusGame}
+          onClose={() => setShowBonusGame(false)}
+        />
+      )}
 
       {/* Баланс */}
       <div className="flex items-center space-x-2 text-green-400">

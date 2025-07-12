@@ -14,6 +14,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [showBonusGame, setShowBonusGame] = useState(false);
+  const [isGlowing, setIsGlowing] = useState(false);
 
   const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
     pollingInterval: 30000, // Обновляем каждые 30 секунд
@@ -47,6 +48,19 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
     };
   }, [bonusStatus?.data?.time_until_next_seconds]);
 
+  // Эффект свечения для доступного бонуса
+  useEffect(() => {
+    if (bonusStatus?.data?.is_available) {
+      const glowInterval = setInterval(() => {
+        setIsGlowing(prev => !prev);
+      }, 2000);
+
+      return () => clearInterval(glowInterval);
+    } else {
+      setIsGlowing(false);
+    }
+  }, [bonusStatus?.data?.is_available]);
+
   const handleOpenBonusGame = () => {
     setShowBonusGame(true);
     if (onClaimBonus) {
@@ -59,50 +73,133 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
   }
 
   const isAvailable = bonusStatus.data?.is_available;
+  const progressPercentage = bonusStatus.data?.time_until_next_seconds && bonusStatus.data?.cooldown_hours
+    ? Math.max(0, 100 - (bonusStatus.data.time_until_next_seconds / (bonusStatus.data.cooldown_hours * 3600)) * 100)
+    : 0;
 
   return (
     <>
-      <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 rounded-lg p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="text-2xl">🎁</div>
+      <div className={`
+        relative overflow-hidden rounded-xl border-2 p-4 transition-all duration-500
+        ${isAvailable
+          ? `border-yellow-400/50 bg-gradient-to-br from-yellow-600/20 via-orange-600/20 to-red-600/20 ${isGlowing ? 'shadow-lg shadow-yellow-500/25' : ''}`
+          : 'border-gray-600/30 bg-gradient-to-br from-gray-800/50 to-gray-900/50'
+        }
+      `}>
+        {/* Фоновый эффект */}
+        {isAvailable && (
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 animate-pulse" />
+        )}
+
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center space-x-3">
+            <div className={`text-3xl transition-transform duration-300 ${isAvailable ? 'animate-bounce' : ''}`}>
+              {isAvailable ? '🎲' : '⏰'}
+            </div>
             <div>
-              <h3 className="text-white font-medium text-sm">Бонусная игра</h3>
+              <h3 className={`font-bold text-base transition-colors duration-300 ${
+                isAvailable ? 'text-yellow-300' : 'text-gray-300'
+              }`}>
+                Кубики Удачи
+              </h3>
+
               {isAvailable ? (
-                <p className="text-green-400 text-xs">Готова к игре!</p>
+                <div className="space-y-1">
+                  <p className="text-green-400 text-sm font-medium flex items-center gap-1">
+                    <span className="animate-pulse">✨</span>
+                    Готово к игре!
+                  </p>
+                  {bonusStatus.data?.lifetime_bonuses_claimed !== undefined && (
+                    <p className="text-yellow-400 text-xs">
+                      🏆 Сыграно: {bonusStatus.data.lifetime_bonuses_claimed} раз
+                    </p>
+                  )}
+                </div>
               ) : (
-                <p className="text-gray-400 text-xs">
-                  {timeLeft ? `Следующая через: ${timeLeft}` : 'Загрузка...'}
-                </p>
-              )}
-              {bonusStatus.data?.lifetime_bonuses_claimed !== undefined && (
-                <p className="text-gray-500 text-xs">
-                  Получено: {bonusStatus.data.lifetime_bonuses_claimed} бонусов
-                </p>
+                <div className="space-y-1">
+                  <p className="text-gray-400 text-sm">
+                    {timeLeft ? (
+                      <span className="flex items-center gap-1">
+                        <span>⏱️</span>
+                        <span className="font-mono text-blue-400">{timeLeft}</span>
+                      </span>
+                    ) : (
+                      'Загрузка...'
+                    )}
+                  </p>
+                  {bonusStatus.data?.lifetime_bonuses_claimed !== undefined && (
+                    <p className="text-gray-500 text-xs">
+                      🏆 Всего сыграно: {bonusStatus.data.lifetime_bonuses_claimed}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
 
           {isAvailable && (
-            <MainButton
-              text={isLoading ? "Запуск..." : "Играть"}
-              onClick={handleOpenBonusGame}
-              loading={isLoading}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              {/* Эффект свечения кнопки */}
+              {isGlowing && (
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg blur-md opacity-50 animate-pulse" />
+              )}
+              <button
+                onClick={handleOpenBonusGame}
+                disabled={isLoading}
+                className="relative z-10 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    Запуск...
+                  </div>
+                ) : (
+                  "🎲 Играть"
+                )}
+              </button>
+            </div>
           )}
         </div>
 
         {/* Прогресс бар для времени */}
         {!isAvailable && timeLeft && bonusStatus.data?.time_until_next_seconds && (
-          <div className="mt-3">
-            <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="mt-4 relative">
+            <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm">
               <div
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 h-2 rounded-full transition-all duration-1000"
-                style={{
-                  width: `${Math.max(0, 100 - (bonusStatus.data.time_until_next_seconds / (bonusStatus.data.cooldown_hours * 3600)) * 100)}%`
-                }}
-              />
+                className="bg-gradient-to-r from-blue-500 via-purple-500 to-yellow-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden"
+                style={{ width: `${progressPercentage}%` }}
+              >
+                {/* Анимированный блик */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
+              </div>
+            </div>
+
+            {/* Подпись к прогресс бару */}
+            <div className="flex justify-between items-center mt-2 text-xs">
+              <span className="text-gray-500">До следующей игры</span>
+              <span className="text-blue-400 font-mono">
+                {Math.round(progressPercentage)}%
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Информация о наградах (только когда бонус доступен) */}
+        {isAvailable && (
+          <div className="mt-3 pt-3 border-t border-yellow-500/20">
+            <div className="flex justify-center gap-4 text-xs">
+              <div className="flex items-center gap-1 text-yellow-400">
+                <span>📦</span>
+                <span>Кейсы</span>
+              </div>
+              <div className="flex items-center gap-1 text-green-400">
+                <span>⭐</span>
+                <span>Подписка</span>
+              </div>
+              <div className="flex items-center gap-1 text-blue-400">
+                <span>🎁</span>
+                <span>Предметы</span>
+              </div>
             </div>
           </div>
         )}

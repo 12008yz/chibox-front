@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import React from "react";
 import { MdOutlineSell } from "react-icons/md";
 import { BsCoin } from "react-icons/bs";
 import { SlPlane } from "react-icons/sl";
@@ -9,10 +10,9 @@ import RightContent from "./Navbar/RightContent";
 
 interface NavbarProps {
   openNotifications: boolean;
-  setOpenNotifications: (open: boolean) => void;
+  setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   openSidebar: boolean;
   setOpenSidebar: (open: boolean) => void;
-  onlineUsers: number;
   user?: any; // TODO: заменить на правильный тип
 }
 
@@ -21,7 +21,6 @@ const Navbar: React.FC<NavbarProps> = ({
   setOpenNotifications,
   openSidebar,
   setOpenSidebar,
-  onlineUsers,
   user
 }) => {
   const toggleSidebar = () => {

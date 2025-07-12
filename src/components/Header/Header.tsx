@@ -108,7 +108,6 @@ const Header: React.FC<HeaderProps> = ({
         setOpenNotifications={setOpenNotifications}
         openSidebar={openSidebar}
         setOpenSidebar={setOpenSidebar}
-        onlineUsers={onlineUsers}
         user={user}
       />
 
