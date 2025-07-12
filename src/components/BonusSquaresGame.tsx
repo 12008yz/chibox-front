@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useGetBonusStatusQuery, usePlayBonusSquaresMutation } from '../features/user/userApi';
+import { useGetBonusStatusQuery, usePlayBonusSquaresMutation, useResetBonusCooldownMutation } from '../features/user/userApi';
 import Modal from './Modal';
 
 interface BonusSquaresGameProps {
@@ -17,8 +17,12 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
   const [showParticles, setShowParticles] = useState(false);
   const [hoveredSquare, setHoveredSquare] = useState<number | null>(null);
 
-  const { data: bonusStatus, refetch: refetchBonusStatus } = useGetBonusStatusQuery();
+  const { data: bonusStatus, refetch: refetchBonusStatus, isFetching } = useGetBonusStatusQuery(undefined, {
+    // Отключаем кэширование для отладки
+    refetchOnMountOrArgChange: true,
+  });
   const [playBonusSquares, { isLoading: isPlaying }] = usePlayBonusSquaresMutation();
+  const [resetBonusCooldown, { isLoading: isResetting }] = useResetBonusCooldownMutation();
 
   // Сброс состояния при открытии модалки
   useEffect(() => {
@@ -56,6 +60,35 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
+  };
+
+  const handleResetCooldown = async () => {
+    console.log('🔄 Начинаем сброс кулдауна...');
+    try {
+      const result = await resetBonusCooldown().unwrap();
+      console.log('✅ Кулдаун сброшен успешно:', result);
+      await refetchBonusStatus();
+      console.log('🔍 Статус обновлен');
+      alert('✅ Кулдаун успешно сброшен!');
+    } catch (error: any) {
+      console.error('❌ Ошибка при сбросе кулдауна:', error);
+      console.error('❌ Детали ошибки:', {
+        status: error?.status,
+        data: error?.data,
+        message: error?.message
+      });
+      alert(`Ошибка сброса кулдауна: ${error?.data?.message || error?.message || 'Неизвестная ошибка'}`);
+    }
+  };
+
+  const handleRefreshStatus = async () => {
+    console.log('🔍 Обновляем статус бонуса...');
+    try {
+      await refetchBonusStatus();
+      console.log('✅ Статус обновлен');
+    } catch (error) {
+      console.error('❌ Ошибка обновления статуса:', error);
+    }
   };
 
   const handlePlayGame = async () => {
@@ -106,6 +139,14 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
   const isAvailable = bonusStatus?.data?.is_available;
   const timeUntilNext = bonusStatus?.data?.time_until_next_seconds;
 
+  // Добавим отладочную информацию в консоль
+  console.log('🎲 BonusSquaresGame - текущий статус:', {
+    isAvailable,
+    timeUntilNext,
+    bonusStatus: bonusStatus?.data,
+    isOpen
+  });
+
   const formatTimeLeft = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -145,7 +186,7 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="">
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 rounded-2xl max-w-md w-full mx-4 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 rounded-2xl relative overflow-hidden">
         {/* Фоновые частицы */}
         {showParticles && (
           <div className="absolute inset-0 pointer-events-none">
@@ -186,13 +227,54 @@ const BonusSquaresGame: React.FC<BonusSquaresGameProps> = ({ isOpen, onClose }) 
                   Следующий бонус через: <span className="font-mono text-yellow-400">{formatTimeLeft(timeUntilNext)}</span>
                 </div>
               )}
+              {bonusStatus?.data?.debug_info && (
+                <details className="mt-3 text-xs">
+                  <summary className="text-gray-500 cursor-pointer hover:text-gray-400">Отладочная информация</summary>
+                  <div className="mt-2 text-gray-400 font-mono text-xs bg-gray-800/50 p-2 rounded">
+                    <div>Текущее время: {bonusStatus.data.debug_info.current_time}</div>
+                    <div>Время следующего бонуса: {bonusStatus.data.debug_info.next_bonus_time || 'не установлено'}</div>
+                    <div>Проверка времени пройдена: {bonusStatus.data.debug_info.is_time_check_passed ? 'да' : 'нет'}</div>
+                  </div>
+                </details>
+              )}
             </div>
-            <button
-              onClick={onClose}
-              className="px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
-            >
-              Закрыть
-            </button>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Кнопка сброса кулдауна нажата');
+                    handleResetCooldown();
+                  }}
+                  disabled={isResetting}
+                  className="flex-1 px-3 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-500 hover:to-orange-500 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  type="button"
+                >
+                  {isResetting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      Сброс...
+                    </span>
+                  ) : (
+                    '🔄 Сбросить кулдаун'
+                  )}
+                </button>
+                <button
+                  onClick={handleRefreshStatus}
+                  className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 text-sm font-medium"
+                  type="button"
+                >
+                  🔍 Обновить статус
+                </button>
+              </div>
+              <button
+                onClick={onClose}
+                className="w-full px-4 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
+              >
+                Закрыть
+              </button>
+            </div>
           </div>
         ) : (
           // Игра доступна

@@ -263,6 +263,18 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
+    // Сброс кулдауна бонуса
+    resetBonusCooldown: builder.mutation<
+      { message: string; user_id: string; previous_next_bonus_time?: string; current_next_bonus_time?: string },
+      void
+    >({
+      query: () => ({
+        url: 'v1/bonus/reset-cooldown',
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+
     // Покупка подписки
     buySubscription: builder.mutation<
       ApiResponse<{ subscription_tier: string; expires_at: string }>,
@@ -364,6 +376,7 @@ export const {
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   usePlayBonusSquaresMutation,
+  useResetBonusCooldownMutation,
   useBuySubscriptionMutation,
   useExchangeItemForSubscriptionMutation,
   useGetBonusInfoQuery,
