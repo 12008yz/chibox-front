@@ -179,6 +179,17 @@ export interface DepositRequest {
   payment_method: 'yookassa';
 }
 
+export interface BonusStatus {
+  is_available: boolean;
+  next_bonus_available_time?: string;
+  time_until_next_seconds?: number;
+  lifetime_bonuses_claimed?: number;
+  last_bonus_date?: string;
+  has_active_subscription: boolean;
+  cooldown_hours: number;
+  subscription_expiry?: string;
+}
+
 // Auth state
 export interface AuthState {
   user: User | null;

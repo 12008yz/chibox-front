@@ -252,15 +252,15 @@ export const userApi = baseApi.injectEndpoints({
 
     // Игра в бонусные квадраты
     playBonusSquares: builder.mutation<
-      ApiResponse<{ reward: number; new_balance: number }>,
-      { square_id: number }
+      { message: string; next_time: string },
+      { chosenCell: number }
     >({
       query: (gameData) => ({
         url: 'v1/bonus/play-squares',
         method: 'POST',
         body: gameData,
       }),
-      invalidatesTags: ['Balance', 'User'],
+      invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
     // Покупка подписки
