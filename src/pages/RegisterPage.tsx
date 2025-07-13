@@ -91,10 +91,14 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    setRegistrationData(null);
-    // Разрешаем редирект на главную страницу
-    setAllowRedirect(true);
+    // Сразу перенаправляем на главную страницу с модальным окном
+    navigate('/', {
+      state: {
+        showRegistrationSuccess: true,
+        registrationEmail: registrationData?.email,
+        previewUrl: registrationData?.previewUrl
+      }
+    });
   };
 
   return (
