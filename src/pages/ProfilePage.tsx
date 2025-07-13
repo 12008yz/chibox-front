@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from '../store/hooks';
-import SteamProfile from '../components/SteamProfile';
 import Avatar from '../components/Avatar';
 
 const ProfilePage: React.FC = () => {
@@ -8,159 +7,302 @@ const ProfilePage: React.FC = () => {
 
   if (!auth.user) {
     return (
-      <div className="min-h-screen bg-[#151225] text-white p-8">
-        <div className="container mx-auto">
-          <h1 className="text-3xl font-bold mb-4">Профиль пользователя</h1>
-          <p className="text-gray-400">Пользователь не найден</p>
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white p-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold mb-2">Пользователь не найден</h1>
+              <p className="text-gray-400">Пожалуйста, войдите в систему</p>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
+  const progressPercentage = auth.user.xp_to_next_level
+    ? Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)
+    : 0;
+
   return (
-    <div className="min-h-screen bg-[#151225] text-white p-8">
-      <div className="container mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Профиль пользователя</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
+      <div className="container mx-auto max-w-7xl p-4 space-y-6">
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Основная информация */}
-          <div className="bg-[#19172D] rounded-lg p-6 border border-gray-700/50">
-            <h2 className="text-xl font-semibold mb-4">Основная информация</h2>
-
-            <div className="flex items-center gap-4 mb-6">
-              <Avatar
-                steamAvatar={auth.user.steam_avatar}
-                id={auth.user.id}
-                size="large"
-                level={auth.user.level}
-                showLevel={true}
-              />
-              <div>
-                <h3 className="text-xl font-bold">
-                  {auth.user.steam_profile?.personaname || auth.user.username}
-                </h3>
-                <p className="text-gray-400">{auth.user.email}</p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-400">ID:</span>
-                <span className="font-mono text-sm">{auth.user.id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Баланс:</span>
-                <span className="text-green-400 font-semibold">${auth.user.balance}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Уровень:</span>
-                <span className="text-blue-400 font-semibold">{auth.user.level}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Опыт:</span>
-                <span>{auth.user.xp}</span>
-              </div>
-              {auth.user.xp_to_next_level && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">До следующего уровня:</span>
-                  <span>{auth.user.xp_to_next_level} XP</span>
-                </div>
-              )}
-            </div>
-
-            {/* Прогресс-бар опыта */}
-            {auth.user.xp_to_next_level && (
-              <div className="mt-4">
-                <div className="flex justify-between text-sm text-gray-400 mb-1">
-                  <span>Прогресс уровня</span>
-                  <span>{Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)}%</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)}%`
-                    }}
-                  ></div>
-                </div>
-              </div>
-            )}
+        {/* Header Section */}
+        <div className="relative bg-gradient-to-r from-[#1a1530] via-[#2a1f47] to-[#1a1530] rounded-2xl p-8 border border-gray-700/30 overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-green-500 to-blue-500 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
           </div>
 
-          {/* Подписка */}
-          <div className="bg-[#19172D] rounded-lg p-6 border border-gray-700/50">
-            <h2 className="text-xl font-semibold mb-4">Подписка</h2>
+          <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8">
+            {/* User Avatar and Basic Info */}
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-1">
+                  <Avatar
+                    steamAvatar={auth.user.steam_avatar}
+                    id={auth.user.id}
+                    size="large"
+                    level={auth.user.level}
+                    showLevel={false}
+                  />
+                </div>
+                {/* Level Badge */}
+                <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-sm px-3 py-1 rounded-full shadow-lg">
+                  LVL {auth.user.level}
+                </div>
+              </div>
 
-            {auth.user.subscription_tier ? (
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Тип подписки:</span>
-                  <span className="bg-yellow-600 text-white px-2 py-1 rounded text-sm font-semibold">
-                    {auth.user.subscription_tier}
+              <div className="space-y-2">
+                <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  {auth.user.steam_profile?.personaname || auth.user.username}
+                </h1>
+                <p className="text-gray-400 text-sm">ID: {auth.user.id}</p>
+
+                {/* Steam Status */}
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0a12 12 0 0 0-8.2 20.8l4.4-1.8a3.4 3.4 0 0 0 6.4-1.8 3.4 3.4 0 0 0-3.3-3.4h-.2l-4.5-6.6a4.5 4.5 0 0 1 8.8 1.2v.3l6.6 4.5a3.4 3.4 0 0 0 1.8-6.4A12 12 0 0 0 12 0zm-4.6 16.6l-3.6 1.5a2.6 2.6 0 0 0 4.8.9l-1.2-2.4zm7.9-5.4a2.3 2.3 0 1 1-4.6 0 2.3 2.3 0 0 1 4.6 0z"/>
+                  </svg>
+                  <span className={`text-sm px-2 py-1 rounded-full ${
+                    auth.user.steam_id
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    {auth.user.steam_id ? 'Steam подключен' : 'Steam не подключен'}
                   </span>
                 </div>
-                {auth.user.subscription_days_left !== undefined && (
+              </div>
+            </div>
+
+            {/* Balance and Level Progress */}
+            <div className="flex-1 space-y-4">
+              <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Баланс</span>
+                  <span className="text-2xl font-bold text-green-400">
+                    ${Number(auth.user.balance).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Level Progress */}
+              <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400 text-sm">Прогресс уровня</span>
+                  <span className="text-sm text-gray-300">{progressPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 rounded-full"
+                    style={{ width: `${progressPercentage}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>{auth.user.xp} XP</span>
+                  {auth.user.xp_to_next_level && (
+                    <span>До следующего: {auth.user.xp_to_next_level} XP</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Cases Opened */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Кейсов сегодня</p>
+                <p className="text-xl font-bold text-white">
+                  {auth.user.cases_opened_today || 0}
+                  <span className="text-gray-400 text-sm">/{auth.user.max_daily_cases || 0}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Total XP */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Общий опыт</p>
+                <p className="text-xl font-bold text-white">{auth.user.total_xp_earned || 0}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bonuses Claimed */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-green-500/50 transition-all duration-300">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Бонусов получено</p>
+                <p className="text-xl font-bold text-white">{auth.user.successful_bonus_claims || 0}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Subscription */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-yellow-500/50 transition-all duration-300">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Подписка</p>
+                <p className="text-xl font-bold text-white">
+                  {auth.user.subscription_tier || (
+                    <span className="text-gray-500 text-base">Нет</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Best Weapon Section */}
+          <div className="lg:col-span-2 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                </svg>
+              </div>
+              Лучшее выбитое оружие
+            </h3>
+
+            {/* Placeholder for best weapon - will be filled with real data later */}
+            <div className="text-center py-8">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-gray-400 text-sm">Пока нет выбитого оружия</p>
+              <p className="text-gray-500 text-xs mt-1">Откройте кейсы, чтобы получить первое оружие</p>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="space-y-6">
+            {/* Account Created */}
+            <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+              <h4 className="text-lg font-semibold mb-3">Информация об аккаунте</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400 text-sm">Email:</span>
+                  <span className="text-white text-sm">{auth.user.email}</span>
+                </div>
+                {auth.user.created_at && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Осталось дней:</span>
-                    <span className={auth.user.subscription_days_left > 7 ? 'text-green-400' : 'text-yellow-400'}>
-                      {auth.user.subscription_days_left}
+                    <span className="text-gray-400 text-sm">Создан:</span>
+                    <span className="text-white text-sm">
+                      {new Date(auth.user.created_at).toLocaleDateString()}
                     </span>
                   </div>
                 )}
-                {auth.user.subscription_expiry_date && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400 text-sm">Статус:</span>
+                  <span className={`text-sm px-2 py-1 rounded-full ${
+                    auth.user.is_email_verified
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {auth.user.is_email_verified ? 'Подтвержден' : 'Не подтвержден'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Drop Rate Bonuses */}
+            <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+              <h4 className="text-lg font-semibold mb-3">Бонусы к дропу</h4>
+              <div className="space-y-2">
+                {auth.user.level_bonus_percentage && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Истекает:</span>
-                    <span>{new Date(auth.user.subscription_expiry_date).toLocaleDateString()}</span>
+                    <span className="text-gray-400 text-sm">Уровень:</span>
+                    <span className="text-green-400 text-sm">+{auth.user.level_bonus_percentage}%</span>
                   </div>
                 )}
+                {auth.user.subscription_bonus_percentage && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400 text-sm">Подписка:</span>
+                    <span className="text-blue-400 text-sm">+{auth.user.subscription_bonus_percentage}%</span>
+                  </div>
+                )}
+                {auth.user.achievements_bonus_percentage && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400 text-sm">Достижения:</span>
+                    <span className="text-purple-400 text-sm">+{auth.user.achievements_bonus_percentage}%</span>
+                  </div>
+                )}
+                <div className="border-t border-gray-600/30 pt-2 mt-3">
+                  <div className="flex justify-between">
+                    <span className="text-white font-semibold text-sm">Итого:</span>
+                    <span className="text-yellow-400 font-semibold text-sm">
+                      +{auth.user.total_drop_bonus_percentage || 0}%
+                    </span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-400 mb-4">У вас нет активной подписки</p>
-                <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md transition-colors">
-                  Оформить подписку
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Статистика */}
-          <div className="bg-[#19172D] rounded-lg p-6 border border-gray-700/50">
-            <h2 className="text-xl font-semibold mb-4">Статистика</h2>
-
-            <div className="space-y-3">
-              {auth.user.cases_opened_today !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Кейсов открыто сегодня:</span>
-                  <span>{auth.user.cases_opened_today}</span>
-                </div>
-              )}
-              {auth.user.max_daily_cases !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Лимит в день:</span>
-                  <span>{auth.user.max_daily_cases}</span>
-                </div>
-              )}
-              {auth.user.total_xp_earned !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Всего опыта получено:</span>
-                  <span>{auth.user.total_xp_earned}</span>
-                </div>
-              )}
-              {auth.user.successful_bonus_claims !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Бонусов получено:</span>
-                  <span>{auth.user.successful_bonus_claims}</span>
-                </div>
-              )}
             </div>
           </div>
+        </div>
 
-          {/* Steam профиль */}
-          <div className="lg:col-span-2">
-            <SteamProfile user={auth.user} />
+        {/* Inventory Section */}
+        <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            Инвентарь
+          </h3>
+
+          {/* Placeholder for inventory - will be filled with real data later */}
+          <div className="text-center py-12">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
+              <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <p className="text-gray-400 text-lg">Инвентарь пуст</p>
+            <p className="text-gray-500 text-sm mt-2">Откройте кейсы, чтобы получить предметы</p>
           </div>
         </div>
+
       </div>
     </div>
   );
