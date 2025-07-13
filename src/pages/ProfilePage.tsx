@@ -1,9 +1,19 @@
 import React from 'react';
 import { useAuth } from '../store/hooks';
+import { useGetUserInventoryQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
 import Avatar from '../components/Avatar';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
+
+  // Загружаем данные через API
+  const { data: inventoryData, isLoading: inventoryLoading } = useGetUserInventoryQuery({
+    page: 1,
+    limit: 50,
+    status: 'inventory'
+  });
+
+  const { data: achievementsData, isLoading: achievementsLoading } = useGetUserAchievementsQuery();
 
   if (!auth.user) {
     return (
@@ -28,6 +38,47 @@ const ProfilePage: React.FC = () => {
   const progressPercentage = auth.user.xp_to_next_level
     ? Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)
     : 0;
+
+  // Получаем инвентарь и достижения
+  const inventory = inventoryData?.success ? inventoryData.data.items : [];
+  const achievements = achievementsData?.success ? achievementsData.data : [];
+
+  // Находим самый дорогой предмет как "лучшее оружие"
+  const bestWeapon = inventory
+    .filter(item => item.status === 'inventory')
+    .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
+
+  // Фильтруем инвентарь по статусу inventory
+  const availableInventory = inventory.filter(item => item.status === 'inventory');
+
+  // Завершенные достижения
+  const completedAchievements = achievements.filter((ach: any) => ach.is_completed);
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity.toLowerCase()) {
+      case 'consumer': return 'from-gray-500 to-gray-600';
+      case 'industrial': return 'from-blue-500 to-blue-600';
+      case 'milspec': return 'from-purple-500 to-purple-600';
+      case 'restricted': return 'from-pink-500 to-pink-600';
+      case 'classified': return 'from-red-500 to-red-600';
+      case 'covert': return 'from-yellow-500 to-orange-500';
+      case 'contraband': return 'from-orange-500 to-red-600';
+      default: return 'from-gray-500 to-gray-600';
+    }
+  };
+
+  const getRarityName = (rarity: string) => {
+    switch (rarity.toLowerCase()) {
+      case 'consumer': return 'Потребительское';
+      case 'industrial': return 'Промышленное';
+      case 'milspec': return 'Армейское';
+      case 'restricted': return 'Запрещённое';
+      case 'classified': return 'Засекреченное';
+      case 'covert': return 'Тайное';
+      case 'contraband': return 'Контрабанда';
+      default: return rarity;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
@@ -136,22 +187,23 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Total XP */}
+          {/* Inventory Count */}
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                  <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Общий опыт</p>
-                <p className="text-xl font-bold text-white">{auth.user.total_xp_earned || 0}</p>
+                <p className="text-gray-400 text-sm">Предметов в инвентаре</p>
+                <p className="text-xl font-bold text-white">{availableInventory.length}</p>
               </div>
             </div>
           </div>
 
-          {/* Bonuses Claimed */}
+          {/* Achievements */}
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-green-500/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -160,8 +212,11 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Бонусов получено</p>
-                <p className="text-xl font-bold text-white">{auth.user.successful_bonus_claims || 0}</p>
+                <p className="text-gray-400 text-sm">Достижения</p>
+                <p className="text-xl font-bold text-white">
+                  {completedAchievements.length}
+                  <span className="text-gray-400 text-sm">/{achievements.length}</span>
+                </p>
               </div>
             </div>
           </div>
@@ -177,7 +232,14 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">Подписка</p>
                 <p className="text-xl font-bold text-white">
-                  {auth.user.subscription_tier || (
+                  {auth.user.subscription_tier ? (
+                    <>
+                      Tier {auth.user.subscription_tier}
+                      <span className="text-gray-400 text-sm block">
+                        {auth.user.subscription_days_left} дней
+                      </span>
+                    </>
+                  ) : (
                     <span className="text-gray-500 text-base">Нет</span>
                   )}
                 </p>
@@ -200,47 +262,113 @@ const ProfilePage: React.FC = () => {
               Лучшее выбитое оружие
             </h3>
 
-            {/* Placeholder for best weapon - will be filled with real data later */}
-            <div className="text-center py-8">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
-                <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                </svg>
+            {inventoryLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-gray-400">Загрузка...</p>
               </div>
-              <p className="text-gray-400 text-sm">Пока нет выбитого оружия</p>
-              <p className="text-gray-500 text-xs mt-1">Откройте кейсы, чтобы получить первое оружие</p>
-            </div>
+            ) : bestWeapon ? (
+              <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
+                <div className="flex items-center gap-6">
+                  <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg`}>
+                    {bestWeapon.item.image_url ? (
+                      <img
+                        src={bestWeapon.item.image_url}
+                        alt={bestWeapon.item.name}
+                        className="w-full h-full object-contain rounded-lg"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) nextElement.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: bestWeapon.item.image_url ? 'none' : 'flex' }}>
+                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-white mb-2">{bestWeapon.item.name}</h4>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.item.rarity)} text-white`}>
+                        {getRarityName(bestWeapon.item.rarity)}
+                      </span>
+                      <span className="text-green-400 font-bold text-lg">${Number(bestWeapon.item.price).toFixed(2)}</span>
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                      Получено: {new Date((bestWeapon as any).acquisition_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
+                  <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-sm">Пока нет выбитого оружия</p>
+                <p className="text-gray-500 text-xs mt-1">Откройте кейсы, чтобы получить первое оружие</p>
+              </div>
+            )}
           </div>
 
-          {/* Quick Stats */}
+          {/* Achievements & Quick Stats */}
           <div className="space-y-6">
-            {/* Account Created */}
+            {/* Achievements */}
             <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
-              <h4 className="text-lg font-semibold mb-3">Информация об аккаунте</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-400 text-sm">Email:</span>
-                  <span className="text-white text-sm">{auth.user.email}</span>
+              <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
+                </svg>
+                Достижения
+              </h4>
+
+              {achievementsLoading ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-gray-400 text-sm">Загрузка...</p>
                 </div>
-                {auth.user.created_at && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Создан:</span>
-                    <span className="text-white text-sm">
-                      {new Date(auth.user.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-400 text-sm">Статус:</span>
-                  <span className={`text-sm px-2 py-1 rounded-full ${
-                    auth.user.is_email_verified
-                      ? 'bg-green-500/20 text-green-400'
-                      : 'bg-yellow-500/20 text-yellow-400'
-                  }`}>
-                    {auth.user.is_email_verified ? 'Подтвержден' : 'Не подтвержден'}
-                  </span>
+              ) : achievements.length > 0 ? (
+                <div className="space-y-3 max-h-48 overflow-y-auto">
+                  {achievements.slice(0, 5).map((achievement) => (
+                    <div key={achievement.id} className={`p-3 rounded-lg border ${
+                      achievement.is_completed
+                        ? 'bg-green-500/10 border-green-500/30'
+                        : 'bg-gray-700/30 border-gray-600/30'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className={`w-2 h-2 rounded-full ${
+                          achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
+                        }`}></div>
+                        <h5 className="font-medium text-sm text-white">{achievement.achievement.name}</h5>
+                      </div>
+                      <p className="text-xs text-gray-400">{achievement.achievement.description}</p>
+                      {!achievement.is_completed && (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-400 mb-1">
+                            Прогресс: {achievement.current_progress}/
+                            {(achievement.achievement as any).requirement_value || 1}
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-1">
+                            <div
+                              className="bg-yellow-500 h-1 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${Math.min(100, (achievement.current_progress / ((achievement.achievement as any).requirement_value || 1)) * 100)}%`
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <p className="text-gray-400 text-sm text-center py-4">Нет достижений</p>
+              )}
             </div>
 
             {/* Drop Rate Bonuses */}
@@ -287,20 +415,68 @@ const ProfilePage: React.FC = () => {
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
             </div>
-            Инвентарь
+            Инвентарь ({availableInventory.length} предметов)
           </h3>
 
-          {/* Placeholder for inventory - will be filled with real data later */}
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
-              <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
-              </svg>
+          {inventoryLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-400">Загрузка инвентаря...</p>
             </div>
-            <p className="text-gray-400 text-lg">Инвентарь пуст</p>
-            <p className="text-gray-500 text-sm mt-2">Откройте кейсы, чтобы получить предметы</p>
-          </div>
+          ) : availableInventory.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {availableInventory.slice(0, 12).map((inventoryItem) => (
+                <div
+                  key={inventoryItem.id}
+                  className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105`}
+                >
+                  <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                    {inventoryItem.item.image_url ? (
+                      <img
+                        src={inventoryItem.item.image_url}
+                        alt={inventoryItem.item.name}
+                        className="w-full h-full object-contain rounded"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) nextElement.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
+                    {inventoryItem.item.name}
+                  </h5>
+                  <p className="text-green-400 text-sm font-bold">${Number(inventoryItem.item.price).toFixed(2)}</p>
+                  <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
+                    {getRarityName(inventoryItem.item.rarity)}
+                  </p>
+                </div>
+              ))}
+              {availableInventory.length > 12 && (
+                <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
+                  <div className="text-2xl font-bold text-gray-400 mb-2">+{availableInventory.length - 12}</div>
+                  <p className="text-gray-400 text-xs text-center">Ещё предметов</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                  <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-gray-400 text-lg">Инвентарь пуст</p>
+              <p className="text-gray-500 text-sm mt-2">Откройте кейсы, чтобы получить предметы</p>
+            </div>
+          )}
         </div>
 
       </div>
