@@ -42,6 +42,9 @@ export interface User {
   role?: string;
   created_at?: string;
   updated_at?: string;
+  // Дополнительные поля для данных профиля
+  achievements?: UserAchievement[];
+  inventory?: UserInventoryItem[];
 }
 
 export interface CaseTemplate {
@@ -70,7 +73,7 @@ export interface UserInventoryItem {
   id: string;
   user_id: string;
   item_id: string;
-  status: 'available' | 'sold' | 'withdrawn' | 'used';
+  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory';
   acquired_at: string;
   item: Item;
 }
@@ -84,6 +87,20 @@ export interface Achievement {
   reward_type: string;
   reward_value: number;
   image_url?: string;
+}
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  current_progress: number;
+  is_completed: boolean;
+  completion_date?: string;
+  notified: boolean;
+  bonus_applied: boolean;
+  createdAt: string;
+  updatedAt: string;
+  achievement: Achievement;
 }
 
 export interface Mission {

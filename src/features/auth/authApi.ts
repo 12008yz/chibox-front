@@ -35,10 +35,17 @@ export const authApi = baseApi.injectEndpoints({
       transformResponse: (response: any) => {
         // Трансформируем ответ бэкенда к ожидаемому формату
         if (response.success && response.token && response.user) {
+          // Добавляем achievements и inventory к пользователю, если они есть
+          const user = {
+            ...response.user,
+            achievements: response.achievements || [],
+            inventory: response.inventory || []
+          };
+
           return {
             success: response.success,
             data: {
-              user: response.user,
+              user,
               token: response.token
             },
             message: response.message

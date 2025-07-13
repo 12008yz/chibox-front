@@ -1,19 +1,26 @@
 import React from 'react';
 import { useAuth } from '../store/hooks';
-import { useGetUserInventoryQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
+import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
 import Avatar from '../components/Avatar';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
 
-  // Загружаем данные через API
+  // Дополнительно загружаем данные через API только если их нет в auth state
   const { data: inventoryData, isLoading: inventoryLoading } = useGetUserInventoryQuery({
     page: 1,
     limit: 50,
     status: 'inventory'
+  }, {
+    skip: !!auth.user?.inventory?.length // Пропускаем запрос если есть данные в auth state
   });
 
-  const { data: achievementsData, isLoading: achievementsLoading } = useGetUserAchievementsQuery();
+  const { data: achievementsProgressData, isLoading: achievementsLoading } = useGetAchievementsProgressQuery(undefined, {
+    skip: !!auth.user?.achievements?.length // Пропускаем запрос если есть данные в auth state
+  });
+
+  // Получаем все достижения для правильного подсчета
+  const { data: allAchievementsData } = useGetUserAchievementsQuery();
 
   if (!auth.user) {
     return (
@@ -39,9 +46,19 @@ const ProfilePage: React.FC = () => {
     ? Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)
     : 0;
 
-  // Получаем инвентарь и достижения
-  const inventory = inventoryData?.success ? inventoryData.data.items : [];
-  const achievements = achievementsData?.success ? achievementsData.data : [];
+  // Получаем инвентарь и достижения - приоритет данным из auth state
+  const inventory = auth.user.inventory?.length
+    ? auth.user.inventory
+    : (inventoryData?.success ? inventoryData.data.items : []);
+  const achievementsProgress = auth.user.achievements?.length
+    ? auth.user.achievements
+    : (achievementsProgressData?.success ? achievementsProgressData.data : []);
+
+  // Общее количество достижений в системе
+  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 8; // fallback к 8
+
+  // Завершенные достижения
+  const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.is_completed).length;
 
   // Находим самый дорогой предмет как "лучшее оружие"
   const bestWeapon = inventory
@@ -52,7 +69,7 @@ const ProfilePage: React.FC = () => {
   const availableInventory = inventory.filter(item => item.status === 'inventory');
 
   // Завершенные достижения
-  const completedAchievements = achievements.filter((ach: any) => ach.is_completed);
+  const completedAchievements = achievementsProgress.filter((ach: any) => ach.is_completed);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -214,8 +231,8 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">Достижения</p>
                 <p className="text-xl font-bold text-white">
-                  {completedAchievements.length}
-                  <span className="text-gray-400 text-sm">/{achievements.length}</span>
+                  {completedAchievementsCount}
+                  <span className="text-gray-400 text-sm">/{totalAchievements}</span>
                 </p>
               </div>
             </div>
@@ -262,7 +279,7 @@ const ProfilePage: React.FC = () => {
               Лучшее выбитое оружие
             </h3>
 
-            {inventoryLoading ? (
+            {(inventoryLoading && !auth.user.inventory?.length) ? (
               <div className="text-center py-8">
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-gray-400">Загрузка...</p>
@@ -327,14 +344,14 @@ const ProfilePage: React.FC = () => {
                 Достижения
               </h4>
 
-              {achievementsLoading ? (
+              {(achievementsLoading && !auth.user.achievements?.length) ? (
                 <div className="text-center py-4">
                   <div className="animate-spin w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                   <p className="text-gray-400 text-sm">Загрузка...</p>
                 </div>
-              ) : achievements.length > 0 ? (
+              ) : achievementsProgress.length > 0 ? (
                 <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {achievements.slice(0, 5).map((achievement) => (
+                  {achievementsProgress.slice(0, 5).map((achievement) => (
                     <div key={achievement.id} className={`p-3 rounded-lg border ${
                       achievement.is_completed
                         ? 'bg-green-500/10 border-green-500/30'
@@ -418,7 +435,7 @@ const ProfilePage: React.FC = () => {
             Инвентарь ({availableInventory.length} предметов)
           </h3>
 
-          {inventoryLoading ? (
+          {(inventoryLoading && !auth.user.inventory?.length) ? (
             <div className="text-center py-12">
               <div className="animate-spin w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-400">Загрузка инвентаря...</p>
