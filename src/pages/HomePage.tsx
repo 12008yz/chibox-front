@@ -1,6 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
 const HomePage: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [registrationData, setRegistrationData] = useState<{
+    email: string;
+    previewUrl?: string;
+  } | null>(null);
+
+  // Проверяем, нужно ли показать модальное окно регистрации
+  useEffect(() => {
+    if (location.state?.showRegistrationSuccess) {
+      setRegistrationData({
+        email: location.state.registrationEmail,
+        previewUrl: location.state.previewUrl
+      });
+      setShowRegistrationModal(true);
+
+      // Очищаем state, чтобы модальное окно не показывалось при обновлении страницы
+      navigate('/', { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleCloseRegistrationModal = () => {
+    setShowRegistrationModal(false);
+    setRegistrationData(null);
+  };
   return (
     <div className="min-h-screen bg-[#151225] text-white">
       <div className="container mx-auto px-4 py-8">
@@ -30,6 +58,16 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Модальное окно успешной регистрации */}
+      {registrationData && (
+        <RegistrationSuccessModal
+          isOpen={showRegistrationModal}
+          onClose={handleCloseRegistrationModal}
+          email={registrationData.email}
+          previewUrl={registrationData.previewUrl}
+        />
+      )}
     </div>
   );
 };

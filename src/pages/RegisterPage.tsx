@@ -6,7 +6,7 @@ import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi'
 import { loginSuccess } from '../features/auth/authSlice';
 import MainButton from '../components/MainButton';
 import SteamLoginButton from '../components/SteamLoginButton';
-import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
+
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -15,13 +15,7 @@ const RegisterPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Состояние для модального окна
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [registrationData, setRegistrationData] = useState<{
-    email: string;
-    previewUrl?: string;
-  } | null>(null);
-  const [allowRedirect, setAllowRedirect] = useState(false);
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,12 +25,7 @@ const RegisterPage: React.FC = () => {
 
   const isLoading = isRegistering || isLoggingIn;
 
-  // Автоматический редирект только после закрытия модального окна
-  useEffect(() => {
-    if (auth.isAuthenticated && allowRedirect) {
-      navigate('/');
-    }
-  }, [auth.isAuthenticated, allowRedirect, navigate]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,12 +46,6 @@ const RegisterPage: React.FC = () => {
       const registerResult = await register({ username, email, password }).unwrap();
 
       if (registerResult.success && registerResult.data) {
-        // Сохраняем данные для модального окна
-        setRegistrationData({
-          email: registerResult.data.email,
-          previewUrl: registerResult.previewUrl
-        });
-
         try {
           // Автоматически логиним пользователя после успешной регистрации
           const loginResult = await login({ email, password }).unwrap();
@@ -79,8 +62,14 @@ const RegisterPage: React.FC = () => {
           // Если автологин не удался, не показываем ошибку - пользователь может войти вручную
         }
 
-        // Показываем модальное окно независимо от результата автологина
-        setShowSuccessModal(true);
+        // Сразу перенаправляем на главную страницу с данными для модального окна
+        navigate('/', {
+          state: {
+            showRegistrationSuccess: true,
+            registrationEmail: registerResult.data.email,
+            previewUrl: registerResult.previewUrl
+          }
+        });
       } else {
         setError('Ошибка регистрации. Попробуйте снова.');
       }
@@ -90,16 +79,7 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  const handleCloseSuccessModal = () => {
-    // Сразу перенаправляем на главную страницу с модальным окном
-    navigate('/', {
-      state: {
-        showRegistrationSuccess: true,
-        registrationEmail: registrationData?.email,
-        previewUrl: registrationData?.previewUrl
-      }
-    });
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#151225]">
@@ -216,15 +196,7 @@ const RegisterPage: React.FC = () => {
         </form>
       </div>
 
-      {/* Модальное окно успешной регистрации */}
-      {registrationData && (
-        <RegistrationSuccessModal
-          isOpen={showSuccessModal}
-          onClose={handleCloseSuccessModal}
-          email={registrationData.email}
-          previewUrl={registrationData.previewUrl}
-        />
-      )}
+
     </div>
   );
 };
