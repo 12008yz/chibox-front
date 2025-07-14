@@ -44,7 +44,14 @@ const authSlice = createSlice({
     // Обновление данных пользователя
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+        // Глубокое слияние для сложных объектов
+        state.user = {
+          ...state.user,
+          ...action.payload,
+          // Специальная обработка для массивов - полная замена если есть новые данные
+          inventory: action.payload.inventory || state.user.inventory,
+          achievements: action.payload.achievements || state.user.achievements,
+        };
       }
     },
 

@@ -1,28 +1,37 @@
 import React from 'react';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
+import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
 
-  // Дополнительно загружаем данные через API только если их нет в auth state
+  // Используем кастомный хук для получения актуальных данных пользователя
+  const { userData: currentUserData, isLoading: userLoading, refetch: refetchUser } = useUserData({
+    refetchOnMount: true, // Всегда запрашиваем актуальные данные при заходе на страницу
+  });
+
+  // Дополнительно загружаем данные через API только если их нет в свежих данных профиля
   const { data: inventoryData, isLoading: inventoryLoading } = useGetUserInventoryQuery({
     page: 1,
     limit: 50,
     status: 'inventory'
   }, {
-    skip: !!auth.user?.inventory?.length // Пропускаем запрос если есть данные в auth state
+    skip: !!currentUserData?.inventory?.length || userLoading // Пропускаем если данные уже пришли из профиля
   });
 
   const { data: achievementsProgressData, isLoading: achievementsLoading } = useGetAchievementsProgressQuery(undefined, {
-    skip: !!auth.user?.achievements?.length // Пропускаем запрос если есть данные в auth state
+    skip: !!currentUserData?.achievements?.length || userLoading // Пропускаем если данные уже пришли из профиля
   });
 
   // Получаем все достижения для правильного подсчета
   const { data: allAchievementsData } = useGetUserAchievementsQuery();
 
-  if (!auth.user) {
+  // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
+  const user = currentUserData || auth.user;
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white p-4">
         <div className="container mx-auto max-w-7xl">
@@ -42,16 +51,16 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const progressPercentage = auth.user.xp_to_next_level
-    ? Math.round(((auth.user.xp || 0) / ((auth.user.xp || 0) + auth.user.xp_to_next_level)) * 100)
+  const progressPercentage = user.xp_to_next_level
+    ? Math.round(((user.xp || 0) / ((user.xp || 0) + user.xp_to_next_level)) * 100)
     : 0;
 
-  // Получаем инвентарь и достижения - приоритет данным из auth state
-  const inventory = auth.user.inventory?.length
-    ? auth.user.inventory
+  // Получаем инвентарь и достижения - приоритет данным из user (актуальные данные)
+  const inventory = user.inventory?.length
+    ? user.inventory
     : (inventoryData?.success ? inventoryData.data.items : []);
-  const achievementsProgress = auth.user.achievements?.length
-    ? auth.user.achievements
+  const achievementsProgress = user.achievements?.length
+    ? user.achievements
     : (achievementsProgressData?.success ? achievementsProgressData.data : []);
 
   // Общее количество достижений в системе
@@ -103,6 +112,17 @@ const ProfilePage: React.FC = () => {
 
         {/* Header Section */}
         <div className="relative bg-gradient-to-r from-[#1a1530] via-[#2a1f47] to-[#1a1530] rounded-2xl p-8 border border-gray-700/30 overflow-hidden">
+          {/* Refresh Button */}
+          <button
+            onClick={() => refetchUser()}
+            disabled={userLoading}
+            className={`absolute top-4 right-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/50 text-blue-400 p-2 rounded-lg transition-all duration-200 ${userLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title="Обновить данные профиля"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
@@ -115,24 +135,24 @@ const ProfilePage: React.FC = () => {
               <div className="relative">
                 <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-1">
                   <Avatar
-                    steamAvatar={auth.user.steam_avatar}
-                    id={auth.user.id}
+                    steamAvatar={user.steam_avatar}
+                    id={user.id}
                     size="large"
-                    level={auth.user.level}
+                    level={user.level}
                     showLevel={false}
                   />
                 </div>
                 {/* Level Badge */}
                 <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-sm px-3 py-1 rounded-full shadow-lg">
-                  LVL {auth.user.level}
+                  LVL {user.level}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  {auth.user.steam_profile?.personaname || auth.user.username}
+                  {user.steam_profile?.personaname || user.username}
                 </h1>
-                <p className="text-gray-400 text-sm">ID: {auth.user.id}</p>
+                <p className="text-gray-400 text-sm">ID: {user.id}</p>
 
                 {/* Steam Status */}
                 <div className="flex items-center gap-2">
@@ -140,11 +160,11 @@ const ProfilePage: React.FC = () => {
                     <path d="M12 0a12 12 0 0 0-8.2 20.8l4.4-1.8a3.4 3.4 0 0 0 6.4-1.8 3.4 3.4 0 0 0-3.3-3.4h-.2l-4.5-6.6a4.5 4.5 0 0 1 8.8 1.2v.3l6.6 4.5a3.4 3.4 0 0 0 1.8-6.4A12 12 0 0 0 12 0zm-4.6 16.6l-3.6 1.5a2.6 2.6 0 0 0 4.8.9l-1.2-2.4zm7.9-5.4a2.3 2.3 0 1 1-4.6 0 2.3 2.3 0 0 1 4.6 0z"/>
                   </svg>
                   <span className={`text-sm px-2 py-1 rounded-full ${
-                    auth.user.steam_id
+                    user.steam_id
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-red-500/20 text-red-400 border border-red-500/30'
                   }`}>
-                    {auth.user.steam_id ? 'Steam подключен' : 'Steam не подключен'}
+                    {user.steam_id ? 'Steam подключен' : 'Steam не подключен'}
                   </span>
                 </div>
               </div>
@@ -156,7 +176,7 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-400 text-sm">Баланс</span>
                   <span className="text-2xl font-bold text-green-400">
-                    ${Number(auth.user.balance).toFixed(2)}
+                    ${Number(user.balance).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -174,9 +194,9 @@ const ProfilePage: React.FC = () => {
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>{auth.user.xp} XP</span>
-                  {auth.user.xp_to_next_level && (
-                    <span>До следующего: {auth.user.xp_to_next_level} XP</span>
+                  <span>{user.xp} XP</span>
+                  {user.xp_to_next_level && (
+                    <span>До следующего: {user.xp_to_next_level} XP</span>
                   )}
                 </div>
               </div>
@@ -197,8 +217,8 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">Кейсов сегодня</p>
                 <p className="text-xl font-bold text-white">
-                  {auth.user.cases_opened_today || 0}
-                  <span className="text-gray-400 text-sm">/{auth.user.max_daily_cases || 0}</span>
+                  {user.cases_opened_today || 0}
+                  <span className="text-gray-400 text-sm">/{user.max_daily_cases || 0}</span>
                 </p>
               </div>
             </div>
@@ -249,11 +269,11 @@ const ProfilePage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">Подписка</p>
                 <p className="text-xl font-bold text-white">
-                  {auth.user.subscription_tier ? (
+                  {user.subscription_tier ? (
                     <>
-                      Tier {auth.user.subscription_tier}
+                      Tier {user.subscription_tier}
                       <span className="text-gray-400 text-sm block">
-                        {auth.user.subscription_days_left} дней
+                        {user.subscription_days_left} дней
                       </span>
                     </>
                   ) : (
@@ -279,7 +299,7 @@ const ProfilePage: React.FC = () => {
               Лучшее выбитое оружие
             </h3>
 
-            {(inventoryLoading && !auth.user.inventory?.length) ? (
+            {(inventoryLoading && !user.inventory?.length) ? (
               <div className="text-center py-8">
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-gray-400">Загрузка...</p>
@@ -344,7 +364,7 @@ const ProfilePage: React.FC = () => {
                 Достижения
               </h4>
 
-              {(achievementsLoading && !auth.user.achievements?.length) ? (
+              {(achievementsLoading && !user.achievements?.length) ? (
                 <div className="text-center py-4">
                   <div className="animate-spin w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                   <p className="text-gray-400 text-sm">Загрузка...</p>
@@ -392,29 +412,29 @@ const ProfilePage: React.FC = () => {
             <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
               <h4 className="text-lg font-semibold mb-3">Бонусы к дропу</h4>
               <div className="space-y-2">
-                {auth.user.level_bonus_percentage && (
+                {user.level_bonus_percentage && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Уровень:</span>
-                    <span className="text-green-400 text-sm">+{auth.user.level_bonus_percentage}%</span>
+                    <span className="text-green-400 text-sm">+{user.level_bonus_percentage}%</span>
                   </div>
                 )}
-                {auth.user.subscription_bonus_percentage && (
+                {user.subscription_bonus_percentage && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Подписка:</span>
-                    <span className="text-blue-400 text-sm">+{auth.user.subscription_bonus_percentage}%</span>
+                    <span className="text-blue-400 text-sm">+{user.subscription_bonus_percentage}%</span>
                   </div>
                 )}
-                {auth.user.achievements_bonus_percentage && (
+                {user.achievements_bonus_percentage && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Достижения:</span>
-                    <span className="text-purple-400 text-sm">+{auth.user.achievements_bonus_percentage}%</span>
+                    <span className="text-purple-400 text-sm">+{user.achievements_bonus_percentage}%</span>
                   </div>
                 )}
                 <div className="border-t border-gray-600/30 pt-2 mt-3">
                   <div className="flex justify-between">
                     <span className="text-white font-semibold text-sm">Итого:</span>
                     <span className="text-yellow-400 font-semibold text-sm">
-                      +{auth.user.total_drop_bonus_percentage || 0}%
+                      +{user.total_drop_bonus_percentage || 0}%
                     </span>
                   </div>
                 </div>
@@ -435,7 +455,7 @@ const ProfilePage: React.FC = () => {
             Инвентарь ({availableInventory.length} предметов)
           </h3>
 
-          {(inventoryLoading && !auth.user.inventory?.length) ? (
+          {(inventoryLoading && !user.inventory?.length) ? (
             <div className="text-center py-12">
               <div className="animate-spin w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-400">Загрузка инвентаря...</p>
