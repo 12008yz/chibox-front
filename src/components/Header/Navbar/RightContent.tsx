@@ -108,7 +108,7 @@ const RightContent: React.FC<RightContentProps> = ({
       </div>
 
       {/* Уведомления */}
-      <div className="relative">
+      <div className="relative" style={{ zIndex: 999999 }}>
         <button
           onClick={toggleNotifications}
           className="relative p-2 text-gray-400 hover:text-white transition-colors"

@@ -56,8 +56,8 @@ const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <div className="w-full flex justify-center">
-      <nav className="py-4 px-8 bg-[#19172D] w-[calc(100vw-2rem)] max-w-[1920px] flex justify-center rounded-lg border border-gray-700/50">
+    <div className="w-full flex justify-center relative z-[999999]">
+      <nav className="py-4 px-8 bg-[#19172D] w-[calc(100vw-2rem)] max-w-[1920px] flex justify-center rounded-lg border border-gray-700/50 relative z-[999999]">
         <div className="flex items-center justify-between w-full min-h-[48px]">
 
           {/* Мобильное меню кнопка */}
