@@ -52,13 +52,44 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  // Расчет прогресса и оставшегося опыта
+  // Расчет прогресса и оставшегося опыта на основе серверной логики
   const currentXp = user.xp || 0;
-  const xpToNext = user.xp_to_next_level || 0;
-  const totalXpNeeded = currentXp + xpToNext;
+  const xpToNextLevel = user.xp_to_next_level || 100;
 
-  const progressPercentage = totalXpNeeded > 0
-    ? Math.round((currentXp / totalXpNeeded) * 100)
+  // Функция для расчета XP требований (дублирует серверную логику)
+  const calculateXpRequired = (level: number): number => {
+    let totalXpRequired = 0;
+
+    for (let i = 1; i < level; i++) {
+      let xpForThisLevel;
+
+      if (i <= 10) {
+        xpForThisLevel = 100 + (i - 1) * 50;
+      } else if (i <= 25) {
+        xpForThisLevel = 500 + (i - 10) * 100;
+      } else if (i <= 50) {
+        xpForThisLevel = 2000 + (i - 25) * 200;
+      } else if (i <= 75) {
+        xpForThisLevel = 7000 + (i - 50) * 400;
+      } else {
+        xpForThisLevel = 17000 + (i - 75) * 800;
+      }
+
+      totalXpRequired += xpForThisLevel;
+    }
+
+    return totalXpRequired;
+  };
+
+  // XP нужное для достижения текущего уровня
+  const xpRequiredForCurrentLevel = calculateXpRequired(user.level);
+
+  // XP уже набранное в текущем уровне
+  const xpInCurrentLevel = Math.max(0, currentXp - xpRequiredForCurrentLevel);
+
+  // Процент прогресса в текущем уровне
+  const progressPercentage = xpToNextLevel > 0
+    ? Math.min(100, Math.round((xpInCurrentLevel / xpToNextLevel) * 100))
     : 0;
 
   // Получаем инвентарь и достижения - приоритет данным из user (актуальные данные)
@@ -199,10 +230,8 @@ const ProfilePage: React.FC = () => {
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>{user.xp} XP</span>
-                  {user.xp_to_next_level && (
-                    <span>До следующего: {user.xp_to_next_level} XP</span>
-                  )}
+                  <span>{xpInCurrentLevel.toLocaleString()}/{xpToNextLevel.toLocaleString()} XP</span>
+                  <span>Уровень {user.level}/100</span>
                 </div>
               </div>
             </div>
