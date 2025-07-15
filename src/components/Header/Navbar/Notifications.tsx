@@ -128,7 +128,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     return (
         <div
             ref={notificationsRef}
-            className="fixed top-20 right-4 w-80 bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-96 overflow-hidden"
+            className="fixed top-25 right-79 w-80 bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-96 overflow-hidden"
             style={{ zIndex: 999999 }}
         >
             {/* Заголовок */}
