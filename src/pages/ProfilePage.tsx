@@ -220,7 +220,50 @@ const ProfilePage: React.FC = () => {
               {/* Level Progress */}
               <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 text-sm">Прогресс уровня</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 text-sm">Прогресс уровня</span>
+                    <Tooltip
+                      content={
+                        <div className="space-y-2">
+                          <div className="font-semibold text-white mb-2">Опыт начисляется за:</div>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                              <span>Открытие кейсов</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                              <span>Выполнение достижений</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                              <span>Ежедневный вход в игру</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                              <span>Покупки в магазине</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                              <span>Участие в событиях</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                              <span>Приглашение друзей</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-600">
+                            Повышение уровня увеличивает бонус к дропу: +0.02% за каждый уровень
+                          </div>
+                        </div>
+                      }
+                      position="bottom"
+                    >
+                      <div className="w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center cursor-help hover:bg-gray-500 transition-colors">
+                        <span className="text-xs text-white font-bold">?</span>
+                      </div>
+                    </Tooltip>
+                  </div>
                   <span className="text-sm text-gray-300">{progressPercentage}%</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
@@ -521,7 +564,7 @@ const ProfilePage: React.FC = () => {
                   <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                     {inventoryItem.item.name}
                   </h5>
-                  <p className="text-green-400 text-sm font-bold">${Number(inventoryItem.item.price).toFixed(2)}</p>
+                  <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
                   <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                     {getRarityName(inventoryItem.item.rarity)}
                   </p>
