@@ -146,7 +146,7 @@ const Avatar: React.FC<AvatarProps> = ({
     };
 
     return (
-        <div className="min-w-[48px]">
+        <div className="flex items-center justify-center">
             {loading ? (
                 <LoadingSkeleton />
             ) : (

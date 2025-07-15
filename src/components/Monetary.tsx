@@ -1,22 +1,20 @@
 interface MonetaryProps {
-   value: number;
-   showFraction?: boolean;
+  value: number;
+  showFraction?: boolean;
 }
 
 const Monetary: React.FC<MonetaryProps> = ({ value, showFraction = false }) => {
-   const formattedValue = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'DOL',
-      maximumFractionDigits: showFraction ? 2 : 0
-   })
-   .format(value)
-   .replace('DOL', 'РУБ');
+  const formattedValue = new Intl.NumberFormat('ru-RU', {
+     minimumFractionDigits: showFraction ? 2 : 0,
+     maximumFractionDigits: showFraction ? 2 : 0
+  })
+  .format(value) + ' КР';
 
-  return (
-    <span>
-      {formattedValue}
-    </span>
-  );
+ return (
+   <span>
+     {formattedValue}
+   </span>
+ );
 };
 
 export default Monetary;

@@ -3,6 +3,7 @@ import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
+import Tooltip from '../components/Tooltip';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
@@ -51,8 +52,13 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const progressPercentage = user.xp_to_next_level
-    ? Math.round(((user.xp || 0) / ((user.xp || 0) + user.xp_to_next_level)) * 100)
+  // Расчет прогресса и оставшегося опыта
+  const currentXp = user.xp || 0;
+  const xpToNext = user.xp_to_next_level || 0;
+  const totalXpNeeded = currentXp + xpToNext;
+
+  const progressPercentage = totalXpNeeded > 0
+    ? Math.round((currentXp / totalXpNeeded) * 100)
     : 0;
 
   // Получаем инвентарь и достижения - приоритет данным из user (актуальные данные)
@@ -106,6 +112,16 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const getSubscriptionName = (tier: string | number) => {
+    const tierNumber = typeof tier === 'string' ? parseInt(tier) : tier;
+    switch (tierNumber) {
+      case 1: return 'Статус';
+      case 2: return 'Статус+';
+      case 3: return 'Статус++';
+      default: return `Tier ${tier}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
       <div className="container mx-auto max-w-7xl p-4 space-y-6">
@@ -122,7 +138,7 @@ const ProfilePage: React.FC = () => {
             {/* User Avatar and Basic Info */}
             <div className="flex items-center gap-6">
               <div className="relative">
-                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-1">
+                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-1 flex items-center justify-center">
                   <Avatar
                     steamAvatar={user.steam_avatar}
                     id={user.id}
@@ -165,7 +181,7 @@ const ProfilePage: React.FC = () => {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-400 text-sm">Баланс</span>
                   <span className="text-2xl font-bold text-green-400">
-                    ${Number(user.balance).toFixed(2)}
+                    {Number(user.balance).toFixed(2)} КР
                   </span>
                 </div>
               </div>
@@ -204,10 +220,9 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Кейсов сегодня</p>
+                <p className="text-gray-400 text-sm">Кейсов открыто</p>
                 <p className="text-xl font-bold text-white">
-                  {user.cases_opened_today || 0}
-                  <span className="text-gray-400 text-sm">/{user.max_daily_cases || 0}</span>
+                  {user.total_cases_opened || 0}
                 </p>
               </div>
             </div>
@@ -256,11 +271,10 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Подписка</p>
                 <p className="text-xl font-bold text-white">
                   {user.subscription_tier ? (
                     <>
-                      Tier {user.subscription_tier}
+                      {getSubscriptionName(user.subscription_tier)}
                       <span className="text-gray-400 text-sm block">
                         {user.subscription_days_left} дней
                       </span>
@@ -321,7 +335,7 @@ const ProfilePage: React.FC = () => {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.item.rarity)} text-white`}>
                         {getRarityName(bestWeapon.item.rarity)}
                       </span>
-                      <span className="text-green-400 font-bold text-lg">${Number(bestWeapon.item.price).toFixed(2)}</span>
+                      <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.item.price).toFixed(2)} КР</span>
                     </div>
                     <p className="text-gray-400 text-sm">
                       Получено: {new Date((bestWeapon as any).acquisition_date).toLocaleDateString()}
@@ -409,7 +423,7 @@ const ProfilePage: React.FC = () => {
                 )}
                 {user.subscription_bonus_percentage && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Подписка:</span>
+                    <span className="text-gray-400 text-sm">Статус:</span>
                     <span className="text-blue-400 text-sm">+{user.subscription_bonus_percentage}%</span>
                   </div>
                 )}
@@ -441,7 +455,7 @@ const ProfilePage: React.FC = () => {
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
             </div>
-            Инвентарь 
+            Инвентарь
           </h3>
 
           {(inventoryLoading && !user.inventory?.length) ? (

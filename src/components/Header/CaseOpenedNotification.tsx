@@ -148,7 +148,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
           />
           <div>
             <p className="text-white text-sm font-medium">{item.name}</p>
-            <p className="text-green-400 text-sm">${item.price.toFixed(2)}</p>
+            <p className="text-green-400 text-sm">{item.price.toFixed(2)} КР</p>
           </div>
         </div>
       </div>

@@ -3,8 +3,8 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import CaseOpenedNotification from "./CaseOpenedNotification";
 import { ImConnection } from "react-icons/im";
-import { useNavigate } from "react-router-dom";
-import { BiArrowBack } from "react-icons/bi";
+
+
 
 interface BasicItem {
   id: string;
@@ -46,8 +46,7 @@ const Header: React.FC<HeaderProps> = ({
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
   const [caseNotifications, setCaseNotifications] = useState<CaseOpeningItem[]>([]);
 
-  const navigate = useNavigate();
-  const isHome = window.location.pathname === "/";
+
 
   const items = [
     {
@@ -111,18 +110,7 @@ const Header: React.FC<HeaderProps> = ({
         user={user}
       />
 
-      {/* Кнопка "Назад" для неглавных страниц */}
-      {!isHome && (
-        <div className="p-4">
-          <div
-            className="flex items-center gap-2 text-[#84819a] cursor-pointer w-fit hover:text-white transition-colors"
-            onClick={() => navigate(-1)}
-          >
-            <BiArrowBack />
-            <span>Назад</span>
-          </div>
-        </div>
-      )}
+
 
       {/* Боковое меню */}
       {openSidebar && (
