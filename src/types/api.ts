@@ -107,11 +107,15 @@ export interface UserInventoryItem {
   id: string;
   item_type: 'item';
   item: Item;
+  item_id: string;
   acquisition_date: string;
   source: string;
   status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory';
   case_id?: string;
+  case_template_id?: string;
   withdrawal?: any;
+  transaction_date?: string;
+  expires_at?: string;
 }
 
 export interface UserCaseItem {
@@ -119,10 +123,12 @@ export interface UserCaseItem {
   item_type: 'case';
   case_template_id: string;
   case_template?: CaseTemplate; // Опциональное, может загружаться отдельно
+  item_id?: string;
   acquisition_date: string;
   expires_at?: string;
   source: string;
-  status: 'inventory';
+  status: 'inventory' | 'used' | 'sold' | 'withdrawn';
+  transaction_date?: string;
 }
 
 // Союзный тип для элементов инвентаря
@@ -237,7 +243,8 @@ export interface BuyCaseRequest {
 }
 
 export interface OpenCaseRequest {
-  case_id: string;
+  case_id?: string;
+  inventoryItemId?: string; // Для открытия кейсов из инвентаря
 }
 
 export interface SellItemRequest {

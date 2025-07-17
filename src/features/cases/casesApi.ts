@@ -4,6 +4,7 @@ import type {
   BuyCaseRequest,
   OpenCaseRequest,
   UserInventoryItem,
+  Item,
   ApiResponse,
   PaginatedResponse
 } from '../../types/api';
@@ -58,9 +59,10 @@ export const casesApi = baseApi.injectEndpoints({
     // Открытие кейса
     openCase: builder.mutation<
       ApiResponse<{
-        item: UserInventoryItem;
+        item: Item;
         animation_data?: any;
         new_balance?: number;
+        caseId?: string;
       }>,
       OpenCaseRequest
     >({

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
-import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
+import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
@@ -46,6 +46,9 @@ const ProfilePage: React.FC = () => {
   // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
 
+  // Хук для открытия кейса
+  const [openCase, { isLoading: isOpeningCase }] = useOpenCaseMutation();
+
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
 
@@ -53,6 +56,33 @@ const ProfilePage: React.FC = () => {
   const getCaseTemplateById = (templateId: string) => {
     if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
     return caseTemplatesData.data.find(template => template.id === templateId);
+  };
+
+  // Функция для открытия кейса из инвентаря
+  const handleOpenCase = async (inventoryItemId: string) => {
+    if (isOpeningCase) return;
+
+    try {
+      const result = await openCase({ inventoryItemId }).unwrap();
+
+      if (result.success && result.data?.item) {
+        const item = result.data.item;
+        // result.data.item это теперь Item, а не UserInventoryItem
+        const itemName = item.name || 'Неизвестный предмет';
+        const itemPrice = item.price || '0.00';
+
+        alert(`🎉 Поздравляем! Вы получили: ${itemName}\nЦена: ${itemPrice} КР`);
+
+        // Перезагружаем данные инвентаря
+        window.location.reload();
+      } else {
+        alert('Ошибка: Не удалось получить информацию о предмете');
+      }
+    } catch (error: any) {
+      console.error('Ошибка при открытии кейса:', error);
+      const errorMessage = error?.data?.message || error?.message || 'Неизвестная ошибка';
+      alert(`Ошибка при открытии кейса: ${errorMessage}`);
+    }
   };
 
   if (!user) {
@@ -149,9 +179,9 @@ const ProfilePage: React.FC = () => {
   };
 
   const getOpenedCases = () => {
-    // Кейсы которые были открыты (предметы полученные из кейсов)
+    // Предметы, полученные из кейсов
     return inventory.filter(item =>
-      isUserItem(item) && item.source === 'case' && (item.status === 'sold' || item.status === 'withdrawn' || item.status === 'used')
+      isUserItem(item) && item.source === 'case'
     );
   };
 
@@ -755,11 +785,14 @@ const ProfilePage: React.FC = () => {
                       return (
                         <>
                           <div
-                            className="w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center cursor-pointer hover:from-yellow-400 hover:to-orange-500 transition-all duration-300"
+                            className={`w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center transition-all duration-300 ${
+                              activeInventoryTab === 'active' && inventoryItem.status === 'inventory'
+                                ? 'cursor-pointer hover:from-yellow-400 hover:to-orange-500'
+                                : 'cursor-not-allowed opacity-60'
+                            }`}
                             onClick={() => {
-                              if (activeInventoryTab === 'active') {
-                                alert(`Открытие кейса: ${caseName}`);
-                                // Здесь будет логика открытия кейса
+                              if (activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && !isOpeningCase) {
+                                handleOpenCase(inventoryItem.id);
                               }
                             }}
                           >
@@ -789,9 +822,22 @@ const ProfilePage: React.FC = () => {
                             <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
                               КЕЙС
                             </p>
-                            {activeInventoryTab === 'active' && (
-                              <button className="text-xs px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors duration-200">
-                                Открыть
+                            {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
+                              <button
+                                className={`text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
+                                  isOpeningCase
+                                    ? 'bg-gray-500 cursor-not-allowed'
+                                    : 'bg-green-600 hover:bg-green-500'
+                                }`}
+                                disabled={isOpeningCase}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!isOpeningCase) {
+                                    handleOpenCase(inventoryItem.id);
+                                  }
+                                }}
+                              >
+                                {isOpeningCase ? 'Открываем...' : 'Открыть'}
                               </button>
                             )}
                           </div>
