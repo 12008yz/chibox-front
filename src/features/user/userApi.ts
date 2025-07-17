@@ -11,6 +11,7 @@ import type {
   DepositRequest,
   ApiResponse,
   PaginatedResponse,
+  InventoryResponse,
   BonusStatus
 } from '../../types/api';
 
@@ -25,7 +26,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение инвентаря пользователя
     getUserInventory: builder.query<
-      PaginatedResponse<UserInventoryItem>,
+      InventoryResponse,
       { page?: number; limit?: number; status?: string }
     >({
       query: ({ page = 1, limit = 20, status } = {}) => {

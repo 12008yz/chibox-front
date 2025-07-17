@@ -51,33 +51,81 @@ export interface User {
 export interface CaseTemplate {
   id: string;
   name: string;
-  price: number;
-  image_url: string;
+  price: string;
+  image_url: string | null;
   description?: string;
-  is_daily: boolean;
-  created_at: string;
+  animation_url?: string | null;
+  type?: string;
+  min_subscription_tier?: number;
+  is_active?: boolean;
+  availability_start?: string | null;
+  availability_end?: string | null;
+  max_opens_per_user?: number | null;
+  cooldown_hours?: number;
+  item_pool_config?: any;
+  special_conditions?: string | null;
+  sort_order?: number;
+  color_scheme?: string | null;
+  guaranteed_min_value?: string | null;
+  is_daily?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Item {
   id: string;
   name: string;
+  description?: string;
+  image_url: string | null;
+  price: string;
   rarity: string;
-  price: number;
-  image_url: string;
-  category: string;
+  drop_weight?: number;
+  min_subscription_tier?: number;
+  weapon_type?: string;
+  skin_name?: string;
   steam_market_hash_name?: string;
-  float_value?: number;
-  in_stock: boolean;
+  steam_market_url?: string;
+  is_available?: boolean;
+  float_value?: number | null;
+  exterior?: string;
+  quality?: string | null;
+  stickers?: string | null;
+  origin?: string;
+  in_stock?: boolean;
+  is_tradable?: boolean;
+  category?: string;
+  category_id?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface UserInventoryItem {
   id: string;
-  user_id: string;
-  item_id: string;
-  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory';
-  acquired_at: string;
+  item_type: 'item';
   item: Item;
+  acquisition_date: string;
+  source: string;
+  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory';
+  case_id?: string;
+  withdrawal?: any;
 }
+
+export interface UserCaseItem {
+  id: string;
+  item_type: 'case';
+  case_template: CaseTemplate;
+  acquisition_date: string;
+  expires_at?: string;
+  source: string;
+  status: 'inventory';
+}
+
+// Союзный тип для элементов инвентаря
+export type InventoryItem = UserInventoryItem | UserCaseItem;
 
 export interface Achievement {
   id: string;
@@ -155,6 +203,18 @@ export interface PaginatedResponse<T> {
     total: number;
     page: number;
     limit: number;
+    totalPages: number;
+  };
+}
+
+export interface InventoryResponse {
+  success: boolean;
+  data: {
+    items: UserInventoryItem[];
+    cases: UserCaseItem[];
+    totalItems: number;
+    totalCases: number;
+    currentPage: number;
     totalPages: number;
   };
 }

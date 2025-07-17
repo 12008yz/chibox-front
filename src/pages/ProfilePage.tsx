@@ -4,9 +4,19 @@ import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAc
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
+import type { UserInventoryItem, UserCaseItem } from '../types/api';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
+
+  // Helper функции для определения типа элемента инвентаря
+  const isUserItem = (item: any): item is UserInventoryItem => {
+    return item.item && !item.case_template;
+  };
+
+  const isUserCase = (item: any): item is UserCaseItem => {
+    return item.case_template && !item.item;
+  };
 
   // Используем кастомный хук для получения актуальных данных пользователя
   const { userData: currentUserData, isLoading: userLoading } = useUserData({
@@ -19,7 +29,7 @@ const ProfilePage: React.FC = () => {
     limit: 50,
     status: 'inventory'
   }, {
-    skip: !!currentUserData?.inventory?.length || userLoading // Пропускаем если данные уже пришли из профиля
+    skip: userLoading // Always fetch inventory data unless user is loading
   });
 
   const { data: achievementsProgressData, isLoading: achievementsLoading } = useGetAchievementsProgressQuery(undefined, {
@@ -92,10 +102,17 @@ const ProfilePage: React.FC = () => {
     ? Math.min(100, Math.round((xpInCurrentLevel / xpToNextLevel) * 100))
     : 0;
 
-  // Получаем инвентарь и достижения - приоритет данным из user (актуальные данные)
-  const inventory = user.inventory?.length
-    ? user.inventory
-    : (inventoryData?.success ? inventoryData.data.items : []);
+  // Получаем инвентарь и достижения - приоритет данным из API (содержат items и cases)
+  console.log('user.inventory:', user.inventory);
+  console.log('inventoryData:', inventoryData);
+
+  const inventory = inventoryData?.success && (inventoryData.data.items.length > 0 || inventoryData.data.cases.length > 0) ?
+    [
+      ...(inventoryData.data.items || []),
+      ...(inventoryData.data.cases || [])
+    ] : (user.inventory || []);
+
+  console.log('Final inventory:', inventory);
   const achievementsProgress = user.achievements?.length
     ? user.achievements
     : (achievementsProgressData?.success ? achievementsProgressData.data : []);
@@ -108,14 +125,13 @@ const ProfilePage: React.FC = () => {
 
   // Находим самый дорогой предмет как "лучшее оружие"
   const bestWeapon = inventory
-    .filter(item => item.status === 'inventory')
+    .filter((item): item is UserInventoryItem => item.status === 'inventory' && isUserItem(item) && !!item.item.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 
   // Фильтруем инвентарь по статусу inventory
-  const availableInventory = inventory.filter(item => item.status === 'inventory');
-
-  // Завершенные достижения
-  const completedAchievements = achievementsProgress.filter((ach: any) => ach.is_completed);
+  const availableInventory = inventory.filter(item =>
+    item.status === 'inventory' && (isUserItem(item) || isUserCase(item))
+  );
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -379,7 +395,7 @@ const ProfilePage: React.FC = () => {
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-gray-400">Загрузка...</p>
               </div>
-            ) : bestWeapon ? (
+            ) : bestWeapon && isUserItem(bestWeapon) ? (
               <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
                 <div className="flex items-center gap-6">
                   <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg`}>
@@ -542,32 +558,78 @@ const ProfilePage: React.FC = () => {
                   key={inventoryItem.id}
                   className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105`}
                 >
-                  <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
-                    {inventoryItem.item.image_url ? (
-                      <img
-                        src={inventoryItem.item.image_url}
-                        alt={inventoryItem.item.name}
-                        className="w-full h-full object-contain rounded"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (nextElement) nextElement.style.display = 'flex';
+                  {isUserItem(inventoryItem) ? (
+                    // Рендеринг предмета
+                    <>
+                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                        {inventoryItem.item.image_url ? (
+                          <img
+                            src={inventoryItem.item.image_url}
+                            alt={inventoryItem.item.name}
+                            className="w-full h-full object-contain rounded"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                          <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                      <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
+                        {inventoryItem.item.name}
+                      </h5>
+                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
+                      <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
+                        {getRarityName(inventoryItem.item.rarity)}
+                      </p>
+                    </>
+                  ) : isUserCase(inventoryItem) ? (
+                    // Рендеринг кейса
+                    <>
+                      <div
+                        className="w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center cursor-pointer hover:from-yellow-400 hover:to-orange-500 transition-all duration-300"
+                        onClick={() => {
+                          alert(`Открытие кейса: ${inventoryItem.case_template.name}`);
+                          // Здесь будет логика открытия кейса
                         }}
-                      />
-                    ) : null}
-                    <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
-                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
-                    {inventoryItem.item.name}
-                  </h5>
-                  <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
-                  <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
-                    {getRarityName(inventoryItem.item.rarity)}
-                  </p>
+                      >
+                        {inventoryItem.case_template.image_url ? (
+                          <img
+                            src={inventoryItem.case_template.image_url}
+                            alt={inventoryItem.case_template.name}
+                            className="w-full h-full object-contain rounded"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.case_template.image_url ? 'none' : 'flex' }}>
+                          <svg className="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                      <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.case_template.name}>
+                        {inventoryItem.case_template.name}
+                      </h5>
+                      <p className="text-yellow-400 text-sm font-bold">{Number(inventoryItem.case_template.price).toFixed(2)} КР</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
+                          КЕЙС
+                        </p>
+                        <button className="text-xs px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors duration-200">
+                          Открыть
+                        </button>
+                      </div>
+                    </>
+                  ) : null}
                 </div>
               ))}
               {availableInventory.length > 12 && (
