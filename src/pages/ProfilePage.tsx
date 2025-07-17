@@ -5,6 +5,7 @@ import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
+import CaseWithDrop from '../components/CaseWithDrop';
 import type { UserInventoryItem, UserCaseItem } from '../types/api';
 
 const ProfilePage: React.FC = () => {
@@ -182,7 +183,7 @@ const ProfilePage: React.FC = () => {
     // Предметы, полученные из кейсов
     return inventory.filter(item =>
       isUserItem(item) && item.source === 'case'
-    );
+    ) as UserInventoryItem[];
   };
 
   const getWithdrawnItems = () => {
@@ -699,7 +700,7 @@ const ProfilePage: React.FC = () => {
           <div className="mb-4 p-3 bg-black/20 rounded-lg border border-gray-700/30">
             <p className="text-sm text-gray-300">
               {activeInventoryTab === 'active' && '🎮 Ваши текущие предметы и неоткрытые кейсы'}
-              {activeInventoryTab === 'opened' && '📦 Предметы, полученные из открытых кейсов'}
+              {activeInventoryTab === 'opened' && '📦 Открытые кейсы - наведите на кейс, чтобы увидеть выпавший предмет'}
               {activeInventoryTab === 'withdrawn' && '📤 Предметы, отправленные в Steam'}
               {activeInventoryTab === 'sold' && '💰 Предметы, проданные за валюту или обмененные на подписку'}
             </p>
@@ -713,149 +714,170 @@ const ProfilePage: React.FC = () => {
             </div>
           ) : filteredInventory.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {filteredInventory.slice(0, 24).map((inventoryItem) => (
-                <div
-                  key={inventoryItem.id}
-                  className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative ${
-                    activeInventoryTab !== 'active' ? 'opacity-75' : ''
-                  }`}
-                >
-                  {/* Status Badge */}
-                  {activeInventoryTab !== 'active' && (
-                    <div className="absolute top-2 right-2 z-10">
-                      <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
-                        activeInventoryTab === 'withdrawn' ? 'bg-purple-500' :
-                        activeInventoryTab === 'sold' ? 'bg-yellow-500' :
-                        'bg-orange-500'
-                      }`}>
-                        {activeInventoryTab === 'withdrawn' ? 'Выведен' :
-                         activeInventoryTab === 'sold' ? 'Продан' :
-                         'Открыт'}
-                      </div>
-                    </div>
-                  )}
+              {activeInventoryTab === 'opened' ? (
+                // Специальный рендеринг для открытых кейсов с анимацией
+                filteredInventory.slice(0, 24).map((inventoryItem) => {
+                  if (isUserItem(inventoryItem)) {
+                    const caseTemplate = inventoryItem.case_template_id
+                      ? getCaseTemplateById(inventoryItem.case_template_id)
+                      : null;
 
-                  {isUserItem(inventoryItem) ? (
-                    // Рендеринг предмета
-                    <>
-                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
-                        {inventoryItem.item.image_url ? (
-                          <img
-                            src={inventoryItem.item.image_url}
-                            alt={inventoryItem.item.name}
-                            className="w-full h-full object-contain rounded"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                              if (nextElement) nextElement.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
-                          <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                          </svg>
+                    return (
+                      <CaseWithDrop
+                        key={inventoryItem.id}
+                        droppedItem={inventoryItem}
+                        caseTemplate={caseTemplate}
+                      />
+                    );
+                  }
+                  return null;
+                })
+              ) : (
+                // Обычный рендеринг для остальных табов
+                filteredInventory.slice(0, 24).map((inventoryItem) => (
+                  <div
+                    key={inventoryItem.id}
+                    className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative ${
+                      activeInventoryTab !== 'active' ? 'opacity-75' : ''
+                    }`}
+                  >
+                    {/* Status Badge */}
+                    {activeInventoryTab !== 'active' && (
+                      <div className="absolute top-2 right-2 z-10">
+                        <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
+                          activeInventoryTab === 'withdrawn' ? 'bg-purple-500' :
+                          activeInventoryTab === 'sold' ? 'bg-yellow-500' :
+                          'bg-orange-500'
+                        }`}>
+                          {activeInventoryTab === 'withdrawn' ? 'Выведен' :
+                           activeInventoryTab === 'sold' ? 'Продан' :
+                           'Открыт'}
                         </div>
                       </div>
-                      <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
-                        {inventoryItem.item.name}
-                      </h5>
-                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
-                      <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
-                        {getRarityName(inventoryItem.item.rarity)}
-                      </p>
-                      {/* Acquisition info */}
-                      <div className="mt-2 text-xs text-gray-400">
-                        <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                        <p className="capitalize">Источник: {
-                          inventoryItem.source === 'case' ? 'Кейс' :
-                          inventoryItem.source === 'purchase' ? 'Покупка' :
-                          inventoryItem.source
-                        }</p>
-                      </div>
-                    </>
-                  ) : isUserCase(inventoryItem) ? (
-                    // Рендеринг кейса
-                    (() => {
-                      const caseTemplate = getCaseTemplateById(inventoryItem.case_template_id);
-                      const caseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
-                      const casePrice = caseTemplate?.price || '0.00';
-                      const caseImageUrl = caseTemplate?.image_url;
+                    )}
 
-                      return (
-                        <>
-                          <div
-                            className={`w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center transition-all duration-300 ${
-                              activeInventoryTab === 'active' && inventoryItem.status === 'inventory'
-                                ? 'cursor-pointer hover:from-yellow-400 hover:to-orange-500'
-                                : 'cursor-not-allowed opacity-60'
-                            }`}
-                            onClick={() => {
-                              if (activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && !isOpeningCase) {
-                                handleOpenCase(inventoryItem.id);
-                              }
-                            }}
-                          >
-                            {caseImageUrl ? (
-                              <img
-                                src={caseImageUrl}
-                                alt={caseName}
-                                className="w-full h-full object-contain rounded"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none';
-                                  const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                                  if (nextElement) nextElement.style.display = 'flex';
-                                }}
-                              />
-                            ) : null}
-                            <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: caseImageUrl ? 'none' : 'flex' }}>
-                              <svg className="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                              </svg>
+                    {isUserItem(inventoryItem) ? (
+                      // Рендеринг предмета
+                      <>
+                        <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                          {inventoryItem.item.image_url ? (
+                            <img
+                              src={inventoryItem.item.image_url}
+                              alt={inventoryItem.item.name}
+                              className="w-full h-full object-contain rounded"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (nextElement) nextElement.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
+                          {inventoryItem.item.name}
+                        </h5>
+                        <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
+                        <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
+                          {getRarityName(inventoryItem.item.rarity)}
+                        </p>
+                        {/* Acquisition info */}
+                        <div className="mt-2 text-xs text-gray-400">
+                          <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                          <p className="capitalize">Источник: {
+                            inventoryItem.source === 'case' ? 'Кейс' :
+                            inventoryItem.source === 'purchase' ? 'Покупка' :
+                            inventoryItem.source
+                          }</p>
+                        </div>
+                      </>
+                    ) : isUserCase(inventoryItem) ? (
+                      // Рендеринг кейса
+                      (() => {
+                        const caseTemplate = getCaseTemplateById(inventoryItem.case_template_id);
+                        const caseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
+                        const casePrice = caseTemplate?.price || '0.00';
+                        const caseImageUrl = caseTemplate?.image_url;
+
+                        return (
+                          <>
+                            <div
+                              className={`w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center transition-all duration-300 ${
+                                activeInventoryTab === 'active' && inventoryItem.status === 'inventory'
+                                  ? 'cursor-pointer hover:from-yellow-400 hover:to-orange-500'
+                                  : 'cursor-not-allowed opacity-60'
+                              }`}
+                              onClick={() => {
+                                if (activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && !isOpeningCase) {
+                                  handleOpenCase(inventoryItem.id);
+                                }
+                              }}
+                            >
+                              {caseImageUrl ? (
+                                <img
+                                  src={caseImageUrl}
+                                  alt={caseName}
+                                  className="w-full h-full object-contain rounded"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (nextElement) nextElement.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: caseImageUrl ? 'none' : 'flex' }}>
+                                <svg className="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                                </svg>
+                              </div>
                             </div>
-                          </div>
-                          <h5 className="text-white text-xs font-medium mb-1 truncate" title={caseName}>
-                            {caseName}
-                          </h5>
-                          <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-                              КЕЙС
-                            </p>
-                            {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
-                              <button
-                                className={`text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
-                                  isOpeningCase
-                                    ? 'bg-gray-500 cursor-not-allowed'
-                                    : 'bg-green-600 hover:bg-green-500'
-                                }`}
-                                disabled={isOpeningCase}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (!isOpeningCase) {
-                                    handleOpenCase(inventoryItem.id);
-                                  }
-                                }}
-                              >
-                                {isOpeningCase ? 'Открываем...' : 'Открыть'}
-                              </button>
-                            )}
-                          </div>
-                          {/* Acquisition info */}
-                          <div className="mt-2 text-xs text-gray-400">
-                            <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                            <p className="capitalize">Источник: {
-                              inventoryItem.source === 'case' ? 'Кейс' :
-                              inventoryItem.source === 'purchase' ? 'Покупка' :
-                              inventoryItem.source
-                            }</p>
-                          </div>
-                        </>
-                      );
-                    })()
-                  ) : null}
-                </div>
-              ))}
+                            <h5 className="text-white text-xs font-medium mb-1 truncate" title={caseName}>
+                              {caseName}
+                            </h5>
+                            <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
+                                КЕЙС
+                              </p>
+                              {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
+                                <button
+                                  className={`text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
+                                    isOpeningCase
+                                      ? 'bg-gray-500 cursor-not-allowed'
+                                      : 'bg-green-600 hover:bg-green-500'
+                                  }`}
+                                  disabled={isOpeningCase}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (!isOpeningCase) {
+                                      handleOpenCase(inventoryItem.id);
+                                    }
+                                  }}
+                                >
+                                  {isOpeningCase ? 'Открываем...' : 'Открыть'}
+                                </button>
+                              )}
+                            </div>
+                            {/* Acquisition info */}
+                            <div className="mt-2 text-xs text-gray-400">
+                              <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                              <p className="capitalize">Источник: {
+                                inventoryItem.source === 'case' ? 'Кейс' :
+                                inventoryItem.source === 'purchase' ? 'Покупка' :
+                                inventoryItem.source
+                              }</p>
+                            </div>
+                          </>
+                        );
+                      })()
+                    ) : null}
+                  </div>
+                ))
+              )}
               {filteredInventory.length > 24 && (
                 <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
                   <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 24}</div>
@@ -889,7 +911,7 @@ const ProfilePage: React.FC = () => {
               </p>
               <p className="text-gray-500 text-sm mt-2">
                 {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
-                {activeInventoryTab === 'opened' && 'Предметы из открытых кейсов будут отображаться здесь'}
+                {activeInventoryTab === 'opened' && 'Открытые кейсы будут отображаться здесь с возможностью увидеть выпавший предмет'}
                 {activeInventoryTab === 'withdrawn' && 'Выведенные в Steam предметы будут отображаться здесь'}
                 {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
               </p>
