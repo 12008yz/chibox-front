@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
+import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
@@ -9,13 +10,16 @@ import type { UserInventoryItem, UserCaseItem } from '../types/api';
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
 
+  // State для переключения между категориями инвентаря
+  const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened' | 'withdrawn' | 'sold'>('active');
+
   // Helper функции для определения типа элемента инвентаря
   const isUserItem = (item: any): item is UserInventoryItem => {
-    return item.item && !item.case_template;
+    return item.item_type === 'item' && item.item_id !== null && item.item;
   };
 
   const isUserCase = (item: any): item is UserCaseItem => {
-    return item.case_template && !item.item;
+    return item.item_type === 'case' && item.case_template_id !== null;
   };
 
   // Используем кастомный хук для получения актуальных данных пользователя
@@ -39,8 +43,17 @@ const ProfilePage: React.FC = () => {
   // Получаем все достижения для правильного подсчета
   const { data: allAchievementsData } = useGetUserAchievementsQuery();
 
+  // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
+  const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
+
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
+
+  // Функция для получения шаблона кейса по ID
+  const getCaseTemplateById = (templateId: string) => {
+    if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
+    return caseTemplatesData.data.find(template => template.id === templateId);
+  };
 
   if (!user) {
     return (
@@ -128,10 +141,52 @@ const ProfilePage: React.FC = () => {
     .filter((item): item is UserInventoryItem => item.status === 'inventory' && isUserItem(item) && !!item.item.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 
-  // Фильтруем инвентарь по статусу inventory
-  const availableInventory = inventory.filter(item =>
-    item.status === 'inventory' && (isUserItem(item) || isUserCase(item))
-  );
+  // Функции для фильтрации инвентаря по разным категориям
+  const getActiveInventory = () => {
+    return inventory.filter(item =>
+      (item.status === 'inventory' || item.status === 'available') && (isUserItem(item) || isUserCase(item))
+    );
+  };
+
+  const getOpenedCases = () => {
+    // Кейсы которые были открыты (предметы полученные из кейсов)
+    return inventory.filter(item =>
+      isUserItem(item) && item.source === 'case' && (item.status === 'sold' || item.status === 'withdrawn' || item.status === 'used')
+    );
+  };
+
+  const getWithdrawnItems = () => {
+    return inventory.filter(item =>
+      isUserItem(item) && item.status === 'withdrawn'
+    );
+  };
+
+  const getSoldItems = () => {
+    return inventory.filter(item =>
+      isUserItem(item) && (item.status === 'sold' || item.status === 'used')
+    );
+  };
+
+  // Получаем инвентарь в зависимости от активного таба
+  const getFilteredInventory = () => {
+    switch (activeInventoryTab) {
+      case 'active':
+        return getActiveInventory();
+      case 'opened':
+        return getOpenedCases();
+      case 'withdrawn':
+        return getWithdrawnItems();
+      case 'sold':
+        return getSoldItems();
+      default:
+        return getActiveInventory();
+    }
+  };
+
+  const filteredInventory = getFilteredInventory();
+
+  // Для обратной совместимости (используется в bestWeapon)
+  const availableInventory = getActiveInventory();
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -534,9 +589,9 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Inventory Section */}
+        {/* Enhanced Inventory Section */}
         <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
             <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
@@ -546,18 +601,110 @@ const ProfilePage: React.FC = () => {
             Инвентарь
           </h3>
 
+          {/* Inventory Tabs */}
+          <div className="flex flex-wrap gap-2 mb-6 p-1 bg-black/20 rounded-lg border border-gray-700/30">
+            <button
+              onClick={() => setActiveInventoryTab('active')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeInventoryTab === 'active'
+                  ? 'bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+              Активные
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveInventoryTab('opened')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeInventoryTab === 'opened'
+                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+              </svg>
+              Открытые кейсы
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveInventoryTab('withdrawn')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeInventoryTab === 'withdrawn'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Выведенные
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getWithdrawnItems().length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveInventoryTab('sold')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeInventoryTab === 'sold'
+                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+              </svg>
+              Обменённые
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getSoldItems().length}</span>
+            </button>
+          </div>
+
+          {/* Tab Description */}
+          <div className="mb-4 p-3 bg-black/20 rounded-lg border border-gray-700/30">
+            <p className="text-sm text-gray-300">
+              {activeInventoryTab === 'active' && '🎮 Ваши текущие предметы и неоткрытые кейсы'}
+              {activeInventoryTab === 'opened' && '📦 Предметы, полученные из открытых кейсов'}
+              {activeInventoryTab === 'withdrawn' && '📤 Предметы, отправленные в Steam'}
+              {activeInventoryTab === 'sold' && '💰 Предметы, проданные за валюту или обмененные на подписку'}
+            </p>
+          </div>
+
+          {/* Inventory Content */}
           {(inventoryLoading && !user.inventory?.length) ? (
             <div className="text-center py-12">
               <div className="animate-spin w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
               <p className="text-gray-400">Загрузка инвентаря...</p>
             </div>
-          ) : availableInventory.length > 0 ? (
+          ) : filteredInventory.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {availableInventory.slice(0, 12).map((inventoryItem) => (
+              {filteredInventory.slice(0, 24).map((inventoryItem) => (
                 <div
                   key={inventoryItem.id}
-                  className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105`}
+                  className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative ${
+                    activeInventoryTab !== 'active' ? 'opacity-75' : ''
+                  }`}
                 >
+                  {/* Status Badge */}
+                  {activeInventoryTab !== 'active' && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
+                        activeInventoryTab === 'withdrawn' ? 'bg-purple-500' :
+                        activeInventoryTab === 'sold' ? 'bg-yellow-500' :
+                        'bg-orange-500'
+                      }`}>
+                        {activeInventoryTab === 'withdrawn' ? 'Выведен' :
+                         activeInventoryTab === 'sold' ? 'Продан' :
+                         'Открыт'}
+                      </div>
+                    </div>
+                  )}
+
                   {isUserItem(inventoryItem) ? (
                     // Рендеринг предмета
                     <>
@@ -587,54 +734,85 @@ const ProfilePage: React.FC = () => {
                       <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                         {getRarityName(inventoryItem.item.rarity)}
                       </p>
+                      {/* Acquisition info */}
+                      <div className="mt-2 text-xs text-gray-400">
+                        <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                        <p className="capitalize">Источник: {
+                          inventoryItem.source === 'case' ? 'Кейс' :
+                          inventoryItem.source === 'purchase' ? 'Покупка' :
+                          inventoryItem.source
+                        }</p>
+                      </div>
                     </>
                   ) : isUserCase(inventoryItem) ? (
                     // Рендеринг кейса
-                    <>
-                      <div
-                        className="w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center cursor-pointer hover:from-yellow-400 hover:to-orange-500 transition-all duration-300"
-                        onClick={() => {
-                          alert(`Открытие кейса: ${inventoryItem.case_template.name}`);
-                          // Здесь будет логика открытия кейса
-                        }}
-                      >
-                        {inventoryItem.case_template.image_url ? (
-                          <img
-                            src={inventoryItem.case_template.image_url}
-                            alt={inventoryItem.case_template.name}
-                            className="w-full h-full object-contain rounded"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                              if (nextElement) nextElement.style.display = 'flex';
+                    (() => {
+                      const caseTemplate = getCaseTemplateById(inventoryItem.case_template_id);
+                      const caseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
+                      const casePrice = caseTemplate?.price || '0.00';
+                      const caseImageUrl = caseTemplate?.image_url;
+
+                      return (
+                        <>
+                          <div
+                            className="w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center cursor-pointer hover:from-yellow-400 hover:to-orange-500 transition-all duration-300"
+                            onClick={() => {
+                              if (activeInventoryTab === 'active') {
+                                alert(`Открытие кейса: ${caseName}`);
+                                // Здесь будет логика открытия кейса
+                              }
                             }}
-                          />
-                        ) : null}
-                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.case_template.image_url ? 'none' : 'flex' }}>
-                          <svg className="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      </div>
-                      <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.case_template.name}>
-                        {inventoryItem.case_template.name}
-                      </h5>
-                      <p className="text-yellow-400 text-sm font-bold">{Number(inventoryItem.case_template.price).toFixed(2)} КР</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-                          КЕЙС
-                        </p>
-                        <button className="text-xs px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors duration-200">
-                          Открыть
-                        </button>
-                      </div>
-                    </>
+                          >
+                            {caseImageUrl ? (
+                              <img
+                                src={caseImageUrl}
+                                alt={caseName}
+                                className="w-full h-full object-contain rounded"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (nextElement) nextElement.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: caseImageUrl ? 'none' : 'flex' }}>
+                              <svg className="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          </div>
+                          <h5 className="text-white text-xs font-medium mb-1 truncate" title={caseName}>
+                            {caseName}
+                          </h5>
+                          <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
+                              КЕЙС
+                            </p>
+                            {activeInventoryTab === 'active' && (
+                              <button className="text-xs px-2 py-1 bg-green-600 hover:bg-green-500 text-white rounded-full transition-colors duration-200">
+                                Открыть
+                              </button>
+                            )}
+                          </div>
+                          {/* Acquisition info */}
+                          <div className="mt-2 text-xs text-gray-400">
+                            <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                            <p className="capitalize">Источник: {
+                              inventoryItem.source === 'case' ? 'Кейс' :
+                              inventoryItem.source === 'purchase' ? 'Покупка' :
+                              inventoryItem.source
+                            }</p>
+                          </div>
+                        </>
+                      );
+                    })()
                   ) : null}
                 </div>
               ))}
-              {availableInventory.length > 12 && (
+              {filteredInventory.length > 24 && (
                 <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
-                  <div className="text-2xl font-bold text-gray-400 mb-2">+{availableInventory.length - 12}</div>
+                  <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 24}</div>
                   <p className="text-gray-400 text-xs text-center">Ещё предметов</p>
                 </div>
               )}
@@ -643,12 +821,32 @@ const ProfilePage: React.FC = () => {
             <div className="text-center py-12">
               <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
                 <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                  <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                  {activeInventoryTab === 'active' ? (
+                    <>
+                      <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                      <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                    </>
+                  ) : activeInventoryTab === 'opened' ? (
+                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                  ) : activeInventoryTab === 'withdrawn' ? (
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  ) : (
+                    <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+                  )}
                 </svg>
               </div>
-              <p className="text-gray-400 text-lg">Инвентарь пуст</p>
-              <p className="text-gray-500 text-sm mt-2">Откройте кейсы, чтобы получить предметы</p>
+              <p className="text-gray-400 text-lg">
+                {activeInventoryTab === 'active' && 'Инвентарь пуст'}
+                {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
+                {activeInventoryTab === 'withdrawn' && 'Нет выведенных предметов'}
+                {activeInventoryTab === 'sold' && 'Нет обмененных предметов'}
+              </p>
+              <p className="text-gray-500 text-sm mt-2">
+                {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
+                {activeInventoryTab === 'opened' && 'Предметы из открытых кейсов будут отображаться здесь'}
+                {activeInventoryTab === 'withdrawn' && 'Выведенные в Steam предметы будут отображаться здесь'}
+                {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
+              </p>
             </div>
           )}
         </div>

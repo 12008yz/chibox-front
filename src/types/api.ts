@@ -117,7 +117,8 @@ export interface UserInventoryItem {
 export interface UserCaseItem {
   id: string;
   item_type: 'case';
-  case_template: CaseTemplate;
+  case_template_id: string;
+  case_template?: CaseTemplate; // Опциональное, может загружаться отдельно
   acquisition_date: string;
   expires_at?: string;
   source: string;
