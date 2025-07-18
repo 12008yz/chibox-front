@@ -358,6 +358,44 @@ export const userApi = baseApi.injectEndpoints({
     >({
       query: (withdrawalId) => `v1/withdraw-item/${withdrawalId}`,
     }),
+
+    // Повторная отправка кода подтверждения email
+    resendVerificationCode: builder.mutation<
+      ApiResponse<{ codeExpires: string }>,
+      { email: string }
+    >({
+      query: (data) => ({
+        url: 'v1/resend-verification-code',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+
+    // Подтверждение email
+    verifyEmail: builder.mutation<
+      ApiResponse<any>,
+      { email: string; verificationCode: string }
+    >({
+      query: (data) => ({
+        url: 'v1/verify-email',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    // Обновление профиля пользователя (для сохранения Trade URL)
+    updateUserProfile: builder.mutation<
+      ApiResponse<any>,
+      { steam_trade_url?: string; [key: string]: any }
+    >({
+      query: (data) => ({
+        url: 'v1/profile',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -393,4 +431,7 @@ export const {
   useGetSteamInventoryQuery,
   useGetPublicProfileQuery,
   useGetWithdrawalStatusQuery,
+  useResendVerificationCodeMutation,
+  useVerifyEmailMutation,
+  useUpdateUserProfileMutation,
 } = userApi;

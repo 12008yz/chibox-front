@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../store/hooks';
-import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../features/user/userApi';
+import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery, useUpdateUserProfileMutation, useResendVerificationCodeMutation, useVerifyEmailMutation } from '../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
@@ -13,6 +13,21 @@ const ProfilePage: React.FC = () => {
 
   // State для переключения между категориями инвентаря
   const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened' | 'withdrawn' | 'sold'>('active');
+
+  // State для модального окна настроек
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [tradeUrl, setTradeUrl] = useState('');
+
+  // State для email верификации
+  const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [emailVerificationStep, setEmailVerificationStep] = useState<'send' | 'verify'>('send');
+
+  // State для уведомлений
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'info';
+  } | null>(null);
 
   // Helper функции для определения типа элемента инвентаря
   const isUserItem = (item: any): item is UserInventoryItem => {
@@ -50,8 +65,20 @@ const ProfilePage: React.FC = () => {
   // Хук для открытия кейса
   const [openCase, { isLoading: isOpeningCase }] = useOpenCaseMutation();
 
+  // Хуки для работы с профилем
+  const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateUserProfileMutation();
+  const [resendVerificationCode, { isLoading: isResendingCode }] = useResendVerificationCodeMutation();
+  const [verifyEmail, { isLoading: isVerifyingEmail }] = useVerifyEmailMutation();
+
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
+
+  // Синхронизируем tradeUrl с данными пользователя
+  useEffect(() => {
+    if (user?.steam_trade_url) {
+      setTradeUrl(user.steam_trade_url);
+    }
+  }, [user?.steam_trade_url]);
 
   // Функция для получения шаблона кейса по ID
   const getCaseTemplateById = (templateId: string) => {
@@ -83,6 +110,66 @@ const ProfilePage: React.FC = () => {
       console.error('Ошибка при открытии кейса:', error);
       const errorMessage = error?.data?.message || error?.message || 'Неизвестная ошибка';
       alert(`Ошибка при открытии кейса: ${errorMessage}`);
+    }
+  };
+
+  // Функция для показа уведомлений
+  const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  // Функция для сохранения настроек
+  const handleSaveSettings = async () => {
+    try {
+      await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+      showNotification('Настройки сохранены успешно!', 'success');
+      setIsSettingsOpen(false);
+    } catch (error: any) {
+      console.error('Ошибка при сохранении настроек:', error);
+      showNotification(error?.data?.message || 'Не удалось сохранить настройки', 'error');
+    }
+  };
+
+  // Функция для привязки Steam
+  const handleSteamLink = () => {
+    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    window.open(`${serverUrl}/auth/link-steam`, '_blank');
+    setIsSettingsOpen(false);
+  };
+
+  // Функция для отправки кода подтверждения email
+  const handleSendVerificationCode = async () => {
+    if (!user?.email) return;
+
+    try {
+      await resendVerificationCode({ email: user.email }).unwrap();
+      setEmailVerificationStep('verify');
+      alert('Код подтверждения отправлен на ваш email!');
+    } catch (error: any) {
+      console.error('Ошибка при отправке кода:', error);
+      alert(`Ошибка: ${error?.data?.message || 'Не удалось отправить код'}`);
+    }
+  };
+
+  // Функция для подтверждения email
+  const handleVerifyEmail = async () => {
+    if (!user?.email || !verificationCode.trim()) return;
+
+    try {
+      await verifyEmail({
+        email: user.email,
+        verificationCode: verificationCode.trim()
+      }).unwrap();
+      alert('Email успешно подтвержден!');
+      setIsEmailVerificationOpen(false);
+      setVerificationCode('');
+      setEmailVerificationStep('send');
+      // Обновляем данные пользователя
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Ошибка при подтверждении email:', error);
+      alert(`Ошибка: ${error?.data?.message || 'Неверный код подтверждения'}`);
     }
   };
 
@@ -266,6 +353,18 @@ const ProfilePage: React.FC = () => {
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-green-500 to-blue-500 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
           </div>
+
+          {/* Settings Button */}
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="absolute top-4 right-4 p-2 bg-black/30 hover:bg-black/50 rounded-lg transition-colors border border-gray-600/50 hover:border-gray-500 z-10"
+            title="Настройки профиля"
+          >
+            <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
 
           <div className="relative flex flex-col lg:flex-row items-start lg:items-center gap-8">
             {/* User Avatar and Basic Info */}
@@ -922,6 +1021,249 @@ const ProfilePage: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Settings Modal */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsSettingsOpen(false)}>
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Настройки профиля</h3>
+              <button
+                onClick={() => setIsSettingsOpen(false)}
+                className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Trade URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Steam Trade URL
+                </label>
+                <input
+                  type="url"
+                  value={tradeUrl}
+                  onChange={(e) => setTradeUrl(e.target.value)}
+                  placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
+                  className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Необходим для автоматической отправки предметов
+                </p>
+              </div>
+
+              {/* Steam Profile */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Steam Профиль
+                </label>
+                <button
+                  onClick={user.steam_id ? undefined : handleSteamLink}
+                  className={`w-full flex items-center gap-3 p-3 bg-black/20 rounded-lg border border-gray-600/30 text-left transition-colors ${
+                    !user.steam_id ? 'hover:bg-black/30 hover:border-gray-500/50 cursor-pointer' : 'cursor-default'
+                  }`}
+                  disabled={!!user.steam_id}
+                >
+                  {user.steam_id ? (
+                    <>
+                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white">{user.steam_profile?.personaname}</p>
+                        <p className="text-xs text-gray-400">Steam подключен</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0a12 12 0 0 0-8.2 20.8l4.4-1.8a3.4 3.4 0 0 0 6.4-1.8 3.4 3.4 0 0 0-3.3-3.4h-.2l-4.5-6.6a4.5 4.5 0 0 1 8.8 1.2v.3l6.6 4.5a3.4 3.4 0 0 0 1.8-6.4A12 12 0 0 0 12 0zm-4.6 16.6l-3.6 1.5a2.6 2.6 0 0 0 4.8.9l-1.2-2.4zm7.9-5.4a2.3 2.3 0 1 1-4.6 0 2.3 2.3 0 0 1 4.6 0z"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white">Подключить Steam</p>
+                        <p className="text-xs text-gray-400">Нажмите для привязки аккаунта</p>
+                      </div>
+                      <div className="text-blue-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Email Verification */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Email подтверждение
+                </label>
+                <button
+                  onClick={user.is_email_verified ? undefined : () => setIsEmailVerificationOpen(true)}
+                  className={`w-full flex items-center gap-3 p-3 bg-black/20 rounded-lg border border-gray-600/30 text-left transition-colors ${
+                    !user.is_email_verified ? 'hover:bg-black/30 hover:border-gray-500/50 cursor-pointer' : 'cursor-default'
+                  }`}
+                  disabled={user.is_email_verified}
+                >
+                  {user.is_email_verified ? (
+                    <>
+                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white">Email подтвержден</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" clipRule="evenodd" />
+                          <path fillRule="evenodd" d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white">Подтвердить Email</p>
+                        <p className="text-xs text-gray-400">Нажмите для отправки кода</p>
+                      </div>
+                      <div className="text-orange-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSaveSettings}
+                disabled={isUpdatingProfile}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+              >
+                {isUpdatingProfile ? 'Сохранение...' : 'Сохранить'}
+              </button>
+              <button
+                onClick={() => setIsSettingsOpen(false)}
+                className="px-4 py-2 bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 rounded-lg transition-colors"
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Email Verification Modal */}
+      {isEmailVerificationOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsEmailVerificationOpen(false)}>
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Подтверждение Email</h3>
+              <button
+                onClick={() => {
+                  setIsEmailVerificationOpen(false);
+                  setEmailVerificationStep('send');
+                  setVerificationCode('');
+                }}
+                className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {emailVerificationStep === 'send' ? (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-8 h-8 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" clipRule="evenodd" />
+                      <path fillRule="evenodd" d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-300 mb-2">
+                    Отправим код подтверждения на:
+                  </p>
+                  <p className="text-white font-semibold mb-4">
+                    {user?.email}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Код действителен в течение 15 минут
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleSendVerificationCode}
+                  disabled={isResendingCode}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                >
+                  {isResendingCode ? 'Отправка кода...' : 'Отправить код'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <p className="text-white font-semibold mb-2">
+                    Код отправлен!
+                  </p>
+                  <p className="text-gray-300 mb-4">
+                    Введите 6-значный код из письма
+                  </p>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    className="w-full px-4 py-3 bg-black/30 border border-gray-600/50 rounded-lg text-white text-center text-lg font-mono tracking-widest placeholder-gray-400 focus:border-green-500 focus:outline-none transition-colors"
+                    maxLength={6}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleVerifyEmail}
+                    disabled={isVerifyingEmail || verificationCode.length !== 6}
+                    className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                  >
+                    {isVerifyingEmail ? 'Проверка...' : 'Подтвердить'}
+                  </button>
+                  <button
+                    onClick={handleSendVerificationCode}
+                    disabled={isResendingCode}
+                    className="px-4 py-3 bg-gray-600/30 hover:bg-gray-600/50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 rounded-lg transition-colors text-sm"
+                  >
+                    {isResendingCode ? '...' : 'Повторить'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
