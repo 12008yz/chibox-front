@@ -589,25 +589,25 @@ const ProfilePage: React.FC = () => {
             <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
               <h4 className="text-lg font-semibold mb-3">Бонусы к дропу</h4>
               <div className="space-y-2">
-                {user.level_bonus_percentage > 0 && (
+                {(user.level_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Уровень:</span>
                     <span className="text-green-400 text-sm">+{parseFloat(Number(user.level_bonus_percentage).toFixed(2))}%</span>
                   </div>
                 )}
-                {user.subscription_bonus_percentage > 0 && (
+                {(user.subscription_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Статус:</span>
                     <span className="text-blue-400 text-sm">+{parseFloat(Number(user.subscription_bonus_percentage).toFixed(2))}%</span>
                   </div>
                 )}
-                {user.achievements_bonus_percentage > 0 && (
+                {(user.achievements_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Достижения:</span>
                     <span className="text-purple-400 text-sm">+{parseFloat(Number(user.achievements_bonus_percentage).toFixed(2))}%</span>
                   </div>
                 )}
-                {user.total_drop_bonus_percentage > 0 && (
+                {(user.total_drop_bonus_percentage ?? 0) > 0 && (
                   <div className="border-t border-gray-600/30 pt-2 mt-3">
                     <div className="flex justify-between">
                       <span className="text-white font-semibold text-sm">Итого:</span>
