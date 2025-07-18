@@ -43,6 +43,43 @@ const ProfilePage: React.FC = () => {
     refetchOnMount: true, // Всегда запрашиваем актуальные данные при заходе на страницу
   });
 
+  // Обработка результатов Steam привязки из URL параметров
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+
+    if (success === 'steam_linked') {
+      showNotification('Steam аккаунт успешно привязан!', 'success');
+      // Очищаем URL от параметров
+      window.history.replaceState({}, '', window.location.pathname);
+      // Перезагружаем данные пользователя
+      window.location.reload();
+    } else if (error) {
+      let errorMessage = 'Ошибка при привязке Steam аккаунта';
+      switch (error) {
+        case 'steam_link_failed':
+          errorMessage = 'Не удалось привязать Steam аккаунт. Попробуйте еще раз.';
+          break;
+        case 'session_expired':
+          errorMessage = 'Сессия истекла. Попробуйте еще раз.';
+          break;
+        case 'steam_already_linked':
+          errorMessage = 'Этот Steam аккаунт уже привязан к другому пользователю.';
+          break;
+        case 'not_linking_process':
+          errorMessage = 'Ошибка процесса привязки. Попробуйте еще раз.';
+          break;
+        case 'link_failed':
+          errorMessage = 'Произошла ошибка при привязке аккаунта.';
+          break;
+      }
+      showNotification(errorMessage, 'error');
+      // Очищаем URL от параметров
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   // Дополнительно загружаем данные через API только если их нет в свежих данных профиля
   const { data: inventoryData, isLoading: inventoryLoading } = useGetUserInventoryQuery({
     page: 1,
@@ -133,8 +170,14 @@ const ProfilePage: React.FC = () => {
 
   // Функция для привязки Steam
   const handleSteamLink = () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      alert('Ошибка: токен авторизации не найден. Пожалуйста, войдите в систему заново.');
+      return;
+    }
+
     const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    window.open(`${serverUrl}/auth/link-steam`, '_blank');
+    window.open(`${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`, '_blank');
     setIsSettingsOpen(false);
   };
 
