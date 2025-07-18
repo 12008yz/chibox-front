@@ -62,6 +62,17 @@ const authSlice = createSlice({
       }
     },
 
+    // Обновление токена
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
+      state.isAuthenticated = true;
+
+      // Сохраняем новый токен в localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', action.payload);
+      }
+    },
+
     // Выход из системы
     logout: (state) => {
       // Полностью очищаем состояние авторизации
@@ -129,6 +140,7 @@ export const {
   loginSuccess,
   updateUser,
   updateBalance,
+  setToken,
   logout,
   authError,
   clearError,

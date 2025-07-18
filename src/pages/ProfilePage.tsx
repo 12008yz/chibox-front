@@ -48,8 +48,15 @@ const ProfilePage: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get('success');
     const error = urlParams.get('error');
+    const token = urlParams.get('token');
 
     if (success === 'steam_linked') {
+      // Если получили новый токен, обновляем его в localStorage
+      if (token) {
+        localStorage.setItem('auth_token', token);
+        console.log('Токен обновлен после привязки Steam');
+      }
+
       showNotification('Steam аккаунт успешно привязан!', 'success');
       // Очищаем URL от параметров
       window.history.replaceState({}, '', window.location.pathname);
@@ -159,9 +166,19 @@ const ProfilePage: React.FC = () => {
   // Функция для сохранения настроек
   const handleSaveSettings = async () => {
     try {
-      await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+      const result = await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+
+      // Если сервер вернул новый токен, обновляем его в localStorage
+      if ('token' in result && result.token) {
+        localStorage.setItem('auth_token', result.token);
+        console.log('Токен обновлен после изменения профиля');
+      }
+
       showNotification('Настройки сохранены успешно!', 'success');
       setIsSettingsOpen(false);
+
+      // Перезагружаем данные пользователя
+      window.location.reload();
     } catch (error: any) {
       console.error('Ошибка при сохранении настроек:', error);
       showNotification(error?.data?.message || 'Не удалось сохранить настройки', 'error');

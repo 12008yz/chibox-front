@@ -27,9 +27,21 @@ const baseQueryWithRetry = retry(baseQuery, {
   maxRetries: 2,
 });
 
-// Обертка для обработки ошибок авторизации
+// Обертка для обработки ошибок авторизации и обновления токенов
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
   const result = await baseQueryWithRetry(args, api, extraOptions);
+
+  // Если в ответе есть новый токен, обновляем его в localStorage и Redux
+  if (result.data && typeof result.data === 'object' && 'token' in result.data && typeof (result.data as any).token === 'string') {
+    console.log('Получен новый токен от сервера, обновляем...');
+    localStorage.setItem('auth_token', (result.data as any).token);
+
+    // Обновляем токен в Redux store
+    api.dispatch({
+      type: 'auth/setToken',
+      payload: (result.data as any).token
+    });
+  }
 
   // Логируем ошибки авторизации, но НЕ делаем автоматический logout
   if (result.error?.status === 401) {

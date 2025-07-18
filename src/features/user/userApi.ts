@@ -386,7 +386,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Обновление профиля пользователя (для сохранения Trade URL)
     updateUserProfile: builder.mutation<
-      ApiResponse<any>,
+      ApiResponse<any> & { token?: string },
       { steam_trade_url?: string; [key: string]: any }
     >({
       query: (data) => ({
