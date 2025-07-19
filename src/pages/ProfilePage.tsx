@@ -77,8 +77,6 @@ const ProfilePage: React.FC = () => {
       showNotification('Steam аккаунт успешно привязан!', 'success');
       // Очищаем URL от параметров
       window.history.replaceState({}, '', window.location.pathname);
-      // Перезагружаем данные пользователя
-      window.location.reload();
     } else if (error) {
       let errorMessage = 'Ошибка при привязке Steam аккаунта';
       switch (error) {
@@ -105,7 +103,7 @@ const ProfilePage: React.FC = () => {
   }, []);
 
   // Дополнительно загружаем данные через API только если их нет в свежих данных профиля
-  const { data: inventoryData, isLoading: inventoryLoading } = useGetUserInventoryQuery({
+  const { data: inventoryData, isLoading: inventoryLoading, refetch: refetchInventory } = useGetUserInventoryQuery({
     page: 1,
     limit: 50,
     status: 'inventory'
@@ -214,7 +212,7 @@ const ProfilePage: React.FC = () => {
   };
 
   // Функция для закрытия анимации открытия кейса
-  const handleCloseCaseAnimation = () => {
+  const handleCloseCaseAnimation = async () => {
     setCaseOpeningAnimation({
       isOpen: false,
       caseTemplate: null,
@@ -223,8 +221,14 @@ const ProfilePage: React.FC = () => {
     });
     setOpeningCaseId(null);
 
-    // Обновляем данные инвентаря через рефетч
-    window.location.reload(); // Пока оставим перезагрузку, так как RTK Query может кешировать данные
+    // Принудительно обновляем данные инвентаря без перезагрузки страницы
+    try {
+      await refetchInventory();
+      showNotification('Инвентарь обновлен!', 'success');
+    } catch (error) {
+      console.error('Ошибка обновления инвентаря:', error);
+      showNotification('Ошибка обновления инвентаря', 'error');
+    }
   };
 
   // Функция для показа уведомлений
@@ -246,9 +250,6 @@ const ProfilePage: React.FC = () => {
 
       showNotification('Настройки сохранены успешно!', 'success');
       setIsSettingsOpen(false);
-
-      // Перезагружаем данные пользователя
-      window.location.reload();
     } catch (error: any) {
       console.error('Ошибка при сохранении настроек:', error);
       showNotification(error?.data?.message || 'Не удалось сохранить настройки', 'error');
@@ -303,8 +304,6 @@ const ProfilePage: React.FC = () => {
       setIsEmailVerificationOpen(false);
       setVerificationCode('');
       setEmailVerificationStep('send');
-      // Обновляем данные пользователя
-      window.location.reload();
     } catch (error: any) {
       console.error('Ошибка при подтверждении email:', error);
       alert(`Ошибка: ${error?.data?.message || 'Неверный код подтверждения'}`);
