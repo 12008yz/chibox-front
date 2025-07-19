@@ -109,21 +109,18 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
       </div>
 
       {/* Dropped Item Info (appears on hover) */}
-      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-500/30">
-        <h6 className="text-white text-xs font-bold mb-1 truncate" title={droppedItem.item.name}>
-          Выпало: {droppedItem.item.name}
+      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-500/30">
+        <h6 className="text-white text-xs font-bold mb-2 truncate" title={droppedItem.item.name}>
+          {droppedItem.item.name}
         </h6>
-        <div className="flex items-center justify-between">
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(droppedItem.item.rarity)} text-white`}>
+        <div className="flex flex-col gap-1">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r ${getRarityColor(droppedItem.item.rarity)} text-white text-center truncate`}>
             {getRarityName(droppedItem.item.rarity)}
           </span>
-          <span className="text-green-400 font-bold text-xs">
+          <span className="text-green-400 font-bold text-xs text-center">
             {Number(droppedItem.item.price).toFixed(2)} КР
           </span>
         </div>
-        <p className="text-gray-300 text-xs mt-1">
-          {new Date(droppedItem.acquisition_date).toLocaleDateString()}
-        </p>
       </div>
     </div>
   );
