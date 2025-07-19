@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useWithdrawItemMutation } from '../features/user/userApi';
+import { useAppSelector } from '../store/hooks';
 import type { UserInventoryItem } from '../types/api';
 
 interface ItemWithdrawBannerProps {
@@ -18,9 +19,14 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const [steamTradeUrl, setSteamTradeUrl] = useState('');
   const [withdrawItem] = useWithdrawItemMutation();
 
+  // Получаем данные пользователя из store
+  const user = useAppSelector(state => state.auth.user);
+  const userHasTradeUrl = user?.steam_trade_url && user.steam_trade_url.trim() !== '';
+
   // Проверка возможности вывода предмета
-  const canWithdraw = item.item?.steam_market_hash_name &&
-                     item.item.steam_market_hash_name.trim() !== '';
+  const canWithdraw = (item.item?.steam_market_hash_name &&
+                      item.item.steam_market_hash_name.trim() !== '') ||
+                     (item.item?.name && item.item.name.trim() !== '');
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -35,9 +41,23 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
     }
   };
 
-  const handleWithdraw = async () => {
+  const handleWithdraw = async (useCustomUrl = false) => {
     if (!canWithdraw) {
       onError('Этот предмет нельзя вывести в Steam');
+      return;
+    }
+
+    // Используем steam_market_hash_name если доступно, иначе name
+    const marketHashName = item.item?.steam_market_hash_name || item.item?.name;
+
+    if (!marketHashName) {
+      onError('Не удалось определить название предмета для вывода');
+      return;
+    }
+
+    // Если у пользователя нет trade URL и он не указал кастомный - показываем форму
+    if (!userHasTradeUrl && !useCustomUrl) {
+      setShowConfirm(true);
       return;
     }
 
@@ -45,7 +65,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
     try {
       const result = await withdrawItem({
         inventoryItemId: item.id,
-        steamTradeUrl: steamTradeUrl || undefined,
+        steamTradeUrl: useCustomUrl ? steamTradeUrl || undefined : undefined,
       }).unwrap();
 
       if (result.success) {
@@ -68,6 +88,8 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   console.log('ItemWithdrawBanner - Item:', item.item.name);
   console.log('ItemWithdrawBanner - steam_market_hash_name:', item.item.steam_market_hash_name);
   console.log('ItemWithdrawBanner - canWithdraw:', canWithdraw);
+  console.log('ItemWithdrawBanner - userHasTradeUrl:', userHasTradeUrl);
+  console.log('ItemWithdrawBanner - Using fallback name:', !item.item.steam_market_hash_name && item.item.name);
 
   return (
     <div className="absolute inset-0 bg-black/90 rounded-xl flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
@@ -91,16 +113,20 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
             {canWithdraw ? (
               <>
                 <button
-                  onClick={() => setShowConfirm(true)}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-sm flex items-center justify-center gap-2"
+                  onClick={() => handleWithdraw()}
+                  disabled={isWithdrawing}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-sm flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
-                  Вывести в Steam
+                  {isWithdrawing ? 'Выводим...' : 'Вывести в Steam'}
                 </button>
                 <div className="text-xs text-gray-400 text-center">
-                  Предмет будет отправлен на ваш Steam аккаунт
+                  {userHasTradeUrl
+                    ? 'Предмет будет отправлен на ваш Steam аккаунт'
+                    : 'Нужно указать Steam Trade URL'
+                  }
                 </div>
               </>
             ) : (
@@ -122,29 +148,33 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
               </svg>
             </div>
             <h5 className="text-white font-semibold text-sm mb-1">
-              Подтвердите вывод
+              Укажите Steam Trade URL
             </h5>
             <p className="text-gray-300 text-xs mb-3">
               {item.item.name}
             </p>
           </div>
 
-          {/* Steam Trade URL input (optional) */}
+          {/* Steam Trade URL input (required) */}
           <div className="mb-3">
             <input
               type="url"
-              placeholder="Steam Trade URL (опционально)"
+              placeholder="https://steamcommunity.com/tradeoffer/new/..."
               value={steamTradeUrl}
               onChange={(e) => setSteamTradeUrl(e.target.value)}
               className="w-full px-2 py-1 bg-black/50 border border-gray-600/50 rounded text-white text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+              required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Найти в Steam: Инвентарь → Настройки приватности → Ссылка для обмена
+            </p>
           </div>
 
           {/* Confirm buttons */}
           <div className="flex gap-2">
             <button
-              onClick={handleWithdraw}
-              disabled={isWithdrawing}
+              onClick={() => handleWithdraw(true)}
+              disabled={isWithdrawing || !steamTradeUrl.trim()}
               className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-xs"
             >
               {isWithdrawing ? 'Выводим...' : 'Подтвердить'}
