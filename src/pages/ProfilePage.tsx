@@ -6,7 +6,8 @@ import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
 import CaseWithDrop from '../components/CaseWithDrop';
-import type { UserInventoryItem, UserCaseItem } from '../types/api';
+import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
+import type { UserInventoryItem, UserCaseItem, Item, CaseTemplate } from '../types/api';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
@@ -28,6 +29,22 @@ const ProfilePage: React.FC = () => {
     message: string;
     type: 'success' | 'error' | 'info';
   } | null>(null);
+
+  // State для анимации открытия кейса
+  const [caseOpeningAnimation, setCaseOpeningAnimation] = useState<{
+    isOpen: boolean;
+    caseTemplate: CaseTemplate | null;
+    wonItem: Item | null;
+    isLoading: boolean;
+  }>({
+    isOpen: false,
+    caseTemplate: null,
+    wonItem: null,
+    isLoading: false
+  });
+
+  // State для отслеживания ID открываемого кейса
+  const [openingCaseId, setOpeningCaseId] = useState<string | null>(null);
 
   // Helper функции для определения типа элемента инвентаря
   const isUserItem = (item: any): item is UserInventoryItem => {
@@ -132,29 +149,82 @@ const ProfilePage: React.FC = () => {
 
   // Функция для открытия кейса из инвентаря
   const handleOpenCase = async (inventoryItemId: string) => {
-    if (isOpeningCase) return;
+    if (openingCaseId === inventoryItemId) return;
+
+    // Находим кейс в инвентаре для получения информации о шаблоне
+    const caseItem = inventory.find(item =>
+      item.id === inventoryItemId && isUserCase(item)
+    );
+
+    if (!caseItem || !isUserCase(caseItem)) {
+      showNotification('Кейс не найден в инвентаре', 'error');
+      return;
+    }
+
+    const caseTemplate = getCaseTemplateById(caseItem.case_template_id);
+
+    // Устанавливаем ID открываемого кейса
+    setOpeningCaseId(inventoryItemId);
+
+    // Показываем анимацию открытия
+    setCaseOpeningAnimation({
+      isOpen: true,
+      caseTemplate: caseTemplate || null,
+      wonItem: null,
+      isLoading: true
+    });
 
     try {
       const result = await openCase({ inventoryItemId }).unwrap();
 
       if (result.success && result.data?.item) {
         const item = result.data.item;
-        // result.data.item это теперь Item, а не UserInventoryItem
-        const itemName = item.name || 'Неизвестный предмет';
-        const itemPrice = item.price || '0.00';
 
-        alert(`🎉 Поздравляем! Вы получили: ${itemName}\nЦена: ${itemPrice} КР`);
+        // Обновляем анимацию с выигранным предметом
+        setCaseOpeningAnimation(prev => ({
+          ...prev,
+          wonItem: item,
+          isLoading: false
+        }));
 
-        // Перезагружаем данные инвентаря
-        window.location.reload();
+        showNotification(`Поздравляем! Вы получили: ${item.name}`, 'success');
       } else {
-        alert('Ошибка: Не удалось получить информацию о предмете');
+        setCaseOpeningAnimation({
+          isOpen: false,
+          caseTemplate: null,
+          wonItem: null,
+          isLoading: false
+        });
+        setOpeningCaseId(null);
+        showNotification('Ошибка: Не удалось получить информацию о предмете', 'error');
       }
     } catch (error: any) {
       console.error('Ошибка при открытии кейса:', error);
       const errorMessage = error?.data?.message || error?.message || 'Неизвестная ошибка';
-      alert(`Ошибка при открытии кейса: ${errorMessage}`);
+
+      setCaseOpeningAnimation({
+        isOpen: false,
+        caseTemplate: null,
+        wonItem: null,
+        isLoading: false
+      });
+      setOpeningCaseId(null);
+      showNotification(`Ошибка при открытии кейса: ${errorMessage}`, 'error');
     }
+  };
+
+  // Функция для закрытия анимации открытия кейса
+  const handleCloseCaseAnimation = () => {
+    setCaseOpeningAnimation({
+      isOpen: false,
+      caseTemplate: null,
+      wonItem: null,
+      isLoading: false
+    });
+    setOpeningCaseId(null);
+
+    // Обновляем данные инвентаря через рефетч
+    window.location.reload(); // Пока оставим перезагрузку, так как RTK Query может кешировать данные
   };
 
   // Функция для показа уведомлений
@@ -976,12 +1046,12 @@ const ProfilePage: React.FC = () => {
                           <>
                             <div
                               className={`w-full aspect-square rounded-lg bg-gradient-to-br from-yellow-500 to-orange-600 p-1 mb-3 flex items-center justify-center transition-all duration-300 ${
-                                activeInventoryTab === 'active' && inventoryItem.status === 'inventory'
+                                activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && openingCaseId !== inventoryItem.id
                                   ? 'cursor-pointer hover:from-yellow-400 hover:to-orange-500'
                                   : 'cursor-not-allowed opacity-60'
                               }`}
                               onClick={() => {
-                                if (activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && !isOpeningCase) {
+                                if (activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && openingCaseId !== inventoryItem.id) {
                                   handleOpenCase(inventoryItem.id);
                                 }
                               }}
@@ -1015,19 +1085,19 @@ const ProfilePage: React.FC = () => {
                               {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
                                 <button
                                   className={`text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
-                                    isOpeningCase
+                                    openingCaseId === inventoryItem.id
                                       ? 'bg-gray-500 cursor-not-allowed'
                                       : 'bg-green-600 hover:bg-green-500'
                                   }`}
-                                  disabled={isOpeningCase}
+                                  disabled={openingCaseId === inventoryItem.id}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    if (!isOpeningCase) {
+                                    if (openingCaseId !== inventoryItem.id) {
                                       handleOpenCase(inventoryItem.id);
                                     }
                                   }}
                                 >
-                                  {isOpeningCase ? 'Открываем...' : 'Открыть'}
+                                  {openingCaseId === inventoryItem.id ? 'Открываем...' : 'Открыть'}
                                 </button>
                               )}
                             </div>
@@ -1328,6 +1398,51 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Case Opening Animation */}
+      <CaseOpeningAnimation
+        isOpen={caseOpeningAnimation.isOpen}
+        onClose={handleCloseCaseAnimation}
+        caseTemplate={caseOpeningAnimation.caseTemplate}
+        wonItem={caseOpeningAnimation.wonItem}
+        isLoading={caseOpeningAnimation.isLoading}
+      />
+
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 max-w-sm w-full px-6 py-4 rounded-lg shadow-lg border transition-all duration-300 ${
+          notification.type === 'success' ? 'bg-green-500/90 border-green-400 text-white' :
+          notification.type === 'error' ? 'bg-red-500/90 border-red-400 text-white' :
+          'bg-blue-500/90 border-blue-400 text-white'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              {notification.type === 'success' ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : notification.type === 'error' ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <p className="text-sm font-medium">{notification.message}</p>
+            <button
+              onClick={() => setNotification(null)}
+              className="flex-shrink-0 ml-auto text-white/80 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
