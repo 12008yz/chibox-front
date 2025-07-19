@@ -253,7 +253,7 @@ export interface SellItemRequest {
 
 export interface WithdrawItemRequest {
   inventoryItemId: string;
-  steamTradeUrl: string;
+  steamTradeUrl?: string;
 }
 
 export interface ApplyPromoRequest {

@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
 import CaseWithDrop from '../components/CaseWithDrop';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
+import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
 import type { UserInventoryItem, UserCaseItem, Item, CaseTemplate } from '../types/api';
 
 const ProfilePage: React.FC = () => {
@@ -999,7 +1000,7 @@ const ProfilePage: React.FC = () => {
                 filteredInventory.slice(0, 24).map((inventoryItem) => (
                   <div
                     key={inventoryItem.id}
-                    className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative ${
+                    className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative group ${
                       activeInventoryTab !== 'active' ? 'opacity-75' : ''
                     }`}
                   >
@@ -1056,6 +1057,21 @@ const ProfilePage: React.FC = () => {
                             inventoryItem.source
                           }</p>
                         </div>
+
+                        {/* Withdraw Banner - показывается только для активных предметов */}
+                        {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
+                          <ItemWithdrawBanner
+                            item={inventoryItem}
+                            onWithdrawSuccess={() => {
+                              showNotification(`Предмет "${inventoryItem.item.name}" успешно отправлен на вывод!`, 'success');
+                              // Обновляем инвентарь
+                              refetchInventory();
+                            }}
+                            onError={(message) => {
+                              showNotification(message, 'error');
+                            }}
+                          />
+                        )}
                       </>
                     ) : isUserCase(inventoryItem) ? (
                       // Рендеринг кейса
