@@ -194,7 +194,15 @@ const ProfilePage: React.FC = () => {
     }
 
     const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    window.open(`${serverUrl}/api/v1/auth/link-steam?token=${encodeURIComponent(token)}`, '_blank');
+    console.log('Попытка привязки Steam:', {
+      serverUrl,
+      token: token.substring(0, 20) + '...',
+      fullUrl: `${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`
+    });
+
+    // Попробуем сначала с window.location вместо window.open
+    const steamLinkUrl = `${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`;
+    window.location.href = steamLinkUrl;
     setIsSettingsOpen(false);
   };
 

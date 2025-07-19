@@ -4,9 +4,10 @@ import type { User } from '../types/api';
 
 interface SteamProfileProps {
   user: User;
+  onSteamLink?: () => void;
 }
 
-const SteamProfile: React.FC<SteamProfileProps> = ({ user }) => {
+const SteamProfile: React.FC<SteamProfileProps> = ({ user, onSteamLink }) => {
   if (!user.steam_id) {
     return (
       <div className="bg-[#19172D] rounded-lg p-6 border border-gray-700/50">
@@ -23,7 +24,10 @@ const SteamProfile: React.FC<SteamProfileProps> = ({ user }) => {
           Steam аккаунт
         </h3>
         <p className="text-gray-400 mb-4">Steam аккаунт не привязан</p>
-        <button className="bg-[#171a21] hover:bg-[#2a2d35] text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2">
+        <button
+          onClick={onSteamLink}
+          className="bg-[#171a21] hover:bg-[#2a2d35] text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2"
+        >
           <svg
             width="16"
             height="16"
