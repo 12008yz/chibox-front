@@ -194,7 +194,7 @@ const ProfilePage: React.FC = () => {
     }
 
     const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    window.open(`${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`, '_blank');
+    window.open(`${serverUrl}/api/v1/auth/link-steam?token=${encodeURIComponent(token)}`, '_blank');
     setIsSettingsOpen(false);
   };
 
