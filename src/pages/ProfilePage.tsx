@@ -56,7 +56,7 @@ const ProfilePage: React.FC = () => {
   };
 
   // Используем кастомный хук для получения актуальных данных пользователя
-  const { userData: currentUserData, isLoading: userLoading } = useUserData({
+  const { userData: currentUserData, isLoading: userLoading, refetch: refetchUser } = useUserData({
     refetchOnMount: true, // Всегда запрашиваем актуальные данные при заходе на страницу
   });
 
@@ -186,6 +186,16 @@ const ProfilePage: React.FC = () => {
         }));
 
         showNotification(`Поздравляем! Вы получили: ${item.name}`, 'success');
+
+        // Автоматически обновляем инвентарь через 2 секунды
+        setTimeout(async () => {
+          try {
+            await refetchInventory();
+            console.log('Inventory automatically refreshed after case opening');
+          } catch (error) {
+            console.error('Failed to auto-refresh inventory:', error);
+          }
+        }, 2000);
       } else {
         setCaseOpeningAnimation({
           isOpen: false,
@@ -213,6 +223,8 @@ const ProfilePage: React.FC = () => {
 
   // Функция для закрытия анимации открытия кейса
   const handleCloseCaseAnimation = async () => {
+    const wonItem = caseOpeningAnimation.wonItem;
+
     setCaseOpeningAnimation({
       isOpen: false,
       caseTemplate: null,
@@ -221,13 +233,25 @@ const ProfilePage: React.FC = () => {
     });
     setOpeningCaseId(null);
 
-    // Принудительно обновляем данные инвентаря без перезагрузки страницы
+    // Принудительно обновляем данные инвентаря и баланса
     try {
-      await refetchInventory();
-      showNotification('Инвентарь обновлен!', 'success');
+      // Добавляем небольшую задержку для завершения серверных операций
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Инвалидируем кеш и принудительно обновляем данные
+      await Promise.all([
+        refetchInventory(),
+        refetchUser() // Обновляем данные пользователя
+      ]);
+
+      if (wonItem) {
+        showNotification(`Предмет "${wonItem.name}" добавлен в инвентарь!`, 'success');
+      } else {
+        showNotification('Инвентарь обновлен!', 'success');
+      }
     } catch (error) {
-      console.error('Ошибка обновления инвентаря:', error);
-      showNotification('Ошибка обновления инвентаря', 'error');
+      console.error('Ошибка обновления данных:', error);
+      showNotification('Ошибка обновления данных. Обновите страницу.', 'error');
     }
   };
 

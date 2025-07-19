@@ -23,20 +23,25 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
 
   // Создаем массив предметов для анимации прокрутки
   useEffect(() => {
-    if (isOpen && caseTemplate?.items) {
-      // Создаем список предметов для прокрутки - смешиваем реальные предметы
-      const itemPool = [...caseTemplate.items];
+    if (isOpen && wonItem) {
+      // Создаем фиктивные предметы для прокрутки, включая выигранный предмет
       const rollingItemsArray: Item[] = [];
 
-      // Добавляем 20 случайных предметов для прокрутки
+      // Добавляем 20 случайных предметов для прокрутки (создаем базовые предметы)
       for (let i = 0; i < 20; i++) {
-        const randomItem = itemPool[Math.floor(Math.random() * itemPool.length)];
+        const randomItem: Item = {
+          id: `rolling-${i}`,
+          name: `Item ${i + 1}`,
+          price: (Math.random() * 100).toFixed(2),
+          rarity: ['consumer', 'industrial', 'milspec', 'restricted'][Math.floor(Math.random() * 4)],
+          image_url: null
+        };
         rollingItemsArray.push(randomItem);
       }
 
       setRollingItems(rollingItemsArray);
     }
-  }, [isOpen, caseTemplate]);
+  }, [isOpen, wonItem]);
 
   useEffect(() => {
     if (isOpen && !isLoading && wonItem) {
@@ -344,68 +349,12 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
       </div>
 
       {/* CSS Animation for rolling */}
-      <style jsx>{`
+      <style>{`
         @keyframes roll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-240px); }
         }
       `}</style>
-
-        {/* Case Info */}
-        {caseTemplate && (
-          <div className="text-center mb-6">
-            <h3 className="text-white text-xl font-bold mb-2">{caseTemplate.name}</h3>
-            {animationStage === 'opening' && (
-              <p className="text-gray-300">Открываем кейс...</p>
-            )}
-          </div>
-        )}
-
-        {/* Won Item Info */}
-        {wonItem && animationStage === 'showing' && (
-          <div className={`text-center space-y-4 transition-all duration-1000 ${
-            animationStage === 'showing' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
-            <div className="bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-              <h2 className="text-2xl font-bold text-white mb-2">🎉 Поздравляем!</h2>
-              <h3 className="text-lg font-semibold text-white mb-3">{wonItem.name}</h3>
-
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <span className={`px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r ${getRarityColor(wonItem.rarity)} text-white`}>
-                  {getRarityName(wonItem.rarity)}
-                </span>
-                <span className="text-green-400 font-bold text-xl">
-                  {Number(wonItem.price).toFixed(2)} КР
-                </span>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
-              >
-                Забрать предмет
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Loading state */}
-        {isLoading && (
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-300">Выбираем предмет...</p>
-          </div>
-        )}
-      </div>
-
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="w-full h-full" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, #fbbf24 0%, transparent 50%),
-                           radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)`,
-          backgroundSize: '200px 200px'
-        }}></div>
-      </div>
     </div>
   );
 };

@@ -71,7 +71,7 @@ export const casesApi = baseApi.injectEndpoints({
         method: 'POST',
         body: caseData,
       }),
-      invalidatesTags: ['Cases', 'Inventory', 'Balance'],
+      invalidatesTags: ['Cases', 'Inventory', 'Balance', 'User'],
       // Обновляем баланс и инвентарь после открытия
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -82,6 +82,11 @@ export const casesApi = baseApi.injectEndpoints({
               payload: data.data.new_balance,
             });
           }
+
+          // Принудительно инвалидируем все связанные кеши
+          dispatch(
+            casesApi.util.invalidateTags(['Inventory', 'Balance', 'User'])
+          );
         } catch {
           // Обработка ошибок
         }
