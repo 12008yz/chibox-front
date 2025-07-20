@@ -396,16 +396,28 @@ const ProfilePage: React.FC = () => {
     : 0;
 
   // Получаем инвентарь и достижения - приоритет данным из API (содержат items и cases)
-  console.log('user.inventory:', user.inventory);
-  console.log('inventoryData:', inventoryData);
 
-  const inventory = inventoryData?.success && (inventoryData.data.items.length > 0 || inventoryData.data.cases.length > 0) ?
+  // Получаем инвентарь с сортировкой: сначала кейсы, потом предметы
+  const rawInventory = inventoryData?.success && (inventoryData.data.items.length > 0 || inventoryData.data.cases.length > 0) ?
     [
       ...(inventoryData.data.items || []),
       ...(inventoryData.data.cases || [])
     ] : (user.inventory || []);
 
-  console.log('Final inventory:', inventory);
+  // Сортируем инвентарь: кейсы первыми, затем остальные предметы
+  // Создаем копию массива для безопасной сортировки
+  const inventory = [...rawInventory].sort((a, b) => {
+    // Если один элемент - кейс, а другой - нет, кейс идет первым
+    if (a.item_type === 'case' && b.item_type !== 'case') return -1;
+    if (a.item_type !== 'case' && b.item_type === 'case') return 1;
+
+    // Если оба кейсы или оба предметы, сортируем по дате получения (новые первыми)
+    const dateA = new Date(a.acquisition_date || 0);
+    const dateB = new Date(b.acquisition_date || 0);
+    return dateB.getTime() - dateA.getTime();
+  });
+
+
   const achievementsProgress = user.achievements?.length
     ? user.achievements
     : (achievementsProgressData?.success ? achievementsProgressData.data : []);
@@ -849,7 +861,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    );
+                    )
                   }).filter(Boolean)}
                 </div>
               ) : (
