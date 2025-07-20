@@ -864,20 +864,44 @@ const ProfilePage: React.FC = () => {
 
                                 {/* Progress */}
                                 {!isCompleted && (
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs text-gray-400">
-                                      <span>
-                                        {progress}/{target}
-                                      </span>
-                                      <span>{progressPercentage}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-700/50 rounded-full h-1.5">
-                                      <div
-                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
-                                        style={{ width: `${progressPercentage}%` }}
-                                      ></div>
-                                    </div>
-                                  </div>
+                                  <>
+                                    {/* Проверяем, если это достижение связано с подпиской или днями */}
+                                    {(achievement.description?.includes('дней') || achievement.description?.includes('день')) ? (
+                                      <div className="space-y-1">
+                                        <div className="flex justify-between text-xs text-gray-400">
+                                          <span>
+                                            {progress}/{target || 30} дней
+                                          </span>
+                                          <span>{Math.min(100, Math.round((progress / (target || 30)) * 100))}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                                          <div
+                                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
+                                            style={{ width: `${Math.min(100, Math.round((progress / (target || 30)) * 100))}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    ) : target > 1 ? (
+                                      <div className="space-y-1">
+                                        <div className="flex justify-between text-xs text-gray-400">
+                                          <span>
+                                            {progress}/{target}
+                                          </span>
+                                          <span>{progressPercentage}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                                          <div
+                                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
+                                            style={{ width: `${progressPercentage}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-gray-400">
+                                        <span>В процессе выполнения</span>
+                                      </div>
+                                    )}
+                                  </>
                                 )}
                               </div>
                             </div>
