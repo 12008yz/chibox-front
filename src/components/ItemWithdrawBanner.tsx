@@ -73,12 +73,10 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
 
   if (!item.item) return null;
 
-  // Отладочная информация
-  console.log('ItemWithdrawBanner - Item:', item.item.name);
-  console.log('ItemWithdrawBanner - steam_market_hash_name:', item.item.steam_market_hash_name);
-  console.log('ItemWithdrawBanner - canWithdraw:', canWithdraw);
-  console.log('ItemWithdrawBanner - userHasTradeUrl:', userHasTradeUrl);
-  console.log('ItemWithdrawBanner - Using fallback name:', !item.item.steam_market_hash_name && item.item.name);
+  // Отладочная информация (только для критических ошибок)
+  if (!canWithdraw && !item.item.name) {
+    console.warn('ItemWithdrawBanner - Warning: Item has no name or steam_market_hash_name');
+  }
 
   return (
     <div className="absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">

@@ -809,25 +809,35 @@ const ProfilePage: React.FC = () => {
                 </div>
               ) : achievementsProgress.length > 0 ? (
                 <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {achievementsProgress.slice(0, 5).map((achievement) => (
-                    <div key={achievement.id} className={`p-3 rounded-lg border ${
-                      achievement.is_completed
-                        ? 'bg-green-500/10 border-green-500/30'
-                        : 'bg-gray-700/30 border-gray-600/30'
-                    }`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className={`w-2 h-2 rounded-full ${
-                          achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
-                        }`}></div>
-                        <h5 className="font-medium text-sm text-white">{achievement.achievement.name}</h5>
-                      </div>
-                      <p className="text-xs text-gray-400">{achievement.achievement.description}</p>
-                      {!achievement.is_completed && (
-                        <div className="mt-2">
-                          <div className="text-xs text-gray-400 mb-1">
-                            Прогресс: {achievement.current_progress}/
-                            {(achievement.achievement as any).requirement_value || 1}
-                          </div>
+                  {achievementsProgress.slice(0, 5).map((achievement) => {
+                    // Проверяем, что achievement и achievement.achievement существуют
+                    if (!achievement || !achievement.achievement) {
+                      return null;
+                    }
+
+                    return (
+                      <div key={achievement.id} className={`p-3 rounded-lg border ${
+                        achievement.is_completed
+                          ? 'bg-green-500/10 border-green-500/30'
+                          : 'bg-gray-700/30 border-gray-600/30'
+                      }`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-2 h-2 rounded-full ${
+                            achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
+                          }`}></div>
+                          <h5 className="font-medium text-sm text-white">
+                            {achievement.achievement?.name || 'Неизвестное достижение'}
+                          </h5>
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          {achievement.achievement?.description || 'Описание отсутствует'}
+                        </p>
+                        {!achievement.is_completed && (
+                          <div className="mt-2">
+                            <div className="text-xs text-gray-400 mb-1">
+                              Прогресс: {achievement.current_progress || 0}/
+                              {(achievement.achievement as any)?.requirement_value || 1}
+                            </div>
                           <div className="w-full bg-gray-700 rounded-full h-1">
                             <div
                               className="bg-yellow-500 h-1 rounded-full transition-all duration-300"
@@ -839,7 +849,8 @@ const ProfilePage: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  }).filter(Boolean)}
                 </div>
               ) : (
                 <p className="text-gray-400 text-sm text-center py-4">Нет достижений</p>
