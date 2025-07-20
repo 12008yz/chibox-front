@@ -47,6 +47,20 @@ const ProfilePage: React.FC = () => {
   // State для отслеживания ID открываемого кейса
   const [openingCaseId, setOpeningCaseId] = useState<string | null>(null);
 
+  // State для раскрытия секции достижений
+  const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
+
+  // Функция для переключения состояния секции достижений
+  const toggleAchievements = () => {
+    console.log('toggleAchievements clicked, current state:', isAchievementsExpanded);
+    setIsAchievementsExpanded(!isAchievementsExpanded);
+  };
+
+  // Отслеживаем изменения состояния достижений
+  useEffect(() => {
+    console.log('isAchievementsExpanded changed to:', isAchievementsExpanded);
+  }, [isAchievementsExpanded]);
+
   // Helper функции для определения типа элемента инвентаря
   const isUserItem = (item: any): item is UserInventoryItem => {
     return item.item_type === 'item' && item.item_id !== null && item.item;
@@ -112,8 +126,9 @@ const ProfilePage: React.FC = () => {
     skip: userLoading // Always fetch inventory data unless user is loading
   });
 
+  // Получаем прогресс достижений пользователя
   const { data: achievementsProgressData, isLoading: achievementsLoading } = useGetAchievementsProgressQuery(undefined, {
-    skip: !!currentUserData?.achievements?.length || userLoading // Пропускаем если данные уже пришли из профиля
+    skip: userLoading
   });
 
   // Получаем все достижения для правильного подсчета
@@ -418,15 +433,23 @@ const ProfilePage: React.FC = () => {
   });
 
 
-  const achievementsProgress = user.achievements?.length
-    ? user.achievements
-    : (achievementsProgressData?.success ? achievementsProgressData.data : []);
+  // Всегда используем данные из API запроса прогресса достижений
+  const achievementsProgress = achievementsProgressData?.success ? achievementsProgressData.data : [];
 
-  // Общее количество достижений в системе
-  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 8; // fallback к 8
+  // Общее количество достижений в системе (соответствует сидеру)
+  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 8;
 
   // Завершенные достижения
-  const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.is_completed).length;
+  const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.completed).length;
+
+  // Отладочная информация
+  console.log('Achievements Debug:', {
+    achievementsProgressData,
+    achievementsProgress,
+    totalAchievements,
+    completedAchievementsCount,
+    achievementsLoading
+  });
 
   // Находим самый дорогой предмет как "лучшее оружие"
   const bestWeapon = inventory
@@ -692,12 +715,20 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Achievements - Interactive */}
-          <div className="group relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border border-gray-700/30 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+          <div className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-hidden ${
+            isAchievementsExpanded
+              ? 'border-red-500/50 shadow-lg shadow-red-500/20'
+              : 'border-gray-700/30 hover:border-red-500/30'
+          }`}>
             {/* Main Achievement Card */}
-            <div className="p-6 cursor-pointer">
+            <div className="p-6 cursor-pointer" onClick={toggleAchievements}>
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-300">
-                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <div className={`w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                isAchievementsExpanded
+                  ? 'bg-red-500/30 scale-110 shadow-lg shadow-red-500/20'
+                  : 'hover:bg-red-500/25 hover:scale-105'
+              }`}>
+                  <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -708,7 +739,9 @@ const ProfilePage: React.FC = () => {
                     <span className="text-gray-400 text-sm">/{totalAchievements}</span>
                   </p>
                 </div>
-                <div className="text-green-400 group-hover:translate-y-1 transition-transform duration-300">
+                <div className={`text-red-400 transition-transform duration-300 ${
+                  isAchievementsExpanded ? 'rotate-180' : 'hover:translate-y-1'
+                }`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -719,21 +752,30 @@ const ProfilePage: React.FC = () => {
               <div className="mt-3">
                 <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 transition-all duration-500 rounded-full"
+                    className={`h-full bg-gradient-to-r from-red-500 via-red-600 to-red-700 transition-all duration-500 rounded-full ${
+                      isAchievementsExpanded ? 'shadow-sm shadow-red-500/50' : ''
+                    }`}
                     style={{ width: `${Math.round((completedAchievementsCount / totalAchievements) * 100)}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>{Math.round((completedAchievementsCount / totalAchievements) * 100)}% завершено</span>
-                  <span>Наведите для подробностей</span>
+                <div className="flex justify-end text-xs text-gray-400 mt-1">
+                  <span>{isAchievementsExpanded ? 'Нажмите чтобы свернуть' : 'Нажмите для подробностей'}</span>
                 </div>
               </div>
             </div>
 
             {/* Expandable Content */}
-            <div className="absolute top-full left-0 right-0 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] border-t border-gray-700/30 rounded-b-xl max-h-0 group-hover:max-h-[600px] overflow-hidden transition-all duration-500 ease-in-out z-50 shadow-2xl">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                {(achievementsLoading && !user.achievements?.length) ? (
+            <div className={`absolute top-full left-0 right-0 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] border-t border-gray-700/30 rounded-b-xl overflow-hidden transition-all duration-500 ease-in-out z-50 shadow-2xl ${
+              isAchievementsExpanded
+                ? 'max-h-[600px] opacity-100'
+                : 'max-h-0 opacity-0'
+            }`}>
+              <div className={`transition-opacity duration-300 ${
+                isAchievementsExpanded
+                  ? 'opacity-100 delay-100'
+                  : 'opacity-0'
+              }`}>
+                {achievementsLoading ? (
                   <div className="p-6">
                     <div className="space-y-4">
                       {[1, 2, 3].map((i) => (
@@ -753,27 +795,31 @@ const ProfilePage: React.FC = () => {
                   <div className="p-6 max-h-[500px] overflow-y-auto custom-scrollbar">
                     <div className="space-y-3">
                       {achievementsProgress.map((achievement, index) => {
-                        // Проверяем, что achievement и achievement.achievement существуют
-                        if (!achievement || !achievement.achievement) {
+                        // Проверяем, что achievement существует
+                        if (!achievement) {
                           return null;
                         }
 
-                        const isCompleted = achievement.is_completed;
-                        const progress = achievement.current_progress || 0;
-                        const target = (achievement.achievement as any)?.requirement_value || 1;
+                        const isCompleted = achievement.completed;
+                        const progress = achievement.progress || 0;
+                        const target = achievement.target || 1;
                         const progressPercentage = Math.min(100, Math.round((progress / target) * 100));
 
                         return (
                           <div
                             key={achievement.id}
-                            className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
+                            className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] transform ${
                               isCompleted
                                 ? 'bg-green-500/10 border-green-500/30 shadow-sm shadow-green-500/20'
                                 : 'bg-gray-700/20 border-gray-600/30 hover:border-gray-500/50'
+                            } ${
+                              isAchievementsExpanded
+                                ? 'translate-y-0 opacity-100'
+                                : 'translate-y-4 opacity-0'
                             }`}
                             style={{
-                              animationDelay: `${index * 50}ms`,
-                              animation: 'slideInFromTop 0.3s ease-out forwards'
+                              transitionDelay: isAchievementsExpanded ? `${index * 50}ms` : '0ms',
+                              transitionDuration: '300ms'
                             }}
                           >
                             <div className="flex items-start gap-3">
@@ -800,7 +846,7 @@ const ProfilePage: React.FC = () => {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2 mb-2">
                                   <h5 className="font-medium text-white text-sm leading-tight">
-                                    {achievement.achievement?.name || 'Неизвестное достижение'}
+                                    {achievement.name || 'Неизвестное достижение'}
                                   </h5>
                                   {isCompleted && (
                                     <div className="flex items-center gap-1 text-xs text-green-400 flex-shrink-0">
@@ -813,7 +859,7 @@ const ProfilePage: React.FC = () => {
                                 </div>
 
                                 <p className="text-xs text-gray-400 mb-2 line-clamp-2">
-                                  {achievement.achievement?.description || 'Описание отсутствует'}
+                                  {achievement.description || 'Описание отсутствует'}
                                 </p>
 
                                 {/* Progress */}
@@ -842,7 +888,12 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="p-6 text-center">
-                    <p className="text-gray-400 text-sm">Нет достижений</p>
+                    <p className="text-gray-400 text-sm mb-2">Достижения не загружены</p>
+                    <p className="text-gray-500 text-xs">
+                      Загрузка: {achievementsLoading ? 'Да' : 'Нет'} |
+                      Достижений: {achievementsProgress.length} |
+                      Всего: {totalAchievements}
+                    </p>
                   </div>
                 )}
               </div>
@@ -1657,5 +1708,46 @@ const ProfilePage: React.FC = () => {
     </div>
   );
 };
+
+// Добавляем стили для плавной анимации
+const styles = `
+  @keyframes slideDown {
+    from {
+      max-height: 0;
+      opacity: 0;
+    }
+    to {
+      max-height: 600px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      max-height: 600px;
+      opacity: 1;
+    }
+    to {
+      max-height: 0;
+      opacity: 0;
+    }
+  }
+
+  .achievements-expand-enter {
+    animation: slideDown 0.5s ease-in-out forwards;
+  }
+
+  .achievements-expand-exit {
+    animation: slideUp 0.3s ease-in-out forwards;
+  }
+`;
+
+// Добавляем стили в head если они еще не добавлены
+if (typeof document !== 'undefined' && !document.getElementById('achievements-styles')) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'achievements-styles';
+  styleSheet.textContent = styles;
+  document.head.appendChild(styleSheet);
+}
 
 export default ProfilePage;
