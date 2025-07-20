@@ -123,7 +123,7 @@ const ProfilePage: React.FC = () => {
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
 
   // Хук для открытия кейса
-  const [openCase, { isLoading: isOpeningCase }] = useOpenCaseMutation();
+  const [openCase, { isLoading: _isOpeningCase }] = useOpenCaseMutation();
 
   // Хуки для работы с профилем
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateUserProfileMutation();
@@ -437,7 +437,7 @@ const ProfilePage: React.FC = () => {
 
   const getWithdrawnItems = () => {
     return inventory.filter(item =>
-      isUserItem(item) && item.status === 'withdrawn'
+      isUserItem(item) && (item.status === 'withdrawn' || item.status === 'pending_withdrawal')
     );
   };
 
@@ -964,7 +964,7 @@ const ProfilePage: React.FC = () => {
             <p className="text-sm text-gray-300">
               {activeInventoryTab === 'active' && '🎮 Ваши текущие предметы и неоткрытые кейсы'}
               {activeInventoryTab === 'opened' && '📦 Открытые кейсы - наведите на кейс, чтобы увидеть выпавший предмет'}
-              {activeInventoryTab === 'withdrawn' && '📤 Предметы, отправленные в Steam'}
+              {activeInventoryTab === 'withdrawn' && '📤 Предметы на выводе: ожидающие отправки и уже отправленные в Steam'}
               {activeInventoryTab === 'sold' && '💰 Предметы, проданные за валюту или обмененные на подписку'}
             </p>
           </div>
@@ -1008,11 +1008,13 @@ const ProfilePage: React.FC = () => {
                     {activeInventoryTab !== 'active' && (
                       <div className="absolute top-2 right-2 z-10">
                         <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
-                          activeInventoryTab === 'withdrawn' ? 'bg-purple-500' :
+                          activeInventoryTab === 'withdrawn' ?
+                            (inventoryItem.status === 'pending_withdrawal' ? 'bg-orange-500' : 'bg-purple-500') :
                           activeInventoryTab === 'sold' ? 'bg-yellow-500' :
                           'bg-orange-500'
                         }`}>
-                          {activeInventoryTab === 'withdrawn' ? 'Выведен' :
+                          {activeInventoryTab === 'withdrawn' ?
+                            (inventoryItem.status === 'pending_withdrawal' ? 'Ожидает отправки' : 'Выведен') :
                            activeInventoryTab === 'sold' ? 'Продан' :
                            'Открыт'}
                         </div>
@@ -1193,7 +1195,7 @@ const ProfilePage: React.FC = () => {
               <p className="text-gray-500 text-sm mt-2">
                 {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
                 {activeInventoryTab === 'opened' && 'Открытые кейсы будут отображаться здесь с возможностью увидеть выпавший предмет'}
-                {activeInventoryTab === 'withdrawn' && 'Выведенные в Steam предметы будут отображаться здесь'}
+                {activeInventoryTab === 'withdrawn' && 'Предметы на выводе и выведенные в Steam будут отображаться здесь'}
                 {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
               </p>
             </div>

@@ -110,7 +110,7 @@ export interface UserInventoryItem {
   item_id: string;
   acquisition_date: string;
   source: string;
-  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory';
+  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory' | 'pending_withdrawal';
   case_id?: string;
   case_template_id?: string;
   withdrawal?: any;
@@ -127,7 +127,7 @@ export interface UserCaseItem {
   acquisition_date: string;
   expires_at?: string;
   source: string;
-  status: 'inventory' | 'used' | 'sold' | 'withdrawn';
+  status: 'inventory' | 'used' | 'sold' | 'withdrawn' | 'pending_withdrawal';
   transaction_date?: string;
 }
 
