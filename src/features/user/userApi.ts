@@ -77,7 +77,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: withdrawData,
       }),
-      invalidatesTags: ['Inventory'],
+      invalidatesTags: ['Inventory', 'Balance', 'User'],
     }),
 
     // Получение достижений

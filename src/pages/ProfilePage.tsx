@@ -1064,8 +1064,11 @@ const ProfilePage: React.FC = () => {
                             item={inventoryItem}
                             onWithdrawSuccess={() => {
                               showNotification(`Предмет "${inventoryItem.item.name}" успешно отправлен на вывод!`, 'success');
-                              // Обновляем инвентарь
-                              refetchInventory();
+                              // Обновляем данные пользователя и инвентарь
+                              setTimeout(() => {
+                                refetchInventory();
+                                refetchUser();
+                              }, 100);
                             }}
                             onError={(message) => {
                               showNotification(message, 'error');
