@@ -691,20 +691,160 @@ const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Achievements */}
-          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-green-500/50 transition-all duration-300">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
-                </svg>
+          {/* Achievements - Interactive */}
+          <div className="group relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border border-gray-700/30 hover:border-green-500/50 transition-all duration-300 overflow-hidden">
+            {/* Main Achievement Card */}
+            <div className="p-6 cursor-pointer">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-300">
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-400 text-sm">Достижения</p>
+                  <p className="text-xl font-bold text-white">
+                    {completedAchievementsCount}
+                    <span className="text-gray-400 text-sm">/{totalAchievements}</span>
+                  </p>
+                </div>
+                <div className="text-green-400 group-hover:translate-y-1 transition-transform duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">Достижения</p>
-                <p className="text-xl font-bold text-white">
-                  {completedAchievementsCount}
-                  <span className="text-gray-400 text-sm">/{totalAchievements}</span>
-                </p>
+
+              {/* Progress Preview */}
+              <div className="mt-3">
+                <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 transition-all duration-500 rounded-full"
+                    style={{ width: `${Math.round((completedAchievementsCount / totalAchievements) * 100)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>{Math.round((completedAchievementsCount / totalAchievements) * 100)}% завершено</span>
+                  <span>Наведите для подробностей</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Expandable Content */}
+            <div className="absolute top-full left-0 right-0 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] border-t border-gray-700/30 rounded-b-xl max-h-0 group-hover:max-h-[600px] overflow-hidden transition-all duration-500 ease-in-out z-50 shadow-2xl">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                {(achievementsLoading && !user.achievements?.length) ? (
+                  <div className="p-6">
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gray-600/30 rounded-lg"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-600/30 rounded w-3/4 mb-2"></div>
+                              <div className="h-3 bg-gray-600/30 rounded w-1/2"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : achievementsProgress.length > 0 ? (
+                  <div className="p-6 max-h-[500px] overflow-y-auto custom-scrollbar">
+                    <div className="space-y-3">
+                      {achievementsProgress.map((achievement, index) => {
+                        // Проверяем, что achievement и achievement.achievement существуют
+                        if (!achievement || !achievement.achievement) {
+                          return null;
+                        }
+
+                        const isCompleted = achievement.is_completed;
+                        const progress = achievement.current_progress || 0;
+                        const target = (achievement.achievement as any)?.requirement_value || 1;
+                        const progressPercentage = Math.min(100, Math.round((progress / target) * 100));
+
+                        return (
+                          <div
+                            key={achievement.id}
+                            className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
+                              isCompleted
+                                ? 'bg-green-500/10 border-green-500/30 shadow-sm shadow-green-500/20'
+                                : 'bg-gray-700/20 border-gray-600/30 hover:border-gray-500/50'
+                            }`}
+                            style={{
+                              animationDelay: `${index * 50}ms`,
+                              animation: 'slideInFromTop 0.3s ease-out forwards'
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              {/* Achievement Icon */}
+                              <div
+                                className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                  isCompleted
+                                    ? 'bg-gradient-to-br from-green-500 to-green-600'
+                                    : 'bg-gray-600/30'
+                                }`}
+                              >
+                                {isCompleted ? (
+                                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                )}
+                              </div>
+
+                              {/* Achievement Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                  <h5 className="font-medium text-white text-sm leading-tight">
+                                    {achievement.achievement?.name || 'Неизвестное достижение'}
+                                  </h5>
+                                  {isCompleted && (
+                                    <div className="flex items-center gap-1 text-xs text-green-400 flex-shrink-0">
+                                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                      </svg>
+                                      <span>Выполнено</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                                  {achievement.achievement?.description || 'Описание отсутствует'}
+                                </p>
+
+                                {/* Progress */}
+                                {!isCompleted && (
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-gray-400">
+                                      <span>
+                                        {progress}/{target}
+                                      </span>
+                                      <span>{progressPercentage}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                                      <div
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
+                                        style={{ width: `${progressPercentage}%` }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }).filter(Boolean)}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 text-center">
+                    <p className="text-gray-400 text-sm">Нет достижений</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
