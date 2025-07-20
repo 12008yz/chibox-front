@@ -53,6 +53,25 @@ const ProfilePage: React.FC = () => {
   // Функция для переключения состояния секции достижений
   const toggleAchievements = () => {
     console.log('toggleAchievements clicked, current state:', isAchievementsExpanded);
+    // Если секция разворачивается, автоматически скроллим к ней
+    if (!isAchievementsExpanded) {
+      setTimeout(() => {
+        const achievementsElement = document.querySelector('[data-achievements-section]');
+        if (achievementsElement) {
+          achievementsElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+    } else {
+      // При сворачивании скроллим вверх к началу страницы
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
     setIsAchievementsExpanded(!isAchievementsExpanded);
   };
 
@@ -715,7 +734,9 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Achievements - Interactive */}
-          <div className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-visible ${
+          <div
+            data-achievements-section
+            className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-visible ${
             isAchievementsExpanded
               ? 'border-red-500/50 shadow-lg shadow-red-500/20'
               : 'border-gray-700/30 hover:border-red-500/30'
@@ -864,44 +885,27 @@ const ProfilePage: React.FC = () => {
 
                                 {/* Progress */}
                                 {!isCompleted && (
-                                  <>
-                                    {/* Проверяем, если это достижение связано с подпиской или днями */}
-                                    {(achievement.description?.includes('дней') || achievement.description?.includes('день')) ? (
-                                      <div className="space-y-1">
-                                        <div className="flex justify-between text-xs text-gray-400">
-                                          <span>
-                                            {progress}/{target || 30} дней
-                                          </span>
-                                          <span>{Math.min(100, Math.round((progress / (target || 30)) * 100))}%</span>
-                                        </div>
-                                        <div className="w-full bg-gray-700/50 rounded-full h-1.5">
-                                          <div
-                                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
-                                            style={{ width: `${Math.min(100, Math.round((progress / (target || 30)) * 100))}%` }}
-                                          ></div>
-                                        </div>
-                                      </div>
-                                    ) : target > 1 ? (
-                                      <div className="space-y-1">
-                                        <div className="flex justify-between text-xs text-gray-400">
-                                          <span>
-                                            {progress}/{target}
-                                          </span>
-                                          <span>{progressPercentage}%</span>
-                                        </div>
-                                        <div className="w-full bg-gray-700/50 rounded-full h-1.5">
-                                          <div
-                                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
-                                            style={{ width: `${progressPercentage}%` }}
-                                          ></div>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <div className="text-xs text-gray-400">
-                                        <span>В процессе выполнения</span>
-                                      </div>
-                                    )}
-                                  </>
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-gray-400">
+                                      <span>
+                                        {progress}/{target}
+                                        {achievement.requirement_type === 'subscription_days' ? ' дней' :
+                                         achievement.requirement_type === 'cases_opened' ? ' кейсов' :
+                                         achievement.requirement_type === 'daily_streak' ? ' дней подряд' :
+                                         achievement.requirement_type === 'best_item_value' ? ' КР' :
+                                         achievement.requirement_type === 'total_items_value' ? ' КР' :
+                                         achievement.requirement_type === 'rare_items_found' ? ' предметов' :
+                                         achievement.requirement_type === 'premium_items_found' ? ' предметов' : ''}
+                                      </span>
+                                      <span>{progressPercentage}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                                      <div
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
+                                        style={{ width: `${progressPercentage}%` }}
+                                      ></div>
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -1064,6 +1068,13 @@ const ProfilePage: React.FC = () => {
                             <div className="text-xs text-gray-400 mb-1">
                               Прогресс: {achievement.current_progress || 0}/
                               {(achievement.achievement as any)?.requirement_value || 1}
+                              {(achievement.achievement as any)?.requirement_type === 'subscription_days' ? ' дней' :
+                               (achievement.achievement as any)?.requirement_type === 'cases_opened' ? ' кейсов' :
+                               (achievement.achievement as any)?.requirement_type === 'daily_streak' ? ' дней подряд' :
+                               (achievement.achievement as any)?.requirement_type === 'best_item_value' ? ' КР' :
+                               (achievement.achievement as any)?.requirement_type === 'total_items_value' ? ' КР' :
+                               (achievement.achievement as any)?.requirement_type === 'rare_items_found' ? ' предметов' :
+                               (achievement.achievement as any)?.requirement_type === 'premium_items_found' ? ' предметов' : ''}
                             </div>
                           <div className="w-full bg-gray-700 rounded-full h-1">
                             <div
