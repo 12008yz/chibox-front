@@ -9,11 +9,51 @@ interface UseSocketReturn {
   liveDrops: LiveDropData[];
 }
 
+const LIVE_DROPS_STORAGE_KEY = 'chibox_live_drops';
+const MAX_LIVE_DROPS = 17;
+
+// Функция для загрузки дропов из localStorage
+const loadLiveDropsFromStorage = (): LiveDropData[] => {
+  try {
+    const stored = localStorage.getItem(LIVE_DROPS_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Проверяем, что данные не старше 24 часов
+      const now = new Date().getTime();
+      const validDrops = parsed.filter((drop: LiveDropData) => {
+        const dropTime = new Date(drop.dropTime).getTime();
+        return now - dropTime < 24 * 60 * 60 * 1000; // 24 часа
+      });
+      return validDrops.slice(0, MAX_LIVE_DROPS);
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки live drops из localStorage:', error);
+  }
+  return [];
+};
+
+// Функция для сохранения дропов в localStorage
+const saveLiveDropsToStorage = (drops: LiveDropData[]) => {
+  try {
+    localStorage.setItem(LIVE_DROPS_STORAGE_KEY, JSON.stringify(drops));
+  } catch (error) {
+    console.error('Ошибка сохранения live drops в localStorage:', error);
+  }
+};
+
 export const useSocket = (): UseSocketReturn => {
   const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [liveDrops, setLiveDrops] = useState<LiveDropData[]>([]);
+  // Инициализируем liveDrops данными из localStorage
+  const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() => loadLiveDropsFromStorage());
+
+  // Функция для обновления live drops с сохранением в localStorage
+  const updateLiveDrops = (newDrops: LiveDropData[]) => {
+    const limitedDrops = newDrops.slice(0, MAX_LIVE_DROPS);
+    setLiveDrops(limitedDrops);
+    saveLiveDropsToStorage(limitedDrops);
+  };
 
   useEffect(() => {
     // Определяем URL сервера
@@ -54,8 +94,10 @@ export const useSocket = (): UseSocketReturn => {
     socketInstance.on('liveDrop', (data) => {
       console.log('WebSocket: Получено живое падение', data);
       setLiveDrops(prevDrops => {
-        // Добавляем новое падение в начало массива и ограничиваем до 50 последних
-        const newDrops = [data, ...prevDrops.slice(0, 49)];
+        // Добавляем новое падение в начало массива и ограничиваем до 17 последних
+        const newDrops = [data, ...prevDrops.slice(0, MAX_LIVE_DROPS - 1)];
+        // Сохраняем в localStorage
+        saveLiveDropsToStorage(newDrops);
         return newDrops;
       });
     });
