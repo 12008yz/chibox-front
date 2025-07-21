@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery, useUpdateUserProfileMutation, useResendVerificationCodeMutation, useVerifyEmailMutation } from '../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases/casesApi';
@@ -50,6 +50,9 @@ const ProfilePage: React.FC = () => {
   // State для раскрытия секции достижений
   const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
 
+  // Ref для области достижений
+  const achievementsRef = useRef<HTMLDivElement>(null);
+
   // Функция для переключения состояния секции достижений
   const toggleAchievements = () => {
     console.log('toggleAchievements clicked, current state:', isAchievementsExpanded);
@@ -66,7 +69,7 @@ const ProfilePage: React.FC = () => {
         }
       }, 100);
     } else {
-      // При сворачивании скроллим вверх к началу страницы
+      // При сворачивании через кнопку скроллим вверх к началу страницы
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -75,9 +78,33 @@ const ProfilePage: React.FC = () => {
     setIsAchievementsExpanded(!isAchievementsExpanded);
   };
 
+  // Функция для закрытия достижений без скролла (при клике вне области)
+  const closeAchievementsWithoutScroll = () => {
+    setIsAchievementsExpanded(false);
+  };
+
   // Отслеживаем изменения состояния достижений
   useEffect(() => {
     console.log('isAchievementsExpanded changed to:', isAchievementsExpanded);
+  }, [isAchievementsExpanded]);
+
+  // Обработчик клика вне области достижений
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isAchievementsExpanded &&
+          achievementsRef.current &&
+          !achievementsRef.current.contains(event.target as Node)) {
+        closeAchievementsWithoutScroll();
+      }
+    };
+
+    if (isAchievementsExpanded) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isAchievementsExpanded]);
 
   // Helper функции для определения типа элемента инвентаря
@@ -735,6 +762,7 @@ const ProfilePage: React.FC = () => {
 
           {/* Achievements - Interactive */}
           <div
+            ref={achievementsRef}
             data-achievements-section
             className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-visible ${
             isAchievementsExpanded
@@ -869,14 +897,21 @@ const ProfilePage: React.FC = () => {
                                   <h5 className="font-medium text-white text-sm leading-tight flex-1">
                                     {achievement.name || 'Неизвестное достижение'}
                                   </h5>
-                                  {isCompleted && (
-                                    <div className="flex items-center gap-1 text-xs text-green-400 whitespace-nowrap">
-                                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                      </svg>
-                                      <span>Выполнено</span>
-                                    </div>
-                                  )}
+                                  <div className="flex items-center gap-1 text-xs text-blue-400 whitespace-nowrap">
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span>+{achievement.bonus_percentage ||
+                                      // Fallback для конкретных достижений с правильными значениями
+                                      (achievement.name === 'Новичок' ? '2.5' :
+                                       achievement.name === 'Коллекционер' ? '5' :
+                                       achievement.name === 'Премиум игрок' ? '7.5' :
+                                       achievement.name === 'Подписчик' ? '5' :
+                                       achievement.name === 'Покупатель подписки' ? '2' :
+                                       achievement.name === 'Удачливый' ? '2.5' :
+                                       achievement.name === 'Миллионер' ? '6.25' :
+                                       achievement.name === 'Эксперт' ? '7.5' : '0.5')}% дроп</span>
+                                  </div>
                                 </div>
 
                                 <p className="text-xs text-gray-400 mb-2 line-clamp-2">
@@ -1052,13 +1087,30 @@ const ProfilePage: React.FC = () => {
                           ? 'bg-green-500/10 border-green-500/30'
                           : 'bg-gray-700/30 border-gray-600/30'
                       }`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-2 h-2 rounded-full ${
-                            achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
-                          }`}></div>
-                          <h5 className="font-medium text-sm text-white">
-                            {achievement.achievement?.name || 'Неизвестное достижение'}
-                          </h5>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
+                            }`}></div>
+                            <h5 className="font-medium text-sm text-white">
+                              {achievement.achievement?.name || 'Неизвестное достижение'}
+                            </h5>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-purple-400 whitespace-nowrap">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span>+{(achievement.achievement as any)?.bonus_percentage ||
+                              // Fallback для конкретных достижений с правильными значениями
+                              (achievement.achievement?.name === 'Новичок' ? '2.5' :
+                               achievement.achievement?.name === 'Коллекционер' ? '5' :
+                               achievement.achievement?.name === 'Премиум игрок' ? '7.5' :
+                               achievement.achievement?.name === 'Подписчик' ? '5' :
+                               achievement.achievement?.name === 'Покупатель подписки' ? '2' :
+                               achievement.achievement?.name === 'Удачливый' ? '2.5' :
+                               achievement.achievement?.name === 'Миллионер' ? '6.25' :
+                               achievement.achievement?.name === 'Эксперт' ? '7.5' : '0.5')}% дроп</span>
+                          </div>
                         </div>
                         <p className="text-xs text-gray-400">
                           {achievement.achievement?.description || 'Описание отсутствует'}
