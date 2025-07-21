@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ServerToClientEvents, ClientToServerEvents } from '../types/socket';
+import { ServerToClientEvents, ClientToServerEvents, LiveDropData } from '../types/socket';
 
 interface UseSocketReturn {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   onlineUsers: number;
   isConnected: boolean;
+  liveDrops: LiveDropData[];
 }
 
 export const useSocket = (): UseSocketReturn => {
   const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [liveDrops, setLiveDrops] = useState<LiveDropData[]>([]);
 
   useEffect(() => {
     // Определяем URL сервера
@@ -48,6 +50,16 @@ export const useSocket = (): UseSocketReturn => {
       setOnlineUsers(data.count);
     });
 
+    // Обработчик живых падений
+    socketInstance.on('liveDrop', (data) => {
+      console.log('WebSocket: Получено живое падение', data);
+      setLiveDrops(prevDrops => {
+        // Добавляем новое падение в начало массива и ограничиваем до 50 последних
+        const newDrops = [data, ...prevDrops.slice(0, 49)];
+        return newDrops;
+      });
+    });
+
     // Обработчик ошибок
     socketInstance.on('connect_error', (error) => {
       console.error('WebSocket: Ошибка подключения', error);
@@ -66,6 +78,7 @@ export const useSocket = (): UseSocketReturn => {
   return {
     socket,
     onlineUsers,
-    isConnected
+    isConnected,
+    liveDrops
   };
 };
