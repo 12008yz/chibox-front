@@ -13,10 +13,12 @@ import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
 import SteamAuthPage from './pages/SteamAuthPage';
 import ProfilePage from './pages/ProfilePage';
+import { useSocket } from './hooks/useSocket';
 
 const App: React.FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
+  const { onlineUsers, isConnected } = useSocket();
 
   console.log('App render - auth state:', {
     isAuthenticated: auth.isAuthenticated,
@@ -98,7 +100,7 @@ const App: React.FC = () => {
     <Router>
       <div className="min-h-screen bg-[#151225]">
         <Header
-          onlineUsers={1337}
+          onlineUsers={onlineUsers}
           user={auth.user}
         />
 
