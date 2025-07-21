@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery, useUpdateUserProfileMutation, useResendVerificationCodeMutation, useVerifyEmailMutation } from '../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases/casesApi';
@@ -25,11 +26,7 @@ const ProfilePage: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [emailVerificationStep, setEmailVerificationStep] = useState<'send' | 'verify'>('send');
 
-  // State для уведомлений
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: 'success' | 'error' | 'info';
-  } | null>(null);
+  // Убираем state для уведомлений - теперь используем react-hot-toast
 
   // State для анимации открытия кейса
   const [caseOpeningAnimation, setCaseOpeningAnimation] = useState<{
@@ -319,8 +316,18 @@ const ProfilePage: React.FC = () => {
 
   // Функция для показа уведомлений
   const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 4000);
+    switch (type) {
+      case 'success':
+        toast.success(message);
+        break;
+      case 'error':
+        toast.error(message);
+        break;
+      case 'info':
+      default:
+        toast(message);
+        break;
+    }
   };
 
   // Функция для сохранения настроек
@@ -893,11 +900,13 @@ const ProfilePage: React.FC = () => {
 
                               {/* Achievement Info */}
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                  <h5 className="font-medium text-white text-sm leading-tight flex-1">
-                                    {achievement.name || 'Неизвестное достижение'}
-                                  </h5>
-                                  <div className="flex items-center gap-1 text-xs text-blue-400 whitespace-nowrap">
+                                <div className="mb-2">
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <h5 className="font-medium text-white text-sm leading-tight">
+                                      {achievement.name || 'Неизвестное достижение'}
+                                    </h5>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-xs text-blue-400">
                                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
@@ -1059,93 +1068,16 @@ const ProfilePage: React.FC = () => {
 
           {/* Achievements & Quick Stats */}
           <div className="space-y-6">
-            {/* Achievements */}
-            <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
-              <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
-                </svg>
-                Достижения
-              </h4>
-
-              {(achievementsLoading && !user.achievements?.length) ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                  <p className="text-gray-400 text-sm">Загрузка...</p>
-                </div>
-              ) : achievementsProgress.length > 0 ? (
-                <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {achievementsProgress.slice(0, 5).map((achievement) => {
-                    // Проверяем, что achievement и achievement.achievement существуют
-                    if (!achievement || !achievement.achievement) {
-                      return null;
-                    }
-
-                    return (
-                      <div key={achievement.id} className={`p-3 rounded-lg border ${
-                        achievement.is_completed
-                          ? 'bg-green-500/10 border-green-500/30'
-                          : 'bg-gray-700/30 border-gray-600/30'
-                      }`}>
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              achievement.is_completed ? 'bg-green-400' : 'bg-gray-500'
-                            }`}></div>
-                            <h5 className="font-medium text-sm text-white">
-                              {achievement.achievement?.name || 'Неизвестное достижение'}
-                            </h5>
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-purple-400 whitespace-nowrap">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span>+{(achievement.achievement as any)?.bonus_percentage ||
-                              // Fallback для конкретных достижений с правильными значениями
-                              (achievement.achievement?.name === 'Новичок' ? '2.5' :
-                               achievement.achievement?.name === 'Коллекционер' ? '5' :
-                               achievement.achievement?.name === 'Премиум игрок' ? '7.5' :
-                               achievement.achievement?.name === 'Подписчик' ? '5' :
-                               achievement.achievement?.name === 'Покупатель подписки' ? '2' :
-                               achievement.achievement?.name === 'Удачливый' ? '2.5' :
-                               achievement.achievement?.name === 'Миллионер' ? '6.25' :
-                               achievement.achievement?.name === 'Эксперт' ? '7.5' : '0.5')}% дроп</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-gray-400">
-                          {achievement.achievement?.description || 'Описание отсутствует'}
-                        </p>
-                        {!achievement.is_completed && (
-                          <div className="mt-2">
-                            <div className="text-xs text-gray-400 mb-1">
-                              Прогресс: {achievement.current_progress || 0}/
-                              {(achievement.achievement as any)?.requirement_value || 1}
-                              {(achievement.achievement as any)?.requirement_type === 'subscription_days' ? ' дней' :
-                               (achievement.achievement as any)?.requirement_type === 'cases_opened' ? ' кейсов' :
-                               (achievement.achievement as any)?.requirement_type === 'daily_streak' ? ' дней подряд' :
-                               (achievement.achievement as any)?.requirement_type === 'best_item_value' ? ' КР' :
-                               (achievement.achievement as any)?.requirement_type === 'total_items_value' ? ' КР' :
-                               (achievement.achievement as any)?.requirement_type === 'rare_items_found' ? ' предметов' :
-                               (achievement.achievement as any)?.requirement_type === 'premium_items_found' ? ' предметов' : ''}
-                            </div>
-                          <div className="w-full bg-gray-700 rounded-full h-1">
-                            <div
-                              className="bg-yellow-500 h-1 rounded-full transition-all duration-300"
-                              style={{
-                                width: `${Math.min(100, (achievement.current_progress / ((achievement.achievement as any).requirement_value || 1)) * 100)}%`
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    )
-                  }).filter(Boolean)}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-sm text-center py-4">Нет достижений</p>
-              )}
-            </div>
+            {/* Purchase Button */}
+            <button
+              onClick={() => {
+                // TODO: Добавить логику пополнения баланса
+                showNotification('Функция пополнения баланса скоро будет доступна!', 'info');
+              }}
+              className="w-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-green-400/20 hover:border-green-400/50"
+            >
+              Приобрести
+            </button>
 
             {/* Drop Rate Bonuses */}
             <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
@@ -1755,43 +1687,6 @@ const ProfilePage: React.FC = () => {
         wonItem={caseOpeningAnimation.wonItem}
         isLoading={caseOpeningAnimation.isLoading}
       />
-
-      {/* Notification Toast */}
-      {notification && (
-        <div className={`fixed top-4 right-4 z-50 max-w-sm w-full px-6 py-4 rounded-lg shadow-lg border transition-all duration-300 ${
-          notification.type === 'success' ? 'bg-green-500/90 border-green-400 text-white' :
-          notification.type === 'error' ? 'bg-red-500/90 border-red-400 text-white' :
-          'bg-blue-500/90 border-blue-400 text-white'
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
-              {notification.type === 'success' ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              ) : notification.type === 'error' ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              )}
-            </div>
-            <p className="text-sm font-medium">{notification.message}</p>
-            <button
-              onClick={() => setNotification(null)}
-              className="flex-shrink-0 ml-auto text-white/80 hover:text-white"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };
@@ -1826,6 +1721,43 @@ const styles = `
 
   .achievements-expand-exit {
     animation: slideUp 0.3s ease-in-out forwards;
+  }
+
+  /* Notification animations */
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(100%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes shrink {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .notification-success {
+    box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
+  }
+
+  .notification-error {
+    box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+  }
+
+  .notification-info {
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
   }
 `;
 
