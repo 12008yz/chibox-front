@@ -345,7 +345,43 @@ export const userApi = baseApi.injectEndpoints({
 
     // Получение публичного профиля пользователя
     getPublicProfile: builder.query<
-      ApiResponse<any>,
+      {
+        user: {
+          id: string;
+          username: string;
+          createdAt: string;
+          level: number;
+          subscriptionTier?: number;
+          totalCasesOpened: number;
+          inventory: Array<{
+            id: string;
+            item: {
+              id: string;
+              name: string;
+              rarity: string;
+              price: string;
+              weapon_type?: string;
+              skin_name?: string;
+            };
+          }>;
+          bestWeapon?: {
+            id: string;
+            name: string;
+            rarity: string;
+            price: string;
+            weapon_type?: string;
+            skin_name?: string;
+          };
+          steam_avatar?: string;
+          steam_profile?: {
+            personaname?: string;
+            profileurl?: string;
+            avatar?: string;
+            avatarmedium?: string;
+            avatarfull?: string;
+          };
+        };
+      },
       string
     >({
       query: (userId) => `v1/users/${userId}`,
