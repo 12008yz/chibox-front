@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
 
 interface LiveDropItemProps {
@@ -58,9 +59,13 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
 
       {/* Информация о пользователе */}
       <div className="flex-shrink-0 min-w-0">
-        <div className="text-sm text-white font-medium truncate">
+        <Link
+          to={`/user/${drop.user.id}`}
+          className="text-sm text-white font-medium truncate hover:text-blue-400 transition-colors cursor-pointer block"
+          title={`Посмотреть профиль ${drop.user.username}`}
+        >
           {drop.user.username}
-        </div>
+        </Link>
         <div className="text-xs text-gray-400">
           Ур. {drop.user.level}
         </div>

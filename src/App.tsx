@@ -13,6 +13,7 @@ import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
 import SteamAuthPage from './pages/SteamAuthPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import { useSocket } from './hooks/useSocket';
 
 const App: React.FC = () => {
@@ -128,6 +129,12 @@ const App: React.FC = () => {
               element={
                 auth.isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />
               }
+            />
+
+            {/* Публичный профиль пользователя */}
+            <Route
+              path="/user/:id"
+              element={<PublicProfilePage />}
             />
             <Route
               path="/marketplace"
