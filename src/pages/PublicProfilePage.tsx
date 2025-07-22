@@ -70,19 +70,33 @@ const PublicProfilePage: React.FC = () => {
     }
   };
 
-  const getSubscriptionName = (tier: string | number) => {
-    const tierNumber = typeof tier === 'string' ? parseInt(tier) : tier;
-    switch (tierNumber) {
-      case 1: return 'Статус';
-      case 2: return 'Статус+';
-      case 3: return 'Статус++';
-      default: return `Tier ${tier}`;
+  const getAchievementCategoryColor = (category: string) => {
+    switch (category) {
+      case 'beginner': return 'from-green-500 to-green-600';
+      case 'collector': return 'from-purple-500 to-purple-600';
+      case 'regular': return 'from-blue-500 to-blue-600';
+      case 'expert': return 'from-orange-500 to-orange-600';
+      case 'legendary': return 'from-red-500 to-pink-500';
+      default: return 'from-gray-500 to-gray-600';
+    }
+  };
+
+  const getAchievementCategoryName = (category: string) => {
+    switch (category) {
+      case 'beginner': return 'Новичок';
+      case 'collector': return 'Коллекционер';
+      case 'regular': return 'Активный';
+      case 'expert': return 'Эксперт';
+      case 'legendary': return 'Легендарный';
+      default: return category;
     }
   };
 
   // Найти лучшее оружие (аналогично приватному профилю)
   const bestWeapon = user.bestWeapon;
   const inventory = user.inventory || [];
+  const achievements = user.achievements || [];
+  const dropBonuses = user.dropBonuses || { achievements: 0, subscription: 0, level: 0, total: 0 };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
@@ -121,6 +135,18 @@ const PublicProfilePage: React.FC = () => {
                 </h1>
                 <p className="text-gray-400 text-sm">ID: {user.id}</p>
 
+                {/* Subscription Status */}
+                {user.subscriptionStatus && user.subscriptionStatus !== 'Без статуса' && (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                    </svg>
+                    <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-sm px-3 py-1 rounded-full shadow-lg">
+                      {user.subscriptionStatus}
+                    </span>
+                  </div>
+                )}
+
                 {/* Steam Status */}
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
@@ -147,14 +173,32 @@ const PublicProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Public Stats */}
+            {/* Drop Bonuses */}
             <div className="flex-1 space-y-4">
               <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 text-sm">Уровень</span>
-                  <span className="text-2xl font-bold text-blue-400">
-                    {user.level}
-                  </span>
+                <h4 className="text-lg font-bold mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                  </svg>
+                  Бонус к дропу
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400 text-sm">Достижения:</span>
+                    <span className="text-green-400 font-bold">+{(dropBonuses.achievements || 0).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400 text-sm">Подписка:</span>
+                    <span className="text-yellow-400 font-bold">+{(dropBonuses.subscription || 0).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400 text-sm">Уровень:</span>
+                    <span className="text-blue-400 font-bold">+{(dropBonuses.level || 0).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between border-t border-gray-600 pt-2">
+                    <span className="text-white font-semibold">Общий бонус:</span>
+                    <span className="text-orange-400 font-bold">+{(dropBonuses.total || 0).toFixed(1)}%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,7 +206,7 @@ const PublicProfilePage: React.FC = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Cases Opened */}
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-2">
@@ -196,26 +240,92 @@ const PublicProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Subscription */}
-          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-yellow-500/50 transition-all duration-300">
+          {/* Total Items Value */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-green-500/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
+                <p className="text-gray-400 text-sm">Общая стоимость</p>
                 <p className="text-xl font-bold text-white">
-                  {user.subscriptionTier ? (
-                    getSubscriptionName(user.subscriptionTier)
-                  ) : (
-                    <span className="text-gray-500 text-base">Нет подписки</span>
-                  )}
+                  {(Number(user.totalItemsValue) || 0).toFixed(2)} КР
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Streak */}
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-orange-500/50 transition-all duration-300">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Ежедневная серия</p>
+                <p className="text-xl font-bold text-white">
+                  {user.dailyStreak || 0} дн. (макс: {user.maxDailyStreak || 0})
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Achievements Section */}
+        {achievements.length > 0 && (
+          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <div className="w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                </svg>
+              </div>
+              Достижения ({achievements.length})
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {achievements.slice(0, 6).map((achievement: any) => (
+                <div
+                  key={achievement.id}
+                  className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getAchievementCategoryColor(achievement.category)} p-1 flex items-center justify-center flex-shrink-0`}>
+                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h5 className="text-white font-medium mb-1 truncate" title={achievement.name}>
+                        {achievement.name}
+                      </h5>
+                      <p className="text-gray-400 text-sm mb-2 line-clamp-2">{achievement.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getAchievementCategoryColor(achievement.category)} text-white`}>
+                          {getAchievementCategoryName(achievement.category)}
+                        </span>
+                        <span className="text-green-400 text-sm font-bold">+{achievement.bonus_percentage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {achievements.length > 6 && (
+                <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
+                  <div className="text-2xl font-bold text-gray-400 mb-2">+{achievements.length - 6}</div>
+                  <p className="text-gray-400 text-xs text-center">Ещё достижений</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Best Weapon Section */}
         <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
@@ -233,9 +343,17 @@ const PublicProfilePage: React.FC = () => {
               <div className="flex items-center gap-6">
                 <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.rarity)} p-1 flex items-center justify-center shadow-lg`}>
                   <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                    </svg>
+                    {bestWeapon.image_url ? (
+                      <img
+                        src={bestWeapon.image_url}
+                        alt={bestWeapon.name}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                    ) : (
+                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                      </svg>
+                    )}
                   </div>
                 </div>
                 <div className="flex-1">
@@ -285,9 +403,17 @@ const PublicProfilePage: React.FC = () => {
                 >
                   <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
                     <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                      </svg>
+                      {inventoryItem.item.image_url ? (
+                        <img
+                          src={inventoryItem.item.image_url}
+                          alt={inventoryItem.item.name}
+                          className="w-full h-full object-contain rounded"
+                        />
+                      ) : (
+                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                        </svg>
+                      )}
                     </div>
                   </div>
                   <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>

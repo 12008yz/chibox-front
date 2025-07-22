@@ -352,7 +352,12 @@ export const userApi = baseApi.injectEndpoints({
           createdAt: string;
           level: number;
           subscriptionTier?: number;
+          subscriptionStatus?: string;
           totalCasesOpened: number;
+          bestItemValue?: number;
+          totalItemsValue?: number;
+          dailyStreak?: number;
+          maxDailyStreak?: number;
           inventory: Array<{
             id: string;
             item: {
@@ -362,6 +367,7 @@ export const userApi = baseApi.injectEndpoints({
               price: string;
               weapon_type?: string;
               skin_name?: string;
+              image_url?: string;
             };
           }>;
           bestWeapon?: {
@@ -371,6 +377,22 @@ export const userApi = baseApi.injectEndpoints({
             price: string;
             weapon_type?: string;
             skin_name?: string;
+            image_url?: string;
+          };
+          achievements?: Array<{
+            id: string;
+            name: string;
+            description: string;
+            icon_url?: string;
+            bonus_percentage: number;
+            category: string;
+            completion_date: string;
+          }>;
+          dropBonuses?: {
+            achievements: number;
+            subscription: number;
+            level: number;
+            total: number;
           };
           steam_avatar?: string;
           steam_profile?: {
