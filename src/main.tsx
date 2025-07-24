@@ -19,58 +19,63 @@ const Loading = () => (
   </div>
 );
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={<Loading />} persistor={persistor}>
-        <App />
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-          gutter={8}
-          containerClassName=""
-          containerStyle={{
-            top: 20,
-            right: 20,
-            zIndex: 9999999,
-          }}
-          toastOptions={{
+// В development режиме отключаем StrictMode для WebSocket
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const AppWithToaster = () => (
+  <Provider store={store}>
+    <PersistGate loading={<Loading />} persistor={persistor}>
+      <App />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{
+          top: 20,
+          right: 20,
+          zIndex: 9999999,
+        }}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid rgba(148, 163, 184, 0.3)',
+            color: '#f8fafc',
+            borderRadius: '12px',
+            backdropFilter: 'blur(16px)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          },
+          success: {
             duration: 4000,
             style: {
-              background: 'rgba(15, 23, 42, 0.95)',
-              border: '1px solid rgba(148, 163, 184, 0.3)',
-              color: '#f8fafc',
-              borderRadius: '12px',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+              background: 'rgba(22, 163, 74, 0.95)',
+              border: '1px solid rgba(34, 197, 94, 0.5)',
+              color: '#ffffff',
             },
-            success: {
-              duration: 4000,
-              style: {
-                background: 'rgba(22, 163, 74, 0.95)',
-                border: '1px solid rgba(34, 197, 94, 0.5)',
-                color: '#ffffff',
-              },
-              iconTheme: {
-                primary: '#ffffff',
-                secondary: '#16a34a',
-              },
+            iconTheme: {
+              primary: '#ffffff',
+              secondary: '#16a34a',
             },
-            error: {
-              duration: 5000,
-              style: {
-                background: 'rgba(220, 38, 38, 0.95)',
-                border: '1px solid rgba(239, 68, 68, 0.5)',
-                color: '#ffffff',
-              },
-              iconTheme: {
-                primary: '#ffffff',
-                secondary: '#dc2626',
-              },
+          },
+          error: {
+            duration: 5000,
+            style: {
+              background: 'rgba(220, 38, 38, 0.95)',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              color: '#ffffff',
             },
-          }}
-        />
-      </PersistGate>
-    </Provider>
-  </StrictMode>
+            iconTheme: {
+              primary: '#ffffff',
+              secondary: '#dc2626',
+            },
+          },
+        }}
+      />
+    </PersistGate>
+  </Provider>
+);
+
+createRoot(rootElement).render(
+  isDevelopment ? <AppWithToaster /> : <StrictMode><AppWithToaster /></StrictMode>
 );

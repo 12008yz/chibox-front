@@ -12,7 +12,7 @@ const LiveDrops: React.FC = () => {
   useEffect(() => {
     const fetchInitialDrops = async () => {
       try {
-        const response = await fetch('/api/v1/getLiveDrops?limit=20');
+        const response = await fetch('/api/v1/live-drops?limit=20');
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
