@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetPublicProfileQuery } from '../features/user/userApi';
 import Avatar from '../components/Avatar';
@@ -6,6 +6,9 @@ import Avatar from '../components/Avatar';
 const PublicProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: profileData, isLoading, error } = useGetPublicProfileQuery(id || '');
+
+  // State для переключения между превью и полным отображением инвентаря
+  const [showFullInventory, setShowFullInventory] = useState(false);
 
   if (isLoading) {
     return (
@@ -382,21 +385,47 @@ const PublicProfilePage: React.FC = () => {
           )}
         </div>
 
-        {/* Inventory Preview */}
+        {/* Inventory Section */}
         {inventory.length > 0 && (
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                  <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              Инвентарь ({inventory.length} предметов)
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                    <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                Инвентарь ({inventory.length} предметов)
+              </h3>
+
+              {/* Toggle Button для показа всех предметов */}
+              {inventory.length > 12 && (
+                <button
+                  onClick={() => setShowFullInventory(!showFullInventory)}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                >
+                  {showFullInventory ? (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                      </svg>
+                      Скрыть
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      Показать все
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {inventory.slice(0, 12).map((inventoryItem: any) => (
+              {(showFullInventory ? inventory : inventory.slice(0, 12)).map((inventoryItem: any) => (
                 <div
                   key={inventoryItem.id}
                   className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
@@ -408,12 +437,18 @@ const PublicProfilePage: React.FC = () => {
                           src={inventoryItem.item.image_url}
                           alt={inventoryItem.item.name}
                           className="w-full h-full object-contain rounded"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (nextElement) nextElement.style.display = 'flex';
+                          }}
                         />
-                      ) : (
+                      ) : null}
+                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
                         <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                         </svg>
-                      )}
+                      </div>
                     </div>
                   </div>
                   <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
@@ -423,15 +458,52 @@ const PublicProfilePage: React.FC = () => {
                   <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                     {getRarityName(inventoryItem.item.rarity)}
                   </p>
+
+                  {/* Дополнительная информация о предмете */}
+                  {inventoryItem.acquisition_date && (
+                    <div className="mt-2 text-xs text-gray-400">
+                      <p>Получен: {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
+                      {inventoryItem.source && (
+                        <p className="capitalize">Источник: {
+                          inventoryItem.source === 'case' ? 'Кейс' :
+                          inventoryItem.source === 'purchase' ? 'Покупка' :
+                          inventoryItem.source
+                        }</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
-              {inventory.length > 12 && (
-                <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
+
+              {/* Показываем карточку "Ещё предметов" только если не показываем все предметы */}
+              {!showFullInventory && inventory.length > 12 && (
+                <div
+                  className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400/50 transition-all duration-300"
+                  onClick={() => setShowFullInventory(true)}
+                >
                   <div className="text-2xl font-bold text-gray-400 mb-2">+{inventory.length - 12}</div>
-                  <p className="text-gray-400 text-xs text-center">Ещё предметов</p>
+                  <p className="text-gray-400 text-xs text-center mb-2">Ещё предметов</p>
+                  <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
               )}
             </div>
+
+            {/* Кнопка "Показать меньше" в конце, если показан полный инвентарь */}
+            {showFullInventory && inventory.length > 12 && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => setShowFullInventory(false)}
+                  className="px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                  Показать меньше
+                </button>
+              </div>
+            )}
           </div>
         )}
 
