@@ -6,6 +6,7 @@ import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases
 import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
+import ScrollToTop from '../components/ScrollToTop';
 import CaseWithDrop from '../components/CaseWithDrop';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
@@ -163,7 +164,7 @@ const ProfilePage: React.FC = () => {
   // Дополнительно загружаем данные через API только если их нет в свежих данных профиля
   const { data: inventoryData, isLoading: inventoryLoading, refetch: refetchInventory } = useGetUserInventoryQuery({
     page: 1,
-    limit: 50,
+    limit: 1000, // Увеличиваем лимит для отображения всего инвентаря
     status: 'inventory'
   }, {
     skip: userLoading // Always fetch inventory data unless user is loading
@@ -463,7 +464,7 @@ const ProfilePage: React.FC = () => {
     ? Math.min(100, Math.round((xpInCurrentLevel / xpToNextLevel) * 100))
     : 0;
 
-  // Получаем инвентарь и достижения - приоритет данным из API (содержат items и cases)
+  // Получаем инвентарь и достижения - приоритет данными из API (содержат items и cases)
 
   // Получаем инвентарь с сортировкой: сначала кейсы, потом предметы
   const rawInventory = inventoryData?.success && (inventoryData.data.items.length > 0 || inventoryData.data.cases.length > 0) ?
@@ -628,8 +629,7 @@ const ProfilePage: React.FC = () => {
               title="Настройки профиля"
             >
               <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383.93.78.165.398.143.854-.107 1.204l-.527.738a1.125 1.125 0 01.12 1.45l.773.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894z" />
               </svg>
             </button>
           </div>
@@ -757,7 +757,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10h14v7a1 1 0 01-1 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1a1 1 0 011-1v-7z" />
                 </svg>
               </div>
               <div>
@@ -803,7 +803,7 @@ const ProfilePage: React.FC = () => {
                   : 'hover:bg-red-500/25 hover:scale-105'
               }`}>
                   <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <div className="flex-1">
@@ -911,7 +911,7 @@ const ProfilePage: React.FC = () => {
                                   </svg>
                                 ) : (
                                   <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clipRule="evenodd" />
                                   </svg>
                                 )}
                               </div>
@@ -925,9 +925,7 @@ const ProfilePage: React.FC = () => {
                                     </h5>
                                   </div>
                                   <div className="flex items-center gap-1 text-xs text-blue-400">
-                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
+                                   
                                     <span>+{achievement.bonus_percentage ||
                                       // Fallback для конкретных достижений с правильными значениями
                                       (achievement.name === 'Новичок' ? '2.5' :
@@ -995,7 +993,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
@@ -1024,7 +1022,7 @@ const ProfilePage: React.FC = () => {
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57-1.116-.334-.804-.614-1.768-.84-2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
                 </svg>
               </div>
               Лучшее выбитое оружие
@@ -1073,13 +1071,34 @@ const ProfilePage: React.FC = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
-                  <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    {activeInventoryTab === 'active' ? (
+                      <>
+                        <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                        <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                      </>
+                    ) : activeInventoryTab === 'opened' ? (
+                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                    ) : activeInventoryTab === 'withdrawn' ? (
+                      <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    ) : (
+                      <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+                    )}
                   </svg>
                 </div>
-                <p className="text-gray-400 text-sm">Пока нет выбитого оружия</p>
-                <p className="text-gray-500 text-xs mt-1">Откройте кейсы, чтобы получить первое оружие</p>
+                <p className="text-gray-400 text-lg">
+                  {activeInventoryTab === 'active' && 'Инвентарь пуст'}
+                  {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
+                  {activeInventoryTab === 'withdrawn' && 'Нет выведенных предметов'}
+                  {activeInventoryTab === 'sold' && 'Нет обмененных предметов'}
+                </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
+                  {activeInventoryTab === 'opened' && 'Открытые кейсы будут отображаться здесь с возможностью увидеть выпавший предмет'}
+                  {activeInventoryTab === 'withdrawn' && 'Предметы на выводе и выведенные в Steam будут отображаться здесь'}
+                  {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
+                </p>
               </div>
             )}
           </div>
@@ -1188,7 +1207,7 @@ const ProfilePage: React.FC = () => {
               }`}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
               Выведенные
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getWithdrawnItems().length}</span>
@@ -1230,7 +1249,7 @@ const ProfilePage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {activeInventoryTab === 'opened' ? (
                 // Специальный рендеринг для открытых кейсов с анимацией
-                filteredInventory.slice(0, 24).map((inventoryItem) => {
+                filteredInventory.map((inventoryItem) => {
                   if (isUserItem(inventoryItem)) {
                     const caseTemplate = inventoryItem.case_template_id
                       ? getCaseTemplateById(inventoryItem.case_template_id)
@@ -1248,7 +1267,7 @@ const ProfilePage: React.FC = () => {
                 })
               ) : (
                 // Обычный рендеринг для остальных табов
-                filteredInventory.slice(0, 24).map((inventoryItem) => (
+                filteredInventory.map((inventoryItem) => (
                   <div
                     key={inventoryItem.id}
                     className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative group ${
@@ -1290,7 +1309,7 @@ const ProfilePage: React.FC = () => {
                           ) : null}
                           <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
                             <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                              <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                             </svg>
                           </div>
                         </div>
@@ -1412,12 +1431,6 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ))
               )}
-              {filteredInventory.length > 24 && (
-                <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
-                  <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 24}</div>
-                  <p className="text-gray-400 text-xs text-center">Ещё предметов</p>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -1431,7 +1444,7 @@ const ProfilePage: React.FC = () => {
                   ) : activeInventoryTab === 'opened' ? (
                     <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                   ) : activeInventoryTab === 'withdrawn' ? (
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   ) : (
                     <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
                   )}
@@ -1550,7 +1563,7 @@ const ProfilePage: React.FC = () => {
                     <>
                       <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
                         <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <path fillRule="evenodd" d="M16 4a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2H6z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div className="flex-1">
@@ -1563,7 +1576,6 @@ const ProfilePage: React.FC = () => {
                       <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
                         <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" clipRule="evenodd" />
-                          <path fillRule="evenodd" d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div className="flex-1">
@@ -1705,6 +1717,9 @@ const ProfilePage: React.FC = () => {
         wonItem={caseOpeningAnimation.wonItem}
         isLoading={caseOpeningAnimation.isLoading}
       />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 };
