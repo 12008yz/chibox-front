@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import LiveDrops from '../components/LiveDrops';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { useSocket } from '../hooks/useSocket';
 
 const HomePage: React.FC = () => {
@@ -34,6 +35,7 @@ const HomePage: React.FC = () => {
   };
   return (
     <div className="min-h-screen bg-[#151225] text-white">
+      <ScrollToTopOnMount />
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">

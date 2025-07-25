@@ -7,6 +7,7 @@ import { useUserData } from '../hooks/useUserData';
 import Avatar from '../components/Avatar';
 import Tooltip from '../components/Tooltip';
 import ScrollToTop from '../components/ScrollToTop';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
@@ -21,6 +22,9 @@ const ProfilePage: React.FC = () => {
   // State для модального окна настроек
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tradeUrl, setTradeUrl] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // State для email верификации
   const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
@@ -192,12 +196,15 @@ const ProfilePage: React.FC = () => {
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
 
-  // Синхронизируем tradeUrl с данными пользователя
+  // Синхронизируем данные с пользователем
   useEffect(() => {
     if (user?.steam_trade_url) {
       setTradeUrl(user.steam_trade_url);
     }
-  }, [user?.steam_trade_url]);
+    if (user?.username) {
+      setNewUsername(user.username);
+    }
+  }, [user?.steam_trade_url, user?.username]);
 
   // Функция для получения шаблона кейса по ID
   const getCaseTemplateById = (templateId: string) => {
@@ -334,7 +341,56 @@ const ProfilePage: React.FC = () => {
   // Функция для сохранения настроек
   const handleSaveSettings = async () => {
     try {
-      const result = await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+      // Валидация пароля, если он введен
+      if (newPassword) {
+        if (newPassword.length < 8) {
+          showNotification('Пароль должен содержать минимум 8 символов', 'error');
+          return;
+        }
+        if (!/[A-Z]/.test(newPassword)) {
+          showNotification('Пароль должен содержать заглавную букву', 'error');
+          return;
+        }
+        if (!/[a-z]/.test(newPassword)) {
+          showNotification('Пароль должен содержать строчную букву', 'error');
+          return;
+        }
+        if (!/[0-9]/.test(newPassword)) {
+          showNotification('Пароль должен содержать цифру', 'error');
+          return;
+        }
+        if (!/[^A-Za-z0-9]/.test(newPassword)) {
+          showNotification('Пароль должен содержать специальный символ', 'error');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          showNotification('Пароли не совпадают', 'error');
+          return;
+        }
+      }
+
+      // Формируем данные для отправки
+      const updateData: any = {};
+
+      if (tradeUrl !== (user?.steam_trade_url || '')) {
+        updateData.steam_trade_url = tradeUrl;
+      }
+
+      if (newUsername && newUsername !== user?.username) {
+        updateData.username = newUsername;
+      }
+
+      if (newPassword) {
+        updateData.password = newPassword;
+      }
+
+      // Если нет изменений, просто закрываем окно
+      if (Object.keys(updateData).length === 0) {
+        setIsSettingsOpen(false);
+        return;
+      }
+
+      const result = await updateProfile(updateData).unwrap();
 
       // Если сервер вернул новый токен, обновляем его в localStorage
       if ('token' in result && result.token) {
@@ -344,6 +400,15 @@ const ProfilePage: React.FC = () => {
 
       showNotification('Настройки сохранены успешно!', 'success');
       setIsSettingsOpen(false);
+
+      // Очищаем пароли
+      setNewPassword('');
+      setConfirmPassword('');
+
+      // Обновляем данные пользователя
+      setTimeout(() => {
+        refetchUser();
+      }, 500);
     } catch (error: any) {
       console.error('Ошибка при сохранении настроек:', error);
       showNotification(error?.data?.message || 'Не удалось сохранить настройки', 'error');
@@ -595,6 +660,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
+      <ScrollToTopOnMount />
       <div className="container mx-auto max-w-7xl p-4 space-y-6">
 
         {/* Header Section */}
@@ -641,7 +707,7 @@ const ProfilePage: React.FC = () => {
 
               <div className="space-y-2">
                 <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  {user.steam_profile?.personaname || user.username}
+                  {user.username || user.steam_profile?.personaname}
                 </h1>
                 <p className="text-gray-400 text-sm">ID: {user.id}</p>
 
@@ -1458,12 +1524,20 @@ const ProfilePage: React.FC = () => {
 
       {/* Settings Modal */}
       {isSettingsOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsSettingsOpen(false)}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => {
+          setIsSettingsOpen(false);
+          setNewPassword('');
+          setConfirmPassword('');
+        }}>
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Настройки профиля</h3>
               <button
-                onClick={() => setIsSettingsOpen(false)}
+                onClick={() => {
+                  setIsSettingsOpen(false);
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
                 className="p-1 hover:bg-gray-700/50 rounded-lg transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1473,6 +1547,64 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div className="space-y-4">
+              {/* Username */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Никнейм
+                </label>
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  placeholder="Введите новый никнейм"
+                  className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  maxLength={50}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Ваше отображаемое имя на сайте
+                </p>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Новый пароль
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Введите новый пароль"
+                  className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  maxLength={128}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Минимум 8 символов, заглавные и строчные буквы, цифры, спецсимволы
+                </p>
+              </div>
+
+              {/* Confirm Password */}
+              {newPassword && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Подтвердите пароль
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Повторите новый пароль"
+                    className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                    maxLength={128}
+                  />
+                  {newPassword !== confirmPassword && confirmPassword && (
+                    <p className="text-xs text-red-400 mt-1">
+                      Пароли не совпадают
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Trade URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1590,7 +1722,11 @@ const ProfilePage: React.FC = () => {
                 {isUpdatingProfile ? 'Сохранение...' : 'Сохранить'}
               </button>
               <button
-                onClick={() => setIsSettingsOpen(false)}
+                onClick={() => {
+                  setIsSettingsOpen(false);
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
                 className="px-4 py-2 bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 rounded-lg transition-colors"
               >
                 Отмена

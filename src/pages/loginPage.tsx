@@ -4,6 +4,7 @@ import { useLoginMutation } from '../features/auth/authApi';
 import { useAuthHandlers } from '../hooks/useAuthHandlers';
 import MainButton from '../components/MainButton';
 import SteamLoginButton from '../components/SteamLoginButton';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -43,6 +44,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#151225]">
+      <ScrollToTopOnMount />
       <div className="max-w-md w-full space-y-8 p-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">

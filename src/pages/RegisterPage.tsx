@@ -6,6 +6,7 @@ import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi'
 import { loginSuccess } from '../features/auth/authSlice';
 import MainButton from '../components/MainButton';
 import SteamLoginButton from '../components/SteamLoginButton';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 
 const RegisterPage: React.FC = () => {
@@ -83,6 +84,7 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#151225]">
+      <ScrollToTopOnMount />
       <div className="max-w-md w-full space-y-8 p-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">

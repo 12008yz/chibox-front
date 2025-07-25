@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetPublicProfileQuery } from '../features/user/userApi';
 import Avatar from '../components/Avatar';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 const PublicProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -103,6 +104,7 @@ const PublicProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
+      <ScrollToTopOnMount />
       <div className="container mx-auto max-w-7xl p-4 space-y-6">
 
         {/* Header Section */}
@@ -134,7 +136,7 @@ const PublicProfilePage: React.FC = () => {
 
               <div className="space-y-2">
                 <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  {user.steam_profile?.personaname || user.username}
+                  {user.username || user.steam_profile?.personaname}
                 </h1>
                 <p className="text-gray-400 text-sm">ID: {user.id}</p>
 
