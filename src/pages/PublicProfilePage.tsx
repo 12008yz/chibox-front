@@ -187,20 +187,20 @@ const PublicProfilePage: React.FC = () => {
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Достижения:</span>
-                    <span className="text-green-400 font-bold">+{(dropBonuses.achievements || 0).toFixed(1)}%</span>
+                    <span className="text-gray-400 text-sm">Уровень:</span>
+                    <span className="text-green-400 font-bold">+{(dropBonuses.level || 0).toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">Подписка:</span>
-                    <span className="text-yellow-400 font-bold">+{(dropBonuses.subscription || 0).toFixed(1)}%</span>
+                    <span className="text-blue-400 font-bold">+{(dropBonuses.subscription || 0).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Уровень:</span>
-                    <span className="text-blue-400 font-bold">+{(dropBonuses.level || 0).toFixed(1)}%</span>
+                    <span className="text-gray-400 text-sm">Достижения:</span>
+                    <span className="text-purple-400 font-bold">+{(dropBonuses.achievements || 0).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between border-t border-gray-600 pt-2">
                     <span className="text-white font-semibold">Общий бонус:</span>
-                    <span className="text-orange-400 font-bold">+{(dropBonuses.total || 0).toFixed(1)}%</span>
+                    <span className="text-yellow-400 font-bold">+{(dropBonuses.total || 0).toFixed(2)}%</span>
                   </div>
                 </div>
               </div>
