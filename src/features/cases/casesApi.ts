@@ -41,7 +41,16 @@ export const casesApi = baseApi.injectEndpoints({
 
     // Покупка кейса
     buyCase: builder.mutation<
-      ApiResponse<{ case_id: string; new_balance: number }>,
+      ApiResponse<{
+        case_id?: string;
+        new_balance?: number;
+        inventory_cases?: any[];
+        paymentUrl?: string;
+        message?: string;
+        balance?: number;
+        paid_cases_bought_today?: number;
+        remaining_cases?: number;
+      }>,
       BuyCaseRequest
     >({
       query: (caseData) => ({
@@ -54,12 +63,15 @@ export const casesApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success && data.data.new_balance !== undefined) {
-            // Обновляем баланс в auth slice
-            dispatch({
-              type: 'auth/updateBalance',
-              payload: data.data.new_balance,
-            });
+          if (data.success) {
+            // Обновляем баланс в auth slice (поддерживаем разные форматы ответа)
+            const newBalance = data.data?.new_balance ?? data.data?.balance;
+            if (newBalance !== undefined) {
+              dispatch({
+                type: 'auth/updateBalance',
+                payload: newBalance,
+              });
+            }
           }
         } catch {
           // В случае ошибки ничего не делаем, RTK Query откатит изменения

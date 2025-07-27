@@ -21,6 +21,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
 
   // Добавим дебаг информацию
   console.log('CasePreviewModal props:', {
@@ -52,6 +53,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Добавим дебаг для мутаций
   console.log('Mutation states:', { buyLoading, openLoading });
+  console.log('fixedPrices check in footer:', fixedPrices);
 
   useEffect(() => {
     if (isOpen) {
@@ -85,26 +87,51 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
 
-    // Иначе используем внутреннюю логику
+    // Иначе используем внутреннюю логику с выбором метода оплаты
     try {
       const result = await buyCase({
-        case_template_id: caseData.id
+        case_template_id: caseData.id,
+        caseTemplateId: caseData.id,
+        method: paymentMethod,
+        quantity: 1
       }).unwrap();
 
       if (result.success) {
-        // После покупки сразу открываем кейс
-        handleOpenCase();
+        if (paymentMethod === 'bank_card') {
+          // Если оплата через карту, перенаправляем на страницу оплаты
+          if (result.data?.paymentUrl) {
+            window.location.href = result.data.paymentUrl;
+          }
+        } else {
+          // Если оплата через баланс, сразу открываем кейс
+          // Ожидаем, что контроллер вернет inventory_cases с купленными кейсами
+          if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
+            const inventoryCase = result.data.inventory_cases[0];
+            handleOpenCase(undefined, inventoryCase.id);
+          }
+        }
       }
     } catch (error) {
       console.error('Ошибка покупки кейса:', error);
     }
   };
 
-  const handleOpenCase = async () => {
+  const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
     try {
-      const result = await openCase({
-        case_id: caseData.id
-      }).unwrap();
+      const openCaseParams: any = {};
+
+      if (inventoryItemId) {
+        // Открываем кейс из инвентаря
+        openCaseParams.inventoryItemId = inventoryItemId;
+      } else if (caseId) {
+        // Открываем кейс по case_id
+        openCaseParams.case_id = caseId;
+      } else {
+        // Используем template_id по умолчанию (для бесплатных кейсов)
+        openCaseParams.case_id = caseData.id;
+      }
+
+      const result = await openCase(openCaseParams).unwrap();
 
       if (result.success && result.data?.item) {
         setOpeningResult(result.data);
@@ -436,29 +463,48 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </button>
 
             {fixedPrices ? (
-              // Показываем кнопку с фиксированной ценой для главной страницы
-              <button
-                onClick={handleBuyCase}
-                disabled={buyLoading || openLoading}
-                className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-              >
-                {buyLoading || openLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Открытие...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Открыть</span>
-                    <span className="text-yellow-400 font-bold">
-                      {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
-                        ? '499₽'
-                        : '99₽'
-                      }
-                    </span>
-                  </>
-                )}
-              </button>
+              // Показываем кнопки с выбором метода оплаты для премиум кейсов
+              <>
+                {console.log('RENDERING FIXED PRICES BLOCK')}
+                <div className="flex items-center space-x-4" style={{ backgroundColor: 'red', padding: '10px' }}>
+                  {/* Селектор метода оплаты */}
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm text-gray-400">Оплата:</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'balance' | 'bank_card')}
+                    className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600 focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="balance">Баланс</option>
+                    <option value="bank_card">Банковская карта</option>
+                  </select>
+                </div>
+
+                {/* Кнопка покупки */}
+                <button
+                  onClick={handleBuyCase}
+                  disabled={buyLoading || openLoading}
+                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {buyLoading || openLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>{paymentMethod === 'bank_card' ? 'Переход к оплате...' : 'Открытие...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{paymentMethod === 'bank_card' ? 'Купить' : 'Открыть'}</span>
+                      <span className="text-yellow-400 font-bold">
+                        {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
+                          ? '499₽'
+                          : '99₽'
+                        }
+                      </span>
+                    </>
+                  )}
+                </button>
+                </div>
+              </>
             ) : (
               // Используем обычную логику для страницы профиля
               <>
@@ -486,7 +532,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
                     {statusData.data.canOpen && (
                       <button
-                        onClick={handleOpenCase}
+                        onClick={() => handleOpenCase()}
                         disabled={buyLoading || openLoading}
                         className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                       >

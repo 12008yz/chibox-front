@@ -43,8 +43,8 @@ const NewHomePage: React.FC = () => {
   });
 
   // Мутации для покупки и открытия кейсов
-  const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
-  const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
+  const [buyCase] = useBuyCaseMutation();
+  const [openCase] = useOpenCaseMutation();
 
   // Баннеры контент
   const bannerContent = [
@@ -126,7 +126,10 @@ const NewHomePage: React.FC = () => {
 
       // Покупаем кейс
       const buyResult = await buyCase({
-        case_template_id: caseTemplate.id
+        case_template_id: caseTemplate.id,
+        caseTemplateId: caseTemplate.id,
+        method: 'balance', // По умолчанию используем баланс для главной страницы
+        quantity: 1
       }).unwrap();
 
       if (!buyResult.success) {

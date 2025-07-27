@@ -239,7 +239,10 @@ export interface RegisterRequest {
 }
 
 export interface BuyCaseRequest {
-  case_template_id: string;
+  case_template_id?: string; // для обратной совместимости
+  caseTemplateId?: string; // новый формат для совместимости с контроллером
+  method: 'balance' | 'bank_card';
+  quantity?: number;
 }
 
 export interface OpenCaseRequest {
