@@ -279,7 +279,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className={`bg-[#1a1629] rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden shadow-2xl transition-all duration-300 ${
+        className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-300 flex flex-col ${
           isAnimating
             ? 'scale-100 opacity-100 translate-y-0'
             : 'scale-75 opacity-0 translate-y-8'
@@ -323,7 +323,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Содержимое кейса */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] relative">
+        <div className="flex-1 p-6 overflow-y-auto relative" style={{ maxHeight: 'calc(90vh - 200px)' }}>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="spinner" />
@@ -446,8 +446,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Футер с кнопками */}
-        <div className="p-6 border-t border-gray-700 flex justify-between items-center">
-          <div className="text-sm text-gray-400">
+        <div className="flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629]">
+          {/* ДЕБАГ: Временный видимый элемент для проверки отображения футера */}
+          <div className="bg-red-500 text-white p-2 mb-4 rounded text-center font-bold">
+            🚨 ФУТЕР ОТОБРАЖАЕТСЯ! fixedPrices={String(fixedPrices)} 🚨
+          </div>
+
+          <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (
               <div>
                 {statusData.data.reason && !statusData.data.canOpen && !statusData.data.canBuy && (
@@ -464,7 +469,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             )}
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
             <button
               onClick={handleClose}
               className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
@@ -473,16 +478,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </button>
 
             {/* DEBUG: Показываем состояние fixedPrices */}
-            <div className="text-xs text-yellow-400 px-2">
+            <div className="text-xs text-yellow-400 px-2 mt-2 md:mt-0">
               DEBUG: fixedPrices={String(fixedPrices)}
             </div>
 
             {fixedPrices ? (
               // Показываем кнопки с выбором метода оплаты для премиум кейсов
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 {/* Селектор метода оплаты */}
                 <div className="flex items-center space-x-2">
-                  <label className="text-sm text-gray-400">Оплата:</label>
+                  <label className="text-sm text-gray-400 whitespace-nowrap">Оплата:</label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value as 'balance' | 'bank_card')}
@@ -497,7 +502,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 <button
                   onClick={handleBuyCase}
                   disabled={buyLoading || openLoading}
-                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                 >
                   {buyLoading || openLoading ? (
                     <>
@@ -519,14 +524,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               </div>
             ) : (
               // Используем обычную логику для страницы профиля
-              <>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 {statusData?.data && !statusLoading ? (
                   <>
                     {statusData.data.canBuy && statusData.data.price > 0 && (
                       <button
                         onClick={handleBuyCase}
                         disabled={buyLoading || openLoading}
-                        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                       >
                         {buyLoading ? (
                           <>
@@ -546,7 +551,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       <button
                         onClick={() => handleOpenCase()}
                         disabled={buyLoading || openLoading}
-                        className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                       >
                         {openLoading ? (
                           <>
@@ -564,7 +569,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   <button
                     onClick={handleBuyCase}
                     disabled={buyLoading || openLoading}
-                    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                   >
                     {buyLoading || openLoading ? (
                       <>
@@ -579,32 +584,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     )}
                   </button>
                 )}
-              </>
+              </div>
             )}
 
-            {/* ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТИРОВАНИЯ */}
-            <button
-              onClick={handleBuyCase}
-              disabled={buyLoading || openLoading}
-              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              {buyLoading || openLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Покупка...</span>
-                </>
-              ) : (
-                <>
-                  <span>ТЕСТ: Купить кейс</span>
-                  <span className="text-yellow-400 font-bold">
-                    {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
-                      ? '499₽'
-                      : '99₽'
-                    }
-                  </span>
-                </>
-              )}
-            </button>
+
           </div>
         </div>
       </div>

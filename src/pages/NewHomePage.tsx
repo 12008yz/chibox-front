@@ -132,14 +132,27 @@ const NewHomePage: React.FC = () => {
         quantity: 1
       }).unwrap();
 
+      console.log('Результат покупки кейса:', buyResult);
+
       if (!buyResult.success) {
         throw new Error('Ошибка покупки кейса');
       }
 
-      // Открываем кейс
+      // Проверяем наличие inventory_cases в ответе
+      const inventoryCases = (buyResult as any).inventory_cases;
+      if (!inventoryCases || inventoryCases.length === 0) {
+        throw new Error('Кейс не был добавлен в инвентарь');
+      }
+
+      const inventoryItemId = inventoryCases[0].id;
+      console.log('Открываем кейс из инвентаря:', inventoryItemId);
+
+      // Открываем кейс используя inventoryItemId
       const openResult = await openCase({
-        case_id: buyResult.data.case_id
+        inventoryItemId: inventoryItemId
       }).unwrap();
+
+      console.log('Результат открытия кейса:', openResult);
 
       if (openResult.success && openResult.data?.item) {
         // Устанавливаем результат анимации
