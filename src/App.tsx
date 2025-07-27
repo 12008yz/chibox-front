@@ -8,7 +8,7 @@ import './index.css'
 
 // Импорты компонентов
 import Header from './components/Header';
-import HomePage from './pages/HomePage';
+import NewHomePage from './pages/NewHomePage';
 import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
 import SteamAuthPage from './pages/SteamAuthPage';
@@ -107,7 +107,7 @@ const App: React.FC = () => {
 
         <main>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<NewHomePage />} />
             <Route
               path="/login"
               element={

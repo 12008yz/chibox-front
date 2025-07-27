@@ -317,6 +317,12 @@
   box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
 }
 
+/* Notched effect styles */
+.notched {
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .sidebar-content {

@@ -18,6 +18,17 @@ export const casesApi = baseApi.injectEndpoints({
       providesTags: ['CaseTemplates'],
     }),
 
+    // Получение всех кейсов (бесплатных и платных)
+    getAllCases: builder.query<ApiResponse<{
+      free_cases: CaseTemplate[];
+      paid_cases: CaseTemplate[];
+      user_cases: any[];
+      user_subscription_tier: number;
+    }>, void>({
+      query: () => 'v1/cases',
+      providesTags: ['Cases', 'CaseTemplates'],
+    }),
+
     // Получение истории кейсов пользователя
     getUserCases: builder.query<
       PaginatedResponse<any>,
@@ -122,6 +133,7 @@ export const casesApi = baseApi.injectEndpoints({
 // Экспортируем хуки для использования в компонентах
 export const {
   useGetCaseTemplatesQuery,
+  useGetAllCasesQuery,
   useGetUserCasesQuery,
   useBuyCaseMutation,
   useOpenCaseMutation,
