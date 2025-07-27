@@ -130,6 +130,26 @@ export const casesApi = baseApi.injectEndpoints({
     >({
       query: () => 'v1/cases/purchase-info',
     }),
+
+    // Получение статуса кейса (можно ли открыть/купить)
+    getCaseStatus: builder.query<
+      ApiResponse<{
+        canOpen: boolean;
+        canBuy: boolean;
+        reason: string;
+        nextAvailableTime: string | null;
+        caseType: string;
+        price: number;
+        subscriptionRequired: boolean;
+        userSubscriptionTier: number;
+        subscriptionDaysLeft: number;
+        minSubscriptionTier: number;
+      }>,
+      string
+    >({
+      query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/status`,
+      providesTags: ['Cases', 'User'],
+    }),
   }),
 });
 
@@ -143,4 +163,5 @@ export const {
   useGetCaseItemsQuery,
   useGetRecentDropsQuery,
   useGetCasePurchaseInfoQuery,
+  useGetCaseStatusQuery,
 } = casesApi;

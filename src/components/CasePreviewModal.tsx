@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetCaseItemsQuery } from '../features/cases/casesApi';
+import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
+import CaseOpeningAnimation from './CaseOpeningAnimation';
 
 interface CasePreviewModalProps {
   isOpen: boolean;
@@ -18,11 +19,26 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
+  const [openingResult, setOpeningResult] = useState<any>(null);
+  const [sliderPosition, setSliderPosition] = useState(0);
+  const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
+  const [targetItemIndex, setTargetItemIndex] = useState(0);
+  const [animationRounds, setAnimationRounds] = useState(0);
+  const [animationSpeed, setAnimationSpeed] = useState(50);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
     caseData.id,
     { skip: !isOpen }
   );
+
+  const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(
+    caseData.id,
+    { skip: !isOpen }
+  );
+
+  const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
+  const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
 
   useEffect(() => {
     if (isOpen) {
@@ -44,9 +60,105 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }, 300);
   };
 
-  const handleOpenCase = () => {
-    handleClose();
-    navigate(`/case/${caseData.id}`);
+  const handleBuyCase = async () => {
+    try {
+      const result = await buyCase({
+        method: 'balance',
+        quantity: 1,
+        caseTemplateId: caseData.id
+      }).unwrap();
+
+      if (result.success) {
+        // После покупки сразу открываем кейс
+        handleOpenCase();
+      }
+    } catch (error) {
+      console.error('Ошибка покупки кейса:', error);
+    }
+  };
+
+  const handleOpenCase = async () => {
+    try {
+      const result = await openCase({
+        caseId: caseData.id
+      }).unwrap();
+
+      if (result.success && result.data?.item) {
+        setOpeningResult(result.data);
+        startAnimation(result.data.item);
+      }
+    } catch (error) {
+      console.error('Ошибка открытия кейса:', error);
+    }
+  };
+
+  const startAnimation = (wonItem: any) => {
+    setShowOpeningAnimation(true);
+    setAnimationPhase('spinning');
+
+    // Находим индекс выигранного предмета
+    const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
+    const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
+
+    // Анимация ползунка
+    let currentPosition = 0;
+    let speed = 50; // начальная скорость (мс между перемещениями)
+    let direction = 1;
+    let rounds = 0;
+    const maxRounds = 2; // количество полных кругов перед замедлением
+
+    const animateSlider = () => {
+      if (animationPhase === 'spinning') {
+        currentPosition += direction;
+
+        // Если дошли до конца, начинаем сначала
+        if (currentPosition >= items.length) {
+          currentPosition = 0;
+          rounds++;
+        }
+
+        setSliderPosition(currentPosition);
+
+        // После 2 кругов начинаем замедляться к выигранному предмету
+        if (rounds >= maxRounds) {
+          setAnimationPhase('slowing');
+          speed = 100; // замедляем
+        }
+
+        setTimeout(animateSlider, speed);
+      } else if (animationPhase === 'slowing') {
+        currentPosition += direction;
+
+        if (currentPosition >= items.length) {
+          currentPosition = 0;
+        }
+
+        setSliderPosition(currentPosition);
+
+        // Увеличиваем задержку для замедления
+        speed += 20;
+
+        // Если достигли целевого предмета и скорость достаточно медленная
+        if (currentPosition === targetIndex && speed > 400) {
+          setAnimationPhase('stopped');
+          setTimeout(() => {
+            handleAnimationComplete();
+          }, 2000); // показываем результат 2 секунды
+        } else {
+          setTimeout(animateSlider, speed);
+        }
+      }
+    };
+
+    animateSlider();
+  };
+
+  const handleAnimationComplete = () => {
+    setShowOpeningAnimation(false);
+    setOpeningResult(null);
+    setAnimationPhase('idle');
+    setSliderPosition(0);
+    // Не закрываем модалку сразу, пусть пользователь сам закроет
   };
 
   // Дефолтные изображения кейсов CS2
@@ -142,7 +254,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Содержимое кейса */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] relative">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="spinner" />
@@ -153,57 +265,109 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               <p className="text-red-400">Ошибка загрузки предметов</p>
             </div>
           ) : items.length > 0 ? (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
-              {items.map((item: any, index: number) => (
-                <div
-                  key={item.id || index}
-                  className={`bg-gray-800 rounded-lg p-2 border-2 ${getRarityColor(item.rarity)} hover:scale-105 transition-all duration-300 animate-fade-in-up`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="aspect-square mb-2 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="text-gray-500 text-xs text-center">
-                        Нет изображения
+            <div className="relative">
+              {/* Сетка предметов с анимацией масштабирования */}
+              <div
+                className={`grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 transition-all duration-1000 ${
+                  showOpeningAnimation ? 'transform scale-50 origin-center' : ''
+                }`}
+              >
+                {items.map((item: any, index: number) => (
+                  <div
+                    key={item.id || index}
+                    className={`bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)} ${
+                      !showOpeningAnimation ? 'hover:scale-105 transition-all duration-300 animate-fade-in-up' : ''
+                    } ${
+                      showOpeningAnimation && sliderPosition === index
+                        ? 'ring-4 ring-yellow-400 ring-opacity-75 shadow-lg shadow-yellow-400/50 scale-110 z-10'
+                        : ''
+                    } ${
+                      animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
+                        ? 'ring-4 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/75 scale-125 z-20'
+                        : ''
+                    }`}
+                    style={{
+                      animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
+                      transition: showOpeningAnimation
+                        ? 'all 0.3s ease-in-out'
+                        : 'all 0.3s ease-in-out'
+                    }}
+                  >
+                    <div className="aspect-square mb-2 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-gray-500 text-xs text-center">
+                          Нет изображения
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="text-center">
+                      <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            lineHeight: '1.2em',
+                            maxHeight: '2.4em'
+                          }}>
+                        {item.name}
+                      </h3>
+
+                      {item.rarity && (
+                        <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
+                          {item.rarity}
+                        </p>
+                      )}
+
+                      <p className="text-green-400 font-bold text-sm">
+                        <Monetary value={parseFloat(item.price || '0')} />
+                      </p>
+
+                      {item.drop_weight && !showOpeningAnimation && (
+                        <p className="text-gray-400 text-xs mt-1">
+                          Шанс: {item.drop_weight}%
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Overlay для блокировки нажатий во время анимации */}
+              {showOpeningAnimation && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    {animationPhase === 'spinning' && (
+                      <div>
+                        <div className="text-2xl font-bold mb-2">🎰 Крутим барабан...</div>
+                        <div className="text-lg">Определяем ваш выигрыш!</div>
+                      </div>
+                    )}
+                    {animationPhase === 'slowing' && (
+                      <div>
+                        <div className="text-2xl font-bold mb-2">⏳ Замедляемся...</div>
+                        <div className="text-lg">Почти готово!</div>
+                      </div>
+                    )}
+                    {animationPhase === 'stopped' && openingResult && (
+                      <div>
+                        <div className="text-3xl font-bold mb-4">🎉 Поздравляем!</div>
+                        <div className="text-xl mb-2">Вы выиграли:</div>
+                        <div className="text-2xl font-bold text-green-400">{openingResult.item.name}</div>
+                        <div className="text-lg mt-2">
+                          <Monetary value={parseFloat(openingResult.item.price || '0')} />
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  <div className="text-center">
-                    <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          lineHeight: '1.2em',
-                          maxHeight: '2.4em'
-                        }}>
-                      {item.name}
-                    </h3>
-
-                    {item.rarity && (
-                      <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
-                        {item.rarity}
-                      </p>
-                    )}
-
-                    <p className="text-green-400 font-bold text-sm">
-                      <Monetary value={parseFloat(item.price || '0')} />
-                    </p>
-
-                    {item.drop_weight && (
-                      <p className="text-gray-400 text-xs mt-1">
-                        Шанс: {item.drop_weight}%
-                      </p>
-                    )}
-                  </div>
                 </div>
-              ))}
+              )}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -213,21 +377,84 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Футер с кнопками */}
-        <div className="p-6 border-t border-gray-700 flex justify-end space-x-4">
-          <button
-            onClick={handleClose}
-            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
-          >
-            Закрыть
-          </button>
-          <button
-            onClick={handleOpenCase}
-            className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-          >
-            Открыть кейс
-          </button>
+        <div className="p-6 border-t border-gray-700 flex justify-between items-center">
+          <div className="text-sm text-gray-400">
+            {statusData?.data && !statusLoading && (
+              <div>
+                {statusData.data.reason && !statusData.data.canOpen && !statusData.data.canBuy && (
+                  <span className="text-red-400">{statusData.data.reason}</span>
+                )}
+                {statusData.data.subscriptionRequired && (
+                  <div className="mt-1">
+                    Требуется подписка уровня {statusData.data.minSubscriptionTier}+
+                    <br />
+                    Ваш уровень: {statusData.data.userSubscriptionTier}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex space-x-4">
+            <button
+              onClick={handleClose}
+              className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
+            >
+              Закрыть
+            </button>
+
+            {statusData?.data && !statusLoading && (
+              <>
+                {statusData.data.canBuy && statusData.data.price > 0 && (
+                  <button
+                    onClick={handleBuyCase}
+                    disabled={buyLoading || openLoading}
+                    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    {buyLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Покупка...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Купить и открыть</span>
+                        <Monetary value={statusData.data.price} />
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {statusData.data.canOpen && (
+                  <button
+                    onClick={handleOpenCase}
+                    disabled={buyLoading || openLoading}
+                    className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                  >
+                    {openLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Открытие...</span>
+                      </>
+                    ) : (
+                      <span>Открыть кейс</span>
+                    )}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Анимация открытия кейса */}
+      {showOpeningAnimation && openingResult && (
+        <CaseOpeningAnimation
+          items={items}
+          wonItem={openingResult.item}
+          onComplete={handleAnimationComplete}
+        />
+      )}
     </div>
   );
 };
