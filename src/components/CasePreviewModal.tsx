@@ -23,13 +23,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
 
-  // Добавим дебаг информацию
-  console.log('CasePreviewModal props:', {
-    isOpen,
-    fixedPrices,
-    onBuyAndOpenCase: !!onBuyAndOpenCase,
-    caseDataName: caseData?.name
-  });
+
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
@@ -45,15 +39,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     { skip: !isOpen }
   );
 
-  // Добавим дебаг для statusData
-  console.log('Status data:', { statusData, statusLoading, fixedPrices });
+
 
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
 
-  // Добавим дебаг для мутаций
-  console.log('Mutation states:', { buyLoading, openLoading });
-  console.log('fixedPrices check in footer:', fixedPrices);
+
 
   useEffect(() => {
     if (isOpen) {
@@ -76,43 +67,62 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   const handleBuyCase = async () => {
+    console.log('handleBuyCase вызван:', { fixedPrices, paymentMethod, onBuyAndOpenCase: !!onBuyAndOpenCase });
+
     // Если есть внешний обработчик, используем его
     if (onBuyAndOpenCase) {
       try {
+        console.log('Используем внешний обработчик onBuyAndOpenCase');
         await onBuyAndOpenCase(caseData);
         handleClose(); // Закрываем модалку после запуска анимации
-      } catch (error) {
-        console.error('Ошибка покупки кейса:', error);
+      } catch (error: any) {
+        console.error('Ошибка покупки кейса через внешний обработчик:', error);
+        alert('Ошибка покупки кейса: ' + (error?.message || 'Неизвестная ошибка'));
       }
       return;
     }
 
     // Иначе используем внутреннюю логику с выбором метода оплаты
     try {
-      const result = await buyCase({
+      console.log('Используем внутреннюю логику покупки');
+      const buyParams = {
         case_template_id: caseData.id,
         caseTemplateId: caseData.id,
         method: paymentMethod,
         quantity: 1
-      }).unwrap();
+      };
+      console.log('Параметры покупки:', buyParams);
+
+      const result = await buyCase(buyParams).unwrap();
+      console.log('Результат покупки:', result);
 
       if (result.success) {
         if (paymentMethod === 'bank_card') {
           // Если оплата через карту, перенаправляем на страницу оплаты
           if (result.data?.paymentUrl) {
             window.location.href = result.data.paymentUrl;
+          } else {
+            alert('Ошибка: не получена ссылка для оплаты');
           }
         } else {
           // Если оплата через баланс, сразу открываем кейс
-          // Ожидаем, что контроллер вернет inventory_cases с купленными кейсами
           if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
             const inventoryCase = result.data.inventory_cases[0];
-            handleOpenCase(undefined, inventoryCase.id);
+            console.log('Открываем кейс из инвентаря:', inventoryCase.id);
+            await handleOpenCase(undefined, inventoryCase.id);
+          } else {
+            console.log('Кейс куплен, но нет inventory_cases в ответе. Закрываем модалку.');
+            alert('Кейс успешно куплен!');
+            handleClose();
           }
         }
+      } else {
+        console.error('Покупка не удалась:', result);
+        alert('Ошибка покупки: ' + (result.message || 'Неизвестная ошибка'));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка покупки кейса:', error);
+      alert('Ошибка покупки кейса: ' + (error?.message || 'Неизвестная ошибка'));
     }
   };
 
@@ -462,12 +472,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               Закрыть
             </button>
 
+            {/* DEBUG: Показываем состояние fixedPrices */}
+            <div className="text-xs text-yellow-400 px-2">
+              DEBUG: fixedPrices={String(fixedPrices)}
+            </div>
+
             {fixedPrices ? (
               // Показываем кнопки с выбором метода оплаты для премиум кейсов
-              <>
-                {console.log('RENDERING FIXED PRICES BLOCK')}
-                <div className="flex items-center space-x-4" style={{ backgroundColor: 'red', padding: '10px' }}>
-                  {/* Селектор метода оплаты */}
+              <div className="flex items-center space-x-4">
+                {/* Селектор метода оплаты */}
                 <div className="flex items-center space-x-2">
                   <label className="text-sm text-gray-400">Оплата:</label>
                   <select
@@ -503,8 +516,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     </>
                   )}
                 </button>
-                </div>
-              </>
+              </div>
             ) : (
               // Используем обычную логику для страницы профиля
               <>
@@ -569,6 +581,30 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 )}
               </>
             )}
+
+            {/* ВРЕМЕННАЯ КНОПКА ДЛЯ ТЕСТИРОВАНИЯ */}
+            <button
+              onClick={handleBuyCase}
+              disabled={buyLoading || openLoading}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {buyLoading || openLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Покупка...</span>
+                </>
+              ) : (
+                <>
+                  <span>ТЕСТ: Купить кейс</span>
+                  <span className="text-yellow-400 font-bold">
+                    {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
+                      ? '499₽'
+                      : '99₽'
+                    }
+                  </span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

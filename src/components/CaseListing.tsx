@@ -23,22 +23,32 @@ const CaseListing: React.FC<CaseListingProps> = ({
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // Добавим дебаг информацию
-  console.log('CaseListing props:', { name, fixedPrices, onBuyAndOpenCase: !!onBuyAndOpenCase });
+
 
   const handleCaseClick = (caseItem: CaseTemplate, event: React.MouseEvent) => {
+    console.log('CaseListing: Клик по кейсу', {
+      caseName: caseItem.name,
+      fixedPrices,
+      hasOnBuyAndOpenCase: !!onBuyAndOpenCase,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey
+    });
+
     // Проверяем, если нажали с Ctrl/Cmd, то открываем в новой вкладке как раньше
     if (event.ctrlKey || event.metaKey) {
+      console.log('CaseListing: Открываем в новой вкладке');
       return; // Позволяем стандартному поведению Link сработать
     }
 
     // Иначе показываем превью
     event.preventDefault();
+    console.log('CaseListing: Показываем превью кейса');
     setPreviewCase(caseItem);
     setIsPreviewOpen(true);
   };
 
   const closePreview = () => {
+    console.log('CaseListing: Закрываем превью');
     setIsPreviewOpen(false);
     setPreviewCase(null);
   };

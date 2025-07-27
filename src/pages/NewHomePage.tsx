@@ -177,10 +177,7 @@ const NewHomePage: React.FC = () => {
     console.error('Ошибка загрузки кейсов:', casesError);
   }
 
-  // Отладочная информация
-  console.log('Cases data:', casesData);
-  console.log('Cases loading:', casesLoading);
-  console.log('Cases error:', casesError);
+
 
   // Принудительное обновление данных при маунте
   useEffect(() => {
