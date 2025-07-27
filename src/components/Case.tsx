@@ -4,7 +4,7 @@ import Monetary from './Monetary';
 interface CaseProps {
   title: string;
   image: string | null;
-  price: number;
+  price: string;
 }
 
 const Case: React.FC<CaseProps> = ({ title, image, price }) => {
@@ -36,7 +36,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price }) => {
       <div className="flex flex-col gap-2 p-4 items-center">
         <div className="font-bold text-lg text-white text-center">{title}</div>
         <div className="font-medium text-md text-green-400">
-          <Monetary value={price} />
+          <Monetary value={parseFloat(price)} />
         </div>
       </div>
     </div>

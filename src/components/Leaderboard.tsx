@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import Title from './Title';
 import TopPlayer from './TopPlayer';
 import Player from './Player';
@@ -26,12 +28,25 @@ const Leaderboard: React.FC = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      if (!token) {
+        setLoading(false);
+        setError('Требуется авторизация');
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await fetch('/api/v1/user/leaderboard?type=level&limit=10');
+        const response = await fetch('/api/v1/leaderboard?type=level&limit=10', {
+          credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
         if (!response.ok) {
           throw new Error('Ошибка загрузки лидерборда');
@@ -52,7 +67,7 @@ const Leaderboard: React.FC = () => {
     };
 
     fetchLeaderboard();
-  }, []);
+  }, [token]);
 
   const getScoreValue = (user: User) => {
     return user.score || user.cases_opened || user.max_item_value || user.level || 0;

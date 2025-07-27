@@ -2,13 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Case from './Case';
 import Title from './Title';
-
-interface CaseTemplate {
-  id: string;
-  name: string;
-  image_url: string;
-  price: number;
-}
+import { CaseTemplate } from '../types/api';
 
 interface CaseListingProps {
   name: string;

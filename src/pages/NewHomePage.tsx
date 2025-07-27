@@ -111,7 +111,7 @@ const NewHomePage: React.FC = () => {
             />
 
             {/* Индикаторы баннеров */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 md:flex hidden">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 space-x-2 md:flex hidden">
               {bannerContent.map((_, index) => (
                 <button
                   key={index}
