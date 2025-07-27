@@ -193,6 +193,9 @@ const ProfilePage: React.FC = () => {
   const [resendVerificationCode, { isLoading: isResendingCode }] = useResendVerificationCodeMutation();
   const [verifyEmail, { isLoading: isVerifyingEmail }] = useVerifyEmailMutation();
 
+  // State для автоматического получения Trade URL
+  const [isFetchingTradeUrl, setIsFetchingTradeUrl] = useState(false);
+
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
 
@@ -466,6 +469,56 @@ const ProfilePage: React.FC = () => {
     } catch (error: any) {
       console.error('Ошибка при подтверждении email:', error);
       alert(`Ошибка: ${error?.data?.message || 'Неверный код подтверждения'}`);
+    }
+  };
+
+  // Функция для автоматического получения Trade URL
+  const handleFetchTradeUrl = async () => {
+    if (!user?.steam_id) {
+      showNotification('Сначала подключите Steam аккаунт', 'error');
+      return;
+    }
+
+    setIsFetchingTradeUrl(true);
+
+    try {
+      const response = await fetch('/api/v1/steam/fetch-trade-url', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data.steam_trade_url) {
+        setTradeUrl(result.data.steam_trade_url);
+        showNotification('Trade URL автоматически получен и сохранен!', 'success');
+        // Обновляем данные пользователя
+        setTimeout(() => {
+          refetchUser();
+        }, 500);
+      } else {
+        // Если не удалось получить автоматически, показываем инструкции
+        const instructions = result.data?.manual_instructions;
+        if (instructions) {
+          const message = `Не удалось автоматически получить Trade URL.\n\n${instructions.title}\n${instructions.steps.map((step: string, index: number) => `${index + 1}. ${step}`).join('\n')}`;
+          showNotification('Получите Trade URL вручную', 'info');
+
+          // Открываем страницу настроек Steam в новой вкладке
+          if (instructions.privacy_url) {
+            window.open(instructions.privacy_url, '_blank');
+          }
+        } else {
+          showNotification('Не удалось получить Trade URL. Попробуйте позже.', 'error');
+        }
+      }
+    } catch (error: any) {
+      console.error('Ошибка при получении Trade URL:', error);
+      showNotification('Ошибка при получении Trade URL', 'error');
+    } finally {
+      setIsFetchingTradeUrl(false);
     }
   };
 
@@ -1633,15 +1686,45 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </Tooltip>
                 </div>
-                <input
-                  type="url"
-                  value={tradeUrl}
-                  onChange={(e) => setTradeUrl(e.target.value)}
-                  placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
-                  className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                />
+
+                <div className="space-y-2">
+                  <input
+                    type="url"
+                    value={tradeUrl}
+                    onChange={(e) => setTradeUrl(e.target.value)}
+                    placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
+                    className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
+
+                  {/* Кнопка автоматического получения Trade URL */}
+                  {user.steam_id && (
+                    <button
+                      onClick={handleFetchTradeUrl}
+                      disabled={isFetchingTradeUrl}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-all duration-200"
+                    >
+                      {isFetchingTradeUrl ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                          Получение Trade URL...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          Получить Trade URL автоматически
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+
                 <p className="text-xs text-gray-400 mt-1">
-                  Необходим для автоматической отправки предметов
+                  {user.steam_id
+                    ? 'Необходим для автоматической отправки предметов. Можно получить автоматически!'
+                    : 'Сначала подключите Steam аккаунт для автоматического получения Trade URL'
+                  }
                 </p>
               </div>
 
