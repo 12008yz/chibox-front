@@ -15,8 +15,10 @@ const NewHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { onlineUsers } = useSocket();
 
-  // Получаем данные о кейсах
-  const { data: casesData, error: casesError, isLoading: casesLoading } = useGetAllCasesQuery();
+  // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
+  const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [registrationData, setRegistrationData] = useState<{
@@ -96,6 +98,16 @@ const NewHomePage: React.FC = () => {
     console.error('Ошибка загрузки кейсов:', casesError);
   }
 
+  // Отладочная информация
+  console.log('Cases data:', casesData);
+  console.log('Cases loading:', casesLoading);
+  console.log('Cases error:', casesError);
+
+  // Принудительное обновление данных при маунте
+  useEffect(() => {
+    refetchCases();
+  }, [refetchCases]);
+
   return (
     <div className="min-h-screen bg-[#151225] text-white">
       <ScrollToTopOnMount />
@@ -141,30 +153,68 @@ const NewHomePage: React.FC = () => {
                 <div className="spinner" />
                 <p className="text-white ml-4">Загрузка кейсов...</p>
               </div>
-            ) : casesData?.success && casesData.data ? (
+            ) : casesData && (casesData.success || casesData.data) ? (
               <>
-                {/* Бесплатные кейсы */}
-                {casesData.data.free_cases && casesData.data.free_cases.length > 0 && (
-                  <div className="mb-12">
-                    <CaseListing
-                      name="Бесплатные кейсы"
-                      description="Ежедневные бесплатные кейсы для всех игроков"
-                      cases={casesData.data.free_cases}
-                    />
-                  </div>
-                )}
+                {/* Попробуем разные варианты структуры данных */}
+                {(() => {
+                  // Определяем где лежат данные
+                  const data = casesData.data || casesData;
+                  const freeCases = data.free_cases || [];
+                  const paidCases = data.paid_cases || [];
 
-                {/* Платные кейсы */}
-                {casesData.data.paid_cases && casesData.data.paid_cases.length > 0 && (
-                  <div className="mb-12">
-                    <CaseListing
-                      name="Премиум кейсы"
-                      description="Платные кейсы с эксклюзивными наградами"
-                      cases={casesData.data.paid_cases}
-                    />
-                  </div>
-                )}
+                  return (
+                    <>
+                      {/* Бесплатные кейсы */}
+                      {freeCases && freeCases.length > 0 && (
+                        <div className="mb-12">
+                          <CaseListing
+                            name="Бесплатные кейсы"
+                            description="Ежедневные бесплатные кейсы для всех игроков"
+                            cases={freeCases}
+                          />
+                        </div>
+                      )}
+
+                      {/* Платные кейсы */}
+                      {paidCases && paidCases.length > 0 && (
+                        <div className="mb-12">
+                          <CaseListing
+                            name="Премиум кейсы"
+                            description="Платные кейсы с эксклюзивными наградами"
+                            cases={paidCases}
+                          />
+                        </div>
+                      )}
+
+                      {/* Если нет кейсов, но данные есть */}
+                      {(!freeCases || freeCases.length === 0) && (!paidCases || paidCases.length === 0) && (
+                        <div className="text-center py-12">
+                          <p className="text-yellow-400">Кейсы не настроены</p>
+                          <p className="text-gray-400 text-sm mt-2">
+                            Данные получены, но список кейсов пуст
+                          </p>
+                          <button
+                            onClick={() => refetchCases()}
+                            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                          >
+                            Обновить кейсы
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </>
+            ) : casesError ? (
+              <div className="text-center py-12">
+                <p className="text-red-400">Ошибка загрузки кейсов</p>
+                <p className="text-gray-400 text-sm mt-2">
+                  {typeof casesError === 'object' && 'status' in casesError
+                    ? `Код ошибки: ${casesError.status}`
+                    : 'Проверьте подключение к интернету'
+                  }
+                </p>
+              </div>
             ) : (
               <div className="text-center py-12">
                 <p className="text-gray-400">Кейсы временно недоступны</p>
