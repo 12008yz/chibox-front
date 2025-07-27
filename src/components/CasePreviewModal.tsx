@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetCaseItemsQuery } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
@@ -16,13 +16,36 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   caseData
 }) => {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
     caseData.id,
     { skip: !isOpen }
   );
 
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+      // Небольшая задержка для запуска анимации после рендера
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      // Скрываем модалку после завершения анимации закрытия
+      setTimeout(() => setIsVisible(false), 300);
+    }
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setIsAnimating(false);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose();
+    }, 300);
+  };
+
   const handleOpenCase = () => {
-    onClose();
+    handleClose();
     navigate(`/case/${caseData.id}`);
   };
 
@@ -45,7 +68,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     return defaultCaseImages[Math.abs(hash) % defaultCaseImages.length];
   }, [caseData.name]);
 
-  if (!isOpen) return null;
+  if (!isVisible) return null;
 
   const items = itemsData?.data?.items || [];
 
@@ -75,8 +98,22 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-75">
-      <div className="bg-[#1a1629] rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
+    <div
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
+        isAnimating
+          ? 'bg-black bg-opacity-75 backdrop-blur-sm'
+          : 'bg-black bg-opacity-0'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`bg-[#1a1629] rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden shadow-2xl transition-all duration-300 ${
+          isAnimating
+            ? 'scale-100 opacity-100 translate-y-0'
+            : 'scale-75 opacity-0 translate-y-8'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Заголовок модального окна */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <div className="flex items-center space-x-4">
@@ -97,8 +134,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold"
+            onClick={handleClose}
+            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-200"
           >
             ×
           </button>
@@ -120,7 +157,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               {items.map((item: any, index: number) => (
                 <div
                   key={item.id || index}
-                  className={`bg-gray-800 rounded-lg p-2 border-2 ${getRarityColor(item.rarity)} hover:scale-105 transition-transform`}
+                  className={`bg-gray-800 rounded-lg p-2 border-2 ${getRarityColor(item.rarity)} hover:scale-105 transition-all duration-300 animate-fade-in-up`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="aspect-square mb-2 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
                     {item.image_url ? (
@@ -177,8 +215,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         {/* Футер с кнопками */}
         <div className="p-6 border-t border-gray-700 flex justify-end space-x-4">
           <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            onClick={handleClose}
+            className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
           >
             Закрыть
           </button>
