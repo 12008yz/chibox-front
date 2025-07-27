@@ -1607,9 +1607,32 @@ const ProfilePage: React.FC = () => {
 
               {/* Trade URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Steam Trade URL
-                </label>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-sm font-medium text-gray-300">
+                    Steam Trade URL
+                  </label>
+                  <Tooltip
+                    content={
+                      <div className="space-y-2 text-sm max-w-xs">
+                        <div className="font-semibold text-white mb-2">Как найти Trade URL:</div>
+                        <div className="space-y-1 text-xs">
+                          <div>1. Откройте Steam в браузере</div>
+                          <div>2. Перейдите в Инвентарь → Предложение обменов</div>
+                          <div>3. Нажмите "Кто может отправить мне запросы на обмен?"</div>
+                          <div>4. Скопируйте URL из поля "Trade URL"</div>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-600">
+                          Ссылка выглядит как: https://steamcommunity.com/tradeoffer/new/?partner=XXXXXXX&token=XXXXXXXX
+                        </div>
+                      </div>
+                    }
+                    position="bottom"
+                  >
+                    <div className="w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center cursor-help hover:bg-gray-500 transition-colors">
+                      <span className="text-xs text-white font-bold">?</span>
+                    </div>
+                  </Tooltip>
+                </div>
                 <input
                   type="url"
                   value={tradeUrl}
