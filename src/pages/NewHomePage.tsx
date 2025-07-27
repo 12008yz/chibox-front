@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useGetAllCasesQuery } from '../features/cases/casesApi';
+import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
@@ -8,7 +8,9 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
+import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import { useSocket } from '../hooks/useSocket';
+import type { CaseTemplate, Item } from '../types/api';
 
 const NewHomePage: React.FC = () => {
   const location = useLocation();
@@ -26,6 +28,23 @@ const NewHomePage: React.FC = () => {
     previewUrl?: string;
   } | null>(null);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  // State для анимации открытия кейса
+  const [caseOpeningAnimation, setCaseOpeningAnimation] = useState<{
+    isOpen: boolean;
+    caseTemplate: CaseTemplate | null;
+    wonItem: Item | null;
+    isLoading: boolean;
+  }>({
+    isOpen: false,
+    caseTemplate: null,
+    wonItem: null,
+    isLoading: false
+  });
+
+  // Мутации для покупки и открытия кейсов
+  const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
+  const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
 
   // Баннеры контент
   const bannerContent = [
@@ -92,6 +111,63 @@ const NewHomePage: React.FC = () => {
   const handleCloseRegistrationModal = () => {
     setShowRegistrationModal(false);
     setRegistrationData(null);
+  };
+
+  // Функция для покупки и открытия кейса
+  const handleBuyAndOpenCase = async (caseTemplate: CaseTemplate) => {
+    try {
+      // Устанавливаем состояние загрузки анимации
+      setCaseOpeningAnimation(prev => ({
+        ...prev,
+        isOpen: true,
+        caseTemplate: caseTemplate,
+        isLoading: true
+      }));
+
+      // Покупаем кейс
+      const buyResult = await buyCase({
+        case_template_id: caseTemplate.id
+      }).unwrap();
+
+      if (!buyResult.success) {
+        throw new Error('Ошибка покупки кейса');
+      }
+
+      // Открываем кейс
+      const openResult = await openCase({
+        case_id: buyResult.data.case_id
+      }).unwrap();
+
+      if (openResult.success && openResult.data?.item) {
+        // Устанавливаем результат анимации
+        setCaseOpeningAnimation(prev => ({
+          ...prev,
+          wonItem: openResult.data.item,
+          isLoading: false
+        }));
+      } else {
+        throw new Error('Ошибка открытия кейса');
+      }
+    } catch (error) {
+      console.error('Ошибка при покупке и открытии кейса:', error);
+      // Закрываем анимацию в случае ошибки
+      setCaseOpeningAnimation({
+        isOpen: false,
+        caseTemplate: null,
+        wonItem: null,
+        isLoading: false
+      });
+    }
+  };
+
+  // Функция для закрытия анимации
+  const handleCloseAnimation = () => {
+    setCaseOpeningAnimation({
+      isOpen: false,
+      caseTemplate: null,
+      wonItem: null,
+      isLoading: false
+    });
   };
 
   if (casesError) {
@@ -171,6 +247,7 @@ const NewHomePage: React.FC = () => {
                             name="Бесплатные кейсы"
                             description="Ежедневные бесплатные кейсы для всех игроков"
                             cases={freeCases}
+                            onBuyAndOpenCase={handleBuyAndOpenCase}
                           />
                         </div>
                       )}
@@ -179,9 +256,11 @@ const NewHomePage: React.FC = () => {
                       {paidCases && paidCases.length > 0 && (
                         <div className="mb-12">
                           <CaseListing
-                            name="Премиум кейсы"
+                            name="Премиум кейсы (99₽ / 499₽)"
                             description="Платные кейсы с эксклюзивными наградами"
                             cases={paidCases}
+                            onBuyAndOpenCase={handleBuyAndOpenCase}
+                            fixedPrices={true}
                           />
                         </div>
                       )}
@@ -251,6 +330,15 @@ const NewHomePage: React.FC = () => {
           previewUrl={registrationData.previewUrl}
         />
       )}
+
+      {/* Анимация открытия кейса */}
+      <CaseOpeningAnimation
+        isOpen={caseOpeningAnimation.isOpen}
+        onClose={handleCloseAnimation}
+        caseTemplate={caseOpeningAnimation.caseTemplate}
+        wonItem={caseOpeningAnimation.wonItem}
+        isLoading={caseOpeningAnimation.isLoading}
+      />
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
@@ -9,23 +8,31 @@ interface CasePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   caseData: CaseTemplate;
+  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
+  fixedPrices?: boolean;
 }
 
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   isOpen,
   onClose,
-  caseData
+  caseData,
+  onBuyAndOpenCase,
+  fixedPrices = false
 }) => {
-  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // Добавим дебаг информацию
+  console.log('CasePreviewModal props:', {
+    isOpen,
+    fixedPrices,
+    onBuyAndOpenCase: !!onBuyAndOpenCase,
+    caseDataName: caseData?.name
+  });
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
-  const [targetItemIndex, setTargetItemIndex] = useState(0);
-  const [animationRounds, setAnimationRounds] = useState(0);
-  const [animationSpeed, setAnimationSpeed] = useState(50);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
     caseData.id,
@@ -37,8 +44,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     { skip: !isOpen }
   );
 
+  // Добавим дебаг для statusData
+  console.log('Status data:', { statusData, statusLoading, fixedPrices });
+
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
+
+  // Добавим дебаг для мутаций
+  console.log('Mutation states:', { buyLoading, openLoading });
 
   useEffect(() => {
     if (isOpen) {
@@ -61,11 +74,21 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   const handleBuyCase = async () => {
+    // Если есть внешний обработчик, используем его
+    if (onBuyAndOpenCase) {
+      try {
+        await onBuyAndOpenCase(caseData);
+        handleClose(); // Закрываем модалку после запуска анимации
+      } catch (error) {
+        console.error('Ошибка покупки кейса:', error);
+      }
+      return;
+    }
+
+    // Иначе используем внутреннюю логику
     try {
       const result = await buyCase({
-        method: 'balance',
-        quantity: 1,
-        caseTemplateId: caseData.id
+        case_template_id: caseData.id
       }).unwrap();
 
       if (result.success) {
@@ -80,7 +103,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const handleOpenCase = async () => {
     try {
       const result = await openCase({
-        caseId: caseData.id
+        case_id: caseData.id
       }).unwrap();
 
       if (result.success && result.data?.item) {
@@ -237,10 +260,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <div>
               <h2 className="text-2xl font-bold text-white">{caseData.name}</h2>
               <p className="text-green-400 font-semibold">
-                {parseFloat(caseData.price) === 0 || isNaN(parseFloat(caseData.price)) ? (
-                  <span>Бесплатный кейс</span>
+                {fixedPrices ? (
+                  <span className="text-yellow-400 font-bold">
+                    {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
+                      ? '499₽'
+                      : '99₽'
+                    }
+                  </span>
                 ) : (
-                  <Monetary value={parseFloat(caseData.price)} />
+                  parseFloat(caseData.price) === 0 || isNaN(parseFloat(caseData.price)) ? (
+                    <span>Бесплатный кейс</span>
+                  ) : (
+                    <Monetary value={parseFloat(caseData.price)} />
+                  )
                 )}
               </p>
             </div>
@@ -403,41 +435,89 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               Закрыть
             </button>
 
-            {statusData?.data && !statusLoading && (
+            {fixedPrices ? (
+              // Показываем кнопку с фиксированной ценой для главной страницы
+              <button
+                onClick={handleBuyCase}
+                disabled={buyLoading || openLoading}
+                className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {buyLoading || openLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Открытие...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Открыть</span>
+                    <span className="text-yellow-400 font-bold">
+                      {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
+                        ? '499₽'
+                        : '99₽'
+                      }
+                    </span>
+                  </>
+                )}
+              </button>
+            ) : (
+              // Используем обычную логику для страницы профиля
               <>
-                {statusData.data.canBuy && statusData.data.price > 0 && (
+                {statusData?.data && !statusLoading ? (
+                  <>
+                    {statusData.data.canBuy && statusData.data.price > 0 && (
+                      <button
+                        onClick={handleBuyCase}
+                        disabled={buyLoading || openLoading}
+                        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        {buyLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Покупка...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Купить и открыть</span>
+                            <Monetary value={statusData.data.price} />
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {statusData.data.canOpen && (
+                      <button
+                        onClick={handleOpenCase}
+                        disabled={buyLoading || openLoading}
+                        className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        {openLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Открытие...</span>
+                          </>
+                        ) : (
+                          <span>Открыть кейс</span>
+                        )}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  // Показываем кнопку по умолчанию, если статус не загружен
                   <button
                     onClick={handleBuyCase}
                     disabled={buyLoading || openLoading}
                     className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    {buyLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Покупка...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Купить и открыть</span>
-                        <Monetary value={statusData.data.price} />
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {statusData.data.canOpen && (
-                  <button
-                    onClick={handleOpenCase}
-                    disabled={buyLoading || openLoading}
-                    className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    {openLoading ? (
+                    {buyLoading || openLoading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Открытие...</span>
                       </>
                     ) : (
-                      <span>Открыть кейс</span>
+                      <>
+                        <span>Открыть кейс</span>
+                        <Monetary value={parseFloat(caseData.price)} />
+                      </>
                     )}
                   </button>
                 )}
@@ -450,9 +530,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       {/* Анимация открытия кейса */}
       {showOpeningAnimation && openingResult && (
         <CaseOpeningAnimation
-          items={items}
+          isOpen={showOpeningAnimation}
+          onClose={handleAnimationComplete}
+          caseTemplate={caseData}
           wonItem={openingResult.item}
-          onComplete={handleAnimationComplete}
+          isLoading={false}
         />
       )}
     </div>

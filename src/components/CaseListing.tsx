@@ -9,15 +9,22 @@ interface CaseListingProps {
   name: string;
   description?: string;
   cases: CaseTemplate[];
+  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
+  fixedPrices?: boolean;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
   name,
   description,
-  cases
+  cases,
+  onBuyAndOpenCase,
+  fixedPrices = false
 }) => {
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Добавим дебаг информацию
+  console.log('CaseListing props:', { name, fixedPrices, onBuyAndOpenCase: !!onBuyAndOpenCase });
 
   const handleCaseClick = (caseItem: CaseTemplate, event: React.MouseEvent) => {
     // Проверяем, если нажали с Ctrl/Cmd, то открываем в новой вкладке как раньше
@@ -55,6 +62,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     title={caseItem.name}
                     image={caseItem.image_url}
                     price={caseItem.price}
+                    fixedPrices={fixedPrices}
                   />
                 </Link>
               );
@@ -75,6 +83,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
           isOpen={isPreviewOpen}
           onClose={closePreview}
           caseData={previewCase}
+          onBuyAndOpenCase={onBuyAndOpenCase}
+          fixedPrices={fixedPrices}
         />
       )}
     </div>

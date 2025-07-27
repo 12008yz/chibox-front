@@ -5,9 +5,10 @@ interface CaseProps {
   title: string;
   image: string | null;
   price: string;
+  fixedPrices?: boolean;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false }) => {
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -51,10 +52,19 @@ const Case: React.FC<CaseProps> = ({ title, image, price }) => {
       <div className="flex flex-col gap-2 p-4 items-center">
         <div className="font-bold text-lg text-white text-center">{title}</div>
         <div className="font-medium text-md text-green-400">
-          {parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
-            <span>ежедневно</span>
+          {fixedPrices ? (
+            <span className="text-yellow-400 font-bold">
+              {title.toLowerCase().includes('premium') || title.toLowerCase().includes('премиум')
+                ? '499₽'
+                : '99₽'
+              }
+            </span>
           ) : (
-            <Monetary value={parseFloat(price)} />
+            parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
+              <span>ежедневно</span>
+            ) : (
+              <Monetary value={parseFloat(price)} />
+            )
           )}
         </div>
       </div>
