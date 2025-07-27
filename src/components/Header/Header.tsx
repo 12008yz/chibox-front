@@ -86,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className="flex flex-col p-4 w-screen justify-center header-gradient relative z-[999999]">
+    <div className="flex flex-col p-4 w-screen justify-center header-gradient relative z-[99]">
       {/* Онлайн счетчик */}
       <div className="flex pb-2 items-center">
         {items.map((item, index) => (

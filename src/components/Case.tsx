@@ -13,11 +13,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price }) => {
 
   // Дефолтные изображения кейсов CS2
   const defaultCaseImages = [
-    'https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frncVtqv7MPE8JaHHCj_Dl-wk4-NtFirikURy4jiGwo2udHqVaAEjDZp3EflK7EeSMnMs4w/256fx256f',
-    'https://www.csgodatabase.com/images/containers/Fever_Case.png',
-    'https://steamcommunity-a.akamaihd.net/economy/image/fWFc82js0fmoRAP-qOIPu5THSWqfSmTELLqcUywGkijVjZULUrsm1j-9xgEObwgfEh_nvjlWhNzZCveCDfIBj98xqodQ2CZknz5_Pb2yLghi_qoIBOOywDM_-AXCUv42UOXXzm1TtZUrKFGu4NSDbOJlZN5OSXqBEu7vKPdlhY16gMPK6JH85G3ni3nAqhZi2H7WQw/256fx256f',
-    'https://steamcommunity-a.akamaihd.net/economy/image/fWFc82js0fmoRAP-qOIPu5THSWqfSmTELLqcUywGkijVjZULUrsm1j-9xgEObwgfEh_nvjlWhNzZCveCDfIBj98xqodQ2CZknz5_Pb2yLghi0qIcV8UzQCJ5-QWMUqoqBNeI8jofzZUoIFT15YeXN-F1PIZNTnKCDrvnPPM7041whqKBs6b05WaJhSnOtBdqhHdSJA/256fx256f',
-    'https://steamcommunity-a.akamaihd.net/economy/image/fWFc82js0fmoRAP-qOIPu5THSWqfSmTELLqcUywGkijVjZULUrsm1j-9xgEObwgfEh_nvjlWhNzZCveCDfIBj98xqodQ2CZknz5_Pa2yLghi_qJdUNE4lBUQHQWGUaoqBNKJ8zrqy5AeIFTp5IWXYrUpZtNOSHTyXO26YaI-h4kv0qCH7pG05mfK5VUKpU/256fx256f'
+    'https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frncVtqv7MPE8JaHHCj_Dl-wk4-NtFirikURy4jiGwo2udHqVaAEjDZp3EflK7EeSMnMs4w/256fx256f'
   ];
 
   // Выбираем случайное изображение кейса на основе названия для стабильности

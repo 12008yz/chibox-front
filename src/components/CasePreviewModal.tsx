@@ -47,7 +47,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   if (!isOpen) return null;
 
-  const items = itemsData?.data || [];
+  const items = itemsData?.data?.items || [];
 
   // Определяем изображение кейса
   const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
@@ -75,7 +75,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-75">
       <div className="bg-[#1a1629] rounded-lg max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* Заголовок модального окна */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
@@ -116,13 +116,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               <p className="text-red-400">Ошибка загрузки предметов</p>
             </div>
           ) : items.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3">
               {items.map((item: any, index: number) => (
                 <div
                   key={item.id || index}
-                  className={`bg-gray-800 rounded-lg p-4 border-2 ${getRarityColor(item.rarity)} hover:scale-105 transition-transform`}
+                  className={`bg-gray-800 rounded-lg p-2 border-2 ${getRarityColor(item.rarity)} hover:scale-105 transition-transform`}
                 >
-                  <div className="aspect-square mb-3 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
+                  <div className="aspect-square mb-2 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
                     {item.image_url ? (
                       <img
                         src={item.image_url}

@@ -106,7 +106,10 @@ export const casesApi = baseApi.injectEndpoints({
 
     // Получение предметов в кейсе (для превью)
     getCaseItems: builder.query<
-      ApiResponse<any[]>,
+      ApiResponse<{
+        caseTemplate: CaseTemplate;
+        items: Item[];
+      }>,
       string
     >({
       query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/items`,
