@@ -32,7 +32,7 @@ const NewHomePage: React.FC = () => {
     {
       left: {
         image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=460&fit=crop',
-        title: "CHIBOX CASINO",
+        title: "CHIBOX Game",
         description: "Открывай кейсы и получай крутые призы! Попробуй свою удачу прямо сейчас!",
         link: "/cases",
       },

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Case from './Case';
 import Title from './Title';
+import CasePreviewModal from './CasePreviewModal';
 import { CaseTemplate } from '../types/api';
 
 interface CaseListingProps {
@@ -15,6 +16,25 @@ const CaseListing: React.FC<CaseListingProps> = ({
   description,
   cases
 }) => {
+  const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const handleCaseClick = (caseItem: CaseTemplate, event: React.MouseEvent) => {
+    // Проверяем, если нажали с Ctrl/Cmd, то открываем в новой вкладке как раньше
+    if (event.ctrlKey || event.metaKey) {
+      return; // Позволяем стандартному поведению Link сработать
+    }
+
+    // Иначе показываем превью
+    event.preventDefault();
+    setPreviewCase(caseItem);
+    setIsPreviewOpen(true);
+  };
+
+  const closePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewCase(null);
+  };
   return (
     <div className="flex flex-col items-center justify-center max-w-[1600px] w-full">
       <Title title={name} />
@@ -29,6 +49,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   to={`/case/${caseItem.id}`}
                   key={caseItem.id}
                   className="transition-transform hover:scale-105"
+                  onClick={(e) => handleCaseClick(caseItem, e)}
                 >
                   <Case
                     title={caseItem.name}
@@ -47,6 +68,15 @@ const CaseListing: React.FC<CaseListingProps> = ({
           </div>
         )}
       </div>
+
+      {/* Модальное окно превью кейса */}
+      {previewCase && (
+        <CasePreviewModal
+          isOpen={isPreviewOpen}
+          onClose={closePreview}
+          caseData={previewCase}
+        />
+      )}
     </div>
   );
 };

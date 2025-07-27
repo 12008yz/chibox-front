@@ -81,7 +81,7 @@ const Navbar: React.FC<NavbarProps> = ({
               />
               <div className="flex flex-col justify-center">
                 <div className="font-normal text-xl text-white">ChiBox</div>
-                <div className="text-xs text-gray-400">Casino</div>
+                <div className="text-xs text-gray-400">game</div>
               </div>
             </Link>
 
