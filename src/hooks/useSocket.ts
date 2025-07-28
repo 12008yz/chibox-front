@@ -14,10 +14,12 @@ const MAX_LIVE_DROPS = 17;
 
 // Глобальное подключение к сокету (синглтон)
 let globalSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
-let socketListeners = new Set<(data: any) => void>();
 let onlineUsersListeners = new Set<(count: number) => void>();
 let connectionListeners = new Set<(isConnected: boolean) => void>();
 let liveDropListeners = new Set<(drop: LiveDropData) => void>();
+
+// Глобальный кеш для предотвращения дублирования дропов
+let receivedDrops = new Map<string, number>();
 
 // Функция для загрузки дропов из localStorage
 const loadLiveDropsFromStorage = (): LiveDropData[] => {
@@ -92,6 +94,26 @@ const createGlobalSocket = () => {
     console.log('WebSocket: Получено живое падение', data);
     // Проверяем, что у нас есть уникальный ID
     if (data && data.id) {
+      // Дополнительная проверка на дублирование на уровне сокета
+      const currentTime = Date.now();
+      const dropKey = `${data.id}_${data.user.id}_${data.item.id}`;
+
+      // Если это не первое получение этого дропа в течение 10 секунд, игнорируем
+      if (receivedDrops.has(dropKey) && (currentTime - receivedDrops.get(dropKey)!) < 10000) {
+        console.warn('WebSocket: Дублированное живое падение, игнорируем:', dropKey);
+        return;
+      }
+
+      // Сохраняем время получения дропа
+      receivedDrops.set(dropKey, currentTime);
+
+      // Очищаем старые записи (старше 5 минут)
+      for (const [key, timestamp] of receivedDrops.entries()) {
+        if (currentTime - timestamp > 300000) {
+          receivedDrops.delete(key);
+        }
+      }
+
       liveDropListeners.forEach(listener => listener(data));
     } else {
       console.warn('WebSocket: Получено живое падение без ID, игнорируем:', data);
@@ -126,6 +148,21 @@ export const useSocket = (): UseSocketReturn => {
     const connectionListener = (connected: boolean) => setIsConnected(connected);
     const liveDropListener = (drop: LiveDropData) => {
       setLiveDrops(prevDrops => {
+        // Проверяем, нет ли уже такого дропа
+        const existingDrop = prevDrops.find(existingDrop => existingDrop.id === drop.id);
+        if (existingDrop) {
+          console.warn('useSocket: Дублированный drop, игнорируем:', drop.id);
+          return prevDrops;
+        }
+
+        // Дополнительная проверка - если дроп очень старый, не добавляем
+        const dropTime = new Date(drop.dropTime).getTime();
+        const now = Date.now();
+        if (now - dropTime > 5 * 60 * 1000) {
+          console.log('useSocket: Drop слишком старый, игнорируем:', drop.id);
+          return prevDrops;
+        }
+
         const newDrops = [drop, ...prevDrops.slice(0, MAX_LIVE_DROPS - 1)];
         saveLiveDropsToStorage(newDrops);
         return newDrops;

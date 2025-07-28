@@ -42,6 +42,15 @@ const LiveDrops: React.FC = () => {
             console.warn('LiveDrop без ID, игнорируем:', drop);
             return false;
           }
+
+          // Дополнительная проверка - если дроп очень старый (более 5 минут), игнорируем
+          const dropTime = new Date(drop.dropTime).getTime();
+          const now = Date.now();
+          if (now - dropTime > 5 * 60 * 1000) {
+            console.log('LiveDrop слишком старый, игнорируем:', drop.id);
+            return false;
+          }
+
           return !existingDropIds.has(drop.id);
         });
 
