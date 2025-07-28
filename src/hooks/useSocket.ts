@@ -90,7 +90,12 @@ const createGlobalSocket = () => {
   // Обработчик живых падений
   globalSocket.on('liveDrop', (data) => {
     console.log('WebSocket: Получено живое падение', data);
-    liveDropListeners.forEach(listener => listener(data));
+    // Проверяем, что у нас есть уникальный ID
+    if (data && data.id) {
+      liveDropListeners.forEach(listener => listener(data));
+    } else {
+      console.warn('WebSocket: Получено живое падение без ID, игнорируем:', data);
+    }
   });
 
   // Обработчик ошибок

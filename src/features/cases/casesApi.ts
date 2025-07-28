@@ -59,7 +59,7 @@ export const casesApi = baseApi.injectEndpoints({
         body: caseData,
       }),
       invalidatesTags: ['Cases', 'Balance', 'User'],
-      // Оптимистичное обновление баланса
+      // Обновление баланса после покупки
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -67,14 +67,14 @@ export const casesApi = baseApi.injectEndpoints({
             // Обновляем баланс в auth slice (поддерживаем разные форматы ответа)
             const newBalance = data.data?.new_balance ?? data.data?.balance;
             if (newBalance !== undefined) {
-              dispatch({
-                type: 'auth/updateBalance',
-                payload: newBalance,
-              });
+              // Импортируем action напрямую
+              const { updateBalance } = await import('../../features/auth/authSlice');
+              dispatch(updateBalance(newBalance));
+              console.log('Баланс обновлен после покупки кейса:', newBalance);
             }
           }
-        } catch {
-          // В случае ошибки ничего не делаем, RTK Query откатит изменения
+        } catch (error) {
+          console.error('Ошибка при обновлении баланса после покупки:', error);
         }
       },
     }),
@@ -100,18 +100,18 @@ export const casesApi = baseApi.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data.new_balance !== undefined) {
-            dispatch({
-              type: 'auth/updateBalance',
-              payload: data.data.new_balance,
-            });
+            // Импортируем action напрямую
+            const { updateBalance } = await import('../../features/auth/authSlice');
+            dispatch(updateBalance(data.data.new_balance));
+            console.log('Баланс обновлен после открытия кейса:', data.data.new_balance);
           }
 
           // Принудительно инвалидируем все связанные кеши
           dispatch(
             casesApi.util.invalidateTags(['Inventory', 'Balance', 'User'])
           );
-        } catch {
-          // Обработка ошибок
+        } catch (error) {
+          console.error('Ошибка при обновлении баланса после открытия:', error);
         }
       },
     }),

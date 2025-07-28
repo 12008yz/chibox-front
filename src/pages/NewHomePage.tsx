@@ -10,12 +10,14 @@ import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import { useSocket } from '../hooks/useSocket';
+import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
 
 const NewHomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { onlineUsers } = useSocket();
+  const { refetch: refetchUser } = useUserData({ autoRefresh: false }); // Отключаем автообновление, только для ручного обновления
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
@@ -138,6 +140,11 @@ const NewHomePage: React.FC = () => {
         throw new Error('Ошибка покупки кейса');
       }
 
+      // Принудительно обновляем данные пользователя для обновления баланса
+      setTimeout(() => {
+        refetchUser();
+      }, 100);
+
       // Проверяем наличие inventory_cases в ответе
       const inventoryCases = (buyResult as any).inventory_cases;
       if (!inventoryCases || inventoryCases.length === 0) {
@@ -161,6 +168,11 @@ const NewHomePage: React.FC = () => {
           wonItem: openResult.data.item,
           isLoading: false
         }));
+
+        // Принудительно обновляем данные пользователя для обновления баланса в navbar
+        setTimeout(() => {
+          refetchUser();
+        }, 500);
       } else {
         throw new Error('Ошибка открытия кейса');
       }

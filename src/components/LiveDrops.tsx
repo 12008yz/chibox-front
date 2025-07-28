@@ -33,12 +33,27 @@ const LiveDrops: React.FC = () => {
   useEffect(() => {
     if (liveDrops.length > 0) {
       setAllDrops(prevDrops => {
-        // Создаем новый массив, исключая дубликаты
-        const newDropIds = new Set(liveDrops.map(drop => drop.id));
-        const filteredPrevDrops = prevDrops.filter(drop => !newDropIds.has(drop.id));
+        // Создаем Map для более эффективной дедупликации
+        const existingDropIds = new Set(prevDrops.map(drop => drop.id));
 
-        // Объединяем и ограничиваем до 50 падений
-        const combined = [...liveDrops, ...filteredPrevDrops].slice(0, 50);
+        // Фильтруем только действительно новые падения
+        const newDrops = liveDrops.filter(drop => {
+          if (!drop.id) {
+            console.warn('LiveDrop без ID, игнорируем:', drop);
+            return false;
+          }
+          return !existingDropIds.has(drop.id);
+        });
+
+        // Если нет новых падений, возвращаем предыдущее состояние
+        if (newDrops.length === 0) {
+          return prevDrops;
+        }
+
+        // Объединяем только новые падения с существующими и ограничиваем до 50
+        const combined = [...newDrops, ...prevDrops].slice(0, 50);
+
+        console.log(`LiveDrops: Добавлено ${newDrops.length} новых падений, всего: ${combined.length}`);
         return combined;
       });
     }
