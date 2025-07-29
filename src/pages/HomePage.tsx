@@ -10,6 +10,7 @@ import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import CaseTimer from '../components/CaseTimer';
+import { SubscriptionCasesClaim } from '../components/SubscriptionCasesClaim';
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
@@ -372,6 +373,11 @@ const HomePage: React.FC = () => {
 
                   return (
                     <>
+                      {/* Компонент получения ежедневных кейсов подписки */}
+                      <div className="mb-8">
+                        <SubscriptionCasesClaim />
+                      </div>
+
                       {/* Бесплатные/Подписочные кейсы */}
                       {subscriptionCases && subscriptionCases.length > 0 && (
                         <div className="mb-12">

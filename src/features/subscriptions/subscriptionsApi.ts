@@ -88,6 +88,38 @@ export const subscriptionsApi = baseApi.injectEndpoints({
         `v1/subscription/history?page=${page}&limit=${limit}`,
       providesTags: ['Subscription'],
     }),
+
+    // Получение статуса ежедневных кейсов подписки
+    getSubscriptionCaseStatus: builder.query<
+      ApiResponse<{
+        has_active_subscription: boolean;
+        can_claim: boolean;
+        subscription_tier: number;
+        next_available_time: string | null;
+        time_remaining: string | null;
+        subscription_expiry_date: string;
+      }>,
+      void
+    >({
+      query: () => 'v1/subscription/case-status',
+      providesTags: ['Subscription', 'Cases'],
+    }),
+
+    // Получение ежедневных кейсов подписки
+    claimSubscriptionCase: builder.mutation<
+      ApiResponse<{
+        cases_claimed: number;
+        next_available_time: string;
+        user_cases: any[];
+      }>,
+      void
+    >({
+      query: () => ({
+        url: 'v1/subscription/claim-case',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Subscription', 'Cases', 'Inventory'],
+    }),
   }),
 });
 
@@ -97,4 +129,6 @@ export const {
   useGetSubscriptionStatusQuery,
   useBuySubscriptionMutation,
   useGetSubscriptionHistoryQuery,
+  useGetSubscriptionCaseStatusQuery,
+  useClaimSubscriptionCaseMutation,
 } = subscriptionsApi;

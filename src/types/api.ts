@@ -248,6 +248,7 @@ export interface BuyCaseRequest {
 export interface OpenCaseRequest {
   case_id?: string;
   inventoryItemId?: string; // Для открытия кейсов из инвентаря
+  template_id?: string; // Для открытия бесплатных кейсов по шаблону
 }
 
 export interface SellItemRequest {
