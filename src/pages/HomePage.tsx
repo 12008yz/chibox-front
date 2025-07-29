@@ -9,6 +9,7 @@ import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
+import CaseTimer from '../components/CaseTimer';
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
@@ -17,7 +18,7 @@ const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { onlineUsers } = useSocket();
-  const { refetch: refetchUser } = useUserData({ autoRefresh: false }); // Отключаем автообновление, только для ручного обновления
+  const { userData, refetch: refetchUser } = useUserData({ autoRefresh: false }); // Получаем данные пользователя
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
@@ -256,22 +257,96 @@ const HomePage: React.FC = () => {
               </div>
             ) : casesData && (casesData.success || casesData.data) ? (
               <>
-                {/* Попробуем разные варианты структуры данных */}
+                {/* Логика отображения кейсов в зависимости от подписки */}
                 {(() => {
                   // Определяем где лежат данные
                   const data = casesData.data || casesData;
                   const freeCases = data.free_cases || [];
                   const paidCases = data.paid_cases || [];
+                  const userSubscriptionTier = Number(data.user_subscription_tier || userData?.subscription_tier || 0);
+                  const subscriptionDaysLeft = Number(userData?.subscription_days_left || 0);
+                  const nextCaseAvailableTime = userData?.next_case_available_time;
+
+                  // Функция для фильтрации кейсов по подписке
+                  const getSubscriptionCases = () => {
+                    if (userSubscriptionTier === 0 || subscriptionDaysLeft <= 0) {
+                      // Если нет активной подписки, показываем все бесплатные кейсы
+                      return freeCases;
+                    }
+
+                    // Фильтруем кейсы для пользователей с подпиской
+                    const subscriptionCases = freeCases.filter(caseTemplate => {
+                      const caseName = caseTemplate.name?.toLowerCase() || '';
+
+                      // Всегда показываем бонусный кейс
+                      if (caseName.includes('бонус')) {
+                        return true;
+                      }
+
+                      // Показываем кейс соответствующий уровню подписки
+                      if (userSubscriptionTier === 1 && caseName.includes('статус') && !caseName.includes('+')) {
+                        return true;
+                      }
+                      if (userSubscriptionTier === 2 && caseName.includes('статус+') && !caseName.includes('++')) {
+                        return true;
+                      }
+                      if (userSubscriptionTier === 3 && caseName.includes('статус++')) {
+                        return true;
+                      }
+
+                      return false;
+                    });
+
+                    return subscriptionCases.length > 0 ? subscriptionCases : freeCases;
+                  };
+
+                  const subscriptionCases = getSubscriptionCases();
+                  const hasActiveSubscription = userSubscriptionTier > 0 && subscriptionDaysLeft > 0;
+
+                  // Определяем название и описание секции
+                  const getSectionTitle = () => {
+                    if (!hasActiveSubscription) {
+                      return "Бесплатные кейсы";
+                    }
+
+                    const tierNames: Record<number, string> = {
+                      1: "Статус",
+                      2: "Статус+",
+                      3: "Статус++"
+                    };
+
+                    return `${tierNames[userSubscriptionTier] || 'Статус'} кейсы`;
+                  };
+
+                  const getSectionDescription = () => {
+                    if (!hasActiveSubscription) {
+                      return "Ежедневные бесплатные кейсы для всех игроков";
+                    }
+
+                    return `Эксклюзивные кейсы для подписчиков. Осталось дней подписки: ${subscriptionDaysLeft}`;
+                  };
 
                   return (
                     <>
-                      {/* Бесплатные кейсы */}
-                      {freeCases && freeCases.length > 0 && (
+                      {/* Бесплатные/Подписочные кейсы */}
+                      {subscriptionCases && subscriptionCases.length > 0 && (
                         <div className="mb-12">
+                          <div className="mb-4">
+                            {/* Показываем таймер если есть ограничение по времени */}
+                            {nextCaseAvailableTime && (
+                              <div className="mb-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-gray-300">Статус следующего кейса:</span>
+                                  <CaseTimer nextAvailableTime={nextCaseAvailableTime} />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
                           <CaseListing
-                            name="Бесплатные кейсы"
-                            description="Ежедневные бесплатные кейсы для всех игроков"
-                            cases={freeCases}
+                            name={getSectionTitle()}
+                            description={getSectionDescription()}
+                            cases={subscriptionCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                           />
                         </div>
@@ -291,7 +366,7 @@ const HomePage: React.FC = () => {
                       )}
 
                       {/* Если нет кейсов, но данные есть */}
-                      {(!freeCases || freeCases.length === 0) && (!paidCases || paidCases.length === 0) && (
+                      {(!subscriptionCases || subscriptionCases.length === 0) && (!paidCases || paidCases.length === 0) && (
                         <div className="text-center py-12">
                           <p className="text-yellow-400">Кейсы не настроены</p>
                           <p className="text-gray-400 text-sm mt-2">
