@@ -13,7 +13,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
 
-const NewHomePage: React.FC = () => {
+const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { onlineUsers } = useSocket();
@@ -368,4 +368,4 @@ const NewHomePage: React.FC = () => {
   );
 };
 
-export default NewHomePage;
+export default HomePage;
