@@ -127,7 +127,39 @@ const HomePage: React.FC = () => {
         isLoading: true
       }));
 
-      // Покупаем кейс
+      // Проверяем, бесплатный ли это кейс
+      const isFreeCase = parseFloat(caseTemplate.price) === 0 || isNaN(parseFloat(caseTemplate.price));
+
+      if (isFreeCase) {
+        console.log('Открываем бесплатный кейс напрямую по template_id:', caseTemplate.id);
+
+        // Для бесплатных кейсов сразу открываем по template_id
+        const openResult = await openCase({
+          template_id: caseTemplate.id
+        }).unwrap();
+
+        console.log('Результат открытия бесплатного кейса:', openResult);
+
+        if (openResult.success && openResult.data?.item) {
+          // Устанавливаем результат анимации
+          setCaseOpeningAnimation(prev => ({
+            ...prev,
+            wonItem: openResult.data.item,
+            isLoading: false
+          }));
+
+          // Принудительно обновляем данные пользователя
+          setTimeout(() => {
+            refetchUser();
+          }, 500);
+        } else {
+          throw new Error('Ошибка открытия бесплатного кейса');
+        }
+        return;
+      }
+
+      // Для платных кейсов покупаем сначала
+      console.log('Покупаем платный кейс:', caseTemplate.id);
       const buyResult = await buyCase({
         case_template_id: caseTemplate.id,
         caseTemplateId: caseTemplate.id,
@@ -177,8 +209,20 @@ const HomePage: React.FC = () => {
       } else {
         throw new Error('Ошибка открытия кейса');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка при покупке и открытии кейса:', error);
+
+      // Показываем пользователю более понятное сообщение об ошибке
+      let errorMessage = 'Произошла ошибка при открытии кейса';
+      if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      // Можно добавить toast уведомление или alert
+      alert(errorMessage);
+
       // Закрываем анимацию в случае ошибки
       setCaseOpeningAnimation({
         isOpen: false,
