@@ -131,16 +131,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const openCaseParams: any = {};
 
       if (inventoryItemId) {
-        // Открываем кейс из инвентаря
+        // Открываем кейс из инвентаря (покупные кейсы)
         openCaseParams.inventoryItemId = inventoryItemId;
       } else if (caseId) {
-        // Открываем кейс по case_id
+        // Открываем кейс по case_id (старый метод)
         openCaseParams.case_id = caseId;
       } else {
-        // Используем template_id по умолчанию (для бесплатных кейсов)
-        openCaseParams.case_id = caseData.id;
+        // Для бесплатных кейсов используем template_id
+        // Бэкенд сам найдет подходящий кейс пользователя по шаблону
+        console.log('Открываем бесплатный кейс по template_id:', caseData.id);
+        openCaseParams.template_id = caseData.id;
       }
 
+      console.log('Параметры открытия кейса:', openCaseParams);
       const result = await openCase(openCaseParams).unwrap();
 
       if (result.success && result.data?.item) {

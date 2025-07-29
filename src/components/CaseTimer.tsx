@@ -62,7 +62,7 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
       <span className="text-orange-400 text-sm font-medium">
         Новые кейсы через: <span className="text-white font-mono">{timeLeft}</span>
       </span>
-      <span className="text-gray-500 text-xs ml-2">(ежедневно в 8:37 МСК)</span>
+      <span className="text-gray-500 text-xs ml-2">(в 21:41 МСК)</span>
     </div>
   );
 };
