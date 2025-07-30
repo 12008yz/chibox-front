@@ -56,13 +56,29 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
     );
   }
 
+  // Вычисляем время в формате МСК из nextAvailableTime
+  const getMoscowTime = () => {
+    if (!nextAvailableTime) return '';
+
+    try {
+      const date = new Date(nextAvailableTime);
+      // Преобразуем в московское время (UTC+3)
+      const moscowTime = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+      const hours = moscowTime.getUTCHours().toString().padStart(2, '0');
+      const minutes = moscowTime.getUTCMinutes().toString().padStart(2, '0');
+      return `(в ${hours}:${minutes} МСК)`;
+    } catch (error) {
+      return '(в --:-- МСК)';
+    }
+  };
+
   return (
     <div className={`inline-flex items-center space-x-2 ${className}`}>
       <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
       <span className="text-orange-400 text-sm font-medium">
         Новые кейсы через: <span className="text-white font-mono">{timeLeft}</span>
       </span>
-      <span className="text-gray-500 text-xs ml-2">(в 21:41 МСК)</span>
+      <span className="text-gray-500 text-xs ml-2">{getMoscowTime()}</span>
     </div>
   );
 };

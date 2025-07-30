@@ -25,7 +25,7 @@ const Player: React.FC<PlayerProps> = ({
   if (!user) return null;
 
   return (
-    <Link to={`/profile/${user.id}`}>
+    <Link to={`/user/${user.id}`}>
       <div className={`flex items-center justify-center text-white transition-opacity hover:opacity-80 ${
         direction === "row" ? "gap-4" : "flex-col"
       }`}>
