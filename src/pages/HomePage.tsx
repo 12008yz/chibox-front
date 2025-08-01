@@ -303,7 +303,7 @@ const HomePage: React.FC = () => {
           }}
         />
         <img
-          src="https://ext.same-assets.com/609624232/2525981327.png"
+          src="https://ext.same-assets.com/609624232/571014729.png"
           alt=""
           className="absolute bottom-1/4 left-1/4 transform -rotate-12 select-none"
           style={{

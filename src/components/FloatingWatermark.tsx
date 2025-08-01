@@ -7,7 +7,7 @@ const FloatingWatermark: React.FC = () => {
     'https://ext.same-assets.com/609624232/355601599.png', // CS soldier with rifle
     'https://ext.same-assets.com/609624232/226050672.png', // CS soldier variant
     'https://ext.same-assets.com/609624232/144393961.png', // CS soldier action
-    'https://ext.same-assets.com/609624232/2525981327.png', // CS soldier standing
+    'https://ext.same-assets.com/609624232/571014729.png', // CS Source logo
     'https://ext.same-assets.com/609624232/1178601660.png', // CS soldier crouching
   ];
 
