@@ -340,7 +340,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <div className="relative">
               {/* Сетка предметов с анимацией масштабирования */}
               <div
-                className={`grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 transition-all duration-1000 ${
+                className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
                   showOpeningAnimation ? 'transform scale-50 origin-center' : ''
                 }`}
               >
@@ -365,15 +365,34 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         : 'all 0.3s ease-in-out'
                     }}
                   >
-                    <div className="aspect-square mb-2 bg-gray-700 rounded flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center overflow-hidden relative">
                       {item.image_url ? (
                         <img
                           src={item.image_url}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          className="max-w-full max-h-full object-contain"
+                          style={{
+                            backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                            mixBlendMode: 'normal'
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.backgroundColor = 'transparent';
+                          }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorDiv = document.createElement('div');
+                              errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center';
+                              errorDiv.textContent = 'Нет изображения';
+                              parent.appendChild(errorDiv);
+                            }
+                          }}
                         />
                       ) : (
-                        <div className="text-gray-500 text-xs text-center">
+                        <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center">
                           Нет изображения
                         </div>
                       )}
@@ -450,10 +469,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         {/* Футер с кнопками */}
         <div className="flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629]">
-          {/* ДЕБАГ: Временный видимый элемент для проверки отображения футера */}
-          <div className="bg-red-500 text-white p-2 mb-4 rounded text-center font-bold">
-            🚨 ФУТЕР ОТОБРАЖАЕТСЯ! fixedPrices={String(fixedPrices)} 🚨
-          </div>
+
 
           <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (
@@ -480,10 +496,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               Закрыть
             </button>
 
-            {/* DEBUG: Показываем состояние fixedPrices */}
-            <div className="text-xs text-yellow-400 px-2 mt-2 md:mt-0">
-              DEBUG: fixedPrices={String(fixedPrices)}
-            </div>
+
 
             {fixedPrices ? (
               // Показываем кнопки с выбором метода оплаты для премиум кейсов
