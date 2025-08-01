@@ -6,6 +6,7 @@ import { SlPlane } from "react-icons/sl";
 import { GiUpgrade } from 'react-icons/gi';
 import { TbCat } from "react-icons/tb";
 import { FaBars } from 'react-icons/fa';
+import { HiSparkles } from 'react-icons/hi';
 import RightContent from "./Navbar/RightContent";
 
 interface NavbarProps {
@@ -13,7 +14,7 @@ interface NavbarProps {
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   openSidebar: boolean;
   setOpenSidebar: (open: boolean) => void;
-  user?: any; // TODO: заменить на правильный тип
+  user?: any;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -30,92 +31,120 @@ const Navbar: React.FC<NavbarProps> = ({
   const links = [
     {
       to: "/marketplace",
-      icon: <MdOutlineSell className="text-2xl" />,
-      label: "Market"
+      icon: <MdOutlineSell className="text-xl" />,
+      label: "Market",
+      color: "from-pink-500 to-violet-500"
     },
     {
       to: "/coinflip",
-      icon: <BsCoin className="text-2xl" />,
-      label: "Coin Flip"
+      icon: <BsCoin className="text-xl" />,
+      label: "Coin Flip",
+      color: "from-yellow-400 to-orange-500"
     },
     {
       to: "/crash",
-      icon: <SlPlane className="text-2xl" />,
-      label: "Crash"
+      icon: <SlPlane className="text-xl" />,
+      label: "Crash",
+      color: "from-red-500 to-pink-500"
     },
     {
       to: "/upgrade",
-      icon: <GiUpgrade className="text-2xl" />,
-      label: "Upgrade"
+      icon: <GiUpgrade className="text-xl" />,
+      label: "Upgrade",
+      color: "from-cyan-400 to-blue-500"
     },
     {
       to: "/slot",
-      icon: <TbCat className="text-2xl" />,
-      label: "Slots"
+      icon: <TbCat className="text-xl" />,
+      label: "Slots",
+      color: "from-green-400 to-emerald-500"
     }
   ];
 
   return (
     <div className="w-full flex justify-center relative z-[999999]">
-      <nav className="py-4 px-8 bg-[#19172D] w-[calc(100vw-2rem)] max-w-[1920px] flex justify-center rounded-lg border border-gray-700/50 relative z-[999999]">
-        <div className="flex items-center justify-between w-full min-h-[48px]">
+      <nav className="modern-navbar group">
+        {/* Animated Border */}
+        <div className="navbar-border"></div>
 
-          {/* Мобильное меню кнопка */}
+        <div className="relative flex items-center justify-between w-full min-h-[64px] px-8 py-4">
+          {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <FaBars
+            <button
               onClick={toggleSidebar}
-              className="text-2xl cursor-pointer text-white hover:text-gray-300 transition-colors"
-            />
+              className="mobile-menu-btn group"
+            >
+              <FaBars className="text-xl text-white transition-transform group-hover:rotate-90" />
+              <div className="btn-glow"></div>
+            </button>
           </div>
 
-          {/* Логотип и навигация для десктопа */}
+          {/* Logo and Desktop Navigation */}
           <div className="hidden md:flex items-center">
-            <Link to="/" className="flex items-center gap-2 mr-8">
-              <img
-                src="/public/vite.svg"
-                alt="ChiBox Logo"
-                className="w-12 h-12 object-contain"
-                onError={(e) => {
-                  e.currentTarget.src = '/vite.svg';
-                }}
-              />
-              <div className="flex flex-col justify-center">
-                <div className="font-normal text-xl text-white">ChiBox</div>
-                <div className="text-xs text-gray-400">game</div>
+            {/* Logo */}
+            <Link to="/" className="gaming-logo group mr-8">
+              <div className="logo-container">
+                <img
+                  src="/vite.svg"
+                  alt="ChiBox Logo"
+                  className="w-12 h-12 object-contain transition-transform group-hover:scale-110"
+                  onError={(e) => {
+                    e.currentTarget.src = '/vite.svg';
+                  }}
+                />
+                <div className="logo-glow"></div>
+              </div>
+              <div className="logo-text">
+                <div className="font-bold text-xl text-white gaming-font">
+                  Chi<span className="text-cyan-400">Box</span>
+                </div>
+                <div className="text-xs text-cyan-300/70 tracking-widest uppercase flex items-center gap-1">
+                  GAME
+                  <HiSparkles className="logo-star text-cyan-400" />
+                </div>
               </div>
             </Link>
 
-            {/* Навигационные ссылки */}
-            <div className="flex items-center gap-6">
+            {/* Navigation Links */}
+            <div className="flex items-center gap-2">
               {links.map((link, index) => (
                 <Link
                   key={index}
                   to={link.to}
-                  className="navbar-item flex items-center gap-2 font-normal text-xs 2xl:text-lg"
+                  className="gaming-nav-item group"
                 >
-                  {link.icon}
-                  <span>{link.label}</span>
+                  <div className="nav-item-content">
+                    <div className="nav-icon">
+                      {link.icon}
+                    </div>
+                    <span className="nav-label gaming-font">{link.label}</span>
+                  </div>
+                  <div className={`nav-item-glow bg-gradient-to-r ${link.color}`}></div>
+                  <div className="nav-item-border"></div>
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Мобильный логотип */}
+          {/* Mobile Logo */}
           <div className="md:hidden flex items-center">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" className="mobile-logo group">
               <img
                 src="/vite.svg"
                 alt="ChiBox Logo"
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
                 onError={(e) => {
                   e.currentTarget.src = '/vite.svg';
                 }}
               />
-              <div className="font-normal text-lg text-white">ChiBox</div>
+              <div className="font-bold text-lg text-white ml-2 flex items-center gap-1">
+                Chi<span className="text-cyan-400">Box</span>
+                <HiSparkles className="logo-star-mobile text-cyan-400" />
+              </div>
             </Link>
           </div>
 
-          {/* Правая часть - аватар, уведомления, баланс */}
+          {/* Right Content - User Actions */}
           <div className="flex-shrink-0">
             <RightContent
               openNotifications={openNotifications}

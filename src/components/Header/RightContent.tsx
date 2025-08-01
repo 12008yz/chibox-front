@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import Avatar from "../Avatar";
-import { FaRegBell, FaRegBellSlash } from "react-icons/fa";
+import { FaRegBell } from "react-icons/fa";
 import { IoMdExit } from "react-icons/io";
 import { BiWallet } from "react-icons/bi";
+import { HiGift } from "react-icons/hi";
 import Monetary from "../Monetary";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../store/hooks";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
+import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../features/user/userApi";
 import Notifications from '../Header/Navbar/Notifications';
 import BonusSquaresGame from '../BonusSquaresGame';
-import { useGetBonusStatusQuery } from "../../features/user/userApi";
 
 interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
-  user?: any; // TODO: заменить на правильный тип
+  user?: any;
 }
 
 const RightContent: React.FC<RightContentProps> = ({
@@ -26,24 +27,29 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
-  const [notificationCount] = useState(0);
   const [showBonusGame, setShowBonusGame] = useState(false);
 
-  const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
+  // Получаем количество непрочитанных уведомлений
+  const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
+    skip: !user,
     pollingInterval: 30000,
   });
 
+  // Получаем статус бонуса
+  const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
+    skip: !user,
+    pollingInterval: 30000,
+  });
+
+  const notificationCount = unreadCountData?.data?.count || 0;
+
   const handleLogout = async () => {
     try {
-      // Сначала вызываем API logout для уведомления сервера
       await logoutApi().unwrap();
     } catch (error) {
-      // Даже если API недоступен, продолжаем logout
       console.log('Logout API error (continuing with logout):', error);
     } finally {
-      // Выполняем полную очистку состояния приложения
       performFullLogout(dispatch);
-      // Перенаправляем на главную страницу
       navigate('/');
     }
   };
@@ -56,87 +62,70 @@ const RightContent: React.FC<RightContentProps> = ({
     setOpenNotifications(!openNotifications);
   };
 
-  const handleBonusClick = () => {
-    setShowBonusGame(true);
-  };
-
   if (!user) {
-    // Если пользователь не авторизован, показываем кнопки входа
+    // Кнопки для неавторизованных пользователей
     return (
       <div className="flex items-center space-x-3">
         <button
           onClick={() => navigate('/login')}
-          className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+          className="gaming-btn gaming-btn-outline group"
         >
-          Войти
+          <span className="btn-text">Войти</span>
+          <div className="btn-glow bg-gradient-to-r from-cyan-400 to-blue-500"></div>
         </button>
         <button
           onClick={() => navigate('/register')}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+          className="gaming-btn gaming-btn-primary group"
         >
-          Регистрация
+          <span className="btn-text">Регистрация</span>
+          <div className="btn-glow bg-gradient-to-r from-purple-500 to-pink-500"></div>
         </button>
       </div>
     );
   }
 
-  const isAvailable = bonusStatus?.data?.is_available;
-  const timeUntilNext = bonusStatus?.data?.time_until_next_seconds;
-
-  const formatTimeLeft = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}:${minutes.toString().padStart(2, '0')}`;
-  };
-
   return (
     <div className="flex items-center space-x-4 relative">
-      {/* Получение бонуса */}
+      {/* Bonus Button */}
       <button
-        onClick={handleBonusClick}
-        disabled={!bonusStatus}
-        className={`
-          relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2
-          ${isAvailable
-            ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white transform hover:scale-105 shadow-lg animate-pulse'
-            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-          }
-        `}
-        title={isAvailable ? "Играть в кубики удачи!" : timeUntilNext ? `Следующий бонус через ${formatTimeLeft(timeUntilNext)}` : "Загрузка..."}
+        className="gaming-btn gaming-btn-bonus group"
+        onClick={() => setShowBonusGame(!showBonusGame)}
       >
-        <span className="text-lg">🎲</span>
-        <span className="hidden sm:inline">
-          {isAvailable ? 'Играть' : timeUntilNext ? formatTimeLeft(timeUntilNext) : '...'}
-        </span>
-
-        {/* Эффект свечения для доступного бонуса */}
-        {isAvailable && (
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg blur-md opacity-30 animate-pulse" />
-        )}
+        <HiGift className="text-lg mr-2" />
+        <span className="btn-text">Бонус</span>
+        <div className="btn-glow bg-gradient-to-r from-green-400 to-emerald-500"></div>
+        <div className="bonus-sparkle"></div>
       </button>
 
-      {/* Баланс */}
-      <div className="flex items-center space-x-2 text-green-400">
-        <BiWallet className="text-lg" />
-        <Monetary value={user?.balance ?? 0} />
+      {showBonusGame && (
+        <BonusSquaresGame
+          isOpen={showBonusGame}
+          onClose={() => setShowBonusGame(false)}
+        />
+      )}
+
+      {/* Balance Display */}
+      <div className="balance-display group">
+        <div className="balance-content">
+          <BiWallet className="text-lg text-cyan-400" />
+          <Monetary value={user?.balance ?? 0} />
+        </div>
+        <div className="balance-glow"></div>
       </div>
 
-      {/* Уведомления */}
-      <div className="relative">
+      {/* Notifications */}
+      <div className="relative" style={{ zIndex: 999999 }}>
         <button
           onClick={toggleNotifications}
-          className="relative p-2 text-gray-400 hover:text-white transition-colors"
+          className="gaming-btn gaming-btn-icon group"
         >
-          {notificationCount > 0 ? (
-            <FaRegBell className="text-xl" />
-          ) : (
-            <FaRegBellSlash className="text-xl" />
-          )}
+          <FaRegBell className="text-lg" />
           {notificationCount > 0 && (
-            <span className="notification-badge">
+            <span className="notification-badge gaming-badge">
               {notificationCount > 99 ? '99+' : notificationCount}
             </span>
           )}
+          <div className="btn-glow bg-gradient-to-r from-yellow-400 to-orange-500"></div>
         </button>
 
         {openNotifications && (
@@ -147,37 +136,33 @@ const RightContent: React.FC<RightContentProps> = ({
         )}
       </div>
 
-      {/* Аватар и профиль */}
+      {/* User Profile */}
       <div
-        className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+        className="user-profile group cursor-pointer"
         onClick={handleProfileClick}
       >
-        <Avatar
-          image={user.profilePicture}
-          steamAvatar={user.steam_avatar}
-          id={user.id || user.username}
-          size="small"
-        />
-        <span className="text-white text-sm hidden md:block">
-          {user.steam_profile?.personaname || user.username}
-        </span>
+        <div className="profile-content">
+          <Avatar
+            image={user.profilePicture}
+            steamAvatar={user.steam_avatar}
+            id={user.id || user.username}
+            size="small"
+          />
+          <span className="username gaming-font hidden md:block">{user.username}</span>
+        </div>
+        <div className="profile-glow"></div>
       </div>
 
-      {/* Кнопка выхода */}
+      {/* Logout Button */}
       <button
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className={`p-2 text-gray-400 hover:text-red-400 transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`gaming-btn gaming-btn-icon gaming-btn-danger group ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
         title="Выйти"
       >
-        <IoMdExit className="text-xl" />
+        <IoMdExit className="text-lg" />
+        <div className="btn-glow bg-gradient-to-r from-red-500 to-pink-500"></div>
       </button>
-
-      {/* Модальное окно бонусной игры */}
-      <BonusSquaresGame
-        isOpen={showBonusGame}
-        onClose={() => setShowBonusGame(false)}
-      />
     </div>
   );
 };
