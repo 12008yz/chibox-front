@@ -8,6 +8,7 @@ import './index.css'
 
 // Импорты компонентов
 import Header from './components/Header';
+import FloatingWatermark from './components/FloatingWatermark';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -90,22 +91,27 @@ const App: React.FC = () => {
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
     console.log('Showing loading screen - fetching user data...');
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#151225]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
-        <div className="text-white mt-4">Загрузка данных пользователя...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#151225] relative">
+        <FloatingWatermark />
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+          <div className="text-white mt-4">Загрузка данных пользователя...</div>
+        </div>
       </div>
     );
   }
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#151225]">
-        <Header
-          onlineUsers={onlineUsers}
-          user={auth.user}
-        />
+      <div className="min-h-screen bg-[#151225] relative">
+        <FloatingWatermark />
+        <div className="relative z-10">
+          <Header
+            onlineUsers={onlineUsers}
+            user={auth.user}
+          />
 
-        <main>
+          <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route
@@ -196,6 +202,7 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        </div>
       </div>
     </Router>
   );

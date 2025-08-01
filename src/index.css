@@ -323,9 +323,36 @@
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
 }
 
+/* Floating Watermark Styles */
+.floating-watermark {
+  opacity: 0.03;
+  animation: subtleFloat 30s ease-in-out infinite;
+}
+
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: rotate(-12deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-12deg) translateY(-10px);
+  }
+}
+
+/* Enhanced watermark with gradient effect */
+.watermark-text {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(147, 51, 234, 0.02) 50%, rgba(59, 130, 246, 0.04) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .sidebar-content {
     @apply w-full;
+  }
+
+  .floating-watermark {
+    opacity: 0.02;
   }
 }

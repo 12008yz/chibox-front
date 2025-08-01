@@ -255,8 +255,68 @@ const HomePage: React.FC = () => {
   }, [refetchCases]);
 
   return (
-    <div className="min-h-screen bg-[#151225] text-white">
-      <ScrollToTopOnMount />
+    <div className="min-h-screen text-white relative">
+      {/* Тестовый водяной знак с CS2 иконками */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <img
+          src="https://ext.same-assets.com/609624232/3169792146.png"
+          alt=""
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-12 select-none"
+          style={{
+            width: '120px',
+            height: '120px',
+            opacity: 0.05,
+            filter: 'grayscale(100%)',
+          }}
+        />
+        <img
+          src="https://ext.same-assets.com/609624232/355601599.png"
+          alt=""
+          className="absolute top-32 left-32 transform -rotate-12 select-none"
+          style={{
+            width: '80px',
+            height: '80px',
+            opacity: 0.04,
+            filter: 'grayscale(100%)',
+          }}
+        />
+        <img
+          src="https://ext.same-assets.com/609624232/226050672.png"
+          alt=""
+          className="absolute bottom-32 right-32 transform -rotate-12 select-none"
+          style={{
+            width: '80px',
+            height: '80px',
+            opacity: 0.04,
+            filter: 'grayscale(100%)',
+          }}
+        />
+        <img
+          src="https://ext.same-assets.com/609624232/144393961.png"
+          alt=""
+          className="absolute top-1/3 right-1/4 transform -rotate-12 select-none"
+          style={{
+            width: '70px',
+            height: '70px',
+            opacity: 0.03,
+            filter: 'grayscale(100%)',
+          }}
+        />
+        <img
+          src="https://ext.same-assets.com/609624232/2525981327.png"
+          alt=""
+          className="absolute bottom-1/4 left-1/4 transform -rotate-12 select-none"
+          style={{
+            width: '70px',
+            height: '70px',
+            opacity: 0.03,
+            filter: 'grayscale(100%)',
+          }}
+        />
+      </div>
+
+      <div className="relative z-10">
+        <ScrollToTopOnMount />
 
       <div className="flex justify-center">
         <div className="flex-col w-full max-w-[1920px]">
@@ -452,6 +512,7 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Модальное окно успешной регистрации */}
