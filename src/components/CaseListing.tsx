@@ -11,6 +11,7 @@ interface CaseListingProps {
   cases: CaseTemplate[];
   onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
   fixedPrices?: boolean;
+  nextCaseAvailableTime?: string;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -18,7 +19,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
   description,
   cases,
   onBuyAndOpenCase,
-  fixedPrices = false
+  fixedPrices = false,
+  nextCaseAvailableTime
 }) => {
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -73,6 +75,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     image={caseItem.image_url}
                     price={caseItem.price}
                     fixedPrices={fixedPrices}
+                    description={caseItem.name?.toLowerCase().includes('бонус') ? 'Выдается за выигрыш в бонус игре' : undefined}
+                    nextCaseAvailableTime={nextCaseAvailableTime}
                   />
                 </Link>
               );

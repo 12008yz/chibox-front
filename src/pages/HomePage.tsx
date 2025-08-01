@@ -10,7 +10,6 @@ import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import CaseTimer from '../components/CaseTimer';
-import { SubscriptionCasesClaim } from '../components/SubscriptionCasesClaim';
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
@@ -373,31 +372,15 @@ const HomePage: React.FC = () => {
 
                   return (
                     <>
-                      {/* Компонент получения ежедневных кейсов подписки */}
-                      <div className="mb-8">
-                        <SubscriptionCasesClaim />
-                      </div>
-
                       {/* Бесплатные/Подписочные кейсы */}
                       {subscriptionCases && subscriptionCases.length > 0 && (
                         <div className="mb-12">
-                          <div className="mb-4">
-                            {/* Показываем таймер если есть ограничение по времени */}
-                            {nextCaseAvailableTime && (
-                              <div className="mb-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-gray-300">Статус следующего кейса:</span>
-                                  <CaseTimer nextAvailableTime={nextCaseAvailableTime} />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
                           <CaseListing
                             name={getSectionTitle()}
                             description={getSectionDescription()}
                             cases={subscriptionCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
+                            nextCaseAvailableTime={nextCaseAvailableTime}
                           />
                         </div>
                       )}

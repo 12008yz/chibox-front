@@ -1,14 +1,17 @@
 import { useState, useMemo } from 'react';
 import Monetary from './Monetary';
+import CaseTimer from './CaseTimer';
 
 interface CaseProps {
   title: string;
   image: string | null;
   price: string;
   fixedPrices?: boolean;
+  description?: string;
+  nextCaseAvailableTime?: string;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime }) => {
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -67,6 +70,18 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false })
             )
           )}
         </div>
+        {/* Отображение таймера для ежедневных кейсов */}
+        {nextCaseAvailableTime && title.toLowerCase().includes('ежедневный') && (
+          <div className="text-center mt-2">
+            <CaseTimer nextAvailableTime={nextCaseAvailableTime} />
+          </div>
+        )}
+        {/* Отображение описания */}
+        {(description || title.toLowerCase().includes('бонус')) && (
+          <div className="text-xs text-gray-400 text-center mt-1">
+            {description || (title.toLowerCase().includes('бонус') ? 'Выдается за выигрыш в бонус игре' : '')}
+          </div>
+        )}
       </div>
     </div>
   );
