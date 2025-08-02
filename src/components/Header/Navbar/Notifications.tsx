@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
+import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
 
 interface NotificationsProps {
     openNotifications: boolean;
@@ -15,9 +16,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         data: notificationsData,
         refetch: refetchNotifications
     } = useGetUserNotificationsQuery({ limit: 20 }, {
-        // Обновляем данные когда панель открывается
         refetchOnMountOrArgChange: true,
-        // Обновляем каждые 10 секунд если панель открыта
         pollingInterval: openNotifications ? 10000 : 0,
     });
 
@@ -38,7 +37,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const handleMarkAsRead = async (notificationId: string) => {
         try {
             await markAsRead(notificationId).unwrap();
-            // Рефетчим уведомления для обновления состояния
             refetchNotifications();
         } catch (error) {
             console.error('Ошибка при отметке уведомления как прочитанного:', error);
@@ -57,12 +55,10 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
     // Обработка клика по уведомлению
     const handleNotificationClick = async (notification: Notification) => {
-        // Если не прочитано, отмечаем как прочитанное
         if (!notification.is_read) {
             await handleMarkAsRead(notification.id);
         }
 
-        // Если есть ссылка, переходим по ней
         if (notification.link) {
             window.location.href = notification.link;
         }
@@ -72,7 +68,11 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-                handleCloseNotifications();
+                // Проверяем, что клик не по backdrop (так как у backdrop есть свой обработчик)
+                const target = event.target as Element;
+                if (!target.closest('.gaming-notifications-container') && !target.classList.contains('fixed')) {
+                    handleCloseNotifications();
+                }
             }
         };
 
@@ -97,138 +97,170 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     };
 
     const getNotificationIcon = (type: string) => {
+        const iconClass = "text-lg";
         switch (type) {
             case 'success':
-                return '✅';
+                return <FaCheckCircle className={`${iconClass} text-green-400`} />;
             case 'info':
-                return 'ℹ️';
+                return <FaInfoCircle className={`${iconClass} text-blue-400`} />;
             case 'warning':
-                return '⚠️';
-            case 'error':
-                return '❌';
-            case 'system':
-                return '⚙️';
-            case 'friendRequest':
-                return '👥';
-            case 'message':
-                return '💬';
             case 'alert':
-                return '⚠️';
+                return <FaExclamationTriangle className={`${iconClass} text-yellow-400`} />;
+            case 'error':
+                return <FaTimesCircle className={`${iconClass} text-red-400`} />;
+            case 'system':
+                return <FaCog className={`${iconClass} text-gray-400`} />;
+            case 'friendRequest':
+                return <FaUsers className={`${iconClass} text-purple-400`} />;
+            case 'message':
+                return <FaComments className={`${iconClass} text-indigo-400`} />;
             case 'caseOpen':
-                return '📦';
+                return <FaBox className={`${iconClass} text-orange-400`} />;
             case 'bonus':
-                return '🎁';
+                return <FaGift className={`${iconClass} text-pink-400`} />;
             default:
-                return '🔔';
+                return <FaInfoCircle className={`${iconClass} text-blue-400`} />;
+        }
+    };
+
+    const getNotificationTypeClass = (type: string) => {
+        switch (type) {
+            case 'success':
+                return 'gaming-notification-success';
+            case 'info':
+                return 'gaming-notification-info';
+            case 'warning':
+            case 'alert':
+                return 'gaming-notification-warning';
+            case 'error':
+                return 'gaming-notification-error';
+            case 'bonus':
+                return 'gaming-notification-bonus';
+            case 'caseOpen':
+                return 'gaming-notification-case';
+            default:
+                return 'gaming-notification-default';
         }
     };
 
     if (!openNotifications) return null;
 
     return (
-        <div
-            ref={notificationsRef}
-            className="fixed top-25 right-79 w-80 bg-gray-900 border border-gray-700 rounded-lg shadow-xl max-h-96 overflow-hidden"
-            style={{ zIndex: 999999 }}
-        >
-            {/* Заголовок */}
-            <div className="p-4 border-b border-gray-700">
-                <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                        <h3 className="text-white font-medium">Уведомления</h3>
-                        {unreadCount > 0 && (
-                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                                {unreadCount}
-                            </span>
-                        )}
-                    </div>
-                    <button
-                        onClick={handleCloseNotifications}
-                        className="text-gray-400 hover:text-white transition-colors"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                {/* Кнопка "Прочитать все" в заголовке */}
-                {unreadCount > 0 && (
-                    <button
-                        onClick={handleMarkAllAsRead}
-                        className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                    >
-                        Прочитать все уведомления
-                    </button>
-                )}
-            </div>
+        <>
+            {/* Backdrop */}
+            <div
+                className="fixed inset-0 z-[9999998]"
+                onClick={handleCloseNotifications}
+            />
 
-            {/* Список уведомлений */}
-            <div className="max-h-80 overflow-y-auto">
-                {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-400">
-                        <div className="text-4xl mb-2">🔔</div>
-                        <p>Нет новых уведомлений</p>
-                    </div>
-                ) : (
-                    notifications.map((notification) => (
-                        <div
-                            key={notification.id}
-                            className={`p-4 border-b border-gray-700 hover:bg-gray-800 transition-colors cursor-pointer ${
-                                !notification.is_read ? 'bg-blue-900/20' : ''
-                            }`}
-                            onClick={() => handleNotificationClick(notification)}
-                        >
-                            <div className="flex items-start space-x-3">
-                                <div className="text-2xl">
-                                    {getNotificationIcon(notification.type)}
+            {/* Notifications Container */}
+            <div
+                ref={notificationsRef}
+                className="gaming-notifications-container"
+                style={{ zIndex: 9999999 }}
+            >
+                {/* Заголовок */}
+                <div className="gaming-notifications-header">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                            <h3 className="gaming-notifications-title">Уведомления</h3>
+                            {unreadCount > 0 && (
+                                <div className="gaming-unread-badge">
+                                    <span className="gaming-unread-count">{unreadCount}</span>
+                                    <div className="gaming-unread-pulse"></div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between">
-                                        <h4 className={`text-sm font-medium ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
-                                            {notification.title}
-                                        </h4>
-                                        {!notification.is_read && (
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                        )}
+                            )}
+                        </div>
+                        <button
+                            onClick={handleCloseNotifications}
+                            className="gaming-close-button"
+                        >
+                            <FaTimes className="text-lg" />
+                        </button>
+                    </div>
+                    {/* Кнопка "Прочитать все" в заголовке */}
+                    {unreadCount > 0 && (
+                        <button
+                            onClick={handleMarkAllAsRead}
+                            className="gaming-mark-all-button"
+                        >
+                            Прочитать все уведомления
+                        </button>
+                    )}
+                </div>
+
+                {/* Список уведомлений */}
+                <div className="gaming-notifications-list">
+                    {notifications.length === 0 ? (
+                        <div className="gaming-empty-state">
+                            <div className="gaming-empty-icon">
+                                <FaGift className="text-4xl text-purple-400" />
+                            </div>
+                            <p className="gaming-empty-text">Нет новых уведомлений</p>
+                            <p className="gaming-empty-subtext">Новые уведомления появятся здесь</p>
+                        </div>
+                    ) : (
+                        notifications.map((notification) => (
+                            <div
+                                key={notification.id}
+                                className={`gaming-notification-item ${getNotificationTypeClass(notification.type)} ${
+                                    !notification.is_read ? 'gaming-notification-unread' : 'gaming-notification-read'
+                                }`}
+                                onClick={() => handleNotificationClick(notification)}
+                            >
+                                <div className="gaming-notification-content">
+                                    <div className="gaming-notification-icon">
+                                        {getNotificationIcon(notification.type)}
                                     </div>
-                                    <div className="text-sm text-gray-400 mt-1 whitespace-pre-line">
-                                        {notification.message.split('\n').map((line, index) => (
-                                            <p key={index}>{line}</p>
-                                        ))}
+                                    <div className="gaming-notification-body">
+                                        <div className="flex items-center justify-between">
+                                            <h4 className={`gaming-notification-title ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
+                                                {notification.title}
+                                            </h4>
+                                            {!notification.is_read && (
+                                                <div className="gaming-unread-indicator"></div>
+                                            )}
+                                        </div>
+                                        <div className="gaming-notification-message">
+                                            {notification.message.split('\n').map((line, index) => (
+                                                <p key={index}>{line}</p>
+                                            ))}
+                                        </div>
+                                        <p className="gaming-notification-time">
+                                            {formatTime(notification.created_at)}
+                                        </p>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-2">
-                                        {formatTime(notification.created_at)}
-                                    </p>
                                 </div>
                             </div>
-                        </div>
-                    ))
-                )}
-            </div>
+                        ))
+                    )}
+                </div>
 
-            <div className="p-3 border-t border-gray-700">
-                {notifications.length > 0 ? (
-                    <div className="space-y-2">
-                        <div className="text-xs text-gray-400 text-center">
-                            Показано {notifications.length} уведомлений
-                            {unreadCount > 0 && ` • ${unreadCount} непрочитанных`}
+                {/* Footer */}
+                <div className="gaming-notifications-footer">
+                    {notifications.length > 0 ? (
+                        <div className="space-y-3">
+                            <div className="gaming-footer-stats">
+                                Показано {notifications.length} уведомлений
+                                {unreadCount > 0 && ` • ${unreadCount} непрочитанных`}
+                            </div>
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={handleMarkAllAsRead}
+                                    className="gaming-footer-button"
+                                >
+                                    Отметить все как прочитанные
+                                </button>
+                            )}
                         </div>
-                        {unreadCount > 0 && (
-                            <button
-                                onClick={handleMarkAllAsRead}
-                                className="w-full text-sm text-blue-400 hover:text-blue-300 transition-colors py-2 px-3 rounded border border-blue-400/30 hover:border-blue-300/30 hover:bg-blue-400/10"
-                            >
-                                Отметить все как прочитанные
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <div className="text-xs text-gray-400 text-center">
-                        Новые уведомления появятся здесь
-                    </div>
-                )}
+                    ) : (
+                        <div className="gaming-footer-empty">
+                            Новые уведомления появятся здесь
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

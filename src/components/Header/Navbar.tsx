@@ -62,8 +62,8 @@ const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <div className="w-full flex justify-center relative z-[999999]">
-      <nav className="modern-navbar group">
+    <div className="w-full relative z-[9999]">
+      <nav className="modern-navbar group w-full">
         {/* Animated Border */}
         <div className="navbar-border"></div>
 
@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Logo and Desktop Navigation */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center flex-1">
             {/* Logo */}
             <Link to="/" className="gaming-logo group mr-8">
               <div className="logo-container">
@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Mobile Logo */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center flex-1">
             <Link to="/" className="mobile-logo group">
               <img
                 src="/vite.svg"

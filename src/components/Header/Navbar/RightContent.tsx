@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Avatar from "../../Avatar";
-import { FaRegBell } from "react-icons/fa";
-import { IoMdExit } from "react-icons/io";
+import { FaRegBell, FaBell, FaCoins, FaDice, FaSignOutAlt } from "react-icons/fa";
 import { BiWallet } from "react-icons/bi";
+import { RiVipCrownFill } from "react-icons/ri";
+import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store/hooks";
@@ -30,8 +31,8 @@ const RightContent: React.FC<RightContentProps> = ({
 
   // Получаем количество непрочитанных уведомлений
   const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
-    skip: !user, // Пропускаем запрос если пользователь не авторизован
-    pollingInterval: 30000, // Обновляем каждые 30 секунд
+    skip: !user,
+    pollingInterval: 30000,
   });
 
   // Получаем статус бонуса
@@ -44,15 +45,11 @@ const RightContent: React.FC<RightContentProps> = ({
 
   const handleLogout = async () => {
     try {
-      // Сначала вызываем API logout для уведомления сервера
       await logoutApi().unwrap();
     } catch (error) {
-      // Даже если API недоступен, продолжаем logout
       console.log('Logout API error (continuing with logout):', error);
     } finally {
-      // Выполняем полную очистку состояния приложения
       performFullLogout(dispatch);
-      // Перенаправляем на главную страницу
       navigate('/');
     }
   };
@@ -66,18 +63,17 @@ const RightContent: React.FC<RightContentProps> = ({
   };
 
   if (!user) {
-    // Если пользователь не авторизован, показываем кнопки входа
     return (
       <div className="flex items-center space-x-3">
         <button
           onClick={() => navigate('/login')}
-          className="bg-transparent border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+          className="gaming-button gaming-button-secondary"
         >
           Войти
         </button>
         <button
           onClick={() => navigate('/register')}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+          className="gaming-button gaming-button-primary"
         >
           Регистрация
         </button>
@@ -87,38 +83,67 @@ const RightContent: React.FC<RightContentProps> = ({
 
   return (
     <div className="flex items-center space-x-4 relative">
-      {/* Получение бонуса */}
-      <button
-        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-        onClick={() => setShowBonusGame(!showBonusGame)}
-      >
-        Получить
-      </button>
-      {showBonusGame && (
-        <BonusSquaresGame
-          isOpen={showBonusGame}
-          onClose={() => setShowBonusGame(false)}
-        />
-      )}
+      {/* Бонус игра */}
+      <div className="relative">
+        <button
+          className="gaming-bonus-button group"
+          onClick={() => setShowBonusGame(!showBonusGame)}
+          disabled={bonusStatus?.data?.cooldownRemaining > 0}
+        >
+          <div className="flex items-center space-x-2">
+            <MdLocalFireDepartment className="text-lg gaming-icon-fire" />
+            <span className="font-bold text-sm">БОНУС</span>
+          </div>
+          {bonusStatus?.data?.cooldownRemaining > 0 && (
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
+              {Math.ceil(bonusStatus.data.cooldownRemaining / 60)}м
+            </div>
+          )}
+        </button>
+        {showBonusGame && (
+          <BonusSquaresGame
+            isOpen={showBonusGame}
+            onClose={() => setShowBonusGame(false)}
+          />
+        )}
+      </div>
 
       {/* Баланс */}
-      <div className="flex items-center space-x-2 text-green-400">
-        <BiWallet className="text-lg" />
-        <Monetary value={user?.balance ?? 0} />
+      <div className="gaming-balance-container">
+        <div className="flex items-center space-x-2">
+          <div className="gaming-coin-icon">
+            <FaCoins className="text-lg" />
+          </div>
+          <div className="flex flex-col">
+            <div className="gaming-balance-value">
+              <Monetary value={user?.balance ?? 0} />
+            </div>
+            <div className="gaming-balance-label">Баланс</div>
+          </div>
+        </div>
       </div>
 
       {/* Уведомления */}
-      <div className="relative" style={{ zIndex: 999999 }}>
+      <div className="relative" style={{ zIndex: 9999999 }}>
         <button
           onClick={toggleNotifications}
-          className="relative p-2 text-gray-400 hover:text-white transition-colors"
+          className="gaming-notification-button"
         >
-          <FaRegBell className="text-xl" />
-          {notificationCount > 0 && (
-            <span className="notification-badge">
-              {notificationCount > 99 ? '99+' : notificationCount}
-            </span>
-          )}
+          <div className="relative">
+            {notificationCount > 0 ? (
+              <FaBell className="gaming-notification-icon gaming-notification-active" />
+            ) : (
+              <FaRegBell className="gaming-notification-icon" />
+            )}
+            {notificationCount > 0 && (
+              <div className="gaming-notification-badge">
+                <span className="gaming-notification-count">
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+                <div className="gaming-notification-pulse"></div>
+              </div>
+            )}
+          </div>
         </button>
 
         {openNotifications && (
@@ -129,28 +154,39 @@ const RightContent: React.FC<RightContentProps> = ({
         )}
       </div>
 
-      {/* Аватар и профиль */}
+      {/* Профиль пользователя */}
       <div
-        className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+        className="gaming-profile-container"
         onClick={handleProfileClick}
       >
-        <Avatar
-          image={user.profilePicture}
-          steamAvatar={user.steam_avatar}
-          id={user.id || user.username}
-          size="small"
-        />
-        <span className="text-white text-sm hidden md:block">{user.username}</span>
+        <div className="flex items-center space-x-3">
+          <div className="gaming-avatar-wrapper">
+            <Avatar
+              image={user.profilePicture}
+              steamAvatar={user.steam_avatar}
+              id={user.id || user.username}
+              size="small"
+            />
+            <div className="gaming-avatar-border"></div>
+          </div>
+          <div className="hidden md:flex flex-col">
+            <span className="gaming-username">{user.username}</span>
+            <div className="flex items-center space-x-1">
+              <RiVipCrownFill className="text-yellow-400 text-xs" />
+              <span className="gaming-level">LVL {user.level || 1}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Кнопка выхода */}
       <button
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className={`p-2 text-gray-400 hover:text-red-400 transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className="gaming-logout-button"
         title="Выйти"
       >
-        <IoMdExit className="text-xl" />
+        <FaSignOutAlt className="text-lg" />
       </button>
     </div>
   );

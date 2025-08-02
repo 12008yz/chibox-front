@@ -81,14 +81,15 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className="modern-header relative z-[99]">
+    <div className="modern-header relative z-[99] w-full">
       {/* Animated Background Glow */}
       <div className="header-glow absolute inset-0 opacity-30 pointer-events-none"></div>
 
       {/* Header Content */}
-      <div className="relative flex flex-col p-4 w-screen justify-center">
+      <div className="relative flex flex-col w-full">
         {/* Online Users Status Bar */}
-        <div className="flex pb-3 items-center justify-center">
+        <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex-1"></div>
           <div className="status-indicator flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-md bg-black/20 border border-cyan-500/30">
             {items.map((item, index) => (
               <div
@@ -104,16 +105,19 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             ))}
           </div>
+          <div className="flex-1"></div>
         </div>
 
         {/* Main Navigation */}
-        <Navbar
-          openNotifications={openNotifications}
-          setOpenNotifications={setOpenNotifications}
-          openSidebar={openSidebar}
-          setOpenSidebar={setOpenSidebar}
-          user={user}
-        />
+        <div className="w-full px-4 pb-4">
+          <Navbar
+            openNotifications={openNotifications}
+            setOpenNotifications={setOpenNotifications}
+            openSidebar={openSidebar}
+            setOpenSidebar={setOpenSidebar}
+            user={user}
+          />
+        </div>
       </div>
 
       {/* Sidebar */}
