@@ -1250,7 +1250,7 @@ const ProfilePage: React.FC = () => {
                     <div className="flex justify-between">
                       <span className="text-white font-semibold text-sm">Общий бонус:</span>
                       <span className="text-yellow-400 font-semibold text-sm">
-                        +{parseFloat(Number(user.total_drop_bonus_percentage || 0).toFixed(1))}%
+                        +{parseFloat(Number(user.total_drop_bonus_percentage || 0).toFixed(2))}%
                       </span>
                     </div>
                   </div>
