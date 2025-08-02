@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Avatar from "../../Avatar";
-import { FaRegBell, FaBell, FaCoins, FaSignOutAlt } from "react-icons/fa";
+import { FaRegBell, FaBell, FaCoins, FaSignOutAlt, FaPlus } from "react-icons/fa";
 import { RiVipCrownFill } from "react-icons/ri";
 import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
@@ -11,6 +11,7 @@ import { performFullLogout } from "../../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
 import BonusSquaresGame from '../../BonusSquaresGame';
+import PurchaseModal from '../../PurchaseModal';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -27,6 +28,8 @@ const RightContent: React.FC<RightContentProps> = ({
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [showBonusGame, setShowBonusGame] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [purchaseModalTab, setPurchaseModalTab] = useState<'balance' | 'subscription'>('balance');
 
   // Получаем количество непрочитанных уведомлений
   const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
@@ -119,6 +122,16 @@ const RightContent: React.FC<RightContentProps> = ({
             </div>
             <div className="gaming-balance-label">Баланс</div>
           </div>
+          <button
+            onClick={() => {
+              setPurchaseModalTab('balance');
+              setIsPurchaseModalOpen(true);
+            }}
+            className="gaming-balance-add-button group"
+            title="Пополнить баланс"
+          >
+            <FaPlus className="text-sm group-hover:scale-110 transition-transform duration-200" />
+          </button>
         </div>
       </div>
 
@@ -136,10 +149,10 @@ const RightContent: React.FC<RightContentProps> = ({
             )}
             {notificationCount > 0 && (
               <div className="gaming-notification-badge">
-                <span className="gaming-notification-count">
+                <div className="gaming-notification-pulse"></div>
+                <span className={`gaming-notification-count ${notificationCount > 99 ? 'gaming-notification-count-large' : ''}`}>
                   {notificationCount > 99 ? '99+' : notificationCount}
                 </span>
-                <div className="gaming-notification-pulse"></div>
               </div>
             )}
           </div>
@@ -187,6 +200,13 @@ const RightContent: React.FC<RightContentProps> = ({
       >
         <FaSignOutAlt className="text-lg" />
       </button>
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        initialTab={purchaseModalTab}
+      />
     </div>
   );
 };

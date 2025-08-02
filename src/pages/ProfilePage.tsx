@@ -11,6 +11,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
 import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
+import PurchaseModal from '../components/PurchaseModal';
 import type { UserInventoryItem, UserCaseItem, Item, CaseTemplate } from '../types/api';
 
 const ProfilePage: React.FC = () => {
@@ -51,6 +52,10 @@ const ProfilePage: React.FC = () => {
 
   // State для раскрытия секции достижений
   const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
+
+  // State для модального окна покупки
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [purchaseModalTab, setPurchaseModalTab] = useState<'balance' | 'subscription'>('balance');
 
   // Ref для области достижений
   const achievementsRef = useRef<HTMLDivElement>(null);
@@ -1215,8 +1220,8 @@ const ProfilePage: React.FC = () => {
             {/* Purchase Button */}
             <button
               onClick={() => {
-                // TODO: Добавить логику пополнения баланса
-                showNotification('Функция пополнения баланса скоро будет доступна!', 'info');
+                setPurchaseModalTab('balance');
+                setIsPurchaseModalOpen(true);
               }}
               className="w-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-green-400/20 hover:border-green-400/50"
             >
@@ -1986,6 +1991,13 @@ const ProfilePage: React.FC = () => {
         caseTemplate={caseOpeningAnimation.caseTemplate}
         wonItem={caseOpeningAnimation.wonItem}
         isLoading={caseOpeningAnimation.isLoading}
+      />
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        initialTab={purchaseModalTab}
       />
 
       {/* Scroll to Top Button */}
