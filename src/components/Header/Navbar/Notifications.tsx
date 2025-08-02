@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
 import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
@@ -145,11 +146,11 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
     if (!openNotifications) return null;
 
-    return (
+    const notificationsElement = (
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 z-[9999998]"
+                className="fixed inset-0 z-[99999998]"
                 onClick={handleCloseNotifications}
             />
 
@@ -157,7 +158,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             <div
                 ref={notificationsRef}
                 className="gaming-notifications-container"
-                style={{ zIndex: 9999999 }}
             >
                 {/* Заголовок */}
                 <div className="gaming-notifications-header">
@@ -262,6 +262,9 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             </div>
         </>
     );
+
+    // Рендерим уведомления в корне документа с помощью Portal
+    return createPortal(notificationsElement, document.body);
 };
 
 export default Notifications;

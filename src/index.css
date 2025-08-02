@@ -619,28 +619,48 @@
 
 /* Gaming Notifications Container */
 .gaming-notifications-container {
-  @apply fixed w-96 max-h-96 overflow-hidden rounded-xl;
-  top: 4.5rem;
-  right: 1rem;
-  background: rgba(17, 24, 39, 0.95);
+  @apply fixed overflow-hidden rounded-xl;
+  width: 380px;
+  max-height: 85vh;
+  top: 6rem;
+  right: 1.5rem;
+  background: rgba(17, 24, 39, 0.98);
   backdrop-filter: blur(20px);
   @apply border border-gray-700/50;
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.4),
-    0 10px 10px -5px rgba(0, 0, 0, 0.2),
-    0 0 40px rgba(99, 102, 241, 0.1);
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    0 10px 20px -5px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(99, 102, 241, 0.15);
   animation: notificationsSlideIn 0.3s ease-out;
-  z-index: 9999999 !important;
+  z-index: 99999999 !important;
+}
+
+/* Responsive для мобильных устройств */
+@media (max-width: 768px) {
+  .gaming-notifications-container {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+    left: 1rem;
+    top: 5rem;
+    max-height: 80vh;
+  }
 }
 
 @keyframes notificationsSlideIn {
   0% {
     opacity: 0;
-    transform: translateY(-10px) scale(0.95);
+    transform: translateY(-20px) scale(0.9);
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(0.95);
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 

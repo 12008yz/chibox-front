@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Avatar from "../../Avatar";
-import { FaRegBell, FaBell, FaCoins, FaDice, FaSignOutAlt } from "react-icons/fa";
-import { BiWallet } from "react-icons/bi";
+import { FaRegBell, FaBell, FaCoins, FaSignOutAlt } from "react-icons/fa";
 import { RiVipCrownFill } from "react-icons/ri";
 import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
@@ -88,15 +87,15 @@ const RightContent: React.FC<RightContentProps> = ({
         <button
           className="gaming-bonus-button group"
           onClick={() => setShowBonusGame(!showBonusGame)}
-          disabled={bonusStatus?.data?.cooldownRemaining > 0}
+          disabled={(bonusStatus?.time_until_next_seconds || 0) > 0}
         >
           <div className="flex items-center space-x-2">
             <MdLocalFireDepartment className="text-lg gaming-icon-fire" />
             <span className="font-bold text-sm">БОНУС</span>
           </div>
-          {bonusStatus?.data?.cooldownRemaining > 0 && (
+          {bonusStatus && (bonusStatus.time_until_next_seconds || 0) > 0 && (
             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
-              {Math.ceil(bonusStatus.data.cooldownRemaining / 60)}м
+              {Math.ceil((bonusStatus.time_until_next_seconds || 0) / 60)}м
             </div>
           )}
         </button>
@@ -124,7 +123,7 @@ const RightContent: React.FC<RightContentProps> = ({
       </div>
 
       {/* Уведомления */}
-      <div className="relative" style={{ zIndex: 9999999 }}>
+      <div className="relative">
         <button
           onClick={toggleNotifications}
           className="gaming-notification-button"

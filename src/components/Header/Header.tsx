@@ -88,24 +88,22 @@ const Header: React.FC<HeaderProps> = ({
       {/* Header Content */}
       <div className="relative flex flex-col w-full">
         {/* Online Users Status Bar */}
-        <div className="flex items-center justify-between px-4 py-2">
-          <div className="flex-1"></div>
-          <div className="status-indicator flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-md bg-black/20 border border-cyan-500/30">
+        <div className="flex items-center justify-start px-4 py-1">
+          <div className="status-indicator flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md bg-black/20 border border-cyan-500/30">
             {items.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 text-cyan-400 text-sm font-medium"
+                className="flex items-center gap-1.5 text-cyan-400 text-xs font-medium"
               >
-                <div className="status-icon relative">
+                <div className="status-icon relative text-sm">
                   {item.icon}
                   <div className="status-pulse"></div>
                 </div>
-                <div className="font-bold text-lg gaming-font">{item.value || 0}</div>
-                <div className="text-cyan-300/70 text-sm">{item.name}</div>
+                <div className="font-bold text-sm gaming-font">{item.value || 0}</div>
+                <div className="text-cyan-300/70 text-xs">{item.name}</div>
               </div>
             ))}
           </div>
-          <div className="flex-1"></div>
         </div>
 
         {/* Main Navigation */}
