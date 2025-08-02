@@ -198,7 +198,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Пополнение баланса
     depositBalance: builder.mutation<
-      ApiResponse<{ payment_url: string; payment_id: string }>,
+      ApiResponse<{ payment_url: string }>,
       DepositRequest
     >({
       query: (depositData) => ({
@@ -283,18 +283,7 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['User'],
     }),
 
-    // Покупка подписки
-    buySubscription: builder.mutation<
-      ApiResponse<{ subscription_tier: string; expires_at: string }>,
-      { tier: string; duration_days: number }
-    >({
-      query: (subscriptionData) => ({
-        url: 'v1/subscription/buy',
-        method: 'POST',
-        body: subscriptionData,
-      }),
-      invalidatesTags: ['User', 'Balance'],
-    }),
+
 
     // Обмен предмета на подписку
     exchangeItemForSubscription: builder.mutation<
@@ -481,7 +470,7 @@ export const {
   useGetBonusStatusQuery,
   usePlayBonusSquaresMutation,
   useResetBonusCooldownMutation,
-  useBuySubscriptionMutation,
+
   useExchangeItemForSubscriptionMutation,
   useGetBonusInfoQuery,
   useSteamBotLoginMutation,

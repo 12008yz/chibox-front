@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FaTimes, FaCoins, FaCrown, FaCheck, FaCreditCard, FaWallet } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import toast from 'react-hot-toast';
@@ -87,7 +88,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
       <div
@@ -263,6 +264,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       </div>
     </div>
   );
+
+  // Рендерим модальное окно в body через портал
+  return createPortal(modalContent, document.body);
 };
 
 export default PurchaseModal;
