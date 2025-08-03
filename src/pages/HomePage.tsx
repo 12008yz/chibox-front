@@ -8,8 +8,8 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
-import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
-import CaseTimer from '../components/CaseTimer';
+
+
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate, Item } from '../types/api';
@@ -32,18 +32,7 @@ const HomePage: React.FC = () => {
   } | null>(null);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
-  // State для анимации открытия кейса
-  const [caseOpeningAnimation, setCaseOpeningAnimation] = useState<{
-    isOpen: boolean;
-    caseTemplate: CaseTemplate | null;
-    wonItem: Item | null;
-    isLoading: boolean;
-  }>({
-    isOpen: false,
-    caseTemplate: null,
-    wonItem: null,
-    isLoading: false
-  });
+
 
   // Мутации для покупки и открытия кейсов
   const [buyCase] = useBuyCaseMutation();
@@ -120,17 +109,9 @@ const HomePage: React.FC = () => {
     setRegistrationData(null);
   };
 
-  // Функция для покупки и открытия кейса
+  // Функция для покупки и открытия кейса - ВОЗВРАЩАЕТ результат для анимации в модале
   const handleBuyAndOpenCase = async (caseTemplate: CaseTemplate) => {
     try {
-      // Устанавливаем состояние загрузки анимации
-      setCaseOpeningAnimation(prev => ({
-        ...prev,
-        isOpen: true,
-        caseTemplate: caseTemplate,
-        isLoading: true
-      }));
-
       // Проверяем, бесплатный ли это кейс
       const isFreeCase = parseFloat(caseTemplate.price) === 0 || isNaN(parseFloat(caseTemplate.price));
 
@@ -145,22 +126,17 @@ const HomePage: React.FC = () => {
         console.log('Результат открытия бесплатного кейса:', openResult);
 
         if (openResult.success && openResult.data?.item) {
-          // Устанавливаем результат анимации
-          setCaseOpeningAnimation(prev => ({
-            ...prev,
-            wonItem: openResult.data.item,
-            isLoading: false
-          }));
-
           // Принудительно обновляем данные пользователя и кейсов
           setTimeout(() => {
             refetchUser();
             refetchCases();
           }, 500);
+
+          // Возвращаем результат для анимации в модале
+          return openResult.data;
         } else {
           throw new Error('Ошибка открытия бесплатного кейса');
         }
-        return;
       }
 
       // Для платных кейсов покупаем сначала
@@ -200,18 +176,14 @@ const HomePage: React.FC = () => {
       console.log('Результат открытия кейса:', openResult);
 
       if (openResult.success && openResult.data?.item) {
-        // Устанавливаем результат анимации
-        setCaseOpeningAnimation(prev => ({
-          ...prev,
-          wonItem: openResult.data.item,
-          isLoading: false
-        }));
-
         // Принудительно обновляем данные пользователя и кейсов для обновления баланса в navbar
         setTimeout(() => {
           refetchUser();
           refetchCases();
         }, 500);
+
+        // Возвращаем результат для анимации в модале
+        return openResult.data;
       } else {
         throw new Error('Ошибка открытия кейса');
       }
@@ -229,29 +201,12 @@ const HomePage: React.FC = () => {
       // Можно добавить toast уведомление или alert
       alert(errorMessage);
 
-      // Закрываем анимацию в случае ошибки
-      setCaseOpeningAnimation({
-        isOpen: false,
-        caseTemplate: null,
-        wonItem: null,
-        isLoading: false
-      });
+      // Пробрасываем ошибку дальше
+      throw error;
     }
   };
 
-  // Функция для закрытия анимации
-  const handleCloseAnimation = () => {
-    setCaseOpeningAnimation({
-      isOpen: false,
-      caseTemplate: null,
-      wonItem: null,
-      isLoading: false
-    });
 
-    // Обновляем данные при закрытии анимации
-    refetchUser();
-    refetchCases();
-  };
 
   if (casesError) {
     console.error('Ошибка загрузки кейсов:', casesError);
@@ -551,14 +506,7 @@ const HomePage: React.FC = () => {
         />
       )}
 
-      {/* Анимация открытия кейса */}
-      <CaseOpeningAnimation
-        isOpen={caseOpeningAnimation.isOpen}
-        onClose={handleCloseAnimation}
-        caseTemplate={caseOpeningAnimation.caseTemplate}
-        wonItem={caseOpeningAnimation.wonItem}
-        isLoading={caseOpeningAnimation.isLoading}
-      />
+
     </div>
   );
 };

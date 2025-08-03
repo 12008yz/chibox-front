@@ -2,13 +2,12 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
-import CaseOpeningAnimation from './CaseOpeningAnimation';
 
 interface CasePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   caseData: CaseTemplate;
-  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
+  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<any>;
   fixedPrices?: boolean;
   onDataUpdate?: () => void;
 }
@@ -25,7 +24,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
 
-
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
@@ -41,12 +39,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     { skip: !isOpen }
   );
 
-
-
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
-
-
 
   useEffect(() => {
     if (isOpen) {
@@ -71,12 +65,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const handleBuyCase = async () => {
     console.log('handleBuyCase вызван:', { fixedPrices, paymentMethod, onBuyAndOpenCase: !!onBuyAndOpenCase });
 
-    // Если есть внешний обработчик, используем его
+    // Если есть внешний обработчик, получаем результат и запускаем нашу анимацию
     if (onBuyAndOpenCase) {
       try {
         console.log('Используем внешний обработчик onBuyAndOpenCase');
-        await onBuyAndOpenCase(caseData);
-        handleClose(); // Закрываем модалку после запуска анимации
+        const result = await onBuyAndOpenCase(caseData);
+
+        // Если получили результат, запускаем анимацию в модале
+        if (result && result.item) {
+          setOpeningResult(result);
+          startAnimation(result.item);
+        }
       } catch (error: any) {
         console.error('Ошибка покупки кейса через внешний обработчик:', error);
         alert('Ошибка покупки кейса: ' + (error?.message || 'Неизвестная ошибка'));
@@ -184,16 +183,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Анимация ползунка
+    // Улучшенная анимация ползунка
     let currentPosition = 0;
     let speed = 50; // начальная скорость (мс между перемещениями)
-    let direction = 1;
     let rounds = 0;
-    const maxRounds = 2; // количество полных кругов перед замедлением
+    const maxRounds = 3; // количество полных кругов перед замедлением
+    const maxSpeed = 200;
 
     const animateSlider = () => {
       if (animationPhase === 'spinning') {
-        currentPosition += direction;
+        currentPosition++;
 
         // Если дошли до конца, начинаем сначала
         if (currentPosition >= items.length) {
@@ -203,15 +202,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         setSliderPosition(currentPosition);
 
-        // После 2 кругов начинаем замедляться к выигранному предмету
+        // После maxRounds кругов начинаем замедляться
         if (rounds >= maxRounds) {
           setAnimationPhase('slowing');
-          speed = 100; // замедляем
+          speed = Math.min(speed + 15, maxSpeed);
         }
 
         setTimeout(animateSlider, speed);
       } else if (animationPhase === 'slowing') {
-        currentPosition += direction;
+        currentPosition++;
 
         if (currentPosition >= items.length) {
           currentPosition = 0;
@@ -219,22 +218,23 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         setSliderPosition(currentPosition);
 
-        // Увеличиваем задержку для замедления
-        speed += 20;
+        // Постепенно увеличиваем задержку для замедления
+        speed = Math.min(speed + 25, 500);
 
         // Если достигли целевого предмета и скорость достаточно медленная
-        if (currentPosition === targetIndex && speed > 400) {
+        if (currentPosition === targetIndex && speed > 300) {
           setAnimationPhase('stopped');
           setTimeout(() => {
             handleAnimationComplete();
-          }, 2000); // показываем результат 2 секунды
+          }, 3000); // показываем результат 3 секунды
         } else {
           setTimeout(animateSlider, speed);
         }
       }
     };
 
-    animateSlider();
+    // Запускаем анимацию
+    setTimeout(animateSlider, 500); // небольшая задержка перед началом
   };
 
   const handleAnimationComplete = () => {
@@ -303,23 +303,31 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       onClick={handleClose}
     >
       <div
-        className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-300 flex flex-col ${
-          isAnimating
+        className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
+          isAnimating && !showOpeningAnimation
             ? 'scale-100 opacity-100 translate-y-0'
-            : 'scale-75 opacity-0 translate-y-8'
+            : showOpeningAnimation
+              ? 'scale-75 opacity-90 translate-y-4' // отдаляем модал при анимации
+              : 'scale-75 opacity-0 translate-y-8'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Заголовок модального окна */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
+        <div className={`flex justify-between items-center p-6 border-b border-gray-700 transition-all duration-1000 ${
+          showOpeningAnimation ? 'scale-90 opacity-70' : ''
+        }`}>
           <div className="flex items-center space-x-4">
             <img
               src={caseImageUrl}
               alt={caseData.name}
-              className="w-16 h-16 object-cover rounded"
+              className={`object-cover rounded transition-all duration-1000 ${
+                showOpeningAnimation ? 'w-12 h-12' : 'w-16 h-16'
+              }`}
             />
             <div>
-              <h2 className="text-2xl font-bold text-white">{caseData.name}</h2>
+              <h2 className={`font-bold text-white transition-all duration-1000 ${
+                showOpeningAnimation ? 'text-xl' : 'text-2xl'
+              }`}>{caseData.name}</h2>
               <p className="text-green-400 font-semibold">
                 {fixedPrices ? (
                   <span className="text-yellow-400 font-bold">
@@ -362,28 +370,30 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               {/* Сетка предметов с анимацией масштабирования */}
               <div
                 className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
-                  showOpeningAnimation ? 'transform scale-50 origin-center' : ''
+                  showOpeningAnimation ? 'transform scale-60 origin-center' : ''
                 }`}
               >
                 {items.map((item: any, index: number) => (
                   <div
                     key={item.id || index}
-                    className={`bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)} ${
-                      !showOpeningAnimation ? 'hover:scale-105 transition-all duration-300 animate-fade-in-up' : ''
+                    className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
+                      !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : ''
                     } ${
                       showOpeningAnimation && sliderPosition === index
-                        ? 'ring-4 ring-yellow-400 ring-opacity-75 shadow-lg shadow-yellow-400/50 scale-110 z-10'
+                        ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 scale-125 z-10 border-yellow-400'
                         : ''
                     } ${
                       animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
-                        ? 'ring-4 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/75 scale-125 z-20'
+                        ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
                         : ''
                     }`}
                     style={{
                       animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
-                      transition: showOpeningAnimation
-                        ? 'all 0.3s ease-in-out'
-                        : 'all 0.3s ease-in-out'
+                      boxShadow: showOpeningAnimation && sliderPosition === index
+                        ? '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
+                        : animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
+                          ? '0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 25px rgba(34, 197, 94, 0.4)'
+                          : 'none'
                     }}
                   >
                     <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center overflow-hidden relative">
@@ -451,29 +461,43 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 ))}
               </div>
 
-              {/* Overlay для блокировки нажатий во время анимации */}
+              {/* Overlay для анимации открытия */}
               {showOpeningAnimation && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
                   <div className="text-center text-white">
                     {animationPhase === 'spinning' && (
                       <div>
-                        <div className="text-2xl font-bold mb-2">🎰 Крутим барабан...</div>
-                        <div className="text-lg">Определяем ваш выигрыш!</div>
+                        <div className="text-3xl font-bold mb-4">🎰 Крутим барабан...</div>
+                        <div className="text-xl">Определяем ваш выигрыш!</div>
+                        <div className="mt-4">
+                          <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                        </div>
                       </div>
                     )}
                     {animationPhase === 'slowing' && (
                       <div>
-                        <div className="text-2xl font-bold mb-2">⏳ Замедляемся...</div>
-                        <div className="text-lg">Почти готово!</div>
+                        <div className="text-3xl font-bold mb-4">⏳ Замедляемся...</div>
+                        <div className="text-xl">Почти готово!</div>
+                        <div className="mt-4">
+                          <div className="w-12 h-12 border-4 border-orange-400 border-t-transparent rounded-full animate-spin mx-auto" style={{ animationDuration: '2s' }}></div>
+                        </div>
                       </div>
                     )}
                     {animationPhase === 'stopped' && openingResult && (
                       <div>
-                        <div className="text-3xl font-bold mb-4">🎉 Поздравляем!</div>
-                        <div className="text-xl mb-2">Вы выиграли:</div>
-                        <div className="text-2xl font-bold text-green-400">{openingResult.item.name}</div>
-                        <div className="text-lg mt-2">
+                        <div className="text-4xl font-bold mb-6">🎉 Поздравляем!</div>
+                        <div className="text-2xl mb-4">Вы выиграли:</div>
+                        <div className="text-3xl font-bold text-green-400 mb-2">{openingResult.item.name}</div>
+                        <div className="text-xl">
                           <Monetary value={parseFloat(openingResult.item.price || '0')} />
+                        </div>
+                        <div className="mt-6">
+                          <button
+                            onClick={handleAnimationComplete}
+                            className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
+                          >
+                            ✨ Забрать предмет ✨
+                          </button>
                         </div>
                       </div>
                     )}
@@ -489,9 +513,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Футер с кнопками */}
-        <div className="flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629]">
-
-
+        <div className={`flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629] transition-all duration-1000 ${
+          showOpeningAnimation ? 'scale-90 opacity-50' : ''
+        }`}>
           <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (
               <div>
@@ -513,32 +537,33 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <button
               onClick={handleClose}
               className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
+              disabled={showOpeningAnimation}
             >
               Закрыть
             </button>
-
-
 
             {fixedPrices ? (
               // Показываем кнопки с выбором метода оплаты для премиум кейсов
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 {/* Селектор метода оплаты */}
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm text-gray-400 whitespace-nowrap">Оплата:</label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value as 'balance' | 'bank_card')}
-                    className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600 focus:border-purple-500 focus:outline-none"
-                  >
-                    <option value="balance">Баланс</option>
-                    <option value="bank_card">Банковская карта</option>
-                  </select>
-                </div>
+                {!showOpeningAnimation && (
+                  <div className="flex items-center space-x-2">
+                    <label className="text-sm text-gray-400 whitespace-nowrap">Оплата:</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value as 'balance' | 'bank_card')}
+                      className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600 focus:border-purple-500 focus:outline-none"
+                    >
+                      <option value="balance">Баланс</option>
+                      <option value="bank_card">Банковская карта</option>
+                    </select>
+                  </div>
+                )}
 
                 {/* Кнопка покупки */}
                 <button
                   onClick={handleBuyCase}
-                  disabled={buyLoading || openLoading}
+                  disabled={buyLoading || openLoading || showOpeningAnimation}
                   className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                 >
                   {buyLoading || openLoading ? (
@@ -567,7 +592,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {statusData.data.canBuy && statusData.data.price > 0 && (
                       <button
                         onClick={handleBuyCase}
-                        disabled={buyLoading || openLoading}
+                        disabled={buyLoading || openLoading || showOpeningAnimation}
                         className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                       >
                         {buyLoading ? (
@@ -587,7 +612,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {statusData.data.canOpen && (
                       <button
                         onClick={() => handleOpenCase()}
-                        disabled={buyLoading || openLoading}
+                        disabled={buyLoading || openLoading || showOpeningAnimation}
                         className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                       >
                         {openLoading ? (
@@ -605,7 +630,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   // Показываем кнопку по умолчанию, если статус не загружен
                   <button
                     onClick={handleBuyCase}
-                    disabled={buyLoading || openLoading}
+                    disabled={buyLoading || openLoading || showOpeningAnimation}
                     className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                   >
                     {buyLoading || openLoading ? (
@@ -623,22 +648,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 )}
               </div>
             )}
-
-
           </div>
         </div>
       </div>
-
-      {/* Анимация открытия кейса */}
-      {showOpeningAnimation && openingResult && (
-        <CaseOpeningAnimation
-          isOpen={showOpeningAnimation}
-          onClose={handleAnimationComplete}
-          caseTemplate={caseData}
-          wonItem={openingResult.item}
-          isLoading={false}
-        />
-      )}
     </div>
   );
 };

@@ -19,6 +19,7 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
   const [animationStage, setAnimationStage] = useState<'starting' | 'rolling' | 'stopping' | 'revealing' | 'showing'>('starting');
   const [showFireworks, setShowFireworks] = useState(false);
   const [rollingItems, setRollingItems] = useState<Item[]>([]);
+  const [sliderPosition, setSliderPosition] = useState(0);
   const rollingRef = useRef<HTMLDivElement>(null);
 
   // Создаем массив предметов для анимации прокрутки
@@ -27,8 +28,8 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
       // Создаем фиктивные предметы для прокрутки, включая выигранный предмет
       const rollingItemsArray: Item[] = [];
 
-      // Добавляем 20 случайных предметов для прокрутки (создаем базовые предметы)
-      for (let i = 0; i < 20; i++) {
+      // Добавляем 25 случайных предметов для прокрутки (больше для длинной рулетки)
+      for (let i = 0; i < 25; i++) {
         const randomItem: Item = {
           id: `rolling-${i}`,
           name: `Item ${i + 1}`,
@@ -39,6 +40,9 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
         rollingItemsArray.push(randomItem);
       }
 
+      // Добавляем выигранный предмет в определенное место для корректной остановки
+      rollingItemsArray.push(wonItem);
+
       setRollingItems(rollingItemsArray);
     }
   }, [isOpen, wonItem]);
@@ -47,43 +51,65 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
     if (isOpen && !isLoading && wonItem) {
       console.log('Starting enhanced case animation with item:', wonItem.name);
 
-      // Фаза 1: Начинаем прокрутку
+      // Фаза 1: Начинаем прокрутку со слайдером
       setTimeout(() => {
         console.log('Animation stage: rolling');
         setAnimationStage('rolling');
+        // Начинаем движение слайдера
+        startSliderAnimation();
       }, 500);
 
       // Фаза 2: Замедляем прокрутку и останавливаем на выигранном предмете
       setTimeout(() => {
         console.log('Animation stage: stopping');
         setAnimationStage('stopping');
-
-        // Добавляем выигранный предмет в конец списка для правильной остановки
-        setRollingItems(prev => [...prev, wonItem]);
-      }, 2500);
+      }, 3000);
 
       // Фаза 3: Показываем результат
       setTimeout(() => {
         console.log('Animation stage: revealing');
         setAnimationStage('revealing');
-      }, 4000);
+      }, 5000);
 
       // Фаза 4: Финальное отображение с эффектами
       setTimeout(() => {
         console.log('Animation stage: showing');
         setAnimationStage('showing');
         setShowFireworks(true);
-      }, 4500);
+      }, 5500);
 
-      setTimeout(() => setShowFireworks(false), 7000);
+      setTimeout(() => setShowFireworks(false), 8000);
     }
   }, [isOpen, isLoading, wonItem]);
+
+  // Анимация движения слайдера
+  const startSliderAnimation = () => {
+    let position = 0;
+    const itemWidth = 80; // ширина каждого предмета
+    const totalItems = rollingItems.length;
+    const maxPosition = (totalItems - 1) * itemWidth;
+
+    const animateSlider = () => {
+      position += 2; // скорость движения
+      if (position > maxPosition + 200) {
+        position = -200; // возвращаем в начало
+      }
+      setSliderPosition(position);
+
+      if (animationStage === 'rolling' || animationStage === 'stopping') {
+        requestAnimationFrame(animateSlider);
+      }
+    };
+
+    requestAnimationFrame(animateSlider);
+  };
 
   useEffect(() => {
     if (isOpen) {
       console.log('Enhanced case opening animation started');
       setAnimationStage('starting');
       setShowFireworks(false);
+      setSliderPosition(0);
     } else {
       console.log('Enhanced case opening animation closed');
     }
@@ -185,17 +211,19 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
         </div>
       )}
 
-      <div className="relative max-w-4xl w-full mx-4">
+      <div className="relative max-w-5xl w-full mx-4">
         {/* Case Opening Stages */}
 
         {/* Stage 1-2: Case presentation and rolling items */}
         {(animationStage === 'starting' || animationStage === 'rolling' || animationStage === 'stopping') && (
-          <div className="space-y-8">
-            {/* Case Display */}
+          <div className="space-y-6">
+            {/* Case Display - уменьшается при старте анимации */}
             <div className={`text-center transition-all duration-1000 ${
-              animationStage === 'stopping' ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+              animationStage === 'starting' ? 'opacity-100 scale-100' : 'opacity-70 scale-75'
             }`}>
-              <div className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 p-2 shadow-2xl mb-4 ring-4 ring-yellow-400/50">
+              <div className={`mx-auto rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 p-2 shadow-2xl mb-4 ring-4 ring-yellow-400/50 transition-all duration-1000 ${
+                animationStage === 'starting' ? 'w-32 h-32' : 'w-20 h-20'
+              }`}>
                 {caseTemplate?.image_url ? (
                   <img
                     src={caseTemplate.image_url}
@@ -204,48 +232,50 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-800 rounded-xl flex items-center justify-center">
-                    <svg className="w-12 h-12 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className={`text-yellow-400 transition-all duration-1000 ${
+                      animationStage === 'starting' ? 'w-12 h-12' : 'w-8 h-8'
+                    }`} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                     </svg>
                   </div>
                 )}
               </div>
-              <h3 className="text-white text-xl font-bold">{caseTemplate?.name}</h3>
+              <h3 className={`text-white font-bold transition-all duration-1000 ${
+                animationStage === 'starting' ? 'text-xl' : 'text-lg'
+              }`}>{caseTemplate?.name}</h3>
             </div>
 
-            {/* Rolling Items Container */}
-            <div className="relative h-32 bg-black/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 overflow-hidden">
-              {/* Selection indicator */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-yellow-400 via-orange-500 to-yellow-400 z-10 shadow-lg">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-400 rotate-45 shadow-lg"></div>
+            {/* Rolling Items Container - уменьшенный размер */}
+            <div className="relative h-24 bg-black/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 overflow-hidden">
+              {/* Движущийся ползунок-border */}
+              <div
+                className="absolute top-0 w-20 h-full border-4 border-yellow-400 border-opacity-80 bg-yellow-400/10 z-20 transition-all duration-100"
+                style={{
+                  left: `${Math.max(0, Math.min(sliderPosition, 100))}px`,
+                  boxShadow: '0 0 20px rgba(255, 193, 7, 0.6), inset 0 0 20px rgba(255, 193, 7, 0.3)'
+                }}
+              >
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
               </div>
 
-              {/* Rolling items */}
+              {/* Rolling items - уменьшенные предметы */}
               <div
                 ref={rollingRef}
-                className={`flex items-center h-full transition-transform ${
-                  animationStage === 'rolling' ? 'animate-none' : ''
-                } ${
-                  animationStage === 'stopping' ? 'duration-3000 ease-out' : ''
-                }`}
+                className="flex items-center h-full px-4"
                 style={{
-                  transform: animationStage === 'rolling'
-                    ? 'translateX(-50%)'
-                    : animationStage === 'stopping'
-                      ? `translateX(-${(rollingItems.length - 1) * 120 - 60}px)` // Stop at won item
-                      : 'translateX(0)',
-                  animation: animationStage === 'rolling'
-                    ? 'roll 2s linear infinite'
-                    : 'none'
+                  transform: animationStage === 'stopping'
+                    ? `translateX(-${rollingItems.length * 40}px)`
+                    : 'translateX(0)',
+                  transition: animationStage === 'stopping' ? 'transform 2s ease-out' : 'none'
                 }}
               >
                 {rollingItems.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className={`flex-shrink-0 w-24 h-24 mx-2 rounded-lg p-1 transition-all duration-300 ${
+                    className={`flex-shrink-0 w-16 h-16 mx-2 rounded-lg p-1 transition-all duration-300 bg-gradient-to-br ${getRarityColor(item.rarity)} ${
                       index === rollingItems.length - 1 && animationStage === 'stopping'
-                        ? `bg-gradient-to-br ${getRarityColor(item.rarity)} ring-4 ring-yellow-400/70 scale-110`
-                        : `bg-gradient-to-br ${getRarityColor(item.rarity)}`
+                        ? 'ring-2 ring-yellow-400/70 scale-110'
+                        : ''
                     }`}
                   >
                     {item.image_url ? (
@@ -256,7 +286,7 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -266,8 +296,8 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
               </div>
 
               {/* Glow effects on sides */}
-              <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-black/80 to-transparent z-5"></div>
-              <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-black/80 to-transparent z-5"></div>
+              <div className="absolute left-0 top-0 w-16 h-full bg-gradient-to-r from-black/80 to-transparent z-10"></div>
+              <div className="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-black/80 to-transparent z-10"></div>
             </div>
 
             {/* Status text */}
@@ -347,14 +377,6 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
           </div>
         )}
       </div>
-
-      {/* CSS Animation for rolling */}
-      <style>{`
-        @keyframes roll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-240px); }
-        }
-      `}</style>
     </div>
   );
 };

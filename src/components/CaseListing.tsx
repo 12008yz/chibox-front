@@ -9,7 +9,7 @@ interface CaseListingProps {
   name: string;
   description?: string;
   cases: CaseTemplate[];
-  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
+  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<any>;
   fixedPrices?: boolean;
   nextCaseAvailableTime?: string;
   onDataUpdate?: () => void;
