@@ -68,87 +68,166 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden font-mono">
+    <div className="min-h-screen relative overflow-hidden gaming-font">
       <ScrollToTopOnMount />
 
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black">
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `
-                linear-gradient(90deg, #00ff8822 1px, transparent 1px),
-                linear-gradient(180deg, #00ff8822 1px, transparent 1px)
-              `,
-              backgroundSize: '60px 60px'
-            }}
-          />
+      {/* Opera GX Style Background with different wave patterns */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#151225] via-[#1a1630] to-[#19172D]">
+        {/* Animated Wave Background */}
+        <div className="absolute inset-0 opacity-20 overflow-hidden">
+          <svg
+            className="absolute inset-0 w-[120%] h-full -left-[10%]"
+            viewBox="0 0 1400 800"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <defs>
+              <linearGradient id="waveGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="50%" stopColor="#0891b2" />
+                <stop offset="100%" stopColor="#0e7490" />
+              </linearGradient>
+              <linearGradient id="waveGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="50%" stopColor="#2563eb" />
+                <stop offset="100%" stopColor="#1d4ed8" />
+              </linearGradient>
+              <linearGradient id="waveGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="50%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#6d28d9" />
+              </linearGradient>
+              <mask id="waveFadeRegister">
+                <rect width="100%" height="100%" fill="white"/>
+                <rect x="0" y="0" width="100" height="100%" fill="url(#fadeLeftRegister)"/>
+                <rect x="1300" y="0" width="100" height="100%" fill="url(#fadeRightRegister)"/>
+              </mask>
+              <linearGradient id="fadeLeftRegister" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="black" stopOpacity="0"/>
+                <stop offset="100%" stopColor="white" stopOpacity="1"/>
+              </linearGradient>
+              <linearGradient id="fadeRightRegister" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="white" stopOpacity="1"/>
+                <stop offset="100%" stopColor="black" stopOpacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <g mask="url(#waveFadeRegister)">
+              <path
+                d="M-200,300 C200,200 400,400 800,300 C1000,250 1200,300 1400,280 C1500,270 1600,275 1700,265 L1700,800 L-200,800 Z"
+                fill="url(#waveGradient3)"
+                opacity="0.4"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; -170,35; 0,0"
+                  dur="18s"
+                  repeatCount="indefinite"
+                />
+              </path>
+
+              <path
+                d="M-200,450 C100,350 500,550 700,450 C900,400 1100,450 1400,430 C1500,420 1600,425 1700,415 L1700,800 L-200,800 Z"
+                fill="url(#waveGradient4)"
+                opacity="0.3"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; 140,-30; 0,0"
+                  dur="22s"
+                  repeatCount="indefinite"
+                />
+              </path>
+
+              <path
+                d="M-200,600 C50,500 350,700 600,600 C800,550 1000,600 1400,580 C1500,570 1600,575 1700,565 L1700,800 L-200,800 Z"
+                fill="url(#waveGradient5)"
+                opacity="0.2"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; -90,18; 0,0"
+                  dur="25s"
+                  repeatCount="indefinite"
+                />
+              </path>
+
+              <path
+                d="M-200,720 C150,620 450,820 750,720 C950,670 1150,720 1400,700 C1500,690 1600,695 1700,685 L1700,800 L-200,800 Z"
+                fill="url(#waveGradient3)"
+                opacity="0.1"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0,0; -60,10; 0,0"
+                  dur="32s"
+                  repeatCount="indefinite"
+                />
+              </path>
+            </g>
+          </svg>
         </div>
 
-        {/* Animated Scanning Lines */}
+        {/* Floating Particles */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-pulse delay-1000"></div>
-          <div className="absolute top-0 left-0 h-full w-0.5 bg-gradient-to-b from-transparent via-cyan-400 to-transparent animate-pulse delay-500"></div>
-          <div className="absolute top-0 right-0 h-full w-0.5 bg-gradient-to-b from-transparent via-purple-400 to-transparent animate-pulse delay-1500"></div>
+          {[...Array(25)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-50"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `float ${4 + Math.random() * 6}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * 3}s`
+              }}
+            />
+          ))}
         </div>
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#151225]/90 via-transparent to-[#151225]/70" />
       </div>
 
-      {/* Main Container */}
+      {/* Main Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-
-          {/* HUD Frame */}
+          {/* Register Card */}
           <div className="relative">
-            {/* Corner Brackets */}
-            <div className="absolute -top-4 -left-4 w-8 h-8 border-l-2 border-t-2 border-green-400"></div>
-            <div className="absolute -top-4 -right-4 w-8 h-8 border-r-2 border-t-2 border-green-400"></div>
-            <div className="absolute -bottom-4 -left-4 w-8 h-8 border-l-2 border-b-2 border-green-400"></div>
-            <div className="absolute -bottom-4 -right-4 w-8 h-8 border-r-2 border-b-2 border-green-400"></div>
+            {/* Glow Effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-cyan-400 rounded-2xl blur-lg opacity-30 animate-pulse" />
 
-            {/* Main Panel */}
-            <div
-              className="relative bg-gray-900/90 border border-gray-600 backdrop-blur-md overflow-hidden"
-              style={{
-                clipPath: 'polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px)'
-              }}
-            >
-              {/* Neon Glow Effect */}
-              <div className="absolute inset-0 border border-green-400/50 -m-px"
-                   style={{
-                     clipPath: 'polygon(20px 0%, 100% 0%, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0% 100%, 0% 20px)',
-                     boxShadow: '0 0 20px #00ff8833, inset 0 0 20px #00ff8811'
-                   }}
-              ></div>
-
-              <div className="relative p-8">
-                {/* Header Section */}
+            {/* Main Card */}
+            <div className="relative bg-gradient-to-br from-[#19172D]/95 to-[#151225]/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl overflow-hidden">
+              {/* Card Header */}
+              <div className="relative p-8 pb-6">
+                {/* Logo Section */}
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center"
-                         style={{ clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)' }}>
-                      <span className="text-black font-bold text-xl">CB</span>
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-400/25">
+                        <span className="text-black font-bold text-2xl">CB</span>
+                      </div>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-xl blur opacity-40 animate-pulse" />
                     </div>
                   </div>
 
-                  <h1 className="text-2xl font-bold text-white mb-2">
-                    <span className="text-green-400">[</span> ACCOUNT CREATION <span className="text-green-400">]</span>
+                  <h1 className="text-3xl font-bold text-white mb-3 gaming-font">
+                    Присоединиться
                   </h1>
-
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>REGISTRATION MODULE ONLINE</span>
-                  </div>
+                  <p className="text-cyan-300/80 text-sm">
+                    Создайте новую учетную запись ChiBox
+                  </p>
                 </div>
 
                 {/* Registration Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-
+                <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Username Field */}
                   <div className="space-y-2">
-                    <label className="block text-green-400 text-sm font-bold font-mono">
-                      &gt; USERNAME
+                    <label className="block text-cyan-300 text-sm font-medium">
+                      Имя пользователя
                     </label>
                     <div className="relative">
                       <input
@@ -156,18 +235,19 @@ const RegisterPage: React.FC = () => {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
-                        className="w-full bg-gray-800/50 border border-gray-600 text-white px-4 py-3 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-gray-800/70 transition-all duration-300"
-                        style={{ clipPath: 'polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px)' }}
-                        placeholder="enter_username"
+                        className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
+                        placeholder="Ваше имя пользователя"
                       />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-green-400 animate-pulse"></div>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                      </div>
                     </div>
                   </div>
 
                   {/* Email Field */}
                   <div className="space-y-2">
-                    <label className="block text-green-400 text-sm font-bold font-mono">
-                      &gt; EMAIL ADDRESS
+                    <label className="block text-cyan-300 text-sm font-medium">
+                      Email адрес
                     </label>
                     <div className="relative">
                       <input
@@ -175,18 +255,19 @@ const RegisterPage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full bg-gray-800/50 border border-gray-600 text-white px-4 py-3 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-gray-800/70 transition-all duration-300"
-                        style={{ clipPath: 'polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px)' }}
-                        placeholder="user@domain.com"
+                        className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
+                        placeholder="your@email.com"
                       />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-green-400 animate-pulse"></div>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                      </div>
                     </div>
                   </div>
 
                   {/* Password Field */}
                   <div className="space-y-2">
-                    <label className="block text-green-400 text-sm font-bold font-mono">
-                      &gt; PASSWORD
+                    <label className="block text-cyan-300 text-sm font-medium">
+                      Пароль
                     </label>
                     <div className="relative">
                       <input
@@ -194,19 +275,20 @@ const RegisterPage: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        className="w-full bg-gray-800/50 border border-gray-600 text-white px-4 py-3 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-gray-800/70 transition-all duration-300"
-                        style={{ clipPath: 'polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px)' }}
+                        className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
                         placeholder="••••••••••"
                       />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-green-400 animate-pulse"></div>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 font-mono">MIN 6 CHARS</div>
+                    <div className="text-xs text-cyan-400/70">Минимум 6 символов</div>
                   </div>
 
                   {/* Confirm Password Field */}
                   <div className="space-y-2">
-                    <label className="block text-green-400 text-sm font-bold font-mono">
-                      &gt; CONFIRM PASSWORD
+                    <label className="block text-cyan-300 text-sm font-medium">
+                      Подтвердите пароль
                     </label>
                     <div className="relative">
                       <input
@@ -214,51 +296,40 @@ const RegisterPage: React.FC = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        className="w-full bg-gray-800/50 border border-gray-600 text-white px-4 py-3 font-mono text-sm focus:outline-none focus:border-green-400 focus:bg-gray-800/70 transition-all duration-300"
-                        style={{ clipPath: 'polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px)' }}
+                        className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
                         placeholder="••••••••••"
                       />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-green-400 animate-pulse"></div>
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                      </div>
                     </div>
                   </div>
 
                   {/* Error Display */}
                   {error && (
-                    <div
-                      className="bg-red-900/30 border border-red-400/50 p-3"
-                      style={{ clipPath: 'polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px)' }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-red-400 animate-pulse"
-                             style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}>
+                    <div className="p-4 bg-red-500/10 border border-red-400/30 rounded-xl backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 bg-red-400 rounded-full flex items-center justify-center">
+                          <span className="text-black text-xs font-bold">!</span>
                         </div>
-                        <span className="text-red-300 text-sm font-mono">[ERROR] {error}</span>
+                        <span className="text-red-300 text-sm">{error}</span>
                       </div>
                     </div>
                   )}
 
-                  {/* Features Grid */}
-                  <div className="grid grid-cols-3 gap-2 my-6">
-                    <div
-                      className="text-center p-3 bg-green-500/10 border border-green-400/30"
-                      style={{ clipPath: 'polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px)' }}
-                    >
-                      <div className="text-green-400 text-lg mb-1 font-mono">$</div>
-                      <div className="text-xs text-gray-400 font-mono">BONUS</div>
+                  {/* Features Preview */}
+                  <div className="grid grid-cols-3 gap-3 my-6">
+                    <div className="text-center p-3 bg-cyan-500/10 border border-cyan-400/30 rounded-xl backdrop-blur-sm hover:bg-cyan-500/20 transition-all duration-300">
+                      <div className="text-cyan-400 text-xl mb-2">💰</div>
+                      <div className="text-xs text-cyan-300/80 font-medium">Бонусы</div>
                     </div>
-                    <div
-                      className="text-center p-3 bg-blue-500/10 border border-blue-400/30"
-                      style={{ clipPath: 'polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px)' }}
-                    >
-                      <div className="text-blue-400 text-lg mb-1 font-mono">♦</div>
-                      <div className="text-xs text-gray-400 font-mono">CASES</div>
+                    <div className="text-center p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
+                      <div className="text-blue-400 text-xl mb-2">🎁</div>
+                      <div className="text-xs text-blue-300/80 font-medium">Кейсы</div>
                     </div>
-                    <div
-                      className="text-center p-3 bg-purple-500/10 border border-purple-400/30"
-                      style={{ clipPath: 'polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px)' }}
-                    >
-                      <div className="text-purple-400 text-lg mb-1 font-mono">★</div>
-                      <div className="text-xs text-gray-400 font-mono">PRIZE</div>
+                    <div className="text-center p-3 bg-purple-500/10 border border-purple-400/30 rounded-xl backdrop-blur-sm hover:bg-purple-500/20 transition-all duration-300">
+                      <div className="text-purple-400 text-xl mb-2">⭐</div>
+                      <div className="text-xs text-purple-300/80 font-medium">Призы</div>
                     </div>
                   </div>
 
@@ -266,61 +337,57 @@ const RegisterPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-4 px-6 font-mono transition-all duration-300 border border-green-400/50 hover:border-green-400 relative overflow-hidden group"
-                    style={{ clipPath: 'polygon(15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%, 0% 15px)' }}
+                    className="w-full relative group"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-blue-400/20 transform translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-                    <span className="relative">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-xl blur opacity-60 group-hover:opacity-100 transition duration-300" />
+                    <div className="relative bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300">
                       {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {isRegistering ? 'CREATING ACCOUNT...' : 'LOGGING IN...'}
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          {isRegistering ? 'Создание аккаунта...' : 'Вход в систему...'}
                         </div>
                       ) : (
-                        '[ CREATE ACCOUNT ]'
+                        'Создать аккаунт'
                       )}
-                    </span>
+                    </div>
                   </button>
 
                   {/* Divider */}
                   <div className="relative py-4">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-600"></div>
+                      <div className="w-full border-t border-cyan-400/30" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-gray-900 px-4 text-gray-500 text-sm font-mono">OR</span>
+                      <span className="bg-[#19172D] px-4 text-cyan-300/70 text-sm">или</span>
                     </div>
                   </div>
 
                   {/* Steam Login */}
-                  <div>
-                    <SteamLoginButton />
-                  </div>
+                  <SteamLoginButton />
                 </form>
 
                 {/* Footer */}
                 <div className="mt-8 text-center">
                   <button
                     onClick={() => navigate('/login')}
-                    className="text-green-400 hover:text-green-300 text-sm font-mono transition-colors duration-300"
+                    className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-300 hover:underline"
                   >
-                    [ EXISTING USER LOGIN ]
+                    Уже есть аккаунт? Войти
                   </button>
-                </div>
-
-                {/* Status Bar */}
-                <div className="mt-6 pt-4 border-t border-gray-700/50">
-                  <div className="flex justify-between items-center text-xs text-gray-500 font-mono">
-                    <span>REG: ACTIVE</span>
-                    <span>ENC: SSL</span>
-                    <span>SEC: HIGH</span>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Custom Styles */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-25px) rotate(180deg); }
+        }
+      `}</style>
     </div>
   );
 };
