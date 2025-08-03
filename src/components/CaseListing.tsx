@@ -12,6 +12,7 @@ interface CaseListingProps {
   onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
   fixedPrices?: boolean;
   nextCaseAvailableTime?: string;
+  onDataUpdate?: () => void;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -20,7 +21,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
   cases,
   onBuyAndOpenCase,
   fixedPrices = false,
-  nextCaseAvailableTime
+  nextCaseAvailableTime,
+  onDataUpdate
 }) => {
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -99,6 +101,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
           caseData={previewCase}
           onBuyAndOpenCase={onBuyAndOpenCase}
           fixedPrices={fixedPrices}
+          onDataUpdate={onDataUpdate}
         />
       )}
     </div>

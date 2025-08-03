@@ -10,6 +10,7 @@ interface CasePreviewModalProps {
   caseData: CaseTemplate;
   onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<void>;
   fixedPrices?: boolean;
+  onDataUpdate?: () => void;
 }
 
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
@@ -17,7 +18,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   onClose,
   caseData,
   onBuyAndOpenCase,
-  fixedPrices = false
+  fixedPrices = false,
+  onDataUpdate
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -150,8 +152,27 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setOpeningResult(result.data);
         startAnimation(result.data.item);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка открытия кейса:', error);
+
+      // Если ошибка связана с тем, что кейс уже получен сегодня, закрываем модал и обновляем данные
+      if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
+        // Показываем сообщение пользователю
+        alert(error.data.message || 'Кейс уже получен сегодня');
+
+        // Закрываем модал
+        onClose();
+
+        // Обновляем данные в родительском компоненте
+        if (onDataUpdate) {
+          setTimeout(() => {
+            onDataUpdate();
+          }, 100);
+        }
+      } else {
+        // Для других ошибок показываем общее сообщение
+        alert(error?.data?.message || 'Произошла ошибка при открытии кейса');
+      }
     }
   };
 

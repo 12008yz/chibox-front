@@ -53,38 +53,42 @@ const HomePage: React.FC = () => {
   const bannerContent = [
     {
       left: {
-        image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=460&fit=crop',
-        title: "CHIBOX Game",
-        description: "Открывай кейсы и получай крутые призы! Попробуй свою удачу прямо сейчас!",
+        image: 'https://public-content.dezctop.com/media/4f10cc5d362c4c8ba700ed232150b98e/neon.webp',
+        title: "CHIBOX",
+        description: "Делаем твой инвентарь лучше с каждым днём. Открывай кейсы и собирай редкие предметы!",
         link: "/cases",
       },
       right: (
         <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">🎁</div>
+          <div className="text-6xl opacity-30">💎</div>
         </div>
       ),
     },
     {
       left: {
-        image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1920&h=460&fit=crop',
-        title: "CRASH GAME",
-        description: "Следи за графиком и забирай выигрыш вовремя! Не дай ему упасть!",
-        link: "/crash",
+        image: 'https://wallpapers.com/images/hd/cs-go-background-aqi1qcryyzms7fjd.jpg',
+        title: "ТВОЯ УДАЧА",
+        description: "Каждый открытый кейс — шанс на джекпот. Проверь свою фортуну сегодня!",
+        link: "/cases",
       },
       right: (
         <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">🚀</div>
+          <div className="text-6xl opacity-30">🍀</div>
         </div>
       ),
     },
     {
       left: {
-        image: 'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=1920&h=460&fit=crop',
-        title: "UPGRADE GAME",
-        description: "Улучшай свои предметы и получай более ценные награды!",
-        link: "/upgrade",
+        image: 'https://static.vecteezy.com/system/resources/thumbnails/046/029/963/large/trendy-retro-futuristic-background-with-desert-landscape-mountains-digital-glowing-grid-blue-and-purple-neon-lights-and-shiny-sunset-retrowave-game-animation-in-the-old-style-4k-60-fps-video.jpg',
+        title: "СООБЩЕСТВО",
+        description: "Присоединяйся к тысячам игроков. Соревнуйся в таблице лидеров и побеждай!",
+        link: "/leaderboard",
       },
-      right: null,
+      right: (
+        <div className="hidden 2xl:flex 2xl:mr-36">
+          <div className="text-6xl opacity-30">🏆</div>
+        </div>
+      ),
     },
   ];
 
@@ -148,9 +152,10 @@ const HomePage: React.FC = () => {
             isLoading: false
           }));
 
-          // Принудительно обновляем данные пользователя
+          // Принудительно обновляем данные пользователя и кейсов
           setTimeout(() => {
             refetchUser();
+            refetchCases();
           }, 500);
         } else {
           throw new Error('Ошибка открытия бесплатного кейса');
@@ -202,9 +207,10 @@ const HomePage: React.FC = () => {
           isLoading: false
         }));
 
-        // Принудительно обновляем данные пользователя для обновления баланса в navbar
+        // Принудительно обновляем данные пользователя и кейсов для обновления баланса в navbar
         setTimeout(() => {
           refetchUser();
+          refetchCases();
         }, 500);
       } else {
         throw new Error('Ошибка открытия кейса');
@@ -241,6 +247,10 @@ const HomePage: React.FC = () => {
       wonItem: null,
       isLoading: false
     });
+
+    // Обновляем данные при закрытии анимации
+    refetchUser();
+    refetchCases();
   };
 
   if (casesError) {
@@ -371,6 +381,20 @@ const HomePage: React.FC = () => {
                   const subscriptionDaysLeft = Number(userData?.subscription_days_left || 0);
                   const nextCaseAvailableTime = userData?.next_case_available_time;
 
+                  // Логирование для отладки
+                  console.log('HomePage: userData и nextCaseAvailableTime:', {
+                    userData: userData,
+                    nextCaseAvailableTime: nextCaseAvailableTime,
+                    casesData: data
+                  });
+
+                  // Функция для принудительного обновления данных
+                  const handleDataUpdate = () => {
+                    console.log('Принудительное обновление данных...');
+                    refetchUser();
+                    refetchCases();
+                  };
+
                   // Функция для фильтрации кейсов по подписке
                   const getSubscriptionCases = () => {
                     if (userSubscriptionTier === 0 || subscriptionDaysLeft <= 0) {
@@ -441,6 +465,7 @@ const HomePage: React.FC = () => {
                             cases={subscriptionCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             nextCaseAvailableTime={nextCaseAvailableTime}
+                            onDataUpdate={handleDataUpdate}
                           />
                         </div>
                       )}
@@ -454,6 +479,7 @@ const HomePage: React.FC = () => {
                             cases={paidCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             fixedPrices={true}
+                            onDataUpdate={handleDataUpdate}
                           />
                         </div>
                       )}
