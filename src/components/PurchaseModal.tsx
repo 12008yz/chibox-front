@@ -232,7 +232,10 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                           <div>
                             <div className="font-semibold text-white">{tier.name}</div>
                             <div className="text-sm text-gray-400">
-                              +{tier.bonus_percentage}% к дропу • {tier.max_daily_cases} кейс в день
+                              {tier.name.includes('Статус++') || tier.name.includes('++') ?
+                                '+8% к дропу • 1 кейс в день • Без дубликатов' :
+                                `+${tier.bonus_percentage}% к дропу • ${tier.max_daily_cases} кейс в день`
+                              }
                             </div>
                           </div>
                         </div>

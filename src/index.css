@@ -447,7 +447,7 @@
 
 .gaming-bonus-button:hover:not(:disabled) {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(234, 88, 12, 0.8);
+  box-shadow: 0 0 30px rgba(220, 38, 38, 0.8);
 }
 
 .gaming-icon-fire {
@@ -455,16 +455,16 @@
 }
 
 @keyframes bonusPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(234, 88, 12, 0.5); }
-  50% { box-shadow: 0 0 30px rgba(234, 88, 12, 0.8); }
+  0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
 }
 
 @keyframes fireFlicker {
-  0% { color: #f97316; }
-  25% { color: #ea580c; }
-  50% { color: #dc2626; }
-  75% { color: #ea580c; }
-  100% { color: #f97316; }
+  0% { color: #dc2626; }
+  25% { color: #b91c1c; }
+  50% { color: #ef4444; }
+  75% { color: #b91c1c; }
+  100% { color: #dc2626; }
 }
 
 /* Gaming Balance Container */
