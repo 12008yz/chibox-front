@@ -82,19 +82,19 @@ const RegisterPage: React.FC = () => {
           >
             <defs>
               <linearGradient id="waveGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#06b6d4" />
-                <stop offset="50%" stopColor="#0891b2" />
-                <stop offset="100%" stopColor="#0e7490" />
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="50%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#047857" />
               </linearGradient>
               <linearGradient id="waveGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="50%" stopColor="#2563eb" />
-                <stop offset="100%" stopColor="#1d4ed8" />
+                <stop offset="0%" stopColor="#22c55e" />
+                <stop offset="50%" stopColor="#16a34a" />
+                <stop offset="100%" stopColor="#15803d" />
               </linearGradient>
               <linearGradient id="waveGradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8b5cf6" />
-                <stop offset="50%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#6d28d9" />
+                <stop offset="0%" stopColor="#84cc16" />
+                <stop offset="50%" stopColor="#65a30d" />
+                <stop offset="100%" stopColor="#4d7c0f" />
               </linearGradient>
               <mask id="waveFadeRegister">
                 <rect width="100%" height="100%" fill="white"/>
@@ -176,7 +176,7 @@ const RegisterPage: React.FC = () => {
           {[...Array(25)].map((_, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-50"
+              className="absolute w-1 h-1 bg-emerald-400 rounded-full opacity-50"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -197,7 +197,7 @@ const RegisterPage: React.FC = () => {
           {/* Register Card */}
           <div className="relative">
             {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-cyan-400 rounded-2xl blur-lg opacity-30 animate-pulse" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-400 rounded-2xl blur-lg opacity-30 animate-pulse" />
 
             {/* Main Card */}
             <div className="relative bg-gradient-to-br from-[#19172D]/95 to-[#151225]/95 backdrop-blur-xl border border-cyan-400/20 rounded-2xl overflow-hidden">
@@ -207,17 +207,17 @@ const RegisterPage: React.FC = () => {
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center mb-4">
                     <div className="relative">
-                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-400/25">
+                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 via-green-500 to-lime-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-400/25">
                         <span className="text-black font-bold text-2xl">CB</span>
                       </div>
-                      <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-xl blur opacity-40 animate-pulse" />
+                      <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 via-green-500 to-lime-600 rounded-xl blur opacity-40 animate-pulse" />
                     </div>
                   </div>
 
                   <h1 className="text-3xl font-bold text-white mb-3 gaming-font">
                     Присоединиться
                   </h1>
-                  <p className="text-cyan-300/80 text-sm">
+                  <p className="text-emerald-300/80 text-sm">
                     Создайте новую учетную запись ChiBox
                   </p>
                 </div>
@@ -226,7 +226,7 @@ const RegisterPage: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Username Field */}
                   <div className="space-y-2">
-                    <label className="block text-cyan-300 text-sm font-medium">
+                    <label className="block text-emerald-300 text-sm font-medium">
                       Имя пользователя
                     </label>
                     <div className="relative">
@@ -327,9 +327,13 @@ const RegisterPage: React.FC = () => {
                       <div className="text-blue-400 text-xl mb-2">🎁</div>
                       <div className="text-xs text-blue-300/80 font-medium">Кейсы</div>
                     </div>
-                    <div className="text-center p-3 bg-purple-500/10 border border-purple-400/30 rounded-xl backdrop-blur-sm hover:bg-purple-500/20 transition-all duration-300">
-                      <div className="text-purple-400 text-xl mb-2">⭐</div>
-                      <div className="text-xs text-purple-300/80 font-medium">Призы</div>
+                    <div className="text-center p-3 bg-lime-500/10 border border-lime-400/30 rounded-xl backdrop-blur-sm hover:bg-lime-500/20 transition-all duration-300 relative group">
+                      <div className="text-lime-400 text-xl mb-2">⭐</div>
+                      <div className="text-xs text-lime-300/80 font-medium">Призы</div>
+                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-lime-300 text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap  shadow-lg">
+                        Ждут по кнопке ниже
+                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 border-l border-t border-lime-400/30 rotate-45"></div>
+                      </div>
                     </div>
                   </div>
 
