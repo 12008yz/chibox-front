@@ -183,15 +183,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Улучшенная анимация ползунка
+    // Улучшенная анимация ползунка с автопрокруткой
     let currentPosition = 0;
-    let speed = 50; // начальная скорость (мс между перемещениями)
+    let speed = 30; // начальная скорость (мс между перемещениями)
     let rounds = 0;
-    const maxRounds = 3; // количество полных кругов перед замедлением
-    const maxSpeed = 200;
+    const maxRounds = 4; // количество полных кругов перед замедлением
+    const maxSpeed = 400;
+
+    // Переменные для автопрокрутки
+    let animationPhaseRef = 'spinning';
 
     const animateSlider = () => {
-      if (animationPhase === 'spinning') {
+      if (animationPhaseRef === 'spinning') {
         currentPosition++;
 
         // Если дошли до конца, начинаем сначала
@@ -204,12 +207,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         // После maxRounds кругов начинаем замедляться
         if (rounds >= maxRounds) {
+          animationPhaseRef = 'slowing';
           setAnimationPhase('slowing');
-          speed = Math.min(speed + 15, maxSpeed);
+          speed = Math.min(speed + 20, maxSpeed);
         }
 
         setTimeout(animateSlider, speed);
-      } else if (animationPhase === 'slowing') {
+      } else if (animationPhaseRef === 'slowing') {
         currentPosition++;
 
         if (currentPosition >= items.length) {
@@ -219,14 +223,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(currentPosition);
 
         // Постепенно увеличиваем задержку для замедления
-        speed = Math.min(speed + 25, 500);
+        speed = Math.min(speed + 30, 600);
 
         // Если достигли целевого предмета и скорость достаточно медленная
-        if (currentPosition === targetIndex && speed > 300) {
+        if (currentPosition === targetIndex && speed > 400) {
+          animationPhaseRef = 'stopped';
           setAnimationPhase('stopped');
           setTimeout(() => {
             handleAnimationComplete();
-          }, 3000); // показываем результат 3 секунды
+          }, 4000); // показываем результат 4 секунды
         } else {
           setTimeout(animateSlider, speed);
         }
@@ -461,44 +466,35 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 ))}
               </div>
 
-              {/* Overlay для анимации открытия */}
+              {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
               {showOpeningAnimation && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
-                  <div className="text-center text-white">
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+                  <div className="text-center text-white bg-black/80 backdrop-blur-sm rounded-lg px-6 py-3 border border-yellow-400/50">
                     {animationPhase === 'spinning' && (
-                      <div>
-                        <div className="text-3xl font-bold mb-4">🎰 Крутим барабан...</div>
-                        <div className="text-xl">Определяем ваш выигрыш!</div>
-                        <div className="mt-4">
-                          <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                        </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-lg font-bold">🎰 Выбираем предмет...</span>
                       </div>
                     )}
                     {animationPhase === 'slowing' && (
-                      <div>
-                        <div className="text-3xl font-bold mb-4">⏳ Замедляемся...</div>
-                        <div className="text-xl">Почти готово!</div>
-                        <div className="mt-4">
-                          <div className="w-12 h-12 border-4 border-orange-400 border-t-transparent rounded-full animate-spin mx-auto" style={{ animationDuration: '2s' }}></div>
-                        </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+                        <span className="text-lg font-bold">⏳ Определяем результат...</span>
                       </div>
                     )}
                     {animationPhase === 'stopped' && openingResult && (
-                      <div>
-                        <div className="text-4xl font-bold mb-6">🎉 Поздравляем!</div>
-                        <div className="text-2xl mb-4">Вы выиграли:</div>
-                        <div className="text-3xl font-bold text-green-400 mb-2">{openingResult.item.name}</div>
-                        <div className="text-xl">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mb-2">🎉 Поздравляем!</div>
+                        <div className="text-lg text-green-400 font-bold">{openingResult.item.name}</div>
+                        <div className="text-md mb-3">
                           <Monetary value={parseFloat(openingResult.item.price || '0')} />
                         </div>
-                        <div className="mt-6">
-                          <button
-                            onClick={handleAnimationComplete}
-                            className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold"
-                          >
-                            ✨ Забрать предмет ✨
-                          </button>
-                        </div>
+                        <button
+                          onClick={handleAnimationComplete}
+                          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold text-sm"
+                        >
+                          ✨ Забрать предмет ✨
+                        </button>
                       </div>
                     )}
                   </div>

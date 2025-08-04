@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Item, CaseTemplate } from '../types/api';
+import { useGetCaseItemsQuery } from '../features/cases/casesApi';
 
 interface CaseOpeningAnimationProps {
   isOpen: boolean;
@@ -22,30 +23,50 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
   const [sliderPosition, setSliderPosition] = useState(0);
   const rollingRef = useRef<HTMLDivElement>(null);
 
+  // Получаем реальные предметы из кейса
+  const { data: caseItemsData } = useGetCaseItemsQuery(
+    caseTemplate?.id || '',
+    { skip: !caseTemplate?.id }
+  );
+
   // Создаем массив предметов для анимации прокрутки
   useEffect(() => {
-    if (isOpen && wonItem) {
-      // Создаем фиктивные предметы для прокрутки, включая выигранный предмет
-      const rollingItemsArray: Item[] = [];
+    if (isOpen && wonItem && caseItemsData?.success) {
+      const caseItems = caseItemsData.data.items || [];
 
-      // Добавляем 25 случайных предметов для прокрутки (больше для длинной рулетки)
-      for (let i = 0; i < 25; i++) {
-        const randomItem: Item = {
-          id: `rolling-${i}`,
-          name: `Item ${i + 1}`,
-          price: (Math.random() * 100).toFixed(2),
-          rarity: ['consumer', 'industrial', 'milspec', 'restricted'][Math.floor(Math.random() * 4)],
-          image_url: null
-        };
-        rollingItemsArray.push(randomItem);
+      if (caseItems.length > 0) {
+        const rollingItemsArray: Item[] = [];
+
+        // Создаем длинную прокрутку из реальных предметов кейса
+        // Повторяем предметы кейса несколько раз для эффекта длинной рулетки
+        for (let round = 0; round < 5; round++) {
+          caseItems.forEach((item) => {
+            rollingItemsArray.push({
+              ...item,
+              id: `rolling-${round}-${item.id}` // Уникальный ID для каждого экземпляра
+            });
+          });
+        }
+
+        // Добавляем еще несколько случайных предметов из кейса
+        for (let i = 0; i < 10; i++) {
+          const randomCaseItem = caseItems[Math.floor(Math.random() * caseItems.length)];
+          rollingItemsArray.push({
+            ...randomCaseItem,
+            id: `extra-rolling-${i}-${randomCaseItem.id}`
+          });
+        }
+
+        // Добавляем выигранный предмет в конец для корректной остановки
+        rollingItemsArray.push({
+          ...wonItem,
+          id: `winner-${wonItem.id}`
+        });
+
+        setRollingItems(rollingItemsArray);
       }
-
-      // Добавляем выигранный предмет в определенное место для корректной остановки
-      rollingItemsArray.push(wonItem);
-
-      setRollingItems(rollingItemsArray);
     }
-  }, [isOpen, wonItem]);
+  }, [isOpen, wonItem, caseItemsData]);
 
   useEffect(() => {
     if (isOpen && !isLoading && wonItem) {
@@ -82,21 +103,39 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
     }
   }, [isOpen, isLoading, wonItem]);
 
-  // Анимация движения слайдера
+  // Анимация движения слайдера с фокусом камеры
   const startSliderAnimation = () => {
     let position = 0;
-    const itemWidth = 80; // ширина каждого предмета
+    let speed = 3; // начальная скорость
+    const itemWidth = 80; // ширина каждого предмета с отступами
     const totalItems = rollingItems.length;
-    const maxPosition = (totalItems - 1) * itemWidth;
+    const maxPosition = (totalItems - 2) * itemWidth; // позиция выигранного предмета
 
     const animateSlider = () => {
-      position += 2; // скорость движения
-      if (position > maxPosition + 200) {
-        position = -200; // возвращаем в начало
+      // Замедляем при приближении к концу (stopping stage)
+      if (animationStage === 'stopping') {
+        const remainingDistance = maxPosition - position;
+        if (remainingDistance > 0) {
+          speed = Math.max(0.5, speed * 0.98); // плавное замедление
+          position += speed;
+
+          // Останавливаемся на выигранном предмете
+          if (position >= maxPosition) {
+            position = maxPosition;
+          }
+        }
+      } else if (animationStage === 'rolling') {
+        // Обычная скорость прокрутки
+        position += speed;
+        // Циклическая прокрутка для эффекта бесконечности
+        if (position > totalItems * itemWidth / 2) {
+          position = position - (totalItems * itemWidth / 3);
+        }
       }
+
       setSliderPosition(position);
 
-      if (animationStage === 'rolling' || animationStage === 'stopping') {
+      if ((animationStage === 'rolling' || animationStage === 'stopping') && position < maxPosition + 10) {
         requestAnimationFrame(animateSlider);
       }
     };
@@ -245,68 +284,89 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
               }`}>{caseTemplate?.name}</h3>
             </div>
 
-            {/* Rolling Items Container - уменьшенный размер */}
-            <div className="relative h-24 bg-black/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 overflow-hidden">
-              {/* Движущийся ползунок-border */}
-              <div
-                className="absolute top-0 w-20 h-full border-4 border-yellow-400 border-opacity-80 bg-yellow-400/10 z-20 transition-all duration-100"
+            {/* Rolling Items Container - увеличенный размер для лучшей видимости */}
+            <div className="relative h-32 bg-black/30 backdrop-blur-sm rounded-2xl border border-purple-500/30 overflow-hidden">
+              {/* Центральная фиксированная рамка-прицел */}
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-20 h-20 border-4 border-yellow-400 border-opacity-90 bg-yellow-400/20 z-20 rounded-lg backdrop-blur-sm"
                 style={{
-                  left: `${Math.max(0, Math.min(sliderPosition, 100))}px`,
-                  boxShadow: '0 0 20px rgba(255, 193, 7, 0.6), inset 0 0 20px rgba(255, 193, 7, 0.3)'
+                  boxShadow: '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
                 }}
               >
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-400 rounded-full animate-pulse shadow-lg"></div>
+                {/* Индикатор фокуса */}
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                  <div className="w-2 h-6 bg-yellow-400 rounded-full animate-bounce"></div>
+                </div>
               </div>
 
-              {/* Rolling items - уменьшенные предметы */}
+              {/* Rolling items - движущиеся предметы под фиксированной рамкой */}
               <div
                 ref={rollingRef}
-                className="flex items-center h-full px-4"
+                className="flex items-center h-full px-4 pt-2"
                 style={{
-                  transform: animationStage === 'stopping'
-                    ? `translateX(-${rollingItems.length * 40}px)`
-                    : 'translateX(0)',
-                  transition: animationStage === 'stopping' ? 'transform 2s ease-out' : 'none'
+                  transform: `translateX(-${sliderPosition}px)`,
+                  transition: animationStage === 'stopping' ? 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
                 }}
               >
-                {rollingItems.map((item, index) => (
-                  <div
-                    key={`${item.id}-${index}`}
-                    className={`flex-shrink-0 w-16 h-16 mx-2 rounded-lg p-1 transition-all duration-300 bg-gradient-to-br ${getRarityColor(item.rarity)} ${
-                      index === rollingItems.length - 1 && animationStage === 'stopping'
-                        ? 'ring-2 ring-yellow-400/70 scale-110'
-                        : ''
-                    }`}
-                  >
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-full h-full object-contain rounded"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                        </svg>
+                {rollingItems.map((item, index) => {
+                  const isWinningItem = index === rollingItems.length - 1;
+                  const distanceFromCenter = Math.abs((sliderPosition + 40) - (index * 80 + 40));
+                  const isInFocus = distanceFromCenter < 60; // предмет в фокусе если близко к центру
+
+                  return (
+                    <div
+                      key={`${item.id}-${index}`}
+                      className={`flex-shrink-0 w-20 h-20 mx-2 rounded-lg p-1 transition-all duration-200 bg-gradient-to-br ${getRarityColor(item.rarity)} ${
+                        isWinningItem && animationStage === 'stopping'
+                          ? 'ring-4 ring-yellow-400/90 scale-110 shadow-2xl'
+                          : isInFocus
+                            ? 'scale-105 ring-2 ring-white/50'
+                            : 'scale-100 opacity-80'
+                      }`}
+                      style={{
+                        filter: isInFocus ? 'brightness(1.2)' : 'brightness(0.8)'
+                      }}
+                    >
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-full h-full object-contain rounded"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
+                          <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+
+                      {/* Показываем цену предмета */}
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-1 rounded">
+                        {Number(item.price).toFixed(0)}₽
                       </div>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Glow effects on sides */}
-              <div className="absolute left-0 top-0 w-16 h-full bg-gradient-to-r from-black/80 to-transparent z-10"></div>
-              <div className="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-black/80 to-transparent z-10"></div>
+              {/* Градиенты по краям для эффекта исчезновения */}
+              <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10"></div>
+              <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-black/90 via-black/60 to-transparent z-10"></div>
             </div>
 
             {/* Status text */}
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-purple-200 text-lg font-medium">
-                {animationStage === 'starting' && "Подготовка к открытию..."}
-                {animationStage === 'rolling' && "🎰 Выбираем предмет..."}
-                {animationStage === 'stopping' && "🎯 Определяем результат..."}
+                {animationStage === 'starting' && "🎁 Открываем кейс..."}
+                {animationStage === 'rolling' && "✨ Предметы кейса в движении"}
+                {animationStage === 'stopping' && "🎯 Ваш предмет выбран!"}
               </p>
+              {caseItemsData?.success && (
+                <p className="text-purple-300 text-sm">
+                  Всего предметов в кейсе: {caseItemsData.data.items.length}
+                </p>
+              )}
             </div>
           </div>
         )}

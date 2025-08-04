@@ -21,13 +21,13 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
       const difference = targetTime - now;
 
       // Логирование для отладки
-      console.log('CaseTimer updateTimer:', {
-        nextAvailableTime,
-        now: new Date(now),
-        targetTime: new Date(targetTime),
-        difference,
-        isAvailable: difference <= 0
-      });
+      // console.log('CaseTimer updateTimer:', {
+      //   nextAvailableTime,
+      //   now: new Date(now),
+      //   targetTime: new Date(targetTime),
+      //   difference,
+      //   isAvailable: difference <= 0
+      // });
 
       if (difference <= 0) {
         setIsAvailable(true);
