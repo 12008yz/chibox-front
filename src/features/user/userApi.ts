@@ -443,6 +443,38 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+
+    // Крестики-нолики API
+    createTicTacToeGame: builder.mutation<
+      ApiResponse<any>,
+      void
+    >({
+      query: () => ({
+        url: 'v1/tic-tac-toe/new-game',
+        method: 'POST',
+      }),
+      invalidatesTags: ['TicTacToe'],
+    }),
+
+    getCurrentTicTacToeGame: builder.query<
+      ApiResponse<any>,
+      void
+    >({
+      query: () => 'v1/tic-tac-toe/current-game',
+      providesTags: ['TicTacToe'],
+    }),
+
+    makeTicTacToeMove: builder.mutation<
+      ApiResponse<any>,
+      { position: number }
+    >({
+      query: (data) => ({
+        url: 'v1/tic-tac-toe/move',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['TicTacToe'],
+    }),
   }),
 });
 
@@ -481,4 +513,9 @@ export const {
   useResendVerificationCodeMutation,
   useVerifyEmailMutation,
   useUpdateUserProfileMutation,
+
+  // Крестики-нолики хуки
+  useCreateTicTacToeGameMutation,
+  useGetCurrentTicTacToeGameQuery,
+  useMakeTicTacToeMoveMutation,
 } = userApi;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
+import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
@@ -8,7 +9,7 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
-
+import TicTacToeGame from '../components/TicTacToeGame';
 
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
@@ -31,12 +32,19 @@ const HomePage: React.FC = () => {
     previewUrl?: string;
   } | null>(null);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
+  const [pendingBonusCase, setPendingBonusCase] = useState<CaseTemplate | null>(null);
 
 
 
   // Мутации для покупки и открытия кейсов
   const [buyCase] = useBuyCaseMutation();
   const [openCase] = useOpenCaseMutation();
+
+  // Запрос для получения информации о крестиках-ноликах
+  const { data: ticTacToeData, refetch: refetchTicTacToe } = useGetCurrentTicTacToeGameQuery(undefined, {
+    skip: !userData?.id, // Пропускаем запрос если пользователь не авторизован
+  });
 
   // Баннеры контент
   const bannerContent = [
@@ -112,6 +120,23 @@ const HomePage: React.FC = () => {
   // Функция для покупки и открытия кейса - ВОЗВРАЩАЕТ результат для анимации в модале
   const handleBuyAndOpenCase = async (caseTemplate: CaseTemplate) => {
     try {
+      // Проверяем, является ли это бонусным кейсом
+      const isBonusCase = caseTemplate.name?.toLowerCase().includes('бонус');
+
+      if (isBonusCase) {
+        // Проверяем, выиграл ли пользователь в крестики-нолики за последние 24 часа
+        await refetchTicTacToe();
+        const hasWonRecently = ticTacToeData?.data?.game?.result === 'win' && ticTacToeData?.data?.game?.reward_given;
+
+        if (!hasWonRecently) {
+          // Если не выиграл, показываем игру крестики-нолики
+          setPendingBonusCase(caseTemplate);
+          setShowTicTacToeGame(true);
+          return null; // Не открываем кейс сейчас
+        }
+        // Если выиграл, продолжаем открытие кейса
+      }
+
       // Проверяем, бесплатный ли это кейс
       const isFreeCase = parseFloat(caseTemplate.price) === 0 || isNaN(parseFloat(caseTemplate.price));
 
@@ -203,6 +228,29 @@ const HomePage: React.FC = () => {
 
       // Пробрасываем ошибку дальше
       throw error;
+    }
+  };
+
+  // Функция для обработки победы в крестики-нолики
+  const handleTicTacToeWin = async () => {
+    try {
+      if (pendingBonusCase) {
+        // Обновляем данные крестики-нолики
+        await refetchTicTacToe();
+
+        // Пытаемся открыть бонусный кейс
+        const result = await handleBuyAndOpenCase(pendingBonusCase);
+
+        // Сбрасываем состояние
+        setPendingBonusCase(null);
+        setShowTicTacToeGame(false);
+
+        return result;
+      }
+    } catch (error) {
+      console.error('Ошибка при открытии бонусного кейса после победы:', error);
+      setPendingBonusCase(null);
+      setShowTicTacToeGame(false);
     }
   };
 
