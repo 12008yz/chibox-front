@@ -86,15 +86,24 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         {isBonusCase ? (
           <button
             onClick={(e) => {
+              console.log('=== КНОПКА ИГРАТЬ НАЖАТА ===');
               console.log('Кнопка "Играть" нажата для кейса:', title);
+              console.log('Event target:', e.target);
+              console.log('Event currentTarget:', e.currentTarget);
               e.preventDefault();
               e.stopPropagation();
               if (onPlayBonusGame) {
-                console.log('Вызываем onPlayBonusGame');
-                onPlayBonusGame();
+                console.log('Вызываем onPlayBonusGame для кейса:', title);
+                try {
+                  onPlayBonusGame();
+                  console.log('onPlayBonusGame вызван успешно');
+                } catch (error) {
+                  console.error('Ошибка при вызове onPlayBonusGame:', error);
+                }
               } else {
                 console.log('onPlayBonusGame не определен!');
               }
+              console.log('=== КОНЕЦ ОБРАБОТКИ КНОПКИ ИГРАТЬ ===');
             }}
             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
           >

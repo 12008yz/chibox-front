@@ -9,6 +9,7 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
+import TicTacToeGame from '../components/TicTacToeGame';
 
 
 import { useSocket } from '../hooks/useSocket';
@@ -32,6 +33,10 @@ const HomePage: React.FC = () => {
     previewUrl?: string;
   } | null>(null);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  // Состояние игры крестики-нолики
+  const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
+  const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
 
 
@@ -374,6 +379,35 @@ const HomePage: React.FC = () => {
                     console.log('Принудительное обновление данных...');
                     refetchUser();
                     refetchCases();
+                  };
+
+                  // Обработчики игры крестики-нолики
+                  const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
+                    console.log('HomePage: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
+                    setBonusCase(caseTemplate);
+                    setShowTicTacToeGame(true);
+                  };
+
+                  const handleTicTacToeGameClose = () => {
+                    console.log('HomePage: Закрываем игру крестики-нолики');
+                    setShowTicTacToeGame(false);
+                    setBonusCase(null);
+                  };
+
+                  const handleTicTacToeWin = async () => {
+                    console.log('HomePage: Победа в крестики-нолики!');
+                    setShowTicTacToeGame(false);
+
+                    if (bonusCase) {
+                      try {
+                        // Открываем бонусный кейс после победы
+                        await handleBuyAndOpenCase(bonusCase);
+                        handleDataUpdate();
+                      } catch (error) {
+                        console.error('Ошибка при открытии бонусного кейса:', error);
+                      }
+                    }
+                    setBonusCase(null);
                   };
 
                   // Функция для фильтрации кейсов по подписке

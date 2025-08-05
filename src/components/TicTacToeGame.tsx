@@ -12,6 +12,7 @@ interface TicTacToeGameProps {
 }
 
 const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
+  console.log('TicTacToeGame: Компонент рендерится с пропсами:', { isOpen, hasOnClose: !!onClose, hasOnRewardReceived: !!onRewardReceived });
 
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
@@ -33,13 +34,18 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   }, [isOpen, refetchCurrentGame]);
 
   const handleStartNewGame = async () => {
+    console.log('TicTacToeGame: Начинаем создание новой игры...');
     try {
+      console.log('TicTacToeGame: Вызываем createGame()...');
       const result = await createGame().unwrap();
+      console.log('TicTacToeGame: Результат создания игры:', result);
       if (result.success) {
+        console.log('TicTacToeGame: Игра успешно создана');
         setMessage('');
         refetchCurrentGame();
       }
     } catch (error: any) {
+      console.error('TicTacToeGame: Ошибка при создании игры:', error);
       setMessage(error?.data?.error || 'Ошибка при создании игры');
     }
   };
@@ -118,7 +124,11 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('TicTacToeGame: Не открыт, возвращаем null');
+    return null;
+  }
+  console.log('TicTacToeGame: Рендерим компонент игры');
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Case from './Case';
 import Title from './Title';
@@ -14,6 +14,7 @@ interface CaseListingProps {
   fixedPrices?: boolean;
   nextCaseAvailableTime?: string;
   onDataUpdate?: () => void;
+  onPlayBonusGame?: (caseTemplate: CaseTemplate) => void;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -23,12 +24,32 @@ const CaseListing: React.FC<CaseListingProps> = ({
   onBuyAndOpenCase,
   fixedPrices = false,
   nextCaseAvailableTime,
-  onDataUpdate
+  onDataUpdate,
+  onPlayBonusGame
 }) => {
+  console.log('=== CASELIST РЕРЕНДЕР ===', {
+    name,
+    casesCount: cases?.length,
+    fixedPrices,
+    nextCaseAvailableTime
+  });
+
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
+  const [showTicTacToeGame, setShowTicTacToeGameInternal] = useState(false);
+
+  // Кастомная функция для изменения состояния игры с логированием
+  const setShowTicTacToeGame = (value: boolean) => {
+    console.log(`=== ИЗМЕНЕНИЕ СОСТОЯНИЯ ИГРЫ: ${showTicTacToeGame} -> ${value} ===`);
+    console.trace('setShowTicTacToeGame вызвана из:');
+    setShowTicTacToeGameInternal(value);
+  };
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
+
+  // Отслеживаем изменения состояния игры
+  useEffect(() => {
+    console.log('CaseListing: showTicTacToeGame изменилось на:', showTicTacToeGame);
+  }, [showTicTacToeGame]);
 
 
 
@@ -64,14 +85,23 @@ const CaseListing: React.FC<CaseListingProps> = ({
     console.log('CaseListing: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
     console.log('CaseListing: ID кейса:', caseTemplate.id);
     console.log('CaseListing: Это бонусный кейс?', caseTemplate.id === '55555555-5555-5555-5555-555555555555');
+    console.log('CaseListing: Текущее состояние showTicTacToeGame до изменения:', showTicTacToeGame);
     setBonusCase(caseTemplate);
     setShowTicTacToeGame(true);
     console.log('CaseListing: Состояние игры установлено в true');
+
+    // Добавляем небольшую задержку для проверки состояния
+    setTimeout(() => {
+      console.log('CaseListing: Состояние showTicTacToeGame после изменения:', showTicTacToeGame);
+    }, 100);
   };
 
   const handleTicTacToeGameClose = () => {
+    console.log('=== ЗАКРЫТИЕ ИГРЫ КРЕСТИКИ-НОЛИКИ ===');
+    console.trace('handleTicTacToeGameClose вызвана из:');
     setShowTicTacToeGame(false);
     setBonusCase(null);
+    console.log('=== ИГРА ЗАКРЫТА ===');
   };
 
   const handleTicTacToeWin = async () => {
