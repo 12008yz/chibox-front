@@ -9,19 +9,23 @@ interface CaseProps {
   fixedPrices?: boolean;
   description?: string;
   nextCaseAvailableTime?: string;
+  isBonusCase?: boolean;
+  onPlayBonusGame?: () => void;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame }) => {
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Логирование для отладки
-  console.log(`Case "${title}":`, {
-    price,
-    isFreeCase: parseFloat(price) === 0 || isNaN(parseFloat(price)),
-    nextCaseAvailableTime,
-    fixedPrices
-  });
+  // // Логирование для отладки
+  // console.log(`Case "${title}":`, {
+  //   price,
+  //   isFreeCase: parseFloat(price) === 0 || isNaN(parseFloat(price)),
+  //   nextCaseAvailableTime,
+  //   fixedPrices,
+  //   isBonusCase,
+  //   hasPlayHandler: !!onPlayBonusGame
+  // });
 
   // Дефолтные изображения кейсов CS2
   const defaultCaseImages = [
@@ -78,11 +82,30 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             )
           )}
         </div>
-        {/* Отображение таймера для бесплатных кейсов */}
-        {nextCaseAvailableTime && (parseFloat(price) === 0 || isNaN(parseFloat(price))) && (
-          <div className="text-center mt-2">
-            <CaseTimer nextAvailableTime={nextCaseAvailableTime} />
-          </div>
+        {/* Отображение кнопки "Играть" для бонусного кейса или таймера для обычных бесплатных кейсов */}
+        {isBonusCase ? (
+          <button
+            onClick={(e) => {
+              console.log('Кнопка "Играть" нажата для кейса:', title);
+              e.preventDefault();
+              e.stopPropagation();
+              if (onPlayBonusGame) {
+                console.log('Вызываем onPlayBonusGame');
+                onPlayBonusGame();
+              } else {
+                console.log('onPlayBonusGame не определен!');
+              }
+            }}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            🎮 Играть
+          </button>
+        ) : (
+          nextCaseAvailableTime && (parseFloat(price) === 0 || isNaN(parseFloat(price))) && (
+            <div className="text-center mt-2">
+              <CaseTimer nextAvailableTime={nextCaseAvailableTime} />
+            </div>
+          )
         )}
         {/* Отображение описания */}
         {(description || title.toLowerCase().includes('бонус')) && (

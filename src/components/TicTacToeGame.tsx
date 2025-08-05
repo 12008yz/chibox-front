@@ -12,7 +12,7 @@ interface TicTacToeGameProps {
 }
 
 const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
-  const [gameStarted, setGameStarted] = useState(false);
+
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
 
@@ -36,7 +36,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     try {
       const result = await createGame().unwrap();
       if (result.success) {
-        setGameStarted(true);
         setMessage('');
         refetchCurrentGame();
       }
@@ -62,7 +61,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         setMessage(result.message || '');
         refetchCurrentGame();
 
-        if (result.game?.result === 'win' && onRewardReceived) {
+        if (result.data?.game?.result === 'win' && onRewardReceived) {
           onRewardReceived();
         }
       }

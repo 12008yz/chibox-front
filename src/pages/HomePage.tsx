@@ -9,11 +9,11 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
 import Leaderboard from '../components/Leaderboard';
-import TicTacToeGame from '../components/TicTacToeGame';
+
 
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
-import type { CaseTemplate, Item } from '../types/api';
+import type { CaseTemplate } from '../types/api';
 
 const HomePage: React.FC = () => {
   const location = useLocation();
@@ -32,8 +32,8 @@ const HomePage: React.FC = () => {
     previewUrl?: string;
   } | null>(null);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
-  const [pendingBonusCase, setPendingBonusCase] = useState<CaseTemplate | null>(null);
+
+
 
 
 
@@ -129,9 +129,8 @@ const HomePage: React.FC = () => {
         const hasWonRecently = ticTacToeData?.data?.game?.result === 'win' && ticTacToeData?.data?.game?.reward_given;
 
         if (!hasWonRecently) {
-          // Если не выиграл, показываем игру крестики-нолики
-          setPendingBonusCase(caseTemplate);
-          setShowTicTacToeGame(true);
+          // Если не выиграл в крестики-нолики, не можем открыть бонусный кейс
+          console.log('Нужно сначала выиграть в крестики-нолики для открытия бонусного кейса');
           return null; // Не открываем кейс сейчас
         }
         // Если выиграл, продолжаем открытие кейса
@@ -231,28 +230,7 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Функция для обработки победы в крестики-нолики
-  const handleTicTacToeWin = async () => {
-    try {
-      if (pendingBonusCase) {
-        // Обновляем данные крестики-нолики
-        await refetchTicTacToe();
 
-        // Пытаемся открыть бонусный кейс
-        const result = await handleBuyAndOpenCase(pendingBonusCase);
-
-        // Сбрасываем состояние
-        setPendingBonusCase(null);
-        setShowTicTacToeGame(false);
-
-        return result;
-      }
-    } catch (error) {
-      console.error('Ошибка при открытии бонусного кейса после победы:', error);
-      setPendingBonusCase(null);
-      setShowTicTacToeGame(false);
-    }
-  };
 
 
 
