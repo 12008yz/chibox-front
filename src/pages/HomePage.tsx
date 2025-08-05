@@ -38,6 +38,42 @@ const HomePage: React.FC = () => {
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
+  // Логирование изменений состояния игры
+  useEffect(() => {
+    console.log('HomePage: showTicTacToeGame изменилось на:', showTicTacToeGame);
+  }, [showTicTacToeGame]);
+
+  // Обработчики игры крестики-нолики
+  const handleTicTacToeGameClose = () => {
+    console.log('HomePage: Закрываем игру крестики-нолики');
+    setShowTicTacToeGame(false);
+    setBonusCase(null);
+  };
+
+  const handleTicTacToeWin = async () => {
+    console.log('HomePage: Победа в крестики-нолики!');
+    setShowTicTacToeGame(false);
+
+    if (bonusCase) {
+      try {
+        // Открываем бонусный кейс после победы
+        await handleBuyAndOpenCase(bonusCase);
+        // Обновляем данные пользователя и кейсов
+        refetchUser();
+        refetchCases();
+      } catch (error) {
+        console.error('Ошибка при открытии бонусного кейса:', error);
+      }
+    }
+    setBonusCase(null);
+  };
+
+  const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
+    console.log('HomePage: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
+    setBonusCase(caseTemplate);
+    setShowTicTacToeGame(true);
+  };
+
 
 
 
@@ -381,34 +417,9 @@ const HomePage: React.FC = () => {
                     refetchCases();
                   };
 
-                  // Обработчики игры крестики-нолики
-                  const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
-                    console.log('HomePage: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
-                    setBonusCase(caseTemplate);
-                    setShowTicTacToeGame(true);
-                  };
 
-                  const handleTicTacToeGameClose = () => {
-                    console.log('HomePage: Закрываем игру крестики-нолики');
-                    setShowTicTacToeGame(false);
-                    setBonusCase(null);
-                  };
 
-                  const handleTicTacToeWin = async () => {
-                    console.log('HomePage: Победа в крестики-нолики!');
-                    setShowTicTacToeGame(false);
 
-                    if (bonusCase) {
-                      try {
-                        // Открываем бонусный кейс после победы
-                        await handleBuyAndOpenCase(bonusCase);
-                        handleDataUpdate();
-                      } catch (error) {
-                        console.error('Ошибка при открытии бонусного кейса:', error);
-                      }
-                    }
-                    setBonusCase(null);
-                  };
 
                   // Функция для фильтрации кейсов по подписке
                   const getSubscriptionCases = () => {
@@ -481,6 +492,7 @@ const HomePage: React.FC = () => {
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             nextCaseAvailableTime={nextCaseAvailableTime}
                             onDataUpdate={handleDataUpdate}
+                            onPlayBonusGame={handlePlayBonusGame}
                           />
                         </div>
                       )}
@@ -495,6 +507,7 @@ const HomePage: React.FC = () => {
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             fixedPrices={true}
                             onDataUpdate={handleDataUpdate}
+                            onPlayBonusGame={handlePlayBonusGame}
                           />
                         </div>
                       )}
@@ -566,6 +579,12 @@ const HomePage: React.FC = () => {
         />
       )}
 
+      {/* Игра крестики-нолики */}
+      <TicTacToeGame
+        isOpen={showTicTacToeGame}
+        onClose={handleTicTacToeGameClose}
+        onRewardReceived={handleTicTacToeWin}
+      />
 
     </div>
   );

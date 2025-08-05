@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   useCreateTicTacToeGameMutation,
   useGetCurrentTicTacToeGameQuery,
@@ -13,6 +13,10 @@ interface TicTacToeGameProps {
 
 const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
   console.log('TicTacToeGame: Компонент рендерится с пропсами:', { isOpen, hasOnClose: !!onClose, hasOnRewardReceived: !!onRewardReceived });
+
+  if (isOpen) {
+    console.log('TicTacToeGame: ИГРА ДОЛЖНА БЫТЬ ОТКРЫТА!');
+  }
 
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
@@ -131,8 +135,24 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   console.log('TicTacToeGame: Рендерим компонент игры');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      style={{ zIndex: 9999 }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          console.log('TicTacToeGame: Клик по фону, закрываем игру');
+          onClose();
+        }
+      }}
+    >
+      <div
+        className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700"
+        style={{
+          backgroundColor: '#1f2937',
+          border: '3px solid #ef4444', // Красная рамка для отладки
+          boxShadow: '0 0 20px rgba(239, 68, 68, 0.5)'
+        }}
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-white">Крестики-нолики</h2>
           <button

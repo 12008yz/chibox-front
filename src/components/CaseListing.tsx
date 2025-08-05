@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Case from './Case';
 import Title from './Title';
 import CasePreviewModal from './CasePreviewModal';
-import TicTacToeGame from './TicTacToeGame';
+
 import { CaseTemplate } from '../types/api';
 
 interface CaseListingProps {
@@ -36,20 +36,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [showTicTacToeGame, setShowTicTacToeGameInternal] = useState(false);
 
-  // Кастомная функция для изменения состояния игры с логированием
-  const setShowTicTacToeGame = (value: boolean) => {
-    console.log(`=== ИЗМЕНЕНИЕ СОСТОЯНИЯ ИГРЫ: ${showTicTacToeGame} -> ${value} ===`);
-    console.trace('setShowTicTacToeGame вызвана из:');
-    setShowTicTacToeGameInternal(value);
-  };
-  const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
-
-  // Отслеживаем изменения состояния игры
-  useEffect(() => {
-    console.log('CaseListing: showTicTacToeGame изменилось на:', showTicTacToeGame);
-  }, [showTicTacToeGame]);
 
 
 
@@ -82,45 +69,13 @@ const CaseListing: React.FC<CaseListingProps> = ({
   };
 
   const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
-    console.log('CaseListing: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
-    console.log('CaseListing: ID кейса:', caseTemplate.id);
-    console.log('CaseListing: Это бонусный кейс?', caseTemplate.id === '55555555-5555-5555-5555-555555555555');
-    console.log('CaseListing: Текущее состояние showTicTacToeGame до изменения:', showTicTacToeGame);
-    setBonusCase(caseTemplate);
-    setShowTicTacToeGame(true);
-    console.log('CaseListing: Состояние игры установлено в true');
-
-    // Добавляем небольшую задержку для проверки состояния
-    setTimeout(() => {
-      console.log('CaseListing: Состояние showTicTacToeGame после изменения:', showTicTacToeGame);
-    }, 100);
-  };
-
-  const handleTicTacToeGameClose = () => {
-    console.log('=== ЗАКРЫТИЕ ИГРЫ КРЕСТИКИ-НОЛИКИ ===');
-    console.trace('handleTicTacToeGameClose вызвана из:');
-    setShowTicTacToeGame(false);
-    setBonusCase(null);
-    console.log('=== ИГРА ЗАКРЫТА ===');
-  };
-
-  const handleTicTacToeWin = async () => {
-    console.log('CaseListing: Победа в крестики-нолики!');
-    setShowTicTacToeGame(false);
-
-    if (bonusCase && onBuyAndOpenCase) {
-      try {
-        // Открываем бонусный кейс после победы
-        await onBuyAndOpenCase(bonusCase);
-        if (onDataUpdate) {
-          onDataUpdate();
-        }
-      } catch (error) {
-        console.error('Ошибка при открытии бонусного кейса:', error);
-      }
+    console.log('CaseListing: Передаем запрос на игру в HomePage для кейса:', caseTemplate.name);
+    if (onPlayBonusGame) {
+      onPlayBonusGame(caseTemplate);
     }
-    setBonusCase(null);
   };
+
+
   return (
     <div className="flex flex-col items-center justify-center max-w-[1600px] w-full">
       <Title title={name} />
@@ -206,12 +161,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
         />
       )}
 
-      {/* Игра крестики-нолики для бонусного кейса */}
-      <TicTacToeGame
-        isOpen={showTicTacToeGame}
-        onClose={handleTicTacToeGameClose}
-        onRewardReceived={handleTicTacToeWin}
-      />
+
     </div>
   );
 };
