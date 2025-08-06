@@ -12,7 +12,10 @@ import type {
   ApiResponse,
   PaginatedResponse,
   InventoryResponse,
-  BonusStatus
+  BonusStatus,
+  TicTacToeCurrentGameResponse,
+  TicTacToeCreateGameResponse,
+  TicTacToeMakeMoveResponse
 } from '../../types/api';
 
 // Расширяем базовый API для работы с пользователем
@@ -446,7 +449,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Крестики-нолики API
     createTicTacToeGame: builder.mutation<
-      ApiResponse<any>,
+      TicTacToeCreateGameResponse,
       void
     >({
       query: () => ({
@@ -457,7 +460,7 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
     getCurrentTicTacToeGame: builder.query<
-      ApiResponse<any>,
+      TicTacToeCurrentGameResponse,
       void
     >({
       query: () => 'v1/tic-tac-toe/current-game',
@@ -465,7 +468,7 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
     makeTicTacToeMove: builder.mutation<
-      ApiResponse<any>,
+      TicTacToeMakeMoveResponse,
       { position: number }
     >({
       query: (data) => ({

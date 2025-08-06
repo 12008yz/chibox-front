@@ -290,3 +290,42 @@ export interface AuthState {
   lastLoginAttempt: number | null;
   sessionExpiry: number | null;
 }
+
+// Типы для крестиков-ноликов
+export interface TicTacToeGameState {
+  board: (string | null)[];
+  currentPlayer: 'player' | 'bot';
+  winner: 'player' | 'bot' | 'draw' | null;
+  status: 'playing' | 'finished';
+}
+
+export interface TicTacToeGame {
+  id: string;
+  user_id: string;
+  game_state: TicTacToeGameState;
+  attempts_left: number;
+  bot_goes_first: boolean;
+  result: 'win' | 'lose' | 'draw' | 'ongoing';
+  reward_given: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TicTacToeCurrentGameResponse {
+  success: boolean;
+  game: TicTacToeGame | null;
+  canPlay: boolean;
+  message?: string;
+}
+
+export interface TicTacToeCreateGameResponse {
+  success: boolean;
+  game: TicTacToeGame;
+  message?: string;
+}
+
+export interface TicTacToeMakeMoveResponse {
+  success: boolean;
+  game: TicTacToeGame;
+  message?: string;
+}

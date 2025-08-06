@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
       if (isBonusCase) {
         // Проверяем, выиграл ли пользователь в крестики-нолики за последние 24 часа
         await refetchTicTacToe();
-        const hasWonRecently = ticTacToeData?.data?.game?.result === 'win' && ticTacToeData?.data?.game?.reward_given;
+        const hasWonRecently = ticTacToeData?.game?.result === 'win' && ticTacToeData?.game?.reward_given;
 
         if (!hasWonRecently) {
           // Если не выиграл в крестики-нолики, не можем открыть бонусный кейс

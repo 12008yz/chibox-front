@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   useCreateTicTacToeGameMutation,
   useGetCurrentTicTacToeGameQuery,
@@ -28,8 +28,16 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   const [createGame, { isLoading: isCreatingGame }] = useCreateTicTacToeGameMutation();
   const [makeMove, { isLoading: isMoving }] = useMakeTicTacToeMoveMutation();
 
-  const game = currentGameData?.data?.game;
-  const canPlay = currentGameData?.data?.canPlay ?? true;
+  const game = currentGameData?.game;
+  const canPlay = currentGameData?.canPlay ?? true;
+
+  console.log('TicTacToeGame: Данные игры:', {
+    currentGameData,
+    game,
+    canPlay,
+    hasGame: !!game,
+    gameState: game?.game_state
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -71,7 +79,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         setMessage(result.message || '');
         refetchCurrentGame();
 
-        if (result.data?.game?.result === 'win' && onRewardReceived) {
+        if (result.game?.result === 'win' && onRewardReceived) {
           onRewardReceived();
         }
       }
@@ -174,7 +182,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
               Закрыть
             </button>
           </div>
-        ) : !game ? (
+        ) : !game || !game.game_state ? (
           <div className="text-center">
             <p className="text-gray-300 mb-6">
               Добро пожаловать в крестики-нолики! Выиграйте у бота, чтобы получить бонусный кейс.
