@@ -48,24 +48,19 @@ const HomePage: React.FC = () => {
     console.log('HomePage: Закрываем игру крестики-нолики');
     setShowTicTacToeGame(false);
     setBonusCase(null);
+    // Обновляем данные после закрытия игры
+    refetchUser();
+    refetchCases();
   };
 
   const handleTicTacToeWin = async () => {
-    console.log('HomePage: Победа в крестики-нолики!');
+    console.log('HomePage: Победа в крестики-нолики! Бонусный кейс добавлен в инвентарь.');
     setShowTicTacToeGame(false);
-
-    if (bonusCase) {
-      try {
-        // Открываем бонусный кейс после победы
-        await handleBuyAndOpenCase(bonusCase);
-        // Обновляем данные пользователя и кейсов
-        refetchUser();
-        refetchCases();
-      } catch (error) {
-        console.error('Ошибка при открытии бонусного кейса:', error);
-      }
-    }
     setBonusCase(null);
+
+    // Просто обновляем данные, чтобы показать новый кейс в инвентаре
+    refetchUser();
+    refetchCases();
   };
 
   const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {

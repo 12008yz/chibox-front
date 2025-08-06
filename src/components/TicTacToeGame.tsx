@@ -20,6 +20,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
+  const [showResult, setShowResult] = useState(false);
+  const [gameResult, setGameResult] = useState<string | null>(null);
 
   const { data: currentGameData, refetch: refetchCurrentGame } = useGetCurrentTicTacToeGameQuery(undefined, {
     skip: !isOpen,
@@ -42,11 +44,18 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   useEffect(() => {
     if (isOpen) {
       refetchCurrentGame();
+      setShowResult(false);
+      setGameResult(null);
+      setMessage('');
     }
   }, [isOpen, refetchCurrentGame]);
 
+
+
   const handleStartNewGame = async () => {
     console.log('TicTacToeGame: Начинаем создание новой игры...');
+    setShowResult(false);
+    setGameResult(null);
     try {
       console.log('TicTacToeGame: Вызываем createGame()...');
       const result = await createGame().unwrap();
@@ -79,8 +88,17 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         setMessage(result.message || '');
         refetchCurrentGame();
 
-        if (result.game?.result === 'win' && onRewardReceived) {
-          onRewardReceived();
+        // Если игра завершена, показываем результат
+        if (result.game?.game_state?.status === 'finished') {
+          setGameResult(result.game.result);
+          setShowResult(true);
+
+          // Если победа, вызываем callback через некоторое время
+          if (result.game?.result === 'win' && onRewardReceived) {
+            setTimeout(() => {
+              onRewardReceived();
+            }, 3000); // Показываем результат 3 секунды
+          }
         }
       }
     } catch (error: any) {
@@ -182,6 +200,57 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
               Закрыть
             </button>
           </div>
+        ) : showResult ? (
+          <div className="text-center">
+            <div className="mb-6">
+              {gameResult === 'win' && (
+                <div>
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h3 className="text-2xl font-bold text-green-400 mb-2">Поздравляем!</h3>
+                  <p className="text-white mb-4">Вы выиграли и получили бонусный кейс!</p>
+                </div>
+              )}
+              {gameResult === 'lose' && (
+                <div>
+                  <div className="text-6xl mb-4">😞</div>
+                  <h3 className="text-2xl font-bold text-red-400 mb-2">Поражение</h3>
+                  <p className="text-white mb-4">В этот раз не повезло, попробуйте еще раз!</p>
+                </div>
+              )}
+              {gameResult === 'draw' && (
+                <div>
+                  <div className="text-6xl mb-4">🤝</div>
+                  <h3 className="text-2xl font-bold text-yellow-400 mb-2">Ничья</h3>
+                  <p className="text-white mb-4">Хорошая игра! Попробуйте еще раз!</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              {game?.attempts_left && game.attempts_left > 0 && (
+                <button
+                  onClick={handleStartNewGame}
+                  disabled={isCreatingGame}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  {isCreatingGame ? 'Создание...' : 'Играть еще'}
+                </button>
+              )}
+
+              <button
+                onClick={onClose}
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+              >
+                Закрыть
+              </button>
+            </div>
+
+            {game?.attempts_left !== undefined && (
+              <p className="text-sm text-gray-400 mt-4">
+                Осталось попыток: {game.attempts_left}
+              </p>
+            )}
+          </div>
         ) : !game || !game.game_state ? (
           <div className="text-center">
             <p className="text-gray-300 mb-6">
@@ -233,16 +302,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
             {/* Кнопки управления */}
             <div className="flex gap-3">
-              {game.game_state.status === 'finished' && (
-                <button
-                  onClick={handleStartNewGame}
-                  disabled={isCreatingGame || game.attempts_left <= 0}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
-                >
-                  {isCreatingGame ? 'Создание...' : 'Новая игра'}
-                </button>
-              )}
-
               <button
                 onClick={onClose}
                 className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
