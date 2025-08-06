@@ -50,6 +50,28 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
   }, [isOpen, refetchCurrentGame]);
 
+  // Проверяем, завершена ли игра при обновлении данных
+  useEffect(() => {
+    if (game && game.game_state?.status === 'finished' && !showResult) {
+      console.log('TicTacToeGame: Обнаружена завершенная игра при загрузке данных', {
+        result: game.result,
+        winner: game.game_state.winner
+      });
+
+      setGameResult(game.result);
+      setShowResult(true);
+
+      // Если победа, вызываем callback
+      if (game.result === 'win' && onRewardReceived) {
+        console.log('TicTacToeGame: Победа при загрузке! Вызываем onRewardReceived через 3 секунды...');
+        setTimeout(() => {
+          console.log('TicTacToeGame: Вызываем onRewardReceived сейчас (из загрузки)!');
+          onRewardReceived();
+        }, 3000);
+      }
+    }
+  }, [game, showResult, onRewardReceived]);
+
 
 
   const handleStartNewGame = async () => {
@@ -90,14 +112,26 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
         // Если игра завершена, показываем результат
         if (result.game?.game_state?.status === 'finished') {
+          console.log('TicTacToeGame: Игра завершена!', {
+            result: result.game.result,
+            gameState: result.game.game_state,
+            winner: result.game.game_state.winner
+          });
+
           setGameResult(result.game.result);
           setShowResult(true);
 
           // Если победа, вызываем callback через некоторое время
           if (result.game?.result === 'win' && onRewardReceived) {
+            console.log('TicTacToeGame: Победа! Вызываем onRewardReceived через 3 секунды...');
             setTimeout(() => {
+              console.log('TicTacToeGame: Вызываем onRewardReceived сейчас!');
               onRewardReceived();
             }, 3000); // Показываем результат 3 секунды
+          } else if (result.game?.result === 'win') {
+            console.log('TicTacToeGame: Победа, но onRewardReceived не передан');
+          } else {
+            console.log('TicTacToeGame: Результат не является победой:', result.game?.result);
           }
         }
       }
@@ -202,6 +236,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </div>
         ) : showResult ? (
           <div className="text-center">
+            {/* Результат игры */}
             <div className="mb-6">
               {gameResult === 'win' && (
                 <div>
@@ -225,6 +260,36 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                 </div>
               )}
             </div>
+
+            {/* Финальная доска с результатами */}
+            {game && game.game_state && (
+              <div className="mb-6">
+                <p className="text-gray-300 mb-3 text-sm">Финальная доска:</p>
+                <div className="grid grid-cols-3 gap-2 mx-auto w-fit mb-4">
+                  {Array.from({ length: 9 }, (_, index) => (
+                    <div
+                      key={index}
+                      className="w-16 h-16 border-2 border-gray-600 bg-gray-800 flex items-center justify-center text-xl font-bold"
+                    >
+                      {getCellContent(index)}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Информация о результате */}
+                <div className="text-sm text-gray-400">
+                  {game.game_state.winner === 'player' && (
+                    <p>🎮 Вы играли ✖️ и выиграли!</p>
+                  )}
+                  {game.game_state.winner === 'bot' && (
+                    <p>🤖 Бот играл ⭕ и выиграл</p>
+                  )}
+                  {game.game_state.winner === 'draw' && (
+                    <p>🤝 Ничья - никто не выиграл</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-3">
               {game?.attempts_left && game.attempts_left > 0 && (
