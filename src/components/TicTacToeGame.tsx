@@ -58,17 +58,20 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         winner: game.game_state.winner
       });
 
-      setGameResult(game.result);
-      setShowResult(true);
+      // Добавляем задержку для всех результатов при загрузке
+      setTimeout(() => {
+        setGameResult(game.result);
+        setShowResult(true);
 
-      // Если победа, вызываем callback
-      if (game.result === 'win' && onRewardReceived) {
-        console.log('TicTacToeGame: Победа при загрузке! Вызываем onRewardReceived через 3 секунды...');
-        setTimeout(() => {
-          console.log('TicTacToeGame: Вызываем onRewardReceived сейчас (из загрузки)!');
-          onRewardReceived();
-        }, 3000);
-      }
+        // Если победа, вызываем callback
+        if (game.result === 'win' && onRewardReceived) {
+          console.log('TicTacToeGame: Победа при загрузке! Вызываем onRewardReceived через 3 секунды...');
+          setTimeout(() => {
+            console.log('TicTacToeGame: Вызываем onRewardReceived сейчас (из загрузки)!');
+            onRewardReceived();
+          }, 3000);
+        }
+      }, 1500); // Задержка 1.5 секунды для всех результатов при загрузке
     }
   }, [game, showResult, onRewardReceived]);
 
@@ -118,21 +121,24 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             winner: result.game.game_state.winner
           });
 
-          setGameResult(result.game.result);
-          setShowResult(true);
+          // Добавляем задержку для всех результатов
+          setTimeout(() => {
+            setGameResult(result.game.result);
+            setShowResult(true);
 
-          // Если победа, вызываем callback через некоторое время
-          if (result.game?.result === 'win' && onRewardReceived) {
-            console.log('TicTacToeGame: Победа! Вызываем onRewardReceived через 3 секунды...');
-            setTimeout(() => {
-              console.log('TicTacToeGame: Вызываем onRewardReceived сейчас!');
-              onRewardReceived();
-            }, 3000); // Показываем результат 3 секунды
-          } else if (result.game?.result === 'win') {
-            console.log('TicTacToeGame: Победа, но onRewardReceived не передан');
-          } else {
-            console.log('TicTacToeGame: Результат не является победой:', result.game?.result);
-          }
+            // Если победа, вызываем callback через дополнительное время
+            if (result.game?.result === 'win' && onRewardReceived) {
+              console.log('TicTacToeGame: Победа! Вызываем onRewardReceived через 3 секунды...');
+              setTimeout(() => {
+                console.log('TicTacToeGame: Вызываем onRewardReceived сейчас!');
+                onRewardReceived();
+              }, 3000); // Показываем результат 3 секунды
+            } else if (result.game?.result === 'win') {
+              console.log('TicTacToeGame: Победа, но onRewardReceived не передан');
+            } else {
+              console.log('TicTacToeGame: Результат не является победой:', result.game?.result);
+            }
+          }, 1500); // Задержка 1.5 секунды для всех результатов
         }
       }
     } catch (error: any) {
