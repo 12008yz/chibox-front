@@ -22,6 +22,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [gameResult, setGameResult] = useState<string | null>(null);
+  const [isProcessingResult, setIsProcessingResult] = useState(false);
 
   const { data: currentGameData, refetch: refetchCurrentGame } = useGetCurrentTicTacToeGameQuery(undefined, {
     skip: !isOpen,
@@ -47,21 +48,25 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
       setShowResult(false);
       setGameResult(null);
       setMessage('');
+      setIsProcessingResult(false);
     }
   }, [isOpen, refetchCurrentGame]);
 
   // Проверяем, завершена ли игра при обновлении данных
   useEffect(() => {
-    if (game && game.game_state?.status === 'finished' && !showResult) {
+    if (game && game.game_state?.status === 'finished' && !showResult && !isProcessingResult) {
       console.log('TicTacToeGame: Обнаружена завершенная игра при загрузке данных', {
         result: game.result,
         winner: game.game_state.winner
       });
 
+      setIsProcessingResult(true);
+
       // Добавляем задержку для всех результатов при загрузке
       setTimeout(() => {
         setGameResult(game.result);
         setShowResult(true);
+        setIsProcessingResult(false);
 
         // Если победа, вызываем callback
         if (game.result === 'win' && onRewardReceived) {
@@ -73,7 +78,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         }
       }, 1500); // Задержка 1.5 секунды для всех результатов при загрузке
     }
-  }, [game, showResult, onRewardReceived]);
+  }, [game, showResult, isProcessingResult, onRewardReceived]);
 
 
 
@@ -81,6 +86,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     console.log('TicTacToeGame: Начинаем создание новой игры...');
     setShowResult(false);
     setGameResult(null);
+    setIsProcessingResult(false);
     try {
       console.log('TicTacToeGame: Вызываем createGame()...');
       const result = await createGame().unwrap();
@@ -121,10 +127,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             winner: result.game.game_state.winner
           });
 
+          setIsProcessingResult(true);
+
           // Добавляем задержку для всех результатов
           setTimeout(() => {
             setGameResult(result.game.result);
             setShowResult(true);
+            setIsProcessingResult(false);
 
             // Если победа, вызываем callback через дополнительное время
             if (result.game?.result === 'win' && onRewardReceived) {
@@ -213,11 +222,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     >
       <div
         className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700"
-        style={{
-          backgroundColor: '#1f2937',
-          border: '3px solid #ef4444', // Красная рамка для отладки
-          boxShadow: '0 0 20px rgba(239, 68, 68, 0.5)'
-        }}
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-white">Крестики-нолики</h2>
@@ -322,6 +326,14 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
               </p>
             )}
           </div>
+        ) : isProcessingResult ? (
+          <div className="text-center">
+            {/* Экран ожидания во время обработки результата */}
+            <div className="mb-6">
+              <div className="text-4xl mb-4">⏳</div>
+              <p className="text-white">Обрабатываем результат...</p>
+            </div>
+          </div>
         ) : !game || !game.game_state ? (
           <div className="text-center">
             <p className="text-gray-300 mb-6">
@@ -345,7 +357,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                   key={index}
                   onClick={() => handleCellClick(index)}
                   className={getCellStyle(index)}
-                  disabled={isMoving || game.game_state.currentPlayer !== 'player' || game.game_state.status !== 'playing'}
+                  disabled={isMoving || game.game_state.currentPlayer !== 'player' || game.game_state.status !== 'playing' || isProcessingResult}
                 >
                   {getCellContent(index)}
                 </button>
@@ -355,7 +367,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {/* Статус игры */}
             <div className="text-center mb-4">
               <p className="text-lg font-semibold text-white mb-2">
-                {getStatusMessage()}
+                {isProcessingResult ? '⏳ Обрабатываем результат...' : getStatusMessage()}
               </p>
 
               <div className="flex justify-between text-sm text-gray-400">
@@ -365,7 +377,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             </div>
 
             {/* Сообщения */}
-            {message && (
+            {message && !isProcessingResult && (
               <div className="mb-4 p-3 bg-gray-800 border border-gray-600 rounded text-center">
                 <p className="text-white">{message}</p>
               </div>
@@ -375,18 +387,21 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+                disabled={isProcessingResult}
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 transition-colors"
               >
                 Закрыть
               </button>
             </div>
 
             {/* Инструкция */}
-            <div className="mt-4 p-3 bg-gray-800 border border-gray-600 rounded">
-              <p className="text-xs text-gray-400 text-center">
-                Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!
-              </p>
-            </div>
+            {!isProcessingResult && (
+              <div className="mt-4 p-3 bg-gray-800 border border-gray-600 rounded">
+                <p className="text-xs text-gray-400 text-center">
+                  Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
