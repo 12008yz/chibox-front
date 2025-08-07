@@ -23,6 +23,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   const [showResult, setShowResult] = useState(false);
   const [gameResult, setGameResult] = useState<string | null>(null);
   const [isProcessingResult, setIsProcessingResult] = useState(false);
+  const [animatingCells, setAnimatingCells] = useState<number[]>([]);
+  const [finalBoard, setFinalBoard] = useState<(string | null)[] | null>(null);
 
   const { data: currentGameData, refetch: refetchCurrentGame } = useGetCurrentTicTacToeGameQuery(undefined, {
     skip: !isOpen,
@@ -39,7 +41,11 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     game,
     canPlay,
     hasGame: !!game,
-    gameState: game?.game_state
+    gameState: game?.game_state,
+    board: game?.game_state?.board,
+    showResult,
+    gameResult,
+    finalBoard
   });
 
   useEffect(() => {
@@ -49,6 +55,15 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
       setGameResult(null);
       setMessage('');
       setIsProcessingResult(false);
+      setAnimatingCells([]);
+      setFinalBoard(null);
+
+      // Если игры нет, автоматически создаем новую
+      if (!currentGameData?.game) {
+        setTimeout(() => {
+          handleStartNewGame();
+        }, 500);
+      }
     }
   }, [isOpen, refetchCurrentGame]);
 
@@ -57,9 +72,12 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     if (game && game.game_state?.status === 'finished' && !showResult && !isProcessingResult) {
       console.log('TicTacToeGame: Обнаружена завершенная игра при загрузке данных', {
         result: game.result,
-        winner: game.game_state.winner
+        winner: game.game_state.winner,
+        board: game.game_state.board
       });
 
+      // Сохраняем финальную доску
+      setFinalBoard(game.game_state.board);
       setIsProcessingResult(true);
 
       // Добавляем задержку для всех результатов при загрузке
@@ -80,13 +98,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
   }, [game, showResult, isProcessingResult, onRewardReceived]);
 
-
-
   const handleStartNewGame = async () => {
     console.log('TicTacToeGame: Начинаем создание новой игры...');
     setShowResult(false);
     setGameResult(null);
     setIsProcessingResult(false);
+    setAnimatingCells([]);
+    setFinalBoard(null);
     try {
       console.log('TicTacToeGame: Вызываем createGame()...');
       const result = await createGame().unwrap();
@@ -112,6 +130,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
 
     setSelectedCell(position);
+    setAnimatingCells([position]);
 
     try {
       const result = await makeMove({ position }).unwrap();
@@ -124,9 +143,12 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           console.log('TicTacToeGame: Игра завершена!', {
             result: result.game.result,
             gameState: result.game.game_state,
-            winner: result.game.game_state.winner
+            winner: result.game.game_state.winner,
+            board: result.game.game_state.board
           });
 
+          // Сохраняем финальную доску
+          setFinalBoard(result.game.game_state.board);
           setIsProcessingResult(true);
 
           // Добавляем задержку для всех результатов
@@ -154,22 +176,54 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
       setMessage(error?.data?.error || 'Ошибка при совершении хода');
     } finally {
       setSelectedCell(null);
+      setTimeout(() => setAnimatingCells([]), 600);
     }
   };
 
   const getCellContent = (index: number) => {
-    if (!game) return '';
+    // Если показываем результат и есть сохраненная финальная доска
+    if (showResult && finalBoard) {
+      const cell = finalBoard[index];
+      console.log(`getCellContent (final): индекс ${index}, значение ячейки:`, cell, typeof cell);
+      if (cell === 'X') return '✖️';
+      if (cell === 'O') return '⭕';
+      return '';
+    }
+
+    // Обычный режим игры
+    if (!game) {
+      console.log('getCellContent: game не существует');
+      return '';
+    }
+    if (!game.game_state) {
+      console.log('getCellContent: game.game_state не существует');
+      return '';
+    }
+    if (!game.game_state.board) {
+      console.log('getCellContent: game.game_state.board не существует');
+      return '';
+    }
+
     const cell = game.game_state.board[index];
+    console.log(`getCellContent: индекс ${index}, значение ячейки:`, cell, typeof cell);
+
     if (cell === 'X') return '✖️';
     if (cell === 'O') return '⭕';
+    if (cell === null) return '';
+
+    console.log(`getCellContent: неизвестное значение ячейки ${index}:`, cell);
     return '';
   };
 
   const getCellStyle = (index: number) => {
-    const baseStyle = "w-20 h-20 border-2 border-gray-600 bg-gray-800 hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center text-2xl font-bold cursor-pointer";
+    const baseStyle = "w-24 h-24 border-4 border-gray-600 bg-gradient-to-br from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 transition-all duration-300 flex items-center justify-center text-3xl font-bold cursor-pointer rounded-lg shadow-lg transform hover:scale-105";
 
-    if (!game || game.game_state.board[index] !== null) {
-      return baseStyle + " cursor-not-allowed opacity-75";
+    if (!game || !game.game_state) {
+      return baseStyle + " cursor-not-allowed opacity-90";
+    }
+
+    if (game.game_state.board[index] !== null || showResult) {
+      return baseStyle + " cursor-not-allowed opacity-90";
     }
 
     if (game.game_state.currentPlayer !== 'player' || game.game_state.status !== 'playing') {
@@ -177,10 +231,14 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
 
     if (selectedCell === index) {
-      return baseStyle + " bg-blue-600";
+      return baseStyle + " bg-gradient-to-br from-blue-600 to-blue-700 scale-95";
     }
 
-    return baseStyle;
+    if (animatingCells.includes(index)) {
+      return baseStyle + " animate-pulse";
+    }
+
+    return baseStyle + " hover:border-blue-500";
   };
 
   const getStatusMessage = () => {
@@ -211,7 +269,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm"
       style={{ zIndex: 9999 }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
@@ -221,13 +279,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
       }}
     >
       <div
-        className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700"
+        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 max-w-lg w-full mx-4 border-2 border-gray-700 shadow-2xl transform transition-all duration-300"
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">Крестики-нолики</h2>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Крестики-нолики</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl"
+            className="text-gray-400 hover:text-white text-2xl hover:rotate-90 transition-all duration-300"
           >
             ✕
           </button>
@@ -235,78 +293,54 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
         {!canPlay ? (
           <div className="text-center">
-            <p className="text-red-400 mb-4">У вас закончились попытки на сегодня!</p>
-            <p className="text-gray-400 mb-6">Приходите завтра за новыми попытками.</p>
+            <div className="text-6xl mb-6">😴</div>
+            <p className="text-red-400 mb-4 text-lg">У вас закончились попытки на сегодня!</p>
+            <p className="text-gray-400 mb-8">Приходите завтра за новыми попытками.</p>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+              className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
             >
               Закрыть
             </button>
           </div>
-        ) : showResult ? (
+        ) : showResult && gameResult === 'win' ? (
           <div className="text-center">
-            {/* Результат игры */}
-            <div className="mb-6">
-              {gameResult === 'win' && (
-                <div>
-                  <div className="text-6xl mb-4">🎉</div>
-                  <h3 className="text-2xl font-bold text-green-400 mb-2">Поздравляем!</h3>
-                  <p className="text-white mb-4">Вы выиграли и получили бонусный кейс!</p>
-                </div>
-              )}
-              {gameResult === 'lose' && (
-                <div>
-                  <div className="text-6xl mb-4">😞</div>
-                  <h3 className="text-2xl font-bold text-red-400 mb-2">Поражение</h3>
-                  <p className="text-white mb-4">В этот раз не повезло, попробуйте еще раз!</p>
-                </div>
-              )}
-              {gameResult === 'draw' && (
-                <div>
-                  <div className="text-6xl mb-4">🤝</div>
-                  <h3 className="text-2xl font-bold text-yellow-400 mb-2">Ничья</h3>
-                  <p className="text-white mb-4">Хорошая игра! Попробуйте еще раз!</p>
-                </div>
-              )}
+            {/* Экран победы */}
+            <div className="mb-8">
+              <div className="animate-bounce">
+                <div className="text-8xl mb-6">🎉</div>
+                <h3 className="text-3xl font-bold text-green-400 mb-4">Поздравляем!</h3>
+                <p className="text-white mb-6 text-lg">Вы выиграли и получили бонусный кейс!</p>
+              </div>
             </div>
 
             {/* Финальная доска с результатами */}
             {game && game.game_state && (
-              <div className="mb-6">
-                <p className="text-gray-300 mb-3 text-sm">Финальная доска:</p>
-                <div className="grid grid-cols-3 gap-2 mx-auto w-fit mb-4">
+              <div className="mb-8">
+                <p className="text-gray-300 mb-4 text-sm">Финальная доска:</p>
+                <div className="grid grid-cols-3 gap-3 mx-auto w-fit mb-6">
                   {Array.from({ length: 9 }, (_, index) => (
                     <div
                       key={index}
-                      className="w-16 h-16 border-2 border-gray-600 bg-gray-800 flex items-center justify-center text-xl font-bold"
+                      className="w-20 h-20 border-2 border-gray-600 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-2xl font-bold rounded-lg"
                     >
                       {getCellContent(index)}
                     </div>
                   ))}
                 </div>
 
-                {/* Информация о результате */}
                 <div className="text-sm text-gray-400">
-                  {game.game_state.winner === 'player' && (
-                    <p>🎮 Вы играли ✖️ и выиграли!</p>
-                  )}
-                  {game.game_state.winner === 'bot' && (
-                    <p>🤖 Бот играл ⭕ и выиграл</p>
-                  )}
-                  {game.game_state.winner === 'draw' && (
-                    <p>🤝 Ничья - никто не выиграл</p>
-                  )}
+                  <p>🎮 Вы играли ✖️ и выиграли!</p>
                 </div>
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {game?.attempts_left && game.attempts_left > 0 && (
                 <button
                   onClick={handleStartNewGame}
                   disabled={isCreatingGame}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-500 hover:to-green-400 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 font-semibold"
                 >
                   {isCreatingGame ? 'Создание...' : 'Играть еще'}
                 </button>
@@ -314,91 +348,126 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-500 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 font-semibold"
               >
-                Закрыть
+                Забрать приз
               </button>
             </div>
 
             {game?.attempts_left !== undefined && (
-              <p className="text-sm text-gray-400 mt-4">
-                Осталось попыток: {game.attempts_left}
+              <p className="text-sm text-gray-400 mt-6 bg-gray-800 rounded-lg p-3">
+                Осталось попыток: <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
               </p>
             )}
           </div>
         ) : isProcessingResult ? (
           <div className="text-center">
             {/* Экран ожидания во время обработки результата */}
-            <div className="mb-6">
-              <div className="text-4xl mb-4">⏳</div>
-              <p className="text-white">Обрабатываем результат...</p>
+            <div className="mb-8">
+              <div className="text-6xl mb-6 animate-spin">⏳</div>
+              <p className="text-white text-lg">Обрабатываем результат...</p>
             </div>
           </div>
-        ) : !game || !game.game_state ? (
+        ) : (!game || !game.game_state) && !showResult ? (
           <div className="text-center">
-            <p className="text-gray-300 mb-6">
-              Добро пожаловать в крестики-нолики! Выиграйте у бота, чтобы получить бонусный кейс.
-            </p>
-            <p className="text-yellow-400 mb-4">У вас есть 3 попытки в день</p>
-            <button
-              onClick={handleStartNewGame}
-              disabled={isCreatingGame}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {isCreatingGame ? 'Создание игры...' : 'Начать игру'}
-            </button>
+            <div className="text-6xl mb-6">🎮</div>
+            <div className="animate-pulse">
+              <p className="text-white text-lg">Создаем новую игру...</p>
+            </div>
           </div>
         ) : (
           <div>
             {/* Игровое поле */}
-            <div className="grid grid-cols-3 gap-2 mb-6 mx-auto w-fit">
+            <div className="grid grid-cols-3 gap-4 mb-8 mx-auto w-fit">
               {Array.from({ length: 9 }, (_, index) => (
                 <button
                   key={index}
                   onClick={() => handleCellClick(index)}
                   className={getCellStyle(index)}
-                  disabled={isMoving || game.game_state.currentPlayer !== 'player' || game.game_state.status !== 'playing' || isProcessingResult}
+                  disabled={isMoving || !game || game.game_state.currentPlayer !== 'player' || game.game_state.status !== 'playing' || isProcessingResult || showResult}
                 >
-                  {getCellContent(index)}
+                  <span className="transform transition-all duration-300 hover:scale-110">
+                    {getCellContent(index)}
+                  </span>
                 </button>
               ))}
             </div>
 
-            {/* Статус игры */}
-            <div className="text-center mb-4">
-              <p className="text-lg font-semibold text-white mb-2">
-                {isProcessingResult ? '⏳ Обрабатываем результат...' : getStatusMessage()}
-              </p>
+            {/* Результат игры под полем (поражение/ничья) */}
+            {showResult && gameResult !== 'win' && (
+              <div className="mb-6 text-center">
+                <div className="bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 rounded-xl p-6">
+                  {gameResult === 'lose' && (
+                    <div>
+                      <div className="text-6xl mb-4">😞</div>
+                      <h3 className="text-2xl font-bold text-red-400 mb-2">Поражение</h3>
+                      <p className="text-white mb-4">В этот раз не повезло, но не сдавайтесь!</p>
+                      <p className="text-sm text-gray-400">🤖 Бот играл ⭕ и выиграл</p>
+                    </div>
+                  )}
+                  {gameResult === 'draw' && (
+                    <div>
+                      <div className="text-6xl mb-4">🤝</div>
+                      <h3 className="text-2xl font-bold text-yellow-400 mb-2">Ничья</h3>
+                      <p className="text-white mb-4">Хорошая игра! Попробуйте переиграть!</p>
+                      <p className="text-sm text-gray-400">🤝 Ничья - никто не выиграл</p>
+                    </div>
+                  )}
 
-              <div className="flex justify-between text-sm text-gray-400">
-                <span>Попыток осталось: {game.attempts_left}</span>
-                <span>Вы играете: ✖️</span>
+                  <div className="flex gap-4 mt-6">
+                    {game?.attempts_left && game.attempts_left > 0 && (
+                      <button
+                        onClick={handleStartNewGame}
+                        disabled={isCreatingGame}
+                        className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-500 hover:to-green-400 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 font-semibold"
+                      >
+                        {isCreatingGame ? 'Создание...' : 'Играть еще'}
+                      </button>
+                    )}
+
+                    <button
+                      onClick={onClose}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105 font-semibold"
+                    >
+                      Закрыть
+                    </button>
+                  </div>
+                </div>
+
+                {game?.attempts_left !== undefined && (
+                  <p className="text-sm text-gray-400 mt-4 bg-gray-800 rounded-lg p-3">
+                    Осталось попыток: <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
+                  </p>
+                )}
               </div>
-            </div>
+            )}
+
+            {/* Статус игры (только во время игры) */}
+            {!showResult && (
+              <div className="text-center mb-6">
+                <p className="text-xl font-semibold text-white mb-4 bg-gray-800 rounded-xl p-4">
+                  {isProcessingResult ? '⏳ Обрабатываем результат...' : getStatusMessage()}
+                </p>
+
+                <div className="flex justify-between text-sm text-gray-400 bg-gray-800 rounded-lg p-3">
+                  <span>Попыток осталось: <span className="text-yellow-400 font-semibold">{game?.attempts_left || 0}</span></span>
+                  <span>Вы играете: <span className="text-blue-400 font-semibold">✖️</span></span>
+                </div>
+              </div>
+            )}
 
             {/* Сообщения */}
-            {message && !isProcessingResult && (
-              <div className="mb-4 p-3 bg-gray-800 border border-gray-600 rounded text-center">
+            {message && !isProcessingResult && !showResult && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 rounded-xl text-center">
                 <p className="text-white">{message}</p>
               </div>
             )}
 
-            {/* Кнопки управления */}
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                disabled={isProcessingResult}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 transition-colors"
-              >
-                Закрыть
-              </button>
-            </div>
-
-            {/* Инструкция */}
-            {!isProcessingResult && (
-              <div className="mt-4 p-3 bg-gray-800 border border-gray-600 rounded">
-                <p className="text-xs text-gray-400 text-center">
-                  Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!
+            {/* Инструкция (только во время игры) */}
+            {!isProcessingResult && !showResult && (
+              <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 rounded-xl">
+                <p className="text-sm text-gray-300 text-center">
+                  <span className="font-semibold text-blue-400">Цель:</span> Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!
                 </p>
               </div>
             )}
