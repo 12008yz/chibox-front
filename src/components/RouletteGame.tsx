@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGetBonusStatusQuery, usePlayRouletteMutation } from '../features/user/userApi';
 import Modal from './Modal';
 
@@ -23,6 +23,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
   const [gameResult, setGameResult] = useState<string>('');
   const [showParticles, setShowParticles] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(0);
+  const wheelRef = useRef<SVGGElement>(null);
 
   const { data: bonusStatus, refetch: refetchBonusStatus } = useGetBonusStatusQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -31,15 +32,15 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
   // Определяем элементы рулетки - 9 секторов, только 2 с подарками
   const rouletteItems: RouletteItem[] = [
-    { id: 0, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 1, type: 'sub_1_day', label: '+1 День', color: '#FBBF24', bgColor: '#D97706', icon: '⭐' },
-    { id: 2, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 3, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 4, type: 'sub_3_days', label: '+3 Дня', color: '#34D399', bgColor: '#059669', icon: '💎' },
-    { id: 5, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 6, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 7, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
-    { id: 8, type: 'empty', label: 'Пусто', color: '#6B7280', bgColor: '#374151', icon: '✗' },
+    { id: 0, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 1, type: 'sub_1_day', label: '+1 День', color: '#FBBF24', bgColor: '#F59E0B', icon: '⭐' },
+    { id: 2, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 3, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 4, type: 'sub_3_days', label: '+3 Дня', color: '#34D399', bgColor: '#10B981', icon: '💎' },
+    { id: 5, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 6, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 7, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
+    { id: 8, type: 'empty', label: 'Пусто', color: '#9CA3AF', bgColor: '#4B5563', icon: '💫' },
   ];
 
   // Сброс состояния при открытии модалки
@@ -60,17 +61,19 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
     setIsSpinning(true);
     setGameState('spinning');
+    setWinnerIndex(null);
 
     try {
       // Делаем запрос к API
       const response = await playRoulette().unwrap();
 
-      const resultIndex = response.winner_index;
+      // Используем точный угол от сервера
+      const finalAngle = response.rotation_angle;
 
-      // Анимация крутения рулетки
-      await animateRoulette(resultIndex);
+      // Анимация крутения рулетки с точным углом от сервера
+      await animateRouletteToAngle(finalAngle);
 
-      setWinnerIndex(resultIndex);
+      setWinnerIndex(response.winner_index);
       setGameState('finished');
 
       if (response.prize_type !== 'empty') {
@@ -91,32 +94,26 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const animateRoulette = (targetIndex: number): Promise<void> => {
+  const animateRouletteToAngle = (targetAngle: number): Promise<void> => {
     return new Promise((resolve) => {
-      // Рассчитываем угол для выигрышного сектора
-      // Каждый сектор занимает 360/9 = 40 градусов
-      const sectorAngle = 360 / 9;
-      const targetAngle = targetIndex * sectorAngle;
+      // Используем угол напрямую от сервера без инверсии
+      // Сервер уже рассчитывает правильный угол для попадания указателя на нужный сектор
+      setRotationAngle(targetAngle);
 
-      // Добавляем дополнительные обороты для эффекта (5-7 полных оборотов)
-      const fullRotations = 5 + Math.random() * 2;
-      const finalAngle = fullRotations * 360 + (360 - targetAngle); // Инвертируем для правильного направления
-
-      setRotationAngle(finalAngle);
-
-      // Анимация длится 4 секунды
+      // Анимация длится 4 секунды - синхронизировано с CSS transition
       setTimeout(resolve, 4000);
     });
   };
 
-  // Создание сектора SVG
+  // Создание сектора SVG с улучшенным дизайном
   const createSector = (item: RouletteItem, index: number) => {
     const radius = 140;
     const centerX = 150;
     const centerY = 150;
-    const sectorAngle = 360 / 9;
-    const startAngle = index * sectorAngle;
-    const endAngle = (index + 1) * sectorAngle;
+    const sectorAngle = 360 / rouletteItems.length; // 40 градусов на сектор
+    // Сдвигаем на -90° чтобы сектор 0 был вверху (12 часов)
+    const startAngle = index * sectorAngle - 90;
+    const endAngle = (index + 1) * sectorAngle - 90;
 
     // Конвертируем углы в радианы
     const startRad = (startAngle * Math.PI) / 180;
@@ -144,14 +141,20 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
     const textX = centerX + textRadius * Math.cos(textRad);
     const textY = centerY + textRadius * Math.sin(textRad);
 
+    // Определяем, является ли сектор выигрышным
+    const isWinner = winnerIndex === index && !isSpinning;
+
     return (
       <g key={item.id}>
         <path
           d={pathData}
           fill={item.bgColor}
-          stroke="#1F2937"
-          strokeWidth="2"
-          className={`transition-all duration-300 ${winnerIndex === index && !isSpinning ? 'drop-shadow-lg' : ''}`}
+          stroke={isWinner ? '#FFD700' : '#1F2937'}
+          strokeWidth={isWinner ? '4' : '2'}
+          className={`transition-all duration-300 ${isWinner ? 'drop-shadow-2xl' : ''}`}
+          style={{
+            filter: isWinner ? 'brightness(1.3) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8))' : 'none'
+          }}
         />
         <text
           x={textX}
@@ -159,8 +162,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
           textAnchor="middle"
           dominantBaseline="middle"
           fill={item.color}
-          fontSize="20"
-          className="font-bold"
+          fontSize="18"
+          className="font-bold pointer-events-none"
         >
           {item.icon}
         </text>
@@ -170,8 +173,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
           textAnchor="middle"
           dominantBaseline="middle"
           fill={item.color}
-          fontSize="10"
-          className="font-medium"
+          fontSize="9"
+          className="font-medium pointer-events-none"
         >
           {item.label}
         </text>
@@ -191,14 +194,14 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="">
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 rounded-2xl min-w-[600px]">
+      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 lg:p-8 rounded-2xl w-full max-w-lg mx-auto">
         {/* Particles Effect */}
         {showParticles && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-            {Array.from({ length: 30 }, (_, i) => (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-10">
+            {Array.from({ length: 20 }, (_, i) => (
               <div
                 key={i}
-                className="absolute w-3 h-3 rounded-full animate-ping"
+                className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full animate-ping"
                 style={{
                   backgroundColor: ['#FBBF24', '#34D399', '#F59E0B', '#10B981'][Math.floor(Math.random() * 4)],
                   left: `${Math.random() * 100}%`,
@@ -212,44 +215,44 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
         )}
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🎰</div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
+        <div className="text-center mb-6">
+          <div className="text-3xl sm:text-4xl mb-2">🎰</div>
+          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
             Рулетка Удачи
           </h2>
-          <p className="text-gray-400 text-sm mt-2">
+          <p className="text-gray-400 text-xs sm:text-sm mt-2">
             Крутите рулетку и выигрывайте дни подписки!
           </p>
         </div>
 
         {!isAvailable && gameState === 'idle' ? (
           // Бонус недоступен
-          <div className="text-center space-y-6">
-            <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6">
-              <div className="text-4xl mb-3">⏰</div>
-              <div className="text-red-400 mb-2 font-medium">Рулетка недоступна</div>
+          <div className="text-center space-y-4 sm:space-y-6">
+            <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 sm:p-6">
+              <div className="text-3xl sm:text-4xl mb-3">⏰</div>
+              <div className="text-red-400 mb-2 font-medium text-sm sm:text-base">Рулетка недоступна</div>
               {timeUntilNext && (
-                <div className="text-gray-300 text-sm">
+                <div className="text-gray-300 text-xs sm:text-sm">
                   Следующая игра через: <span className="font-mono text-yellow-400">{formatTimeLeft(timeUntilNext)}</span>
                 </div>
               )}
             </div>
             <button
               onClick={onClose}
-              className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-all duration-200"
+              className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-all duration-200 text-sm sm:text-base"
             >
               Закрыть
             </button>
           </div>
         ) : (
           // Игра доступна
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Рулетка */}
             <div className="flex justify-center">
               <div className="relative">
                 {/* SVG Рулетка */}
-                <div className="relative">
-                  <svg width="300" height="300" className="drop-shadow-2xl">
+                <div className="relative w-72 h-72 sm:w-80 sm:h-80">
+                  <svg width="100%" height="100%" viewBox="0 0 300 300" className="drop-shadow-2xl">
                     {/* Внешнее кольцо */}
                     <circle
                       cx="150"
@@ -263,6 +266,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
                     {/* Колесо рулетки */}
                     <g
+                      ref={wheelRef}
                       style={{
                         transformOrigin: '150px 150px',
                         transform: `rotate(${rotationAngle}deg)`,
@@ -290,15 +294,16 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
                       dominantBaseline="middle"
                       fill="#FBBF24"
                       fontSize="20"
+                      className="pointer-events-none"
                     >
                       ⭐
                     </text>
                   </svg>
 
                   {/* Стрелочка указатель */}
-                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 z-10">
                     <div
-                      className="w-0 h-0 border-l-[15px] border-r-[15px] border-b-[25px] border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"
+                      className="w-0 h-0 border-l-[12px] sm:border-l-[15px] border-r-[12px] sm:border-r-[15px] border-b-[20px] sm:border-b-[25px] border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"
                       style={{
                         filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))'
                       }}
@@ -309,10 +314,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Статус игры */}
-            <div className="text-center min-h-[80px] flex flex-col items-center justify-center">
+            <div className="text-center min-h-[60px] sm:min-h-[80px] flex flex-col items-center justify-center">
               {gameState === 'idle' && (
                 <div className="space-y-2">
-                  <p className="text-gray-400">Нажмите "Крутить" чтобы начать!</p>
+                  <p className="text-gray-400 text-sm sm:text-base">Нажмите "Крутить" чтобы начать!</p>
                   <div className="text-xs text-gray-500">
                     <p>Шансы: 20% - 1 день, 10% - 3 дня, 70% - пусто</p>
                   </div>
@@ -321,17 +326,17 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
               {gameState === 'spinning' && (
                 <div className="flex flex-col items-center gap-3 text-yellow-400">
-                  <div className="animate-pulse text-3xl">🎰</div>
-                  <span className="font-medium">Рулетка крутится...</span>
+                  <div className="animate-pulse text-2xl sm:text-3xl">🎰</div>
+                  <span className="font-medium text-sm sm:text-base">Рулетка крутится...</span>
                 </div>
               )}
 
               {gameState === 'finished' && gameResult && (
                 <div className="space-y-3">
-                  <div className="text-4xl">
+                  <div className="text-3xl sm:text-4xl">
                     {winnerIndex !== null && rouletteItems[winnerIndex].type !== 'empty' ? '🎉' : '😔'}
                   </div>
-                  <p className={`font-medium text-lg ${
+                  <p className={`font-medium text-sm sm:text-lg ${
                     winnerIndex !== null && rouletteItems[winnerIndex].type !== 'empty'
                       ? 'text-green-400'
                       : 'text-red-400'
@@ -348,7 +353,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
                 <button
                   onClick={handleSpin}
                   disabled={isSpinning}
-                  className="flex-1 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-medium transition-all duration-200 disabled:opacity-50 text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-medium transition-all duration-200 disabled:opacity-50 text-sm sm:text-lg shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
                 >
                   🎰 Крутить рулетку!
                 </button>
@@ -356,8 +361,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
               <button
                 onClick={onClose}
-                className={`py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all duration-200 ${
-                  gameState === 'idle' ? 'px-8' : 'flex-1'
+                className={`py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all duration-200 text-sm sm:text-base ${
+                  gameState === 'idle' ? 'px-6 sm:px-8' : 'flex-1'
                 }`}
               >
                 {gameState === 'finished' ? 'Готово' : 'Отмена'}
@@ -369,12 +374,12 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
               <div className="text-center pt-4 border-t border-gray-700/50">
                 <div className="text-xs text-gray-500 space-y-2">
                   <p>Возможные награды:</p>
-                  <div className="flex justify-center gap-6 text-gray-400">
-                    <span className="flex items-center gap-1">
+                  <div className="flex justify-center gap-4 sm:gap-6 text-gray-400">
+                    <span className="flex items-center gap-1 text-xs sm:text-sm">
                       <span className="text-yellow-400">⭐</span>
                       +1 День
                     </span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 text-xs sm:text-sm">
                       <span className="text-green-400">💎</span>
                       +3 Дня
                     </span>

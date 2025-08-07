@@ -255,7 +255,7 @@ export const userApi = baseApi.injectEndpoints({
       query: () => 'v1/bonus/status',
     }),
 
-   
+
     // Игра в рулетку
     playRoulette: builder.mutation<
       {
@@ -264,6 +264,7 @@ export const userApi = baseApi.injectEndpoints({
         winner_index: number;
         prize_type: 'sub_1_day' | 'sub_3_days' | 'empty';
         prize_value: number;
+        rotation_angle: number;
       },
       void
     >({
