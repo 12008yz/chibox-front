@@ -71,6 +71,28 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
       const finalAngle = response.rotation_angle;
 
       // Анимация крутения рулетки с точным углом от сервера
+      console.log('🎰 Server response:', {
+        winnerIndex: response.winner_index,
+        rotationAngle: finalAngle.toFixed(1),
+        prizeType: response.prize_type
+      });
+
+      // Отладка: рассчитываем на какую точку колеса будет указывать стрелка
+      const normalizedRotation = ((finalAngle % 360) + 360) % 360;
+      const pointerTargetOnWheel = ((-normalizedRotation % 360) + 360) % 360;
+
+      // Определяем expected сектор для этой точки
+      const expectedSectorAngle = 360 / rouletteItems.length;
+      const expectedSectorForPointer = Math.floor((pointerTargetOnWheel + 90) / expectedSectorAngle) % rouletteItems.length;
+
+      console.log(`🎯 Rotation analysis:`, {
+        wheelRotation: normalizedRotation.toFixed(1) + '°',
+        pointerTargetsWheelPosition: pointerTargetOnWheel.toFixed(1) + '°',
+        expectedSector: expectedSectorForPointer,
+        declaredWinner: response.winner_index,
+        match: expectedSectorForPointer === response.winner_index
+      });
+
       await animateRouletteToAngle(finalAngle);
 
       setWinnerIndex(response.winner_index);
@@ -96,8 +118,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
   const animateRouletteToAngle = (targetAngle: number): Promise<void> => {
     return new Promise((resolve) => {
-      // Используем угол напрямую от сервера без инверсии
-      // Сервер уже рассчитывает правильный угол для попадания указателя на нужный сектор
+      // ИСПРАВЛЕНО: Используем точный угол от сервера
+      // Сервер рассчитал правильный угол поворота колеса для попадания указателя
+      // на центр нужного сектора с учетом смещения -90°
+      console.log('🎰 Animating wheel to angle:', targetAngle);
       setRotationAngle(targetAngle);
 
       // Анимация длится 4 секунды - синхронизировано с CSS transition
@@ -110,8 +134,9 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
     const radius = 140;
     const centerX = 150;
     const centerY = 150;
-    const sectorAngle = 360 / rouletteItems.length; // 40 градусов на сектор
-    // Сдвигаем на -90° чтобы сектор 0 был вверху (12 часов)
+    const sectorAngle = 360 / rouletteItems.length; // 40 градусов на сектор (9 секторов)
+    // ВАЖНО: Сдвигаем на -90° чтобы сектор 0 был вверху (12 часов)
+    // Это синхронизировано с серверной логикой
     const startAngle = index * sectorAngle - 90;
     const endAngle = (index + 1) * sectorAngle - 90;
 
@@ -143,6 +168,47 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
     // Определяем, является ли сектор выигрышным
     const isWinner = winnerIndex === index && !isSpinning;
+
+    // Отладка - показываем все секторы и углы
+    const sectorDebugInfo = {
+      index,
+      startAngle,
+      endAngle,
+      centerAngle: startAngle + sectorAngle/2,
+      isWinner,
+      item: item.type
+    };
+
+    // Проверяем реальное попадание указателя после поворота
+    if (rotationAngle > 0 && gameState === 'finished') {
+      const normalizedRotation = ((rotationAngle % 360) + 360) % 360;
+      const pointerTargetOnWheel = ((-normalizedRotation % 360) + 360) % 360;
+
+      // Нормализуем углы сектора для проверки
+      const normalizedStartAngle = ((startAngle % 360) + 360) % 360;
+      const normalizedEndAngle = ((endAngle % 360) + 360) % 360;
+
+      let isPointerInThisSector = false;
+      if (normalizedStartAngle <= normalizedEndAngle) {
+        isPointerInThisSector = pointerTargetOnWheel >= normalizedStartAngle && pointerTargetOnWheel <= normalizedEndAngle;
+      } else {
+        // Сектор пересекает 0° (например, от 350° до 30°)
+        isPointerInThisSector = pointerTargetOnWheel >= normalizedStartAngle || pointerTargetOnWheel <= normalizedEndAngle;
+      }
+
+      if (isPointerInThisSector) {
+        console.log(`🎯 REAL POINTER TARGET - Sector ${index}:`, {
+          ...sectorDebugInfo,
+          pointerTargetOnWheel: pointerTargetOnWheel.toFixed(1),
+          wheelRotation: normalizedRotation.toFixed(1),
+          reallyWinner: true
+        });
+      }
+    }
+
+    if (isWinner) {
+      console.log(`🎯 DECLARED WINNER sector:`, sectorDebugInfo);
+    }
 
     return (
       <g key={item.id}>
