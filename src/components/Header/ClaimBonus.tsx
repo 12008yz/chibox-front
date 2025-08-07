@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetBonusStatusQuery } from "../../features/user/userApi";
 import MainButton from "../MainButton";
-import BonusSquaresGame from "../BonusSquaresGame";
+import RouletteGame from "../RouletteGame";
 
 interface ClaimBonusProps {
   onClaimBonus?: () => Promise<void>;
@@ -14,6 +14,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
 }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [showBonusGame, setShowBonusGame] = useState(false);
+  const [showRouletteGame, setShowRouletteGame] = useState(false);
   const [isGlowing, setIsGlowing] = useState(false);
 
   const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {

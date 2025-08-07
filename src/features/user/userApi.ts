@@ -274,6 +274,24 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
+    // Игра в рулетку
+    playRoulette: builder.mutation<
+      {
+        message: string;
+        next_time: string;
+        winner_index: number;
+        prize_type: 'sub_1_day' | 'sub_3_days' | 'empty';
+        prize_value: number;
+      },
+      void
+    >({
+      query: () => ({
+        url: 'v1/bonus/play-roulette',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Balance', 'User', 'Inventory'],
+    }),
+
     // Сброс кулдауна бонуса
     resetBonusCooldown: builder.mutation<
       { message: string; user_id: string; previous_next_bonus_time?: string; current_next_bonus_time?: string },
@@ -504,6 +522,7 @@ export const {
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   usePlayBonusSquaresMutation,
+  usePlayRouletteMutation,
   useResetBonusCooldownMutation,
 
   useExchangeItemForSubscriptionMutation,
