@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useGetBonusStatusQuery } from "../../features/user/userApi";
-import MainButton from "../MainButton";
 import RouletteGame from "../RouletteGame";
 
 interface ClaimBonusProps {
@@ -13,7 +12,6 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
   isLoading = false
 }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
-  const [showBonusGame, setShowBonusGame] = useState(false);
   const [showRouletteGame, setShowRouletteGame] = useState(false);
   const [isGlowing, setIsGlowing] = useState(false);
 
@@ -24,8 +22,8 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (bonusStatus?.data?.time_until_next_seconds) {
-      let remainingSeconds = bonusStatus.data.time_until_next_seconds;
+    if (bonusStatus?.time_until_next_seconds) {
+      let remainingSeconds = bonusStatus.time_until_next_seconds;
 
       interval = setInterval(() => {
         if (remainingSeconds <= 0) {
@@ -47,11 +45,11 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [bonusStatus?.data?.time_until_next_seconds]);
+  }, [bonusStatus?.time_until_next_seconds]);
 
   // Эффект свечения для доступного бонуса
   useEffect(() => {
-    if (bonusStatus?.data?.is_available) {
+    if (bonusStatus?.is_available) {
       const glowInterval = setInterval(() => {
         setIsGlowing(prev => !prev);
       }, 2000);
@@ -60,10 +58,10 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
     } else {
       setIsGlowing(false);
     }
-  }, [bonusStatus?.data?.is_available]);
+  }, [bonusStatus?.is_available]);
 
   const handleOpenBonusGame = () => {
-    setShowBonusGame(true);
+    setShowRouletteGame(true);
     if (onClaimBonus) {
       onClaimBonus();
     }
@@ -73,9 +71,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
     return null; // Не показываем компонент, если нет данных
   }
 
-  const isAvailable = bonusStatus.data?.is_available;
-  const progressPercentage = bonusStatus.data?.time_until_next_seconds && bonusStatus.data?.cooldown_hours
-    ? Math.max(0, 100 - (bonusStatus.data.time_until_next_seconds / (bonusStatus.data.cooldown_hours * 3600)) * 100)
+  const isAvailable = bonusStatus?.is_available;
+  const progressPercentage = bonusStatus?.time_until_next_seconds && bonusStatus?.cooldown_hours
+    ? Math.max(0, 100 - (bonusStatus.time_until_next_seconds / (bonusStatus.cooldown_hours * 3600)) * 100)
     : 0;
 
   return (
@@ -110,9 +108,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
                     <span className="animate-pulse">✨</span>
                     Готово к игре!
                   </p>
-                  {bonusStatus.data?.lifetime_bonuses_claimed !== undefined && (
+                  {bonusStatus?.lifetime_bonuses_claimed !== undefined && (
                     <p className="text-yellow-400 text-xs">
-                      🏆 Сыграно: {bonusStatus.data.lifetime_bonuses_claimed} раз
+                      🏆 Сыграно: {bonusStatus.lifetime_bonuses_claimed} раз
                     </p>
                   )}
                 </div>
@@ -128,9 +126,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
                       'Загрузка...'
                     )}
                   </p>
-                  {bonusStatus.data?.lifetime_bonuses_claimed !== undefined && (
+                  {bonusStatus?.lifetime_bonuses_claimed !== undefined && (
                     <p className="text-gray-500 text-xs">
-                      🏆 Всего сыграно: {bonusStatus.data.lifetime_bonuses_claimed}
+                      🏆 Всего сыграно: {bonusStatus.lifetime_bonuses_claimed}
                     </p>
                   )}
                 </div>
@@ -163,7 +161,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
         </div>
 
         {/* Прогресс бар для времени */}
-        {!isAvailable && timeLeft && bonusStatus.data?.time_until_next_seconds && (
+        {!isAvailable && timeLeft && bonusStatus?.time_until_next_seconds && (
           <div className="mt-4 relative">
             <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm">
               <div
@@ -207,9 +205,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
       </div>
 
       {/* Модальное окно игры */}
-      <BonusSquaresGame
-        isOpen={showBonusGame}
-        onClose={() => setShowBonusGame(false)}
+      <RouletteGame
+        isOpen={showRouletteGame}
+        onClose={() => setShowRouletteGame(false)}
       />
     </>
   );

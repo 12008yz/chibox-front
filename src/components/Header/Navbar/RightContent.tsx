@@ -10,7 +10,7 @@ import { useLogoutMutation } from "../../../features/auth/authApi";
 import { performFullLogout } from "../../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
-import BonusSquaresGame from '../../BonusSquaresGame';
+import RouletteGame from '../../RouletteGame';
 import PurchaseModal from '../../PurchaseModal';
 
 interface RightContentProps {
@@ -103,7 +103,7 @@ const RightContent: React.FC<RightContentProps> = ({
           )}
         </button>
         {showBonusGame && (
-          <BonusSquaresGame
+          <RouletteGame
             isOpen={showBonusGame}
             onClose={() => setShowBonusGame(false)}
           />

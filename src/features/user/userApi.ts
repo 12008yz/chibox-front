@@ -255,25 +255,7 @@ export const userApi = baseApi.injectEndpoints({
       query: () => 'v1/bonus/status',
     }),
 
-    // Игра в бонусные квадраты
-    playBonusSquares: builder.mutation<
-      {
-        message: string;
-        next_time: string;
-        chosen_cell: number;
-        all_prizes: (string | null)[];
-        won_prize: string | null;
-      },
-      { chosenCell: number }
-    >({
-      query: (gameData) => ({
-        url: 'v1/bonus/play-squares',
-        method: 'POST',
-        body: gameData,
-      }),
-      invalidatesTags: ['Balance', 'User', 'Inventory'],
-    }),
-
+   
     // Игра в рулетку
     playRoulette: builder.mutation<
       {
@@ -521,7 +503,6 @@ export const {
   useWithdrawBalanceMutation,
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
-  usePlayBonusSquaresMutation,
   usePlayRouletteMutation,
   useResetBonusCooldownMutation,
 

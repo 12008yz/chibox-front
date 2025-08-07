@@ -11,7 +11,6 @@ import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../features/user/userApi";
 import Notifications from '../Header/Navbar/Notifications';
-import BonusSquaresGame from '../BonusSquaresGame';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -97,12 +96,6 @@ const RightContent: React.FC<RightContentProps> = ({
         <div className="bonus-sparkle"></div>
       </button>
 
-      {showBonusGame && (
-        <BonusSquaresGame
-          isOpen={showBonusGame}
-          onClose={() => setShowBonusGame(false)}
-        />
-      )}
 
       {/* Balance Display */}
       <div className="balance-display group">
