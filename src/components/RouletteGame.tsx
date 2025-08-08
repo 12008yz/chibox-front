@@ -70,27 +70,25 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
       // Используем точный угол от сервера
       const finalAngle = response.rotation_angle;
 
-      // Анимация крутения рулетки с точным углом от сервера
       console.log('🎰 Server response:', {
         winnerIndex: response.winner_index,
         rotationAngle: finalAngle.toFixed(1),
         prizeType: response.prize_type
       });
 
-      // Отладка: рассчитываем на какую точку колеса будет указывать стрелка
-      const normalizedRotation = ((finalAngle % 360) + 360) % 360;
-      const pointerTargetOnWheel = ((-normalizedRotation % 360) + 360) % 360;
-
-      // Определяем expected сектор для этой точки
-      const expectedSectorAngle = 360 / rouletteItems.length;
-      const expectedSectorForPointer = Math.floor((pointerTargetOnWheel + 90) / expectedSectorAngle) % rouletteItems.length;
-
-      console.log(`🎯 Rotation analysis:`, {
-        wheelRotation: normalizedRotation.toFixed(1) + '°',
-        pointerTargetsWheelPosition: pointerTargetOnWheel.toFixed(1) + '°',
-        expectedSector: expectedSectorForPointer,
-        declaredWinner: response.winner_index,
-        match: expectedSectorForPointer === response.winner_index
+      // Отладка: проверяем правильность попадания указателя
+      const sectorAngle = 360 / rouletteItems.length;
+      const normalizedAngle = ((finalAngle % 360) + 360) % 360;
+      const winnerSectorCenter = response.winner_index * sectorAngle; // Центр сектора N на N*40°
+      const sectorCenterAfterRotation = (winnerSectorCenter + normalizedAngle) % 360;
+      console.log('🎯 Debug info:', {
+        winnerIndex: response.winner_index,
+        sectorAngle: sectorAngle.toFixed(1),
+        winnerSectorCenter: winnerSectorCenter.toFixed(1),
+        wheelRotation: normalizedAngle.toFixed(1),
+        sectorCenterAfterRotation: sectorCenterAfterRotation.toFixed(1),
+        pointerAt: '0° (top)',
+        shouldHitPointer: Math.abs(sectorCenterAfterRotation) < sectorAngle/2 || Math.abs(sectorCenterAfterRotation - 360) < sectorAngle/2
       });
 
       await animateRouletteToAngle(finalAngle);
@@ -118,9 +116,6 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
 
   const animateRouletteToAngle = (targetAngle: number): Promise<void> => {
     return new Promise((resolve) => {
-      // ИСПРАВЛЕНО: Используем точный угол от сервера
-      // Сервер рассчитал правильный угол поворота колеса для попадания указателя
-      // на центр нужного сектора с учетом смещения -90°
       console.log('🎰 Animating wheel to angle:', targetAngle);
       setRotationAngle(targetAngle);
 
@@ -129,16 +124,17 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  // Создание сектора SVG с улучшенным дизайном
+  // Создание сектора SVG
   const createSector = (item: RouletteItem, index: number) => {
     const radius = 140;
     const centerX = 150;
     const centerY = 150;
-    const sectorAngle = 360 / rouletteItems.length; // 40 градусов на сектор (9 секторов)
-    // ВАЖНО: Сдвигаем на -90° чтобы сектор 0 был вверху (12 часов)
-    // Это синхронизировано с серверной логикой
-    const startAngle = index * sectorAngle - 90;
-    const endAngle = (index + 1) * sectorAngle - 90;
+    const sectorAngle = 360 / rouletteItems.length; // 40 градусов на сектор
+
+    // Позиционируем секторы так, чтобы сектор 0 был центрирован сверху
+    // Сдвигаем на -sectorAngle/2, чтобы центр сектора 0 был на 0°
+    const startAngle = index * sectorAngle - sectorAngle/2;
+    const endAngle = (index + 1) * sectorAngle - sectorAngle/2;
 
     // Конвертируем углы в радианы
     const startRad = (startAngle * Math.PI) / 180;
@@ -167,48 +163,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
     const textY = centerY + textRadius * Math.sin(textRad);
 
     // Определяем, является ли сектор выигрышным
-    const isWinner = winnerIndex === index && !isSpinning;
-
-    // Отладка - показываем все секторы и углы
-    const sectorDebugInfo = {
-      index,
-      startAngle,
-      endAngle,
-      centerAngle: startAngle + sectorAngle/2,
-      isWinner,
-      item: item.type
-    };
-
-    // Проверяем реальное попадание указателя после поворота
-    if (rotationAngle > 0 && gameState === 'finished') {
-      const normalizedRotation = ((rotationAngle % 360) + 360) % 360;
-      const pointerTargetOnWheel = ((-normalizedRotation % 360) + 360) % 360;
-
-      // Нормализуем углы сектора для проверки
-      const normalizedStartAngle = ((startAngle % 360) + 360) % 360;
-      const normalizedEndAngle = ((endAngle % 360) + 360) % 360;
-
-      let isPointerInThisSector = false;
-      if (normalizedStartAngle <= normalizedEndAngle) {
-        isPointerInThisSector = pointerTargetOnWheel >= normalizedStartAngle && pointerTargetOnWheel <= normalizedEndAngle;
-      } else {
-        // Сектор пересекает 0° (например, от 350° до 30°)
-        isPointerInThisSector = pointerTargetOnWheel >= normalizedStartAngle || pointerTargetOnWheel <= normalizedEndAngle;
-      }
-
-      if (isPointerInThisSector) {
-        console.log(`🎯 REAL POINTER TARGET - Sector ${index}:`, {
-          ...sectorDebugInfo,
-          pointerTargetOnWheel: pointerTargetOnWheel.toFixed(1),
-          wheelRotation: normalizedRotation.toFixed(1),
-          reallyWinner: true
-        });
-      }
-    }
-
-    if (isWinner) {
-      console.log(`🎯 DECLARED WINNER sector:`, sectorDebugInfo);
-    }
+    const isWinner = winnerIndex === index && gameState === 'finished';
 
     return (
       <g key={item.id}>
@@ -366,7 +321,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
                     </text>
                   </svg>
 
-                  {/* Стрелочка указатель */}
+                  {/* Стрелочка указатель - сверху (0°) */}
                   <div className="absolute top-1 left-1/2 transform -translate-x-1/2 z-10">
                     <div
                       className="w-0 h-0 border-l-[12px] sm:border-l-[15px] border-r-[12px] sm:border-r-[15px] border-b-[20px] sm:border-b-[25px] border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"
