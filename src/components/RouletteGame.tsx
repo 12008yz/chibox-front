@@ -81,20 +81,62 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
       const normalizedAngle = ((finalAngle % 360) + 360) % 360;
       const winnerSectorCenter = response.winner_index * sectorAngle; // Центр сектора N на N*40°
       const sectorCenterAfterRotation = (winnerSectorCenter + normalizedAngle) % 360;
-      console.log('🎯 Debug info:', {
-        winnerIndex: response.winner_index,
-        sectorAngle: sectorAngle.toFixed(1),
-        winnerSectorCenter: winnerSectorCenter.toFixed(1),
-        wheelRotation: normalizedAngle.toFixed(1),
-        sectorCenterAfterRotation: sectorCenterAfterRotation.toFixed(1),
-        pointerAt: '0° (top)',
-        shouldHitPointer: Math.abs(sectorCenterAfterRotation) < sectorAngle/2 || Math.abs(sectorCenterAfterRotation - 360) < sectorAngle/2
+
+      // Проверяем, где должна быть стрелочка после поворота
+      const expectedPointerTarget = (360 - normalizedAngle) % 360;
+      const actualWinnerItem = rouletteItems[response.winner_index];
+
+      // Проверяем правильность: куда указывает стрелочка после поворота
+      const distanceFromPointer = Math.min(
+        Math.abs(sectorCenterAfterRotation),
+        Math.abs(sectorCenterAfterRotation - 360)
+      );
+      const isCorrectAlignment = distanceFromPointer <= sectorAngle / 2;
+
+      console.log('🎯 Проверка точности рулетки:', {
+        winnerSector: response.winner_index,
+        sectorAngle: sectorAngle.toFixed(1) + '°',
+        wheelRotation: normalizedAngle.toFixed(1) + '°',
+        sectorFinalPosition: sectorCenterAfterRotation.toFixed(1) + '°',
+        pointerPosition: '0° (верх)',
+        distanceFromPointer: distanceFromPointer.toFixed(1) + '°',
+        isAlignedCorrectly: isCorrectAlignment,
+        expectedPrize: actualWinnerItem.type,
+        actualResult: response.prize_type,
+        resultsMatch: actualWinnerItem.type === response.prize_type,
+        message: response.message
       });
 
       await animateRouletteToAngle(finalAngle);
 
-      setWinnerIndex(response.winner_index);
+      // 🎯 КРИТИЧЕСКАЯ ПРОВЕРКА: проверяем, куда РЕАЛЬНО указывает стрелочка
+      const actualSectorIndex = calculateSectorUnderPointer(finalAngle);
+      const serverSaidIndex = response.winner_index;
+
+      console.log('🔍 ПРОВЕРКА ТОЧНОСТИ РУЛЕТКИ:', {
+        serverSaidWinner: serverSaidIndex,
+        actualPointerAt: actualSectorIndex,
+        isAccurate: serverSaidIndex === actualSectorIndex,
+        serverItem: rouletteItems[serverSaidIndex],
+        actualItem: rouletteItems[actualSectorIndex],
+        finalAngle: finalAngle.toFixed(1)
+      });
+
+      // Используем РЕАЛЬНЫЙ результат, а не серверный (для честности)
+      const realWinnerIndex = actualSectorIndex;
+      const realWinnerItem = rouletteItems[realWinnerIndex];
+
+      setWinnerIndex(realWinnerIndex);
       setGameState('finished');
+
+      // Обновляем результат на основе реального попадания
+      if (realWinnerItem.type !== 'empty') {
+        setGameResult(`Поздравляем! Вы выиграли ${realWinnerItem.label}!`);
+        setShowParticles(true);
+        setTimeout(() => setShowParticles(false), 3000);
+      } else {
+        setGameResult('В этот раз не повезло. Попробуйте еще раз!');
+      }
 
       if (response.prize_type !== 'empty') {
         setGameResult(response.message || 'Поздравляем! Вы выиграли приз!');
@@ -122,6 +164,42 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose }) => {
       // Анимация длится 4 секунды - синхронизировано с CSS transition
       setTimeout(resolve, 4000);
     });
+  };
+
+  // 🎯 Определяем, на какой сектор указывает стрелочка после поворота
+  const calculateSectorUnderPointer = (rotationAngle: number): number => {
+    const sectorAngle = 360 / rouletteItems.length; // 40°
+
+    // Нормализуем угол поворота в диапазон [0, 360)
+    const normalizedRotation = ((rotationAngle % 360) + 360) % 360;
+
+    // Стрелочка указывает на 0° (вверх)
+    // После поворота колеса на normalizedRotation,
+    // сектор который был на угле X теперь находится на угле (X + normalizedRotation) % 360
+
+    // Сектор 0 изначально на 0°, после поворота он на normalizedRotation
+    // Сектор 1 изначально на 40°, после поворота он на (40 + normalizedRotation) % 360
+    // И т.д.
+
+    // Нам нужно найти сектор, который после поворота оказался на 0° (под стрелочкой)
+    // Это сектор, который изначально был на угле (-normalizedRotation) % 360
+    const originalAngleUnderPointer = (360 - normalizedRotation) % 360;
+
+    // Определяем индекс сектора по углу
+    let sectorIndex = Math.floor(originalAngleUnderPointer / sectorAngle);
+
+    // Убеждаемся что индекс в правильном диапазоне
+    sectorIndex = Math.max(0, Math.min(sectorIndex, rouletteItems.length - 1));
+
+    console.log('🔍 Расчет сектора под стрелочкой:', {
+      rotationAngle: rotationAngle.toFixed(1),
+      normalizedRotation: normalizedRotation.toFixed(1),
+      originalAngleUnderPointer: originalAngleUnderPointer.toFixed(1),
+      sectorAngle: sectorAngle.toFixed(1),
+      calculatedSectorIndex: sectorIndex
+    });
+
+    return sectorIndex;
   };
 
   // Создание сектора SVG
