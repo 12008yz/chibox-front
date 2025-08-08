@@ -11,15 +11,15 @@ interface RouletteSegment {
 
 // Конфигурация 9 секций рулетки
 const ROULETTE_SEGMENTS: RouletteSegment[] = [
-  { id: 0, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 1, type: 'sub_1_day', label: '1 день', color: '#10B981', textColor: '#FFFFFF' },
-  { id: 2, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 3, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 4, type: 'sub_2_days', label: '2 дня', color: '#F59E0B', textColor: '#000000' },
-  { id: 5, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 6, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 7, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' },
-  { id: 8, type: 'empty', label: 'Пусто', color: '#6B7280', textColor: '#FFFFFF' }
+  { id: 0, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 1, type: 'sub_1_day', label: '1 день', color: '#059669', textColor: '#FFFFFF' },
+  { id: 2, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 3, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 4, type: 'sub_2_days', label: '2 дня', color: '#DC2626', textColor: '#FFFFFF' },
+  { id: 5, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 6, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 7, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' },
+  { id: 8, type: 'empty', label: 'Пусто', color: '#4B5563', textColor: '#D1D5DB' }
 ];
 
 interface RouletteGameProps {
@@ -100,10 +100,15 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ className = '' }) => {
       return '';
     }
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const totalMinutes = Math.ceil(diff / (1000 * 60));
 
-    return `${hours}ч ${minutes}м`;
+    if (totalMinutes < 60) {
+      return `${totalMinutes}м`;
+    } else {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${hours}ч ${minutes}м`;
+    }
   };
 
   // Создаем SVG элементы для секций колеса
@@ -150,7 +155,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ className = '' }) => {
             d={pathData}
             fill={segment.color}
             stroke="#FFFFFF"
-            strokeWidth="2"
+            strokeWidth={segment.type !== 'empty' ? "3" : "2"}
+            filter={segment.type !== 'empty' ? "url(#glow)" : ""}
           />
           <text
             x={textX}
@@ -172,10 +178,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`flex flex-col items-center space-y-6 ${className}`}>
+    <div className={`flex flex-col items-center space-y-4 ${className}`}>
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">Колесо Удачи</h2>
-        <p className="text-gray-300">Крути колесо и выигрывай дни подписки!</p>
+        <p className="text-gray-300 text-sm mb-1">Крути колесо и выигрывай дни подписки!</p>
+        <p className="text-xs text-gray-400">30 игр в день • Перезарядка каждые 48 минут</p>
       </div>
 
       {/* Колесо рулетки */}
@@ -194,7 +200,16 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ className = '' }) => {
             transition: isSpinning ? 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
           }}
         >
-          <svg width="300" height="300" viewBox="0 0 300 300">
+          <svg width="280" height="280" viewBox="0 0 300 300">
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
             {createWheelSegments()}
             {/* Центральный круг */}
             <circle
@@ -256,16 +271,16 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ className = '' }) => {
         <h3 className="text-lg font-semibold text-white">Призы:</h3>
         <div className="flex flex-wrap justify-center gap-4 text-sm">
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span className="text-gray-300">1 день подписки</span>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#059669' }}></div>
+            <span className="text-gray-300 font-semibold">1 день подписки</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span className="text-gray-300">2 дня подписки</span>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#DC2626' }}></div>
+            <span className="text-gray-300 font-semibold">2 дня подписки</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-gray-500 rounded"></div>
-            <span className="text-gray-300">Пусто</span>
+            <div className="w-4 h-4 bg-gray-600 rounded"></div>
+            <span className="text-gray-400">Пусто</span>
           </div>
         </div>
       </div>
