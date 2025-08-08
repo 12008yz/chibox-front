@@ -259,10 +259,11 @@ export const userApi = baseApi.injectEndpoints({
     // Игра в рулетку
     playRoulette: builder.mutation<
       {
+        success: boolean;
         message: string;
         next_time: string;
         winner_index: number;
-        prize_type: 'sub_1_day' | 'sub_3_days' | 'empty';
+        prize_type: 'sub_1_day' | 'sub_2_days' | 'empty';
         prize_value: number;
         rotation_angle: number;
       },

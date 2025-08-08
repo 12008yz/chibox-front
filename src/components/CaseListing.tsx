@@ -27,12 +27,6 @@ const CaseListing: React.FC<CaseListingProps> = ({
   onDataUpdate,
   onPlayBonusGame
 }) => {
-  console.log('=== CASELIST РЕРЕНДЕР ===', {
-    name,
-    casesCount: cases?.length,
-    fixedPrices,
-    nextCaseAvailableTime
-  });
 
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -41,35 +35,24 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
 
   const handleCaseClick = (caseItem: CaseTemplate, event: React.MouseEvent) => {
-    console.log('CaseListing: Клик по кейсу', {
-      caseName: caseItem.name,
-      fixedPrices,
-      hasOnBuyAndOpenCase: !!onBuyAndOpenCase,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey
-    });
 
     // Проверяем, если нажали с Ctrl/Cmd, то открываем в новой вкладке как раньше
     if (event.ctrlKey || event.metaKey) {
-      console.log('CaseListing: Открываем в новой вкладке');
       return; // Позволяем стандартному поведению Link сработать
     }
 
     // Иначе показываем превью
     event.preventDefault();
-    console.log('CaseListing: Показываем превью кейса');
     setPreviewCase(caseItem);
     setIsPreviewOpen(true);
   };
 
   const closePreview = () => {
-    console.log('CaseListing: Закрываем превью');
     setIsPreviewOpen(false);
     setPreviewCase(null);
   };
 
   const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
-    console.log('CaseListing: Передаем запрос на игру в HomePage для кейса:', caseTemplate.name);
     if (onPlayBonusGame) {
       onPlayBonusGame(caseTemplate);
     }
@@ -84,11 +67,6 @@ const CaseListing: React.FC<CaseListingProps> = ({
       <div className="flex flex-col md:flex-row items-center justify-center w-full gap-8 md:flex-wrap">
         {cases && cases.length > 0 ? (
           cases.map((caseItem) => {
-            console.log('CaseListing: Рендерим кейс:', {
-              id: caseItem.id,
-              name: caseItem.name,
-              isBonusCase: caseItem.id === '55555555-5555-5555-5555-555555555555'
-            });
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
 
