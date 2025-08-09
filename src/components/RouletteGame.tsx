@@ -27,6 +27,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
+  const [startingPosition, setStartingPosition] = useState(0);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
 
@@ -43,6 +44,12 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       } else {
         localStorage.removeItem('roulette_next_play_time');
       }
+    }
+
+    // Загружаем сохраненную позицию колеса
+    const savedPosition = localStorage.getItem('roulette_last_position');
+    if (savedPosition) {
+      setStartingPosition(parseInt(savedPosition, 10));
     }
   }, []);
 
@@ -80,6 +87,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   // Обработка завершения вращения
   const handleSpinComplete = () => {
     setMustSpin(false);
+
+    // Сохраняем финальную позицию колеса для следующей игры
+    setStartingPosition(prizeNumber);
+    localStorage.setItem('roulette_last_position', prizeNumber.toString());
 
     // Определяем сообщение на основе выигрышного сегмента
     const wonSegment = wheelData[prizeNumber];
@@ -182,7 +193,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
               fontSize={14}
               textDistance={80}
               spinDuration={0.8}
-              startingOptionIndex={0}
+              startingOptionIndex={startingPosition}
               disableInitialAnimation={true}
               pointerProps={{
                 src: undefined,

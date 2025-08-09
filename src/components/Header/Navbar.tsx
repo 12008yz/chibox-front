@@ -32,32 +32,20 @@ const Navbar: React.FC<NavbarProps> = ({
     {
       to: "/marketplace",
       icon: <MdOutlineSell className="text-xl" />,
-      label: "Market",
+      label: "Обмен предметов",
       color: "from-pink-500 to-violet-500"
-    },
-    {
-      to: "/coinflip",
-      icon: <BsCoin className="text-xl" />,
-      label: "Coin Flip",
-      color: "from-yellow-400 to-orange-500"
-    },
-    {
-      to: "/crash",
-      icon: <SlPlane className="text-xl" />,
-      label: "Crash",
-      color: "from-red-500 to-pink-500"
-    },
-    {
-      to: "/upgrade",
-      icon: <GiUpgrade className="text-xl" />,
-      label: "Upgrade",
-      color: "from-cyan-400 to-blue-500"
     },
     {
       to: "/slot",
       icon: <TbCat className="text-xl" />,
-      label: "Slots",
+      label: "Слот",
       color: "from-green-400 to-emerald-500"
+    },
+    {
+      to: "/coinflip",
+      icon: <BsCoin className="text-xl" />,
+      label: "Таблица лидеров",
+      color: "from-yellow-400 to-orange-500"
     }
   ];
 
