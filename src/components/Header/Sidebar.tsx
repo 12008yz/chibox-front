@@ -2,7 +2,7 @@ import { BsCoin } from "react-icons/bs";
 import { GiUpgrade } from "react-icons/gi";
 import { MdOutlineSell } from "react-icons/md";
 import { SlPlane } from "react-icons/sl";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaExchangeAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
@@ -42,6 +42,11 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
             name: "Home",
             path: "/",
             icon: <FaHome className="text-2xl" />,
+        },
+        {
+            name: "Exchange",
+            path: "/exchange",
+            icon: <FaExchangeAlt className="text-2xl" />,
         },
         {
             name: "Market",

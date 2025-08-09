@@ -16,6 +16,7 @@ import SteamAuthPage from './pages/SteamAuthPage';
 import ProfilePage from './pages/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import ExchangePage from './pages/ExchangePage';
 import { useSocket } from './hooks/useSocket';
 
 const App: React.FC = () => {
@@ -143,6 +144,15 @@ const App: React.FC = () => {
               path="/user/:id"
               element={<PublicProfilePage />}
             />
+
+            {/* Страница обмена предметов */}
+            <Route
+              path="/exchange"
+              element={
+                auth.isAuthenticated ? <ExchangePage /> : <Navigate to="/login" replace />
+              }
+            />
+
             <Route
               path="/marketplace"
               element={

@@ -30,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const links = [
     {
-      to: "/marketplace",
+      to: "/exchange",
       icon: <MdOutlineSell className="text-xl" />,
       label: "Обмен предметов",
       color: "from-pink-500 to-violet-500"
