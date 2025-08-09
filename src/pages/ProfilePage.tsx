@@ -9,7 +9,7 @@ import Tooltip from '../components/Tooltip';
 import ScrollToTop from '../components/ScrollToTop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
-import CaseOpeningAnimation from '../components/CaseOpeningAnimation';
+
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
 import PurchaseModal from '../components/PurchaseModal';
 import type { UserInventoryItem, UserCaseItem, Item, CaseTemplate } from '../types/api';
@@ -34,18 +34,7 @@ const ProfilePage: React.FC = () => {
 
   // Убираем state для уведомлений - теперь используем react-hot-toast
 
-  // State для анимации открытия кейса
-  const [caseOpeningAnimation, setCaseOpeningAnimation] = useState<{
-    isOpen: boolean;
-    caseTemplate: CaseTemplate | null;
-    wonItem: Item | null;
-    isLoading: boolean;
-  }>({
-    isOpen: false,
-    caseTemplate: null,
-    wonItem: null,
-    isLoading: false
-  });
+
 
   // State для отслеживания ID открываемого кейса
   const [openingCaseId, setOpeningCaseId] = useState<string | null>(null);
@@ -236,30 +225,19 @@ const ProfilePage: React.FC = () => {
 
     const caseTemplate = getCaseTemplateById(caseItem.case_template_id);
 
+    if (!caseTemplate) {
+      showNotification('Шаблон кейса не найден', 'error');
+      return;
+    }
+
     // Устанавливаем ID открываемого кейса
     setOpeningCaseId(inventoryItemId);
-
-    // Показываем анимацию открытия
-    setCaseOpeningAnimation({
-      isOpen: true,
-      caseTemplate: caseTemplate || null,
-      wonItem: null,
-      isLoading: true
-    });
 
     try {
       const result = await openCase({ inventoryItemId }).unwrap();
 
       if (result.success && result.data?.item) {
         const item = result.data.item;
-
-        // Обновляем анимацию с выигранным предметом
-        setCaseOpeningAnimation(prev => ({
-          ...prev,
-          wonItem: item,
-          isLoading: false
-        }));
-
         showNotification(`Поздравляем! Вы получили: ${item.name}`, 'success');
 
         // Автоматически обновляем инвентарь через 2 секунды
@@ -272,61 +250,14 @@ const ProfilePage: React.FC = () => {
           }
         }, 2000);
       } else {
-        setCaseOpeningAnimation({
-          isOpen: false,
-          caseTemplate: null,
-          wonItem: null,
-          isLoading: false
-        });
-        setOpeningCaseId(null);
         showNotification('Ошибка: Не удалось получить информацию о предмете', 'error');
       }
     } catch (error: any) {
       console.error('Ошибка при открытии кейса:', error);
       const errorMessage = error?.data?.message || error?.message || 'Неизвестная ошибка';
-
-      setCaseOpeningAnimation({
-        isOpen: false,
-        caseTemplate: null,
-        wonItem: null,
-        isLoading: false
-      });
-      setOpeningCaseId(null);
       showNotification(`Ошибка при открытии кейса: ${errorMessage}`, 'error');
-    }
-  };
-
-  // Функция для закрытия анимации открытия кейса
-  const handleCloseCaseAnimation = async () => {
-    const wonItem = caseOpeningAnimation.wonItem;
-
-    setCaseOpeningAnimation({
-      isOpen: false,
-      caseTemplate: null,
-      wonItem: null,
-      isLoading: false
-    });
-    setOpeningCaseId(null);
-
-    // Принудительно обновляем данные инвентаря и баланса
-    try {
-      // Добавляем небольшую задержку для завершения серверных операций
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Инвалидируем кеш и принудительно обновляем данные
-      await Promise.all([
-        refetchInventory(),
-        refetchUser() // Обновляем данные пользователя
-      ]);
-
-      if (wonItem) {
-        showNotification(`Предмет "${wonItem.name}" добавлен в инвентарь!`, 'success');
-      } else {
-        showNotification('Инвентарь обновлен!', 'success');
-      }
-    } catch (error) {
-      console.error('Ошибка обновления данных:', error);
-      showNotification('Ошибка обновления данных. Обновите страницу.', 'error');
+    } finally {
+      setOpeningCaseId(null);
     }
   };
 
@@ -1984,14 +1915,7 @@ const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* Case Opening Animation */}
-      <CaseOpeningAnimation
-        isOpen={caseOpeningAnimation.isOpen}
-        onClose={handleCloseCaseAnimation}
-        caseTemplate={caseOpeningAnimation.caseTemplate}
-        wonItem={caseOpeningAnimation.wonItem}
-        isLoading={caseOpeningAnimation.isLoading}
-      />
+
 
       {/* Purchase Modal */}
       <PurchaseModal

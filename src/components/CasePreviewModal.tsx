@@ -312,14 +312,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           isAnimating && !showOpeningAnimation
             ? 'scale-100 opacity-100 translate-y-0'
             : showOpeningAnimation
-              ? 'scale-75 opacity-90 translate-y-4' // отдаляем модал при анимации
+              ? 'scale-95 opacity-100 translate-y-0' // минимальное отдаление при анимации
               : 'scale-75 opacity-0 translate-y-8'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Заголовок модального окна */}
         <div className={`flex justify-between items-center p-6 border-b border-gray-700 transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-90 opacity-70' : ''
+          showOpeningAnimation ? 'scale-95 opacity-90' : ''
         }`}>
           <div className="flex items-center space-x-4">
             <img
@@ -375,7 +375,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               {/* Сетка предметов с анимацией масштабирования */}
               <div
                 className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
-                  showOpeningAnimation ? 'transform scale-60 origin-center' : ''
+                  showOpeningAnimation ? 'transform scale-90 origin-center' : ''
                 }`}
               >
                 {items.map((item: any, index: number) => (
@@ -468,7 +468,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
               {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
               {showOpeningAnimation && (
-                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-30">
                   <div className="text-center text-white bg-black/80 backdrop-blur-sm rounded-lg px-6 py-3 border border-yellow-400/50">
                     {animationPhase === 'spinning' && (
                       <div className="flex items-center space-x-3">
@@ -510,7 +510,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         {/* Футер с кнопками */}
         <div className={`flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629] transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-90 opacity-50' : ''
+          showOpeningAnimation ? 'scale-95 opacity-80' : ''
         }`}>
           <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (
