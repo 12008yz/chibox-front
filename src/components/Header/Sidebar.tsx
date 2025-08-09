@@ -50,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
         },
         {
             name: "Coin Flip",
-            path: "/coinflip",
+            path: "/leaderboard",
             icon: <BsCoin className="text-2xl" />,
         },
         {

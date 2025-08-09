@@ -15,6 +15,7 @@ import RegisterPage from './pages/RegisterPage';
 import SteamAuthPage from './pages/SteamAuthPage';
 import ProfilePage from './pages/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import { useSocket } from './hooks/useSocket';
 
 const App: React.FC = () => {
@@ -155,14 +156,11 @@ const App: React.FC = () => {
             />
             <Route
               path="/coinflip"
-              element={
-                <div className="min-h-screen bg-[#151225] text-white p-8">
-                  <div className="container mx-auto">
-                    <h1 className="text-3xl font-bold">Coin Flip</h1>
-                    <p>Coming soon...</p>
-                  </div>
-                </div>
-              }
+              element={<LeaderboardPage />}
+            />
+            <Route
+              path="/leaderboard"
+              element={<LeaderboardPage />}
             />
             <Route
               path="/crash"

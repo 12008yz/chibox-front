@@ -22,9 +22,9 @@ const GamesListing: React.FC<GameListingProps> = ({
     },
     {
       id: "2",
-      title: "Coinflip",
+      title: "leaderboard",
       description: "Орел или решка - проверь свою удачу!",
-      link: "/coinflip",
+      link: "/leaderboard",
       gradient: "from-blue-500 to-cyan-500",
       icon: "🪙"
     },

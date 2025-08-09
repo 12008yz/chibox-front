@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({
       color: "from-green-400 to-emerald-500"
     },
     {
-      to: "/coinflip",
+      to: "/leaderboard",
       icon: <BsCoin className="text-xl" />,
       label: "Таблица лидеров",
       color: "from-yellow-400 to-orange-500"

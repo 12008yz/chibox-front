@@ -8,7 +8,6 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import GamesListing from '../components/GamesListing';
-import Leaderboard from '../components/Leaderboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 
 
@@ -548,11 +547,6 @@ const HomePage: React.FC = () => {
                 name="Наши игры"
                 description="Попробуй различные игры и выиграй большие призы"
               />
-            </div>
-
-            {/* Лидерборд */}
-            <div className="mb-12">
-              <Leaderboard />
             </div>
 
             {/* Живые дропы */}
