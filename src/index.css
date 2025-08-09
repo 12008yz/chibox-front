@@ -1005,3 +1005,51 @@
   min-width: 18px;
   text-align: center;
 }
+
+/* LiveDrops Animations */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* Кастомный скроллбар для LiveDrops */
+.live-drops-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.live-drops-scroll::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.3);
+  border-radius: 4px;
+}
+
+.live-drops-scroll::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.live-drops-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4B5563;
+}
+
+/* Исправление отображения изображений в LiveDrops */
+.live-drop-item img {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+}
+
+/* Обеспечиваем правильное отображение теней и границ */
+.live-drop-container {
+  padding: 8px;
+  overflow: visible;
+}

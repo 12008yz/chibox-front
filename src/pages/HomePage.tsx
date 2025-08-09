@@ -265,9 +265,15 @@ const HomePage: React.FC = () => {
     }
   };
 
+
+
+
+
   if (casesError) {
     console.error('Ошибка загрузки кейсов:', casesError);
   }
+
+
 
   // Принудительное обновление данных при маунте
   useEffect(() => {
@@ -538,15 +544,15 @@ const HomePage: React.FC = () => {
             {/* Статусы подписки */}
             <div className="mb-12">
               <AppFeatures
-                name="Ежемесячные статусы"
+                name="Статусы подписки ChiBox"
                 description="Выбери подходящий статус и получай эксклюзивные привилегии каждый день"
               />
             </div>
+          </div>
 
-            {/* Живые дропы */}
-            <div className="mt-12">
-              <LiveDrops />
-            </div>
+          {/* Живые дропы - полная ширина экрана */}
+          <div className="mt-12">
+            <LiveDrops />
           </div>
         </div>
       </div>
