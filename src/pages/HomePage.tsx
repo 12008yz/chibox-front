@@ -7,7 +7,7 @@ import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
-import GamesListing from '../components/GamesListing';
+import AppFeatures from '../components/AppFeatures';
 import TicTacToeGame from '../components/TicTacToeGame';
 
 
@@ -541,11 +541,11 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
-            {/* Игры */}
+            {/* Возможности приложения */}
             <div className="mb-12">
-              <GamesListing
-                name="Наши игры"
-                description="Попробуй различные игры и выиграй большие призы"
+              <AppFeatures
+                name="Что ты можешь делать в ChiBox"
+                description="Открывай кейсы, получай статусы, играй в мини-игры и выводи предметы в Steam"
               />
             </div>
 
