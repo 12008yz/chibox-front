@@ -1042,14 +1042,56 @@
   background: #4B5563;
 }
 
-/* Исправление отображения изображений в LiveDrops */
-.live-drop-item img {
-  background-color: transparent !important;
-  backdrop-filter: none !important;
+/* Улучшенные анимации для рулетки */
+.roulette-result-enter {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Обеспечиваем правильное отображение теней и границ */
-.live-drop-container {
-  padding: 8px;
-  overflow: visible;
+.roulette-result-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.roulette-celebration {
+  animation: celebration 0.6s ease-out;
+}
+
+@keyframes celebration {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.1);
+  }
+  40% {
+    transform: scale(0.95);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  80% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Улучшение анимации bounce для эмодзи */
+@keyframes gentle-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 1.5s infinite;
 }

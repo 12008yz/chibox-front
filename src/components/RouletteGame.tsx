@@ -28,6 +28,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const [result, setResult] = useState<string | null>(null);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
   const [startingPosition, setStartingPosition] = useState(0);
+  const [isResultAnimating, setIsResultAnimating] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
 
@@ -56,7 +58,17 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const spin = async () => {
     if (!canPlay) return;
 
+    // Плавно скрываем предыдущий результат
+    if (result) {
+      setShowResult(false);
+      // Даем время на анимацию исчезновения
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // Очищаем предыдущий результат
     setResult(null);
+    setShowResult(false);
+    setIsResultAnimating(false);
 
     try {
       const response = await playRoulette().unwrap();
@@ -94,13 +106,28 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
     // Определяем сообщение на основе выигрышного сегмента
     const wonSegment = wheelData[prizeNumber];
+    let resultMessage = '';
+
     if (wonSegment.option === 'Пусто') {
-      setResult('Удачи в следующий раз!');
+      resultMessage = 'Удачи в следующий раз!';
     } else if (wonSegment.option === '1 день') {
-      setResult('Поздравляем! Вы выиграли 1 день подписки!');
+      resultMessage = 'Поздравляем! Вы выиграли 1 день подписки!';
     } else if (wonSegment.option === '2 дня') {
-      setResult('Поздравляем! Вы выиграли 2 дня подписки!');
+      resultMessage = 'Поздравляем! Вы выиграли 2 дня подписки!';
     }
+
+    // Плавное появление результата с задержкой
+    setIsResultAnimating(true);
+
+    setTimeout(() => {
+      setResult(resultMessage);
+      setShowResult(true);
+
+      // Добавляем небольшую дополнительную задержку для полного fade-in
+      setTimeout(() => {
+        setIsResultAnimating(false);
+      }, 300);
+    }, 800); // 800ms задержка для естественного перехода
   };
 
   const formatTimeRemaining = (nextTime: string) => {
@@ -230,8 +257,30 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
           {/* Результат */}
           {result && (
-            <div className="text-center p-4 bg-gray-800 rounded-lg border border-gray-600">
-              <p className="text-lg font-semibold text-white">{result}</p>
+            <div
+              className={`text-center p-4 bg-gray-800 rounded-lg border border-gray-600 transition-all duration-500 transform ${
+                showResult
+                  ? 'opacity-100 scale-100 translate-y-0'
+                  : 'opacity-0 scale-95 translate-y-2'
+              }`}
+              style={{
+                background: result.includes('Поздравляем')
+                  ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)'
+                  : 'rgba(31, 41, 55, 0.8)'
+              }}
+            >
+              <p className={`text-lg font-semibold transition-all duration-300 ${
+                result.includes('Поздравляем') ? 'text-green-300' : 'text-white'
+              }`}>
+                {result}
+              </p>
+              {result.includes('Поздравляем') && (
+                <div className="mt-2 flex justify-center space-x-2">
+                  <div className="text-2xl animate-gentle-bounce">🎉</div>
+                  <div className="text-2xl animate-gentle-bounce" style={{ animationDelay: '0.2s' }}>✨</div>
+                  <div className="text-2xl animate-gentle-bounce" style={{ animationDelay: '0.4s' }}>🎊</div>
+                </div>
+              )}
             </div>
           )}
 
