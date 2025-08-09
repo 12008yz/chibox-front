@@ -34,7 +34,7 @@ const AppWithToaster = () => (
         containerStyle={{
           top: 20,
           right: 20,
-          zIndex: 9999999,
+          zIndex: 99999999,
         }}
         toastOptions={{
           duration: 4000,

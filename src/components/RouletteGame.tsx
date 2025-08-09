@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Wheel } from 'react-custom-roulette';
 import { usePlayRouletteMutation } from '../features/user/userApi';
+import toast from 'react-hot-toast';
 
 // Конфигурация 9 секций рулетки для библиотеки
 const wheelData = [
@@ -16,6 +17,44 @@ const wheelData = [
   { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } }        // 8
 ];
 
+// Фразы для проигрыша
+const loseMessages = [
+  'Не в этот раз',
+  'Очень жаль',
+  'У вас будут ещё попытки',
+  'Увы ;(',
+  'Почти получилось!',
+  'Не расстраивайтесь',
+  'Попробуйте ещё раз, завтра',
+  'Удача отвернулась',
+  'В следующий раз повезёт',
+  'Не сегодня',
+  'Фортуна спит',
+  'Может в следующий раз?',
+  'Терпение и труд',
+  'Ничего страшного',
+  'Держите удар!'
+];
+
+// Фразы для выигрыша
+const winMessages = [
+  'Все мы рады этому',
+  'Поздравляем!',
+  'Невероятно!',
+  'Вы молодец!',
+  'Фантастика!',
+  'Отличная работа!',
+  'Удача на вашей стороне!',
+  'Великолепно!',
+  'Просто супер!',
+  'Вы везунчик!'
+];
+
+// Функция для получения случайной фразы
+const getRandomMessage = (messages: string[]): string => {
+  return messages[Math.floor(Math.random() * messages.length)];
+};
+
 interface RouletteGameProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,11 +64,8 @@ interface RouletteGameProps {
 const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className = '' }) => {
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
-  const [result, setResult] = useState<string | null>(null);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
   const [startingPosition, setStartingPosition] = useState(0);
-  const [isResultAnimating, setIsResultAnimating] = useState(false);
-  const [showResult, setShowResult] = useState(false);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
 
@@ -58,18 +94,6 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const spin = async () => {
     if (!canPlay) return;
 
-    // Плавно скрываем предыдущий результат
-    if (result) {
-      setShowResult(false);
-      // Даем время на анимацию исчезновения
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    // Очищаем предыдущий результат
-    setResult(null);
-    setShowResult(false);
-    setIsResultAnimating(false);
-
     try {
       const response = await playRoulette().unwrap();
 
@@ -84,7 +108,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         setNextPlayTime(response.next_time);
         localStorage.setItem('roulette_next_play_time', response.next_time);
       } else {
-        setResult(response.message);
+        toast.error(response.message || 'Что-то пошло не так');
         if (response.next_time) {
           setNextPlayTime(response.next_time);
           localStorage.setItem('roulette_next_play_time', response.next_time);
@@ -92,7 +116,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       }
     } catch (err: any) {
       console.error('Ошибка при игре в рулетку:', err);
-      setResult(err.data?.message || 'Произошла ошибка');
+      toast.error(err.data?.message || 'Произошла ошибка');
     }
   };
 
@@ -106,28 +130,32 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
     // Определяем сообщение на основе выигрышного сегмента
     const wonSegment = wheelData[prizeNumber];
-    let resultMessage = '';
-
-    if (wonSegment.option === 'Пусто') {
-      resultMessage = 'Удачи в следующий раз!';
-    } else if (wonSegment.option === '1 день') {
-      resultMessage = 'Поздравляем! Вы выиграли 1 день подписки!';
-    } else if (wonSegment.option === '2 дня') {
-      resultMessage = 'Поздравляем! Вы выиграли 2 дня подписки!';
-    }
-
-    // Плавное появление результата с задержкой
-    setIsResultAnimating(true);
-
+    // Показываем всплывающее уведомление с задержкой для эффекта
     setTimeout(() => {
-      setResult(resultMessage);
-      setShowResult(true);
-
-      // Добавляем небольшую дополнительную задержку для полного fade-in
-      setTimeout(() => {
-        setIsResultAnimating(false);
-      }, 300);
-    }, 800); // 800ms задержка для естественного перехода
+      if (wonSegment.option === 'Пусто') {
+        const randomLoseMessage = getRandomMessage(loseMessages);
+        toast(randomLoseMessage, {
+          icon: '😔',
+          style: {
+            background: '#374151',
+            color: '#fff',
+            border: '1px solid #6b7280',
+            zIndex: 999999999,
+          },
+        });
+      } else {
+        const randomWinMessage = getRandomMessage(winMessages);
+        toast(randomWinMessage, {
+          icon: '🎉',
+          style: {
+            background: '#059669',
+            color: '#fff',
+            border: '1px solid #10b981',
+            zIndex: 999999999,
+          },
+        });
+      }
+    }, 800); // Задержка для завершения анимации колеса
   };
 
   const formatTimeRemaining = (nextTime: string) => {
@@ -255,34 +283,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
             )}
           </div>
 
-          {/* Результат */}
-          {result && (
-            <div
-              className={`text-center p-4 bg-gray-800 rounded-lg border border-gray-600 transition-all duration-500 transform ${
-                showResult
-                  ? 'opacity-100 scale-100 translate-y-0'
-                  : 'opacity-0 scale-95 translate-y-2'
-              }`}
-              style={{
-                background: result.includes('Поздравляем')
-                  ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)'
-                  : 'rgba(31, 41, 55, 0.8)'
-              }}
-            >
-              <p className={`text-lg font-semibold transition-all duration-300 ${
-                result.includes('Поздравляем') ? 'text-green-300' : 'text-white'
-              }`}>
-                {result}
-              </p>
-              {result.includes('Поздравляем') && (
-                <div className="mt-2 flex justify-center space-x-2">
-                  <div className="text-2xl animate-gentle-bounce">🎉</div>
-                  <div className="text-2xl animate-gentle-bounce" style={{ animationDelay: '0.2s' }}>✨</div>
-                  <div className="text-2xl animate-gentle-bounce" style={{ animationDelay: '0.4s' }}>🎊</div>
-                </div>
-              )}
-            </div>
-          )}
+
 
           {/* Ошибка */}
           {error && (
