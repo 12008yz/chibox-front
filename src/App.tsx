@@ -93,7 +93,21 @@ const App: React.FC = () => {
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
     console.log('Showing loading screen - fetching user data...');
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#151225] relative">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #151225 0%, #1a1630 100%)',
+      }}>
+        {/* Gaming Background Pattern for Loading */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 26L45 35.32V43.68L30 53L15 43.68V35.32L30 26z' stroke='%236366f1' stroke-opacity='0.8' stroke-width='1'/%3E%3Cpath d='M30 0L45 9.32V17.68L30 27L15 17.68V9.32L30 0z' stroke='%238b5cf6' stroke-opacity='0.6' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 52px',
+              animation: 'float 20s ease-in-out infinite',
+            }}
+          />
+        </div>
+
         <FloatingWatermark />
         <div className="relative z-10 flex flex-col items-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
@@ -105,7 +119,51 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#151225] relative">
+      <div className="min-h-screen relative overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #151225 0%, #1a1630 100%)',
+      }}>
+        {/* Gaming Background Pattern */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          {/* Hexagonal Pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 26L45 35.32V43.68L30 53L15 43.68V35.32L30 26z' stroke='%236366f1' stroke-opacity='0.8' stroke-width='1'/%3E%3Cpath d='M30 0L45 9.32V17.68L30 27L15 17.68V9.32L30 0z' stroke='%238b5cf6' stroke-opacity='0.6' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 52px',
+              animation: 'float 20s ease-in-out infinite',
+            }}
+          />
+
+          {/* Circuit-like Grid */}
+          <div
+            className="absolute inset-0 opacity-[0.02]"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)
+              `,
+              backgroundSize: '40px 40px',
+            }}
+          />
+
+          {/* Animated Gaming Particles */}
+          <div className="absolute inset-0">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  background: i % 2 === 0 ? 'rgba(99, 102, 241, 0.3)' : 'rgba(139, 92, 246, 0.3)',
+                  animation: `float ${15 + Math.random() * 10}s ease-in-out infinite ${Math.random() * 5}s`,
+                  boxShadow: i % 3 === 0 ? '0 0 10px rgba(99, 102, 241, 0.5)' : '0 0 8px rgba(139, 92, 246, 0.4)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
         <FloatingWatermark />
         <div className="relative z-10">
           <Header
@@ -156,7 +214,7 @@ const App: React.FC = () => {
             <Route
               path="/marketplace"
               element={
-                <div className="min-h-screen bg-[#151225] text-white p-8">
+                <div className="min-h-screen text-white p-8">
                   <div className="container mx-auto">
                     <h1 className="text-3xl font-bold">Marketplace</h1>
                     <p>Coming soon...</p>
@@ -175,7 +233,7 @@ const App: React.FC = () => {
             <Route
               path="/crash"
               element={
-                <div className="min-h-screen bg-[#151225] text-white p-8">
+                <div className="min-h-screen text-white p-8">
                   <div className="container mx-auto">
                     <h1 className="text-3xl font-bold">Crash</h1>
                     <p>Coming soon...</p>
@@ -186,7 +244,7 @@ const App: React.FC = () => {
             <Route
               path="/upgrade"
               element={
-                <div className="min-h-screen bg-[#151225] text-white p-8">
+                <div className="min-h-screen text-white p-8">
                   <div className="container mx-auto">
                     <h1 className="text-3xl font-bold">Upgrade</h1>
                     <p>Coming soon...</p>
@@ -197,7 +255,7 @@ const App: React.FC = () => {
             <Route
               path="/slot"
               element={
-                <div className="min-h-screen bg-[#151225] text-white p-8">
+                <div className="min-h-screen text-white p-8">
                   <div className="container mx-auto">
                     <h1 className="text-3xl font-bold">Slots</h1>
                     <p>Coming soon...</p>

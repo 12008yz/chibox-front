@@ -3,10 +3,10 @@ import React from 'react';
 const FloatingWatermark: React.FC = () => {
   // Массив иконок CS2 из icons8
   const cs2Icons = [
-    'https://ext.same-assets.com/609624232/3169792146.png', // CS soldier icon
-    'https://ext.same-assets.com/609624232/355601599.png', // CS soldier with rifle
-    'https://ext.same-assets.com/609624232/226050672.png', // CS soldier variant
-    'https://ext.same-assets.com/609624232/144393961.png', // CS soldier action
+    'https://www.csgodatabase.com/images/weapons/webp/Shadow_Daggers.webp', // CS soldier icon
+    'https://www.csgodatabase.com/images/weapons/webp/Bayonet.webp', // CS soldier with rifle
+    'https://www.csgodatabase.com/images/weapons/webp/AK-47.webp', // CS soldier variant
+    'https://www.csgodatabase.com/images/weapons/webp/M4A1-S.webp', // CS soldier action
     'https://ext.same-assets.com/609624232/571014729.png', // CS Source logo
     'https://ext.same-assets.com/609624232/1178601660.png', // CS soldier crouching
   ];
