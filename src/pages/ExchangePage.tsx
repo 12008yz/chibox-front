@@ -25,13 +25,16 @@ const ItemCard: React.FC<{
   itemGroup: { item: Item, instances: UserInventoryItem[], count: number };
   onSellItem: (itemId: string, itemName: string, sellPrice: number) => void;
   onExchangeItem: (itemId: string, itemName: string, itemPrice: number) => void;
+  calculateSubscriptionDays: (itemPrice: number) => number;
+  selectedTab: 'sell' | 'exchange';
   isLoading?: boolean;
-}> = ({ itemGroup, onSellItem, onExchangeItem, isLoading = false }) => {
+}> = ({ itemGroup, onSellItem, onExchangeItem, calculateSubscriptionDays, selectedTab, isLoading = false }) => {
   const [imageError, setImageError] = useState(false);
   const { item, count } = itemGroup;
   // Используем price как sellPrice (цена продажи = 70% от рыночной стоимости)
   const itemPrice = parseFloat(item.price || '0');
   const sellPrice = itemPrice * 0.7; // 70% от цены предмета
+  const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
@@ -106,11 +109,20 @@ const ItemCard: React.FC<{
             </span>
           </div>
 
-          {sellPrice > 0 && (
+          {sellPrice > 0 && selectedTab === 'sell' && (
             <div className="flex justify-between items-center text-xs">
               <span className="text-green-300">Продажа:</span>
               <span className="text-green-300 font-semibold">
                 <Monetary value={sellPrice} />
+              </span>
+            </div>
+          )}
+
+          {selectedTab === 'exchange' && (
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-purple-300">Подписка:</span>
+              <span className={`font-semibold ${subscriptionDays >= 1 ? 'text-purple-300' : 'text-red-400'}`}>
+                {subscriptionDays >= 1 ? `${subscriptionDays} дней` : 'Мало'}
               </span>
             </div>
           )}
@@ -119,7 +131,7 @@ const ItemCard: React.FC<{
         {/* Кнопки действий */}
         <div className="mt-4 space-y-2">
           {/* Кнопка продажи */}
-          {sellPrice > 0 && (
+          {sellPrice > 0 && selectedTab === 'sell' && (
             <button
               onClick={() => onSellItem(item.id, item.name, sellPrice)}
               disabled={isLoading}
@@ -137,20 +149,29 @@ const ItemCard: React.FC<{
           )}
 
           {/* Кнопка обмена на подписку */}
-          <button
-            onClick={() => onExchangeItem(item.id, item.name, itemPrice)}
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Обмениваем...
-              </div>
-            ) : (
-              'Обменять на подписку'
-            )}
-          </button>
+          {selectedTab === 'exchange' && (
+            <button
+              onClick={() => onExchangeItem(item.id, item.name, itemPrice)}
+              disabled={isLoading || subscriptionDays < 1}
+              className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed ${
+                subscriptionDays >= 1
+                  ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white'
+                  : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 cursor-not-allowed'
+              }`}
+              title={subscriptionDays < 1 ? 'Предмет слишком дешевый для обмена (минимум 120₽)' : ''}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Обмениваем...
+                </div>
+              ) : subscriptionDays >= 1 ? (
+                `Обменять на ${subscriptionDays} дней`
+              ) : (
+                'Слишком дешевый'
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -191,7 +212,7 @@ const ExchangePage: React.FC = () => {
       const isAvailable = item.status === 'inventory'; // Только предметы в инвентаре
       const hasValidAction = selectedTab === 'sell'
         ? parseFloat(item.item.price || '0') > 0
-        : true; // Все предметы со статусом inventory можно обменять на подписку
+        : calculateSubscriptionDays(parseFloat(item.item.price || '0')) >= 1; // Только предметы стоимостью от 1 дня подписки
 
       return matchesSearch && matchesRarity && hasValidAction && isAvailable;
     });
@@ -211,7 +232,15 @@ const ExchangePage: React.FC = () => {
       return acc;
     }, {} as Record<string, { item: Item, instances: UserInventoryItem[], count: number }>);
 
-    return Object.values(grouped);
+    // Возвращаем отсортированный массив для стабильного порядка
+    return Object.values(grouped).sort((a, b) => {
+      // Сначала сортируем по названию предмета для стабильного порядка
+      const nameComparison = a.item.name.localeCompare(b.item.name);
+      if (nameComparison !== 0) return nameComparison;
+
+      // Затем по ID для абсолютной стабильности
+      return a.item.id.localeCompare(b.item.id);
+    });
   }, [inventoryData, searchTerm, rarityFilter, selectedTab]);
 
   // Обработчик продажи предмета
@@ -259,6 +288,12 @@ const ExchangePage: React.FC = () => {
     }
   };
 
+  // Функция расчета дней подписки
+  const calculateSubscriptionDays = (itemPrice: number) => {
+    const pricePerDay = 120; // 120₽ за 1 день подписки
+    return Math.floor(itemPrice / pricePerDay);
+  };
+
   // Обработчик обмена предмета на подписку
   const handleExchangeItem = async (itemId: string, itemName: string, itemPrice: number) => {
     try {
@@ -267,7 +302,16 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Exchanging item:', { itemId, itemName, itemPrice, userId: auth.user.id });
+      // Проверяем минимальную стоимость
+      const subscriptionDays = calculateSubscriptionDays(itemPrice);
+      const pricePerDay = 120;
+
+      if (subscriptionDays < 1) {
+        toast.error(`Предмет слишком дешевый для обмена. Минимальная стоимость: ${pricePerDay}₽ (стоимость предмета: ${Math.round(itemPrice)}₽)`);
+        return;
+      }
+
+      console.log('Exchanging item:', { itemId, itemName, itemPrice, subscriptionDays, userId: auth.user.id });
 
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
@@ -286,12 +330,17 @@ const ExchangePage: React.FC = () => {
       console.log('Using inventory item ID for exchange:', inventoryItem.id);
       const result = await exchangeItem({
         userId: auth.user.id,
-        itemId: inventoryItem.item.id, // Для обмена используем ID предмета, как было изначально
-        tierId: '1' // Базовый уровень подписки, можно сделать динамическим
+        itemId: inventoryItem.item.id
       }).unwrap();
 
       if (result.success) {
-        toast.success(`Предмет "${itemName}" обменян на подписку!`);
+        toast.success(
+          <div>
+            <div className="font-semibold">Обмен успешен!</div>
+            <div className="text-sm">Предмет "{itemName}" обменян на {result.data.subscription_days_added} дней подписки</div>
+            <div className="text-xs text-gray-300">Всего дней: {result.data.subscription_days_left}</div>
+          </div>
+        );
         // Оптимистичное обновление происходит автоматически в userApi
       }
     } catch (error: any) {
@@ -467,12 +516,14 @@ const ExchangePage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {groupedAndFilteredItems.map((itemGroup) => (
+              {groupedAndFilteredItems.map((itemGroup, index) => (
                 <ItemCard
-                  key={itemGroup.item.id}
+                  key={`${itemGroup.item.id}-${itemGroup.item.name}-${index}`} // Стабильный ключ
                   itemGroup={itemGroup}
                   onSellItem={handleSellItem}
                   onExchangeItem={handleExchangeItem}
+                  calculateSubscriptionDays={calculateSubscriptionDays}
+                  selectedTab={selectedTab}
                   isLoading={isSellingItem || isExchangingItem}
                 />
               ))}

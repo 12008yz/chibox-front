@@ -258,7 +258,18 @@ export interface SellItemRequest {
 export interface ExchangeItemForSubscriptionRequest {
   userId: string;
   itemId: string;
-  tierId: string;
+}
+
+export interface ExchangeItemForSubscriptionResponse {
+  success: boolean;
+  message: string;
+  data: {
+    subscription_days_added: number;
+    subscription_days_left: number;
+    subscription_expiry_date: string;
+    item_name: string;
+    item_price: number;
+  };
 }
 
 export interface WithdrawItemRequest {

@@ -193,7 +193,7 @@ const PublicProfilePage: React.FC = () => {
                     <span className="text-green-400 font-bold">+{(dropBonuses.level || 0).toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Подписка:</span>
+                    <span className="text-gray-400 text-sm">Статус:</span>
                     <span className="text-blue-400 font-bold">+{(dropBonuses.subscription || 0).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">

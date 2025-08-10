@@ -520,7 +520,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 )}
                 {statusData.data.subscriptionRequired && (
                   <div className="mt-1">
-                    Требуется подписка уровня {statusData.data.minSubscriptionTier}+
+                    Требуется статус уровня {statusData.data.minSubscriptionTier}+
                     <br />
                     Ваш уровень: {statusData.data.userSubscriptionTier}
                   </div>

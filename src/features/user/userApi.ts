@@ -6,6 +6,7 @@ import type {
   Transaction,
   SellItemRequest,
   ExchangeItemForSubscriptionRequest,
+  ExchangeItemForSubscriptionResponse,
   WithdrawItemRequest,
   ApplyPromoRequest,
   DepositRequest,
@@ -53,17 +54,23 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: sellData,
       }),
-      invalidatesTags: ['Inventory', 'Balance', 'User'],
+      invalidatesTags: ['Balance', 'User'], // Убираем 'Inventory' чтобы избежать перезагрузки и перемешивания
       // Оптимистичное обновление инвентаря и баланса
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         // Оптимистичное обновление инвентаря
         const patchResult = dispatch(
           userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
             if (draft.data?.items) {
-              // Находим и обновляем статус проданного предмета
+              // Находим и УДАЛЯЕМ проданный предмет из списка
               const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
               if (itemIndex !== -1) {
-                draft.data.items[itemIndex].status = 'sold';
+                console.log('Optimistically removing sold item:', draft.data.items[itemIndex]);
+                // Удаляем предмет из массива вместо изменения статуса
+                draft.data.items.splice(itemIndex, 1);
+                // Обновляем общее количество, если нужно
+                if (draft.data.totalItems) {
+                  draft.data.totalItems -= 1;
+                }
               }
             }
           })
@@ -306,7 +313,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Обмен предмета на подписку
     exchangeItemForSubscription: builder.mutation<
-      ApiResponse<{ subscription_days_added: number }>,
+      ExchangeItemForSubscriptionResponse,
       ExchangeItemForSubscriptionRequest
     >({
       query: (exchangeData) => ({
@@ -314,17 +321,23 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: exchangeData,
       }),
-      invalidatesTags: ['User', 'Inventory'],
+      invalidatesTags: ['User'], // Убираем 'Inventory' чтобы избежать перезагрузки и перемешивания
       // Оптимистичное обновление инвентаря
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        // Оптимистичное обновление инвентаря - обновляем статус предмета
+        // Оптимистичное обновление инвентаря - удаляем обмененный предмет
         const patchResult = dispatch(
           userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
             if (draft.data?.items) {
-              // Находим предмет по item_id и обновляем статус первого найденного
+              // Находим предмет по item_id и УДАЛЯЕМ первый найденный
               const itemIndex = draft.data.items.findIndex(item => item.item.id === arg.itemId && item.status === 'inventory');
               if (itemIndex !== -1) {
-                draft.data.items[itemIndex].status = 'converted_to_subscription';
+                console.log('Optimistically removing exchanged item:', draft.data.items[itemIndex]);
+                // Удаляем предмет из массива вместо изменения статуса
+                draft.data.items.splice(itemIndex, 1);
+                // Обновляем общее количество, если нужно
+                if (draft.data.totalItems) {
+                  draft.data.totalItems -= 1;
+                }
               }
             }
           })

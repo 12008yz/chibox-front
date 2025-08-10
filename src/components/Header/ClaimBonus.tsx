@@ -193,7 +193,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
               </div>
               <div className="flex items-center gap-1 text-green-400">
                 <span>⭐</span>
-                <span>Подписка</span>
+                <span>Статус</span>
               </div>
               <div className="flex items-center gap-1 text-blue-400">
                 <span>🎁</span>

@@ -1171,7 +1171,7 @@ const ProfilePage: React.FC = () => {
                 )}
                 {(user.subscription_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Подписка:</span>
+                    <span className="text-gray-400 text-sm">Статус:</span>
                     <span className="text-blue-400 text-sm">+{parseFloat(Number(user.subscription_bonus_percentage).toFixed(1))}%</span>
                   </div>
                 )}
