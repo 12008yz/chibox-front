@@ -9,7 +9,7 @@ import {
 } from '../features/user/userApi';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
-import type { UserInventoryItem } from '../types/api';
+import type { UserInventoryItem, Item } from '../types/api';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -22,14 +22,15 @@ const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-ful
 
 // Компонент карточки предмета
 const ItemCard: React.FC<{
-  item: UserInventoryItem;
+  itemGroup: { item: Item, instances: UserInventoryItem[], count: number };
   onSellItem: (itemId: string, itemName: string, sellPrice: number) => void;
   onExchangeItem: (itemId: string, itemName: string, itemPrice: number) => void;
   isLoading?: boolean;
-}> = ({ item, onSellItem, onExchangeItem, isLoading = false }) => {
+}> = ({ itemGroup, onSellItem, onExchangeItem, isLoading = false }) => {
   const [imageError, setImageError] = useState(false);
+  const { item, count } = itemGroup;
   // Используем price как sellPrice (цена продажи = 70% от рыночной стоимости)
-  const itemPrice = parseFloat(item.item.price || '0');
+  const itemPrice = parseFloat(item.price || '0');
   const sellPrice = itemPrice * 0.7; // 70% от цены предмета
 
   const getRarityColor = (rarity: string) => {
@@ -63,11 +64,11 @@ const ItemCard: React.FC<{
       <div className="relative">
         {/* Изображение предмета */}
         <div className="relative mb-3">
-          <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.item.rarity)} opacity-20 rounded-lg`}></div>
-          {!imageError && item.item.image_url ? (
+          <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
+          {!imageError && item.image_url ? (
             <img
-              src={item.item.image_url}
-              alt={item.item.name}
+              src={item.image_url}
+              alt={item.name}
               className="w-full h-32 object-cover rounded-lg relative z-10"
               onError={() => setImageError(true)}
             />
@@ -75,20 +76,26 @@ const ItemCard: React.FC<{
             <PlaceholderImage />
           )}
           {/* Редкость бейдж */}
-          <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(item.item.rarity)} text-white text-xs font-bold z-20`}>
-            {getRarityDisplayName(item.item.rarity)}
+          <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(item.rarity)} text-white text-xs font-bold z-20`}>
+            {getRarityDisplayName(item.rarity)}
           </div>
+          {/* Количество предметов */}
+          {count > 1 && (
+            <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/80 text-white text-xs font-bold z-20">
+              x{count}
+            </div>
+          )}
         </div>
 
         {/* Информация о предмете */}
         <div className="space-y-2">
-          <h3 className="text-white font-semibold text-sm truncate" title={item.item.name}>
-            {item.item.name}
+          <h3 className="text-white font-semibold text-sm truncate" title={item.name}>
+            {item.name}
           </h3>
 
-          {item.item.weapon_type && (
+          {item.weapon_type && (
             <p className="text-gray-400 text-xs">
-              {item.item.weapon_type}
+              {item.weapon_type}
             </p>
           )}
 
@@ -114,7 +121,7 @@ const ItemCard: React.FC<{
           {/* Кнопка продажи */}
           {sellPrice > 0 && (
             <button
-              onClick={() => onSellItem(item.item.id, item.item.name, sellPrice)}
+              onClick={() => onSellItem(item.id, item.name, sellPrice)}
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed"
             >
@@ -124,14 +131,14 @@ const ItemCard: React.FC<{
                   Продаём...
                 </div>
               ) : (
-                `Продать за ${Math.round(sellPrice)}₽`
+                `Продать ${count > 1 ? 'один ' : ''}за ${Math.round(sellPrice)}₽`
               )}
             </button>
           )}
 
           {/* Кнопка обмена на подписку */}
           <button
-            onClick={() => onExchangeItem(item.item.id, item.item.name, itemPrice)}
+            onClick={() => onExchangeItem(item.id, item.name, itemPrice)}
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed"
           >
@@ -173,19 +180,38 @@ const ExchangePage: React.FC = () => {
   const [sellItem, { isLoading: isSellingItem }] = useSellItemMutation();
   const [exchangeItem, { isLoading: isExchangingItem }] = useExchangeItemForSubscriptionMutation();
 
-  // Фильтрация предметов
-  const filteredItems = React.useMemo(() => {
+  // Группировка и фильтрация предметов
+  const groupedAndFilteredItems = React.useMemo(() => {
     if (!inventoryData?.data?.items) return [];
 
-    return inventoryData.data.items.filter((item: UserInventoryItem) => {
+    // Сначала фильтруем
+    const filtered = inventoryData.data.items.filter((item: UserInventoryItem) => {
       const matchesSearch = item.item.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRarity = rarityFilter === 'all' || item.item.rarity?.toLowerCase() === rarityFilter.toLowerCase();
+      const isAvailable = item.status === 'inventory'; // Только предметы в инвентаре
       const hasValidAction = selectedTab === 'sell'
         ? parseFloat(item.item.price || '0') > 0
-        : true; // Все предметы можно обменять на подписку
+        : true; // Все предметы со статусом inventory можно обменять на подписку
 
-      return matchesSearch && matchesRarity && hasValidAction;
+      return matchesSearch && matchesRarity && hasValidAction && isAvailable;
     });
+
+    // Группируем по типу предмета
+    const grouped = filtered.reduce((acc, item) => {
+      const key = item.item.id; // Группируем по ID шаблона предмета
+      if (!acc[key]) {
+        acc[key] = {
+          item: item.item,
+          instances: [],
+          count: 0
+        };
+      }
+      acc[key].instances.push(item);
+      acc[key].count++;
+      return acc;
+    }, {} as Record<string, { item: Item, instances: UserInventoryItem[], count: number }>);
+
+    return Object.values(grouped);
   }, [inventoryData, searchTerm, rarityFilter, selectedTab]);
 
   // Обработчик продажи предмета
@@ -196,16 +222,32 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Selling item with ID:', itemId);
-      // Исправляем параметры для сервера - используем itemId вместо user_inventory_item_id
-      const result = await sellItem({ itemId }).unwrap();
+      console.log('Selling item:', { itemId, itemName, sellPrice, userId: auth.user.id });
+
+      // Находим группу предметов
+      const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
+      if (!itemGroup || itemGroup.instances.length === 0) {
+        toast.error('Предмет не найден в инвентаре');
+        return;
+      }
+
+      // Берем первый доступный экземпляр для продажи
+      const inventoryItem = itemGroup.instances[0];
+      if (inventoryItem.status !== 'inventory') {
+        toast.error('Предмет недоступен для продажи');
+        return;
+      }
+
+      console.log('Using inventory item ID:', inventoryItem.id);
+      const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
         toast.success(`Предмет "${itemName}" продан за ${Math.round(sellPrice)}₽!`);
         refetchInventory();
       }
     } catch (error: any) {
       console.error('Ошибка при продаже предмета:', error);
-      toast.error(error?.data?.message || 'Ошибка при продаже предмета');
+      const errorMessage = error?.data?.message || error?.message || 'Ошибка при продаже предмета';
+      toast.error(errorMessage);
     }
   };
 
@@ -217,11 +259,26 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Exchanging item with ID:', itemId);
-      // Исправляем параметры для сервера
+      console.log('Exchanging item:', { itemId, itemName, userId: auth.user.id });
+
+      // Находим группу предметов
+      const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
+      if (!itemGroup || itemGroup.instances.length === 0) {
+        toast.error('Предмет не найден в инвентаре');
+        return;
+      }
+
+      // Берем первый доступный экземпляр для обмена
+      const inventoryItem = itemGroup.instances[0];
+      if (inventoryItem.status !== 'inventory') {
+        toast.error('Предмет недоступен для обмена');
+        return;
+      }
+
+      console.log('Using inventory item ID for exchange:', inventoryItem.id);
       const result = await exchangeItem({
         userId: auth.user.id,
-        itemId: itemId,
+        itemId: inventoryItem.item.id, // Для обмена используем ID предмета, как было изначально
         tierId: '1' // Базовый уровень подписки, можно сделать динамическим
       }).unwrap();
 
@@ -231,7 +288,8 @@ const ExchangePage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Ошибка при обмене предмета:', error);
-      toast.error(error?.data?.message || 'Ошибка при обмене предмета');
+      const errorMessage = error?.data?.message || error?.message || 'Ошибка при обмене предмета';
+      toast.error(errorMessage);
     }
   };
 
