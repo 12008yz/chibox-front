@@ -405,7 +405,7 @@ const HomePage: React.FC = () => {
                       return "Ежедневные бесплатные кейсы для всех игроков";
                     }
 
-                    return `Эксклюзивные кейсы для подписчиков. Осталось дней подписки: ${subscriptionDaysLeft}`;
+                    return `Эксклюзивные кейсы для подписчиков. Осталось дней статуса: ${subscriptionDaysLeft}`;
                   };
 
                   return (
@@ -429,8 +429,8 @@ const HomePage: React.FC = () => {
                       {paidCases && paidCases.length > 0 && (
                         <div className="mb-12">
                           <CaseListing
-                            name="Премиум кейсы (99₽ / 499₽)"
-                            description="Платные кейсы с эксклюзивными наградами"
+                            name="Премиум кейсы"
+                            description="Кейсы с эксклюзивными наградами"
                             cases={paidCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             fixedPrices={true}
