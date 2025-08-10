@@ -321,20 +321,20 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: exchangeData,
       }),
-      invalidatesTags: ['User'], // Убираем 'Inventory' чтобы избежать перезагрузки и перемешивания
-      // Оптимистичное обновление инвентаря
+      invalidatesTags: ['User'],
+      // Оптимистичное обновление инвентаря и подписки
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         // Оптимистичное обновление инвентаря - удаляем обмененный предмет
-        const patchResult = dispatch(
+        const inventoryPatch = dispatch(
           userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
             if (draft.data?.items) {
-              // Находим предмет по item_id и УДАЛЯЕМ первый найденный
-              const itemIndex = draft.data.items.findIndex(item => item.item.id === arg.itemId && item.status === 'inventory');
+              // Находим предмет по ID экземпляра инвентаря
+              const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId && item.status === 'inventory');
               if (itemIndex !== -1) {
                 console.log('Optimistically removing exchanged item:', draft.data.items[itemIndex]);
-                // Удаляем предмет из массива вместо изменения статуса
+                // Удаляем предмет из массива
                 draft.data.items.splice(itemIndex, 1);
-                // Обновляем общее количество, если нужно
+                // Обновляем общее количество
                 if (draft.data.totalItems) {
                   draft.data.totalItems -= 1;
                 }
@@ -344,10 +344,28 @@ export const userApi = baseApi.injectEndpoints({
         );
 
         try {
-          await queryFulfilled;
-        } catch {
+          // Ждем ответ от сервера
+          const response = await queryFulfilled;
+
+          // Оптимистичное обновление данных подписки
+          if (response.data.success && response.data.data) {
+            dispatch(
+              userApi.util.updateQueryData('getUserSubscription', undefined, (draft) => {
+                if (draft.data) {
+                  // Обновляем дни подписки из ответа сервера (оба поля для совместимости)
+                  draft.data.days_left = response.data.data.subscription_days_left;
+                  draft.data.subscription_days_left = response.data.data.subscription_days_left;
+                  draft.data.expiry_date = response.data.data.subscription_expiry_date;
+                  draft.data.subscription_expiry_date = response.data.data.subscription_expiry_date;
+                  console.log('Updated subscription days optimistically:', response.data.data.subscription_days_left);
+                }
+              })
+            );
+          }
+        } catch (error) {
           // Откатываем оптимистичное обновление при ошибке
-          patchResult.undo();
+          inventoryPatch.undo();
+          console.error('Exchange failed, rolled back optimistic update:', error);
         }
       },
     }),

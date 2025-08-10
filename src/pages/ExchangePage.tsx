@@ -205,7 +205,7 @@ const ExchangePage: React.FC = () => {
   // Вычисляем значения на основе тарифа подписки
   const currentTier = subscriptionData?.data?.subscription_tier || 1;
   const pricePerDay = currentTier === 3 ? 300 : 150;
-  const minExchangePrice = currentTier === 3 ? 280 : 140;
+  const minExchangePrice = Math.floor(pricePerDay * 0.93); // Синхронизировано с сервером
 
   // Функция расчета дней подписки
   const calculateSubscriptionDays = useCallback((itemPrice: number) => {
@@ -338,7 +338,7 @@ const ExchangePage: React.FC = () => {
       console.log('Using inventory item ID for exchange:', inventoryItem.id);
       const result = await exchangeItem({
         userId: auth.user.id,
-        itemId: inventoryItem.item.id
+        itemId: inventoryItem.id  // Используем ID конкретного экземпляра в инвентаре
       }).unwrap();
 
       if (result.success) {
