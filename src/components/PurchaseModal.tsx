@@ -206,7 +206,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               <div className="bg-black/20 rounded-xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Выберите подписку</h3>
                 <p className="text-gray-400 text-sm mb-6">
-                  Статус дает бонус к шансу выпадения редких предметов и ежедневные бесплатные кейсы
+                  Статус дает бонус к шансу выпадения редких предметов и ежедневные бесплатные кейсы и многое другое
                 </p>
 
                 <div className="space-y-3">

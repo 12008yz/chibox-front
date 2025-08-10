@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../store/hooks';
 import {
@@ -158,7 +158,7 @@ const ItemCard: React.FC<{
                   ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white'
                   : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 cursor-not-allowed'
               }`}
-              title={subscriptionDays < 1 ? 'Предмет слишком дешевый для обмена (минимум 120₽)' : ''}
+              title={subscriptionDays < 1 ? 'Предмет слишком дешевый для обмена (минимум 60₽)' : ''}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -200,6 +200,12 @@ const ExchangePage: React.FC = () => {
 
   const [sellItem, { isLoading: isSellingItem }] = useSellItemMutation();
   const [exchangeItem, { isLoading: isExchangingItem }] = useExchangeItemForSubscriptionMutation();
+
+  // Функция расчета дней подписки
+  const calculateSubscriptionDays = useCallback((itemPrice: number) => {
+    const pricePerDay = 120; // 120₽ за 1 день подписки
+    return Math.round(itemPrice / pricePerDay);
+  }, []);
 
   // Группировка и фильтрация предметов
   const groupedAndFilteredItems = React.useMemo(() => {
@@ -288,12 +294,6 @@ const ExchangePage: React.FC = () => {
     }
   };
 
-  // Функция расчета дней подписки
-  const calculateSubscriptionDays = (itemPrice: number) => {
-    const pricePerDay = 120; // 120₽ за 1 день подписки
-    return Math.floor(itemPrice / pricePerDay);
-  };
-
   // Обработчик обмена предмета на подписку
   const handleExchangeItem = async (itemId: string, itemName: string, itemPrice: number) => {
     try {
@@ -304,10 +304,10 @@ const ExchangePage: React.FC = () => {
 
       // Проверяем минимальную стоимость
       const subscriptionDays = calculateSubscriptionDays(itemPrice);
-      const pricePerDay = 120;
+      const minPrice = 60; // 60₽ минимум (50% от 120₽)
 
       if (subscriptionDays < 1) {
-        toast.error(`Предмет слишком дешевый для обмена. Минимальная стоимость: ${pricePerDay}₽ (стоимость предмета: ${Math.round(itemPrice)}₽)`);
+        toast.error(`Предмет слишком дешевый для обмена. Минимальная стоимость: ${minPrice}₽ (стоимость предмета: ${Math.round(itemPrice)}₽)`);
         return;
       }
 
@@ -547,7 +547,8 @@ const ExchangePage: React.FC = () => {
               <strong className="text-purple-400">Обмен на подписку:</strong>
               <ul className="mt-2 space-y-1 list-disc list-inside pl-4">
                 <li>Продление времени подписки</li>
-                <li>Время зависит от стоимости предмета</li>
+                <li>120₽ = 1 день подписки</li>
+                <li>Минимум 60₽ для обмена</li>
                 <li>Подписка даёт бонусы и ежедневные кейсы</li>
               </ul>
             </div>
