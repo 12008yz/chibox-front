@@ -11,6 +11,15 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import type { UserInventoryItem } from '../types/api';
 
+// Создаем SVG заглушку для изображений
+const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
+  <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center`}>
+    <svg className="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+);
+
 // Компонент карточки предмета
 const ItemCard: React.FC<{
   item: UserInventoryItem;
@@ -18,6 +27,7 @@ const ItemCard: React.FC<{
   onExchangeItem: (itemId: string, itemName: string, itemPrice: number) => void;
   isLoading?: boolean;
 }> = ({ item, onSellItem, onExchangeItem, isLoading = false }) => {
+  const [imageError, setImageError] = useState(false);
   // Используем price как sellPrice (цена продажи = 70% от рыночной стоимости)
   const itemPrice = parseFloat(item.item.price || '0');
   const sellPrice = itemPrice * 0.7; // 70% от цены предмета
@@ -54,15 +64,16 @@ const ItemCard: React.FC<{
         {/* Изображение предмета */}
         <div className="relative mb-3">
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.item.rarity)} opacity-20 rounded-lg`}></div>
-          <img
-            src={item.item.image_url || '/api/placeholder/120/120'}
-            alt={item.item.name}
-            className="w-full h-32 object-cover rounded-lg relative z-10"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/api/placeholder/120/120';
-            }}
-          />
+          {!imageError && item.item.image_url ? (
+            <img
+              src={item.item.image_url}
+              alt={item.item.name}
+              className="w-full h-32 object-cover rounded-lg relative z-10"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <PlaceholderImage />
+          )}
           {/* Редкость бейдж */}
           <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(item.item.rarity)} text-white text-xs font-bold z-20`}>
             {getRarityDisplayName(item.item.rarity)}
@@ -103,7 +114,7 @@ const ItemCard: React.FC<{
           {/* Кнопка продажи */}
           {sellPrice > 0 && (
             <button
-              onClick={() => onSellItem(item.id, item.item.name, sellPrice)}
+              onClick={() => onSellItem(item.item.id, item.item.name, sellPrice)}
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed"
             >
@@ -120,7 +131,7 @@ const ItemCard: React.FC<{
 
           {/* Кнопка обмена на подписку */}
           <button
-            onClick={() => onExchangeItem(item.id, item.item.name, itemPrice)}
+            onClick={() => onExchangeItem(item.item.id, item.item.name, itemPrice)}
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed"
           >
@@ -180,7 +191,14 @@ const ExchangePage: React.FC = () => {
   // Обработчик продажи предмета
   const handleSellItem = async (itemId: string, itemName: string, sellPrice: number) => {
     try {
-      const result = await sellItem({ user_inventory_item_id: itemId }).unwrap();
+      if (!auth.user?.id) {
+        toast.error('Необходимо авторизоваться для продажи предметов');
+        return;
+      }
+
+      console.log('Selling item with ID:', itemId);
+      // Исправляем параметры для сервера - используем itemId вместо user_inventory_item_id
+      const result = await sellItem({ itemId }).unwrap();
       if (result.success) {
         toast.success(`Предмет "${itemName}" продан за ${Math.round(sellPrice)}₽!`);
         refetchInventory();
@@ -194,8 +212,17 @@ const ExchangePage: React.FC = () => {
   // Обработчик обмена предмета на подписку
   const handleExchangeItem = async (itemId: string, itemName: string) => {
     try {
+      if (!auth.user?.id) {
+        toast.error('Необходимо авторизоваться для обмена предметов');
+        return;
+      }
+
+      console.log('Exchanging item with ID:', itemId);
+      // Исправляем параметры для сервера
       const result = await exchangeItem({
-        user_inventory_item_id: itemId
+        userId: auth.user.id,
+        itemId: itemId,
+        tierId: '1' // Базовый уровень подписки, можно сделать динамическим
       }).unwrap();
 
       if (result.success) {
@@ -239,7 +266,7 @@ const ExchangePage: React.FC = () => {
               <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 001.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
                 </svg>
               </div>
             </div>

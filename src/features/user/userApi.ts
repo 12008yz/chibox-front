@@ -6,6 +6,7 @@ import type {
   Notification,
   Transaction,
   SellItemRequest,
+  ExchangeItemForSubscriptionRequest,
   WithdrawItemRequest,
   ApplyPromoRequest,
   DepositRequest,
@@ -293,7 +294,7 @@ export const userApi = baseApi.injectEndpoints({
     // Обмен предмета на подписку
     exchangeItemForSubscription: builder.mutation<
       ApiResponse<{ subscription_days_added: number }>,
-      { user_inventory_item_id: string }
+      ExchangeItemForSubscriptionRequest
     >({
       query: (exchangeData) => ({
         url: 'v1/items/exchange-for-subscription',

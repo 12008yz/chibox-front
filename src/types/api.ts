@@ -252,7 +252,13 @@ export interface OpenCaseRequest {
 }
 
 export interface SellItemRequest {
-  user_inventory_item_id: string;
+  itemId: string;
+}
+
+export interface ExchangeItemForSubscriptionRequest {
+  userId: string;
+  itemId: string;
+  tierId: string;
 }
 
 export interface WithdrawItemRequest {
