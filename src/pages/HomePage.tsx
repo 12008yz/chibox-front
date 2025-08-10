@@ -311,13 +311,6 @@ const HomePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Статистика онлайн */}
-          <div className="flex items-center justify-center space-x-2 py-4 bg-gray-900/30">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-sm text-gray-400">
-              Игроков онлайн: <span className="text-green-400 font-bold">{onlineUsers}</span>
-            </span>
-          </div>
 
           {/* Кейсы секция */}
           <div className="container mx-auto px-4 py-8">

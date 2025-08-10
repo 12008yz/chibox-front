@@ -1,6 +1,5 @@
 import { baseApi } from '../../store/api/baseApi';
 import type {
-  UserInventoryItem,
   Achievement,
   Mission,
   Notification,
@@ -55,8 +54,21 @@ export const userApi = baseApi.injectEndpoints({
         body: sellData,
       }),
       invalidatesTags: ['Inventory', 'Balance', 'User'],
-      // Оптимистичное обновление баланса
+      // Оптимистичное обновление инвентаря и баланса
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        // Оптимистичное обновление инвентаря
+        const patchResult = dispatch(
+          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
+            if (draft.data?.items) {
+              // Находим и обновляем статус проданного предмета
+              const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
+              if (itemIndex !== -1) {
+                draft.data.items[itemIndex].status = 'sold';
+              }
+            }
+          })
+        );
+
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data.new_balance !== undefined) {
@@ -66,7 +78,8 @@ export const userApi = baseApi.injectEndpoints({
             });
           }
         } catch {
-          // Обработка ошибок
+          // Откатываем оптимистичное обновление при ошибке
+          patchResult.undo();
         }
       },
     }),
@@ -302,6 +315,28 @@ export const userApi = baseApi.injectEndpoints({
         body: exchangeData,
       }),
       invalidatesTags: ['User', 'Inventory'],
+      // Оптимистичное обновление инвентаря
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        // Оптимистичное обновление инвентаря - обновляем статус предмета
+        const patchResult = dispatch(
+          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
+            if (draft.data?.items) {
+              // Находим предмет по item_id и обновляем статус первого найденного
+              const itemIndex = draft.data.items.findIndex(item => item.item.id === arg.itemId && item.status === 'inventory');
+              if (itemIndex !== -1) {
+                draft.data.items[itemIndex].status = 'converted_to_subscription';
+              }
+            }
+          })
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          // Откатываем оптимистичное обновление при ошибке
+          patchResult.undo();
+        }
+      },
     }),
 
     // Получение информации о бонусах

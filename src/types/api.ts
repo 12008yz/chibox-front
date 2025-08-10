@@ -110,7 +110,7 @@ export interface UserInventoryItem {
   item_id: string;
   acquisition_date: string;
   source: string;
-  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory' | 'pending_withdrawal';
+  status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory' | 'pending_withdrawal' | 'converted_to_subscription';
   case_id?: string;
   case_template_id?: string;
   withdrawal?: any;

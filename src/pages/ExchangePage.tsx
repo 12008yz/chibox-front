@@ -131,7 +131,7 @@ const ItemCard: React.FC<{
                   Продаём...
                 </div>
               ) : (
-                `Продать ${count > 1 ? 'один ' : ''}за ${Math.round(sellPrice)}₽`
+                `Продать 1 шт. за ${Math.round(sellPrice)}₽`
               )}
             </button>
           )}
@@ -222,6 +222,12 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
+      // Защита от множественных кликов
+      if (isSellingItem) {
+        toast.error('Дождитесь завершения предыдущей продажи');
+        return;
+      }
+
       console.log('Selling item:', { itemId, itemName, sellPrice, userId: auth.user.id });
 
       // Находим группу предметов
@@ -232,17 +238,19 @@ const ExchangePage: React.FC = () => {
       }
 
       // Берем первый доступный экземпляр для продажи
-      const inventoryItem = itemGroup.instances[0];
-      if (inventoryItem.status !== 'inventory') {
-        toast.error('Предмет недоступен для продажи');
+      const availableInstances = itemGroup.instances.filter(instance => instance.status === 'inventory');
+      if (availableInstances.length === 0) {
+        toast.error('Нет доступных для продажи экземпляров этого предмета');
         return;
       }
 
-      console.log('Using inventory item ID:', inventoryItem.id);
+      const inventoryItem = availableInstances[0];
+      console.log('Using inventory item ID:', inventoryItem.id, 'Available instances:', availableInstances.length);
+
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
-        toast.success(`Предмет "${itemName}" продан за ${Math.round(sellPrice)}₽!`);
-        refetchInventory();
+        toast.success(`Предмет "${itemName}" (1 шт.) продан за ${Math.round(sellPrice)}₽!`);
+        // Оптимистичное обновление происходит автоматически в userApi
       }
     } catch (error: any) {
       console.error('Ошибка при продаже предмета:', error);
@@ -252,14 +260,14 @@ const ExchangePage: React.FC = () => {
   };
 
   // Обработчик обмена предмета на подписку
-  const handleExchangeItem = async (itemId: string, itemName: string) => {
+  const handleExchangeItem = async (itemId: string, itemName: string, itemPrice: number) => {
     try {
       if (!auth.user?.id) {
         toast.error('Необходимо авторизоваться для обмена предметов');
         return;
       }
 
-      console.log('Exchanging item:', { itemId, itemName, userId: auth.user.id });
+      console.log('Exchanging item:', { itemId, itemName, itemPrice, userId: auth.user.id });
 
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
@@ -284,7 +292,7 @@ const ExchangePage: React.FC = () => {
 
       if (result.success) {
         toast.success(`Предмет "${itemName}" обменян на подписку!`);
-        refetchInventory();
+        // Оптимистичное обновление происходит автоматически в userApi
       }
     } catch (error: any) {
       console.error('Ошибка при обмене предмета:', error);
@@ -418,7 +426,7 @@ const ExchangePage: React.FC = () => {
               {selectedTab === 'sell' ? 'Предметы для продажи' : 'Предметы для обмена'}
             </h2>
             <span className="text-gray-400">
-              {filteredItems.length} предметов
+              {groupedAndFilteredItems.length} предметов
             </span>
           </div>
 
@@ -437,7 +445,7 @@ const ExchangePage: React.FC = () => {
                 Попробовать снова
               </button>
             </div>
-          ) : filteredItems.length === 0 ? (
+          ) : groupedAndFilteredItems.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
                 <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -459,10 +467,10 @@ const ExchangePage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {filteredItems.map((item) => (
+              {groupedAndFilteredItems.map((itemGroup) => (
                 <ItemCard
-                  key={item.id}
-                  item={item}
+                  key={itemGroup.item.id}
+                  itemGroup={itemGroup}
                   onSellItem={handleSellItem}
                   onExchangeItem={handleExchangeItem}
                   isLoading={isSellingItem || isExchangingItem}
