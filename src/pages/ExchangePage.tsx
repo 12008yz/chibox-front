@@ -64,7 +64,7 @@ const ItemCard: React.FC<{
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20">
+    <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
       <div className="relative">
         {/* Изображение предмета */}
         <div className="relative mb-3">
@@ -144,7 +144,7 @@ const ItemCard: React.FC<{
                   Продаём...
                 </div>
               ) : (
-                `Продать 1 шт. за ${Math.round(sellPrice)}₽`
+                <>💸 Продать за {Math.round(sellPrice)}₽</>
               )}
             </button>
           )}
@@ -156,7 +156,7 @@ const ItemCard: React.FC<{
               disabled={isLoading || subscriptionDays < 1}
               className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 disabled:cursor-not-allowed ${
                 subscriptionDays >= 1
-                  ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:from-gray-600 disabled:to-gray-700 text-white'
+                  ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 disabled:from-gray-600 disabled:to-gray-700 text-white'
                   : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 cursor-not-allowed'
               }`}
               title={subscriptionDays < 1 ? `Предмет слишком дешевый для обмена (минимум ${minExchangePrice}₽)` : ''}
@@ -167,9 +167,9 @@ const ItemCard: React.FC<{
                   Обмениваем...
                 </div>
               ) : subscriptionDays >= 1 ? (
-                `Обменять на ${subscriptionDays} дней`
+                <>⭐ Обменять на {subscriptionDays} дней</>
               ) : (
-                'Слишком дешевый'
+                <>❌ Слишком дешевый</>
               )}
             </button>
           )}

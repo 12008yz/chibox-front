@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
   const bannerContent = [
     {
       left: {
-        image: 'https://public-content.dezctop.com/media/4f10cc5d362c4c8ba700ed232150b98e/neon.webp',
+        image: 'https://static.vecteezy.com/system/resources/previews/033/170/491/non_2x/abstract-elegant-game-background-gradient-abstract-banner-template-for-landing-page-design-or-website-background-free-vector.jpg',
         title: "CHIBOX",
         description: "Делаем твой инвентарь лучше с каждым днём. Открывай кейсы и собирай редкие предметы!",
         link: "/cases",
@@ -98,7 +98,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://wallpapers.com/images/hd/cs-go-background-aqi1qcryyzms7fjd.jpg',
+        image: 'https://img.freepik.com/premium-photo/christmas-gaming-background-new-year-neon-banner-neon-gaming-controller-banner-with-copy-space_1136325-4426.jpg?w=1480',
         title: "ТВОЯ УДАЧА",
         description: "Каждый открытый кейс — шанс на джекпот. Проверь свою фортуну сегодня!",
         link: "/cases",
@@ -111,7 +111,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://static.vecteezy.com/system/resources/thumbnails/046/029/963/large/trendy-retro-futuristic-background-with-desert-landscape-mountains-digital-glowing-grid-blue-and-purple-neon-lights-and-shiny-sunset-retrowave-game-animation-in-the-old-style-4k-60-fps-video.jpg',
+        image: 'https://img.freepik.com/free-vector/gaming-design-template_23-2149883126.jpg?ga=GA1.1.721176243.1754874666&semt=ais_hybrid&w=740&q=80',
         title: "СООБЩЕСТВО",
         description: "Присоединяйся к тысячам игроков. Соревнуйся в таблице лидеров и побеждай!",
         link: "/leaderboard",
