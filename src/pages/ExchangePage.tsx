@@ -121,7 +121,7 @@ const ItemCard: React.FC<{
 
           {selectedTab === 'exchange' && (
             <div className="flex justify-between items-center text-xs">
-              <span className="text-purple-300">Подписка:</span>
+              <span className="text-purple-300">Статус:</span>
               <span className={`font-semibold ${subscriptionDays >= 1 ? 'text-purple-300' : 'text-red-400'}`}>
                 {subscriptionDays >= 1 ? `${subscriptionDays} дней` : 'Мало'}
               </span>
@@ -399,7 +399,7 @@ const ExchangePage: React.FC = () => {
           <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-6 border border-purple-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-purple-300 font-semibold mb-2">Подписка</h3>
+                <h3 className="text-purple-300 font-semibold mb-2">Статус</h3>
                 {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
                   <>
                     <p className="text-xl font-bold text-purple-400">
@@ -412,7 +412,7 @@ const ExchangePage: React.FC = () => {
                     )}
                   </>
                 ) : (
-                  <p className="text-xl font-bold text-gray-400">Неактивна</p>
+                  <p className="text-xl font-bold text-gray-400">Неактивен</p>
                 )}
               </div>
               <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
@@ -466,7 +466,7 @@ const ExchangePage: React.FC = () => {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Обмен на подписку
+              Обмен на время статуса
             </button>
           </div>
         </div>
@@ -581,12 +581,12 @@ const ExchangePage: React.FC = () => {
               </ul>
             </div>
             <div>
-              <strong className="text-purple-400">Обмен на подписку:</strong>
+              <strong className="text-purple-400">Обмен на время статуса:</strong>
               <ul className="mt-2 space-y-1 list-disc list-inside pl-4">
                 <li>Продление времени подписки</li>
                 <li>{pricePerDay}₽ = 1 день подписки {subscriptionData?.data?.subscription_tier === 3 ? '(тариф Статус++)' : '(тарифы Статус/Статус+)'}</li>
                 <li>Минимум {minExchangePrice}₽ для обмена</li>
-                <li>Подписка даёт бонусы и ежедневные кейсы</li>
+                <li>Статус даёт бонусы и ежедневные кейсы</li>
               </ul>
             </div>
           </div>
