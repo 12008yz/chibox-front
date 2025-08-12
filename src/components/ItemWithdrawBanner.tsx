@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useWithdrawItemMutation } from '../features/user/userApi';
 import { useAppSelector } from '../store/hooks';
+import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUtils';
 import type { UserInventoryItem } from '../types/api';
 
 interface ItemWithdrawBannerProps {
@@ -23,14 +24,29 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const user = useAppSelector(state => state.auth.user);
   const userHasTradeUrl = user?.steam_trade_url && user.steam_trade_url.trim() !== '';
 
-  // Проверка возможности вывода предмета
-  const canWithdraw = (item.item?.steam_market_hash_name &&
+  // Проверяем статус подписки
+  const withdrawPermission = canWithdrawItems(user);
+  const subscriptionStatus = getSubscriptionStatus(user);
+
+  // Проверка возможности вывода предмета (и наличия подписки)
+  const canWithdraw = ((item.item?.steam_market_hash_name &&
                       item.item.steam_market_hash_name.trim() !== '') ||
-                     (item.item?.name && item.item.name.trim() !== '');
+                     (item.item?.name && item.item.name.trim() !== '')) &&
+                     withdrawPermission.canWithdraw;
 
 
 
   const handleWithdraw = async (useCustomUrl = false) => {
+    // Проверяем подписку перед выводом
+    if (!withdrawPermission.canWithdraw) {
+      if (withdrawPermission.requiresSubscription) {
+        onError(`${withdrawPermission.reason}. ${subscriptionStatus.statusText}.`);
+      } else {
+        onError(withdrawPermission.reason || 'Невозможно вывести предмет');
+      }
+      return;
+    }
+
     if (!canWithdraw) {
       onError('Этот предмет нельзя вывести в Steam');
       return;
@@ -65,7 +81,14 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       }
     } catch (error: any) {
       console.error('Ошибка при выводе предмета:', error);
-      onError(error?.data?.message || 'Не удалось вывести предмет');
+
+      // Специальная обработка ошибки отсутствия подписки
+      if (error?.data?.error_code === 'SUBSCRIPTION_REQUIRED') {
+        const subscriptionInfo = error.data.data?.subscription_status || 'Подписка отсутствует';
+        onError(`${error.data.message}. Статус: ${subscriptionInfo}. Перейдите в профиль для покупки подписки.`);
+      } else {
+        onError(error?.data?.message || 'Не удалось вывести предмет');
+      }
     } finally {
       setIsWithdrawing(false);
     }
@@ -104,17 +127,29 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
                   {isWithdrawing ? 'Выводим...' : 'Вывести в Steam'}
                 </button>
                 <p className="text-xs text-gray-400 text-center">
-                  {userHasTradeUrl
-                    ? 'Отправить на ваш Steam'
-                    : 'Нужен Steam Trade URL'
+                  {!withdrawPermission.canWithdraw
+                    ? (withdrawPermission.requiresSubscription
+                        ? 'Требуется подписка'
+                        : withdrawPermission.reason)
+                    : (userHasTradeUrl
+                        ? 'Отправить на ваш Steam'
+                        : 'Нужен Steam Trade URL')
                   }
                 </p>
               </div>
             ) : (
               <div className="text-center">
                 <p className="text-xs text-gray-400 bg-gray-700/50 rounded py-1.5 px-2">
-                  Нельзя вывести в Steam
+                  {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription
+                    ? 'Требуется подписка'
+                    : 'Нельзя вывести в Steam'
+                  }
                 </p>
+                {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription && (
+                  <p className="text-xs text-orange-400 mt-1">
+                    {subscriptionStatus.statusText}
+                  </p>
+                )}
               </div>
             )}
           </>
