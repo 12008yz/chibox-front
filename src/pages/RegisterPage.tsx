@@ -5,9 +5,11 @@ import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi'
 import { loginSuccess } from '../features/auth/authSlice';
 import SteamLoginButton from '../components/SteamLoginButton';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,6 +25,17 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Валидация имени пользователя
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.isValid) {
+      const suggestions = suggestAlternativeUsername(username);
+      const suggestionText = suggestions.length > 0
+        ? ` Попробуйте: ${suggestions.join(', ')}`
+        : '';
+      setError(`${usernameValidation.error}${suggestionText}`);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Пароли не совпадают');

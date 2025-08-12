@@ -10,6 +10,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
 import { formatDays, getDaysDeclension } from '../utils/declension';
+import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
 import PurchaseModal from '../components/PurchaseModal';
@@ -25,6 +26,7 @@ const ProfilePage: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tradeUrl, setTradeUrl] = useState('');
   const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -204,6 +206,23 @@ const ProfilePage: React.FC = () => {
     }
   }, [user?.steam_trade_url, user?.username]);
 
+  // Обработчик изменения имени пользователя с валидацией
+  const handleUsernameChange = (newValue: string) => {
+    setNewUsername(newValue);
+
+    if (newValue.trim() === '') {
+      setUsernameError('');
+      return;
+    }
+
+    const validation = validateUsername(newValue);
+    if (!validation.isValid) {
+      setUsernameError(validation.error || 'Недопустимое имя пользователя');
+    } else {
+      setUsernameError('');
+    }
+  };
+
   // Функция для получения шаблона кейса по ID
   const getCaseTemplateById = (templateId: string) => {
     if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
@@ -305,6 +324,19 @@ const ProfilePage: React.FC = () => {
         }
         if (newPassword !== confirmPassword) {
           showNotification('Пароли не совпадают', 'error');
+          return;
+        }
+      }
+
+      // Валидация имени пользователя, если оно изменилось
+      if (newUsername && newUsername !== user?.username) {
+        const usernameValidation = validateUsername(newUsername);
+        if (!usernameValidation.isValid) {
+          const suggestions = suggestAlternativeUsername(newUsername);
+          const suggestionText = suggestions.length > 0
+            ? ` Попробуйте: ${suggestions.join(', ')}`
+            : '';
+          showNotification(`${usernameValidation.error}${suggestionText}`, 'error');
           return;
         }
       }
@@ -1544,14 +1576,24 @@ const ProfilePage: React.FC = () => {
                 <input
                   type="text"
                   value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
+                  onChange={(e) => handleUsernameChange(e.target.value)}
                   placeholder="Введите новый никнейм"
-                  className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                  maxLength={50}
+                  className={`w-full px-3 py-2 bg-black/30 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors ${
+                    usernameError
+                      ? 'border-red-500 focus:border-red-400'
+                      : 'border-gray-600/50 focus:border-blue-500'
+                  }`}
+                  maxLength={20}
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  Ваше отображаемое имя на сайте
-                </p>
+                {usernameError ? (
+                  <p className="text-xs text-red-400 mt-1">
+                    {usernameError}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Ваше отображаемое имя на сайте (3-20 символов)
+                  </p>
+                )}
               </div>
 
               {/* Password */}
