@@ -65,12 +65,13 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
   const [startingPosition, setStartingPosition] = useState(0);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
 
   // Проверяем, можно ли играть
-  const canPlay = !mustSpin && !isLoading && !nextPlayTime;
+  const canPlay = !mustSpin && !isLoading && !nextPlayTime && !isSpinning;
 
   useEffect(() => {
     // Проверяем, есть ли сохраненное время следующей игры
@@ -95,19 +96,19 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
     if (!canPlay) return;
 
     try {
+      setIsSpinning(true);
       const response = await playRoulette().unwrap();
 
       if (response.success) {
-        // Устанавливаем индекс выигрышного сегмента
+        // Устанавливаем результат и запускаем анимацию
         setPrizeNumber(response.winner_index);
-
-        // Запускаем анимацию колеса
         setMustSpin(true);
 
         // Сохраняем время следующей игры
         setNextPlayTime(response.next_time);
         localStorage.setItem('roulette_next_play_time', response.next_time);
       } else {
+        setIsSpinning(false);
         toast.error(response.message || 'Что-то пошло не так');
         if (response.next_time) {
           setNextPlayTime(response.next_time);
@@ -115,6 +116,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         }
       }
     } catch (err: any) {
+      setIsSpinning(false);
       console.error('Ошибка при игре в рулетку:', err);
       toast.error(err.data?.message || 'Произошла ошибка');
     }
@@ -123,6 +125,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   // Обработка завершения вращения
   const handleSpinComplete = () => {
     setMustSpin(false);
+    setIsSpinning(false);
 
     // Сохраняем финальную позицию колеса для следующей игры
     setStartingPosition(prizeNumber);
@@ -130,32 +133,31 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
     // Определяем сообщение на основе выигрышного сегмента
     const wonSegment = wheelData[prizeNumber];
-    // Показываем всплывающее уведомление с задержкой для эффекта
-    setTimeout(() => {
-      if (wonSegment.option === 'Пусто') {
-        const randomLoseMessage = getRandomMessage(loseMessages);
-        toast(randomLoseMessage, {
-          icon: '😔',
-          style: {
-            background: '#374151',
-            color: '#fff',
-            border: '1px solid #6b7280',
-            zIndex: 999999999,
-          },
-        });
-      } else {
-        const randomWinMessage = getRandomMessage(winMessages);
-        toast(randomWinMessage, {
-          icon: '🎉',
-          style: {
-            background: '#059669',
-            color: '#fff',
-            border: '1px solid #10b981',
-            zIndex: 999999999,
-          },
-        });
-      }
-    }, 800); // Задержка для завершения анимации колеса
+
+    // Показываем результат сразу
+    if (wonSegment.option === 'Пусто') {
+      const randomLoseMessage = getRandomMessage(loseMessages);
+      toast(randomLoseMessage, {
+        icon: '😔',
+        style: {
+          background: '#374151',
+          color: '#fff',
+          border: '1px solid #6b7280',
+          zIndex: 999999999,
+        },
+      });
+    } else {
+      const randomWinMessage = getRandomMessage(winMessages);
+      toast(randomWinMessage, {
+        icon: '🎉',
+        style: {
+          background: '#059669',
+          color: '#fff',
+          border: '1px solid #10b981',
+          zIndex: 999999999,
+        },
+      });
+    }
   };
 
   const formatTimeRemaining = (nextTime: string) => {
@@ -179,8 +181,6 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       return `${hours}ч ${minutes}м`;
     }
   };
-
-
 
   // Предотвращаем скроллинг страницы когда модальное окно открыто
   useEffect(() => {
@@ -247,7 +247,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
               radiusLineWidth={2}
               fontSize={14}
               textDistance={80}
-              spinDuration={0.8}
+              spinDuration={1.5}
               startingOptionIndex={startingPosition}
               disableInitialAnimation={true}
               pointerProps={{
@@ -278,12 +278,10 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
                     : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {mustSpin ? 'Крутится...' : isLoading ? 'Загрузка...' : 'Крутить колесо'}
+                {isSpinning || mustSpin ? 'Крутится...' : isLoading ? 'Загрузка...' : 'Крутить колесо'}
               </button>
             )}
           </div>
-
-
 
           {/* Ошибка */}
           {error && (
