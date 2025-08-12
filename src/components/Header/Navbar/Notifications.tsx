@@ -31,6 +31,20 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
     const handleCloseNotifications = () => {
+        // Отмечаем все уведомления как прочитанные при закрытии панели
+        if (unreadCount > 0) {
+            markAllAsRead().unwrap()
+                .then(() => {
+                    // Обновляем данные после прочтения
+                    setTimeout(() => {
+                        refetchNotifications();
+                    }, 100);
+                })
+                .catch((error) => {
+                    console.error('Ошибка при прочтении уведомлений при закрытии:', error);
+                });
+        }
+
         setOpenNotifications(false);
     };
 
@@ -84,7 +98,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [openNotifications]);
+    }, [openNotifications, unreadCount, markAllAsRead, refetchNotifications]);
 
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);

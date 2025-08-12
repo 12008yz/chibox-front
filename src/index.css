@@ -881,26 +881,13 @@
 /* Gaming Notifications List */
 .gaming-notifications-list {
   @apply max-h-80 overflow-y-auto;
-  /* Custom scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 .gaming-notifications-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.gaming-notifications-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.gaming-notifications-list::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.5);
-  border-radius: 2px;
-}
-
-.gaming-notifications-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.7);
+  display: none; /* Safari and Chrome */
 }
 
 /* Empty State */
@@ -943,8 +930,34 @@
 }
 
 .gaming-notification-unread {
-  background: rgba(99, 102, 241, 0.1);
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(99, 102, 241, 0.15) 100%);
   border-left: 3px solid #6366f1;
+  position: relative;
+  animation: newNotificationGlow 2s ease-in-out infinite;
+}
+
+.gaming-notification-unread::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg,
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 50%,
+    rgba(99, 102, 241, 0.1) 100%);
+  opacity: 0;
+  animation: notificationShimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gaming-notification-unread:hover::before {
+  animation-duration: 1.5s;
 }
 
 .gaming-notification-read {
@@ -1282,5 +1295,39 @@
   }
   75% {
     transform: translateY(-12px) translateX(5px);
+  }
+}
+
+/* Анимация свечения для новых уведомлений */
+@keyframes newNotificationGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
+    border-left-color: #6366f1;
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+    border-left-color: #8b5cf6;
+  }
+}
+
+/* Анимация мерцания для новых уведомлений */
+@keyframes notificationShimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  25% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(0%) skewX(-15deg);
+  }
+  75% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) skewX(-15deg);
   }
 }
