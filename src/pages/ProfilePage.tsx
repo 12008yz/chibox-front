@@ -9,10 +9,11 @@ import Tooltip from '../components/Tooltip';
 import ScrollToTop from '../components/ScrollToTop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
+import { formatDays, getDaysDeclension } from '../utils/declension';
 
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
 import PurchaseModal from '../components/PurchaseModal';
-import type { UserInventoryItem, UserCaseItem, Item, CaseTemplate } from '../types/api';
+import type { UserInventoryItem, UserCaseItem } from '../types/api';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
@@ -439,7 +440,6 @@ const ProfilePage: React.FC = () => {
         // Если не удалось получить автоматически, показываем инструкции
         const instructions = result.data?.manual_instructions;
         if (instructions) {
-          const message = `Не удалось автоматически получить Trade URL.\n\n${instructions.title}\n${instructions.steps.map((step: string, index: number) => `${index + 1}. ${step}`).join('\n')}`;
           showNotification('Получите Trade URL вручную', 'info');
 
           // Открываем страницу настроек Steam в новой вкладке
@@ -670,7 +670,7 @@ const ProfilePage: React.FC = () => {
               title="Настройки профиля"
             >
               <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383.93.78.165.398.143.854-.107 1.204l-.527.738a1.125 1.125 0 01.12 1.45l.773.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
               </svg>
             </button>
           </div>
@@ -992,9 +992,9 @@ const ProfilePage: React.FC = () => {
                                     <div className="flex justify-between text-xs text-gray-400">
                                       <span>
                                         {progress}/{target}
-                                        {achievement.requirement_type === 'subscription_days' ? ' дней' :
+                                        {achievement.requirement_type === 'subscription_days' ? ` ${getDaysDeclension(target)}` :
                                          achievement.requirement_type === 'cases_opened' ? ' кейсов' :
-                                         achievement.requirement_type === 'daily_streak' ? ' дней подряд' :
+                                         achievement.requirement_type === 'daily_streak' ? ` ${getDaysDeclension(target)} подряд` :
                                          achievement.requirement_type === 'best_item_value' ? ' КР' :
                                          achievement.requirement_type === 'total_items_value' ? ' КР' :
                                          achievement.requirement_type === 'rare_items_found' ? ' предметов' :
@@ -1045,7 +1045,7 @@ const ProfilePage: React.FC = () => {
                     <>
                       {getSubscriptionName(user.subscription_tier)}
                       <span className="text-gray-400 text-sm block">
-                        {user.subscription_days_left} дней
+                        {formatDays(user.subscription_days_left || 0)}
                       </span>
                     </>
                   ) : (

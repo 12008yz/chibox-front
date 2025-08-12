@@ -9,6 +9,7 @@ import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import AppFeatures from '../components/AppFeatures';
 import TicTacToeGame from '../components/TicTacToeGame';
+import { formatDays } from '../utils/declension';
 
 
 import { useSocket } from '../hooks/useSocket';
@@ -405,7 +406,7 @@ const HomePage: React.FC = () => {
                       return "Ежедневные бесплатные кейсы для всех игроков";
                     }
 
-                    return `Эксклюзивные кейсы для подписчиков. Осталось дней статуса: ${subscriptionDaysLeft}`;
+                    return `Эксклюзивные кейсы для подписчиков. Осталось ${formatDays(subscriptionDaysLeft)} статуса`;
                   };
 
                   return (

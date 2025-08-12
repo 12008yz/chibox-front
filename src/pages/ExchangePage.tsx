@@ -9,6 +9,7 @@ import {
 } from '../features/user/userApi';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
+import { formatDays } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
 
 // Создаем SVG заглушку для изображений
@@ -127,7 +128,7 @@ const ItemCard: React.FC<{
             <div className="flex justify-between items-center text-xs">
               <span className="text-purple-300">Статус:</span>
               <span className={`font-semibold ${subscriptionDays >= 1 ? 'text-purple-300' : 'text-red-400'}`}>
-                {subscriptionDays >= 1 ? `${subscriptionDays} дней` : 'Мало'}
+                {subscriptionDays >= 1 ? formatDays(subscriptionDays) : 'Мало'}
               </span>
             </div>
           )}
@@ -171,7 +172,7 @@ const ItemCard: React.FC<{
                   Обмениваем...
                 </div>
               ) : subscriptionDays >= 1 ? (
-                <>⭐ Обменять на {subscriptionDays} дней</>
+                <>⭐ Обменять на {formatDays(subscriptionDays)}</>
               ) : (
                 <>❌ Слишком дешевый</>
               )}
@@ -353,8 +354,8 @@ const ExchangePage: React.FC = () => {
         toast.success(
           <div>
             <div className="font-semibold">Обмен успешен!</div>
-            <div className="text-sm">Предмет "{itemName}" обменян на {result.data.subscription_days_added} дней подписки</div>
-            <div className="text-xs text-gray-300">Всего дней: {result.data.subscription_days_left}</div>
+            <div className="text-sm">Предмет "{itemName}" обменян на {formatDays(result.data.subscription_days_added)} подписки</div>
+            <div className="text-xs text-gray-300">Всего {formatDays(result.data.subscription_days_left)}</div>
           </div>
         );
         // Принудительно обновляем инвентарь для ProfilePage
@@ -413,7 +414,7 @@ const ExchangePage: React.FC = () => {
                 <h3 className="text-purple-300 font-medium text-sm mb-1">Статус</h3>
                 {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
                   <div className="text-xl font-bold text-purple-400">
-                    {subscriptionData.data.subscription_days_left} дней
+                    {formatDays(subscriptionData.data.subscription_days_left)}
                   </div>
                 ) : (
                   <div className="text-xl font-bold text-gray-400">Неактивен</div>

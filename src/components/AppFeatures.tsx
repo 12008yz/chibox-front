@@ -1,6 +1,7 @@
 import React from 'react';
 import Title from './Title';
 import { Link } from 'react-router-dom';
+import { formatDays } from '../utils/declension';
 
 interface StatusTier {
   name: string;
@@ -34,11 +35,11 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       features: [
         '+3% к шансу выпадения',
         '1 ежедневный кейс',
-        'Доступ ко всем бонусам', 
-        '3 попытки бонусного кейса', 
+        'Доступ ко всем бонусам',
+        '3 попытки бонусного кейса',
         'Возможность обмена предметов',
         'Вывод предметов',
-        '1 спин в день', 
+        '1 спин в день',
       ]
     },
     {
@@ -53,11 +54,11 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       features: [
         '+5% к шансу выпадения',
         '1 ежедневный кейс',
-        'Доступ ко всем бонусам', 
-        '4 попытки бонусного кейса', 
+        'Доступ ко всем бонусам',
+        '4 попытки бонусного кейса',
         'Возможность обмена предметов',
         'Вывод предметов',
-        '2 спина в день', 
+        '2 спина в день',
         'Вывод баланса'
       ],
       popular: true
@@ -74,12 +75,12 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       features: [
         '+8% к шансу выпадения',
         '1 ежедневный кейс',
-        'Доступ ко всем бонусам', 
-        '5 попыток бонусного кейса', 
+        'Доступ ко всем бонусам',
+        '5 попыток бонусного кейса',
         'Возможность обмена предметов',
         'Не выпадают повторные предметы',
         'Вывод предметов',
-        '3 спина в день', 
+        '3 спина в день',
         'Вывод баланса',
       ]
     }
@@ -137,7 +138,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                   {tier.price}₽
                 </div>
                 <div className="text-gray-400 text-sm">
-                  за {tier.days} дней
+                  за {formatDays(tier.days)}
                 </div>
               </div>
 
