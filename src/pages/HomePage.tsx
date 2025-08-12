@@ -478,7 +478,7 @@ const HomePage: React.FC = () => {
             {/* Статусы подписки */}
             <div className="mb-12">
               <AppFeatures
-                name="Статусы подписки ChiBox"
+                name="Статусы ChiBox"
                 description="Выбери подходящий статус и получай эксклюзивные привилегии каждый день"
               />
             </div>

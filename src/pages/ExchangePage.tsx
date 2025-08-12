@@ -67,17 +67,21 @@ const ItemCard: React.FC<{
     <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-3">
+        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError && item.image_url ? (
             <img
               src={item.image_url}
               alt={item.name}
-              className="w-full h-32 object-cover rounded-lg relative z-10"
+              className="absolute inset-0 w-full h-full object-contain mix-blend-normal z-10"
               onError={() => setImageError(true)}
+              style={{
+                backgroundColor: 'transparent',
+                filter: 'none'
+              }}
             />
           ) : (
-            <PlaceholderImage />
+            <PlaceholderImage className="w-full h-full" />
           )}
           {/* Редкость бейдж */}
           <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(item.rarity)} text-white text-xs font-bold z-20`}>
@@ -184,6 +188,7 @@ const ExchangePage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'sell' | 'exchange'>('sell');
   const [searchTerm, setSearchTerm] = useState('');
   const [rarityFilter, setRarityFilter] = useState<string>('all');
+  const [showExchangeInfo, setShowExchangeInfo] = useState(false);
 
   // API hooks
   const {
@@ -375,19 +380,19 @@ const ExchangePage: React.FC = () => {
           </p>
         </div>
 
-        {/* Информационные панели */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Компактные информационные панели */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {/* Текущий баланс */}
-          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-6 border border-green-500/30">
+          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-green-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-green-300 font-semibold mb-2">Текущий баланс</h3>
-                <Monetary
-                  value={parseFloat(auth.user?.balance?.toString() || '0')}
-                />
+                <h3 className="text-green-300 font-medium text-sm mb-1">Баланс</h3>
+                <div className="text-xl font-bold text-green-400">
+                  <Monetary value={parseFloat(auth.user?.balance?.toString() || '0')} />
+                </div>
               </div>
-              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 001.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
                 </svg>
@@ -396,51 +401,91 @@ const ExchangePage: React.FC = () => {
           </div>
 
           {/* Статус подписки */}
-          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-6 border border-purple-500/30">
+          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-purple-300 font-semibold mb-2">Статус</h3>
+                <h3 className="text-purple-300 font-medium text-sm mb-1">Статус</h3>
                 {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
-                  <>
-                    <p className="text-xl font-bold text-purple-400">
-                      {subscriptionData.data.subscription_days_left} дней
-                    </p>
-                    {subscriptionData.data.subscription_tier && (
-                      <p className="text-sm text-gray-400 mt-1">
-                        Тариф {subscriptionData.data.subscription_tier} • {pricePerDay}₽/день
-                      </p>
-                    )}
-                  </>
+                  <div className="text-xl font-bold text-purple-400">
+                    {subscriptionData.data.subscription_days_left} дней
+                  </div>
                 ) : (
-                  <p className="text-xl font-bold text-gray-400">Неактивен</p>
+                  <div className="text-xl font-bold text-gray-400">Неактивен</div>
                 )}
               </div>
-              <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.383-1.835-.528-2.516zM16 11.459c-.145.681-.318 1.617-.528 2.516.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z" clipRule="evenodd"/>
                 </svg>
               </div>
             </div>
           </div>
+
+          {/* Быстрая информация о курсе обмена */}
+          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-amber-500/30">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-amber-300 font-medium text-sm mb-1">Курс обмена</h3>
+                <div className="text-xl font-bold text-amber-400">{pricePerDay}₽/день</div>
+                <div className="text-xs text-gray-400">Тариф {subscriptionData?.data?.subscription_tier || 1}</div>
+              </div>
+              <button
+                onClick={() => setShowExchangeInfo(!showExchangeInfo)}
+                className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center hover:bg-amber-500/30 transition-colors"
+                title="Подробная информация"
+              >
+                <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Информация о тарифах обмена */}
-        {selectedTab === 'exchange' && (
-          <div className="mb-6 bg-gradient-to-r from-purple-600/10 to-violet-600/10 rounded-xl p-4 border border-purple-500/30">
-            <div className="flex items-center mb-2">
-              <svg className="w-5 h-5 text-purple-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
-              </svg>
-              <span className="text-purple-300 font-semibold">Цены обмена по тарифам</span>
+        {/* Расширенная информация о тарифах (скрываемая) */}
+        {showExchangeInfo && (
+          <div className="mb-6 bg-gradient-to-r from-amber-600/10 to-orange-600/10 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h4 className="text-amber-300 font-semibold text-lg mb-2">Тарифы обмена</h4>
+                <p className="text-gray-300 text-sm">Подробная информация о ценах и условиях обмена</p>
+              </div>
+              <button
+                onClick={() => setShowExchangeInfo(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                </svg>
+              </button>
             </div>
-            <div className="text-sm text-gray-300">
-              <span className="text-purple-300">Ваш тариф:</span> {subscriptionData?.data?.subscription_tier || 1} •
-              <span className="ml-1 font-semibold text-purple-400">{pricePerDay}₽ за день</span>
-              {subscriptionData?.data?.subscription_tier === 3 ? (
-                <span className="ml-2 text-yellow-400">(премиум тариф)</span>
-              ) : (
-                <span className="ml-2 text-gray-400">(базовые тарифы: 150₽/день)</span>
-              )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-black/20 rounded-lg p-4">
+                <h5 className="text-blue-300 font-medium mb-2">Тариф 1 (Статус)</h5>
+                <p className="text-white text-lg font-bold">150₽ за день</p>
+                <p className="text-gray-400 text-sm">Базовая подписка</p>
+              </div>
+              <div className="bg-black/20 rounded-lg p-4">
+                <h5 className="text-purple-300 font-medium mb-2">Тариф 2 (Статус+)</h5>
+                <p className="text-white text-lg font-bold">150₽ за день</p>
+                <p className="text-gray-400 text-sm">Улучшенная подписка</p>
+              </div>
+              <div className="bg-black/20 rounded-lg p-4 border border-yellow-500/30">
+                <h5 className="text-yellow-300 font-medium mb-2">Тариф 3 (Статус++)</h5>
+                <p className="text-white text-lg font-bold">300₽ за день</p>
+                <p className="text-gray-400 text-sm">Премиум подписка</p>
+              </div>
+            </div>
+
+            <div className="mt-4 p-4 bg-purple-600/10 rounded-lg">
+              <h6 className="text-purple-300 font-medium mb-2">Важные условия:</h6>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li>• Минимальная стоимость предмета для обмена: <span className="text-purple-400 font-medium">{minExchangePrice}₽</span></li>
+                <li>• При продаже вы получаете <span className="text-green-400 font-medium">70% от стоимости</span> предмета</li>
+                <li>• Обменянные предметы нельзя вернуть</li>
+                <li>• Дни подписки суммируются с текущими</li>
+              </ul>
             </div>
           </div>
         )}
@@ -456,7 +501,7 @@ const ExchangePage: React.FC = () => {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Продажа за валюту
+              💰 Продажа за валюту
             </button>
             <button
               onClick={() => setSelectedTab('exchange')}
@@ -466,10 +511,12 @@ const ExchangePage: React.FC = () => {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Обмен на время статуса
+              ⭐ Обмен на статус
             </button>
           </div>
         </div>
+
+
 
         {/* Фильтры */}
         <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30 mb-8">
@@ -551,7 +598,7 @@ const ExchangePage: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 auto-rows-fr">
               {groupedAndFilteredItems.map((itemGroup, index) => (
                 <ItemCard
                   key={`${itemGroup.item.id}-${itemGroup.item.name}-${index}`} // Стабильный ключ
@@ -566,30 +613,6 @@ const ExchangePage: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
-
-        {/* Информационный блок */}
-        <div className="mt-8 bg-gradient-to-r from-purple-600/10 to-violet-600/10 rounded-xl p-6 border border-purple-500/30">
-          <h3 className="text-lg font-semibold text-purple-300 mb-3">ℹ️ Информация об обмене</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-            <div>
-              <strong className="text-green-400">Продажа за валюту:</strong>
-              <ul className="mt-2 space-y-1 list-disc list-inside pl-4">
-                <li>Мгновенное пополнение баланса</li>
-                <li>Цена продажи составляет 70% от стоимости</li>
-                <li>Валюта используется для покупки кейсов</li>
-              </ul>
-            </div>
-            <div>
-              <strong className="text-purple-400">Обмен на время статуса:</strong>
-              <ul className="mt-2 space-y-1 list-disc list-inside pl-4">
-                <li>Продление времени подписки</li>
-                <li>{pricePerDay}₽ = 1 день подписки {subscriptionData?.data?.subscription_tier === 3 ? '(тариф Статус++)' : '(тарифы Статус/Статус+)'}</li>
-                <li>Минимум {minExchangePrice}₽ для обмена</li>
-                <li>Статус даёт бонусы и ежедневные кейсы</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
     </div>
