@@ -299,7 +299,10 @@ const ExchangePage: React.FC = () => {
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
         toast.success(`Предмет "${itemName}" (1 шт.) продан за ${Math.round(sellPrice)}₽!`);
-        // Оптимистичное обновление происходит автоматически в userApi
+        // Принудительно обновляем инвентарь для ProfilePage
+        setTimeout(() => {
+          refetchInventory();
+        }, 500);
       }
     } catch (error: any) {
       console.error('Ошибка при продаже предмета:', error);
@@ -354,7 +357,10 @@ const ExchangePage: React.FC = () => {
             <div className="text-xs text-gray-300">Всего дней: {result.data.subscription_days_left}</div>
           </div>
         );
-        // Оптимистичное обновление происходит автоматически в userApi
+        // Принудительно обновляем инвентарь для ProfilePage
+        setTimeout(() => {
+          refetchInventory();
+        }, 500);
       }
     } catch (error: any) {
       console.error('Ошибка при обмене предмета:', error);

@@ -163,7 +163,7 @@ const ProfilePage: React.FC = () => {
   const { data: inventoryData, isLoading: inventoryLoading, refetch: refetchInventory } = useGetUserInventoryQuery({
     page: 1,
     limit: 1000, // Увеличиваем лимит для отображения всего инвентаря
-    status: 'inventory'
+    // Убираем фильтр по статусу, чтобы получить ВСЕ предметы (активные, проданные, обмененные, выведенные)
   }, {
     skip: userLoading // Always fetch inventory data unless user is loading
   });
