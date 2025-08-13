@@ -45,14 +45,26 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      // Блокируем скролл основной страницы
+      document.body.style.overflow = 'hidden';
       // Небольшая задержка для запуска анимации после рендера
       setTimeout(() => setIsAnimating(true), 10);
     } else {
       setIsAnimating(false);
+      // Возвращаем скролл основной страницы
+      document.body.style.overflow = 'unset';
       // Скрываем модалку после завершения анимации закрытия
       setTimeout(() => setIsVisible(false), 300);
     }
   }, [isOpen]);
+
+  // Cleanup при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      // Восстанавливаем скролл при размонтировании
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -183,12 +195,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Улучшенная анимация ползунка с автопрокруткой
+    // Прямая анимация без кругов
     let currentPosition = 0;
-    let speed = 30; // начальная скорость (мс между перемещениями)
-    let rounds = 0;
-    const maxRounds = 4; // количество полных кругов перед замедлением
-    const maxSpeed = 400;
+    let speed = 100; // начальная скорость (мс между перемещениями)
+    const totalSteps = Math.max(15, targetIndex + 5); // минимум 15 шагов до остановки
+    let stepCount = 0;
 
     // Переменные для автопрокрутки
     let animationPhaseRef = 'spinning';
@@ -196,20 +207,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const animateSlider = () => {
       if (animationPhaseRef === 'spinning') {
         currentPosition++;
+        stepCount++;
 
-        // Если дошли до конца, начинаем сначала
+        // Если дошли до конца списка предметов, возвращаемся к началу
         if (currentPosition >= items.length) {
           currentPosition = 0;
-          rounds++;
         }
 
         setSliderPosition(currentPosition);
 
-        // После maxRounds кругов начинаем замедляться
-        if (rounds >= maxRounds) {
+        // После первых шагов начинаем замедляться
+        if (stepCount >= totalSteps * 0.6) {
           animationPhaseRef = 'slowing';
           setAnimationPhase('slowing');
-          speed = Math.min(speed + 20, maxSpeed);
         }
 
         setTimeout(animateSlider, speed);
@@ -223,10 +233,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(currentPosition);
 
         // Постепенно увеличиваем задержку для замедления
-        speed = Math.min(speed + 30, 600);
+        speed = Math.min(speed * 1.15, 600);
 
-        // Если достигли целевого предмета и скорость достаточно медленная
-        if (currentPosition === targetIndex && speed > 400) {
+        // Останавливаемся на целевом предмете когда скорость достаточно медленная
+        if (currentPosition === targetIndex && speed > 300) {
           animationPhaseRef = 'stopped';
           setAnimationPhase('stopped');
           setTimeout(() => {
@@ -239,7 +249,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
 
     // Запускаем анимацию
-    setTimeout(animateSlider, 500); // небольшая задержка перед началом
+    setTimeout(animateSlider, 800); // задержка перед началом
   };
 
   const handleAnimationComplete = () => {
@@ -319,7 +329,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       >
         {/* Заголовок модального окна */}
         <div className={`flex justify-between items-center p-6 border-b border-gray-700 transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-95 opacity-90' : ''
+          showOpeningAnimation ? 'scale-85 opacity-80' : ''
         }`}>
           <div className="flex items-center space-x-4">
             <img
@@ -375,7 +385,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               {/* Сетка предметов с анимацией масштабирования */}
               <div
                 className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
-                  showOpeningAnimation ? 'transform scale-90 origin-center' : ''
+                  showOpeningAnimation ? 'transform scale-75 origin-top -mt-3' : ''
                 }`}
               >
                 {items.map((item: any, index: number) => (
@@ -510,7 +520,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         {/* Футер с кнопками */}
         <div className={`flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629] transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-95 opacity-80' : ''
+          showOpeningAnimation ? 'scale-85 opacity-70' : ''
         }`}>
           <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (

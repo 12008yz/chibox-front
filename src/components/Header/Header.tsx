@@ -43,6 +43,8 @@ const Header: React.FC<HeaderProps> = ({
   const [openNotifications, setOpenNotifications] = useState<boolean>(false);
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
   const [caseNotifications, setCaseNotifications] = useState<CaseOpeningItem[]>([]);
+  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
+  const [lastScrollY, setLastScrollY] = useState<number>(0);
 
   const items = [
     {
@@ -76,12 +78,40 @@ const Header: React.FC<HeaderProps> = ({
     }
   }, [notification]);
 
+  // Отслеживание скролла для скрытия/показа хедера
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY === 0) {
+        // В самом верху страницы - всегда показываем хедер
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Скролл вниз и не в начале - скрываем хедер
+        setIsHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Скролл вверх - показываем хедер
+        setIsHeaderVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [lastScrollY]);
+
   const handleCloseCaseNotification = (index: number) => {
     setCaseNotifications(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="modern-header relative z-[99] w-full">
+    <div className={`modern-header relative z-[99] w-full transition-transform duration-300 ${
+      isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
       {/* Animated Background Glow */}
       <div className="header-glow absolute inset-0 opacity-30 pointer-events-none"></div>
 
