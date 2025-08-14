@@ -45,6 +45,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      // Сбрасываем состояние анимации
+      setSliderPosition(0);
+      setAnimationPhase('idle');
+      setShowOpeningAnimation(false);
+      setOpeningResult(null);
       // Блокируем скролл основной страницы
       document.body.style.overflow = 'hidden';
       // Небольшая задержка для запуска анимации после рендера
@@ -195,61 +200,52 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Прямая анимация без кругов
-    let currentPosition = 0;
-    let speed = 100; // начальная скорость (мс между перемещениями)
-    const totalSteps = Math.max(15, targetIndex + 5); // минимум 15 шагов до остановки
-    let stepCount = 0;
+    // Сбрасываем позицию в начало
+    setSliderPosition(0);
 
-    // Переменные для автопрокрутки
-    let animationPhaseRef = 'spinning';
+    // Настройки анимации
+    let currentPosition = 0;
+    let initialSpeed = 150; // начальная скорость
+    let currentSpeed = initialSpeed;
+
+    // Рассчитываем расстояние до цели
+    const distance = targetIndex;
+    const slowDownStart = Math.max(0, distance - 7); // начинаем замедляться за 7 шагов до цели
 
     const animateSlider = () => {
-      if (animationPhaseRef === 'spinning') {
-        currentPosition++;
-        stepCount++;
-
-        // Если дошли до конца списка предметов, возвращаемся к началу
-        if (currentPosition >= items.length) {
-          currentPosition = 0;
-        }
-
-        setSliderPosition(currentPosition);
-
-        // После первых шагов начинаем замедляться
-        if (stepCount >= totalSteps * 0.6) {
-          animationPhaseRef = 'slowing';
-          setAnimationPhase('slowing');
-        }
-
-        setTimeout(animateSlider, speed);
-      } else if (animationPhaseRef === 'slowing') {
-        currentPosition++;
-
-        if (currentPosition >= items.length) {
-          currentPosition = 0;
-        }
-
-        setSliderPosition(currentPosition);
-
-        // Постепенно увеличиваем задержку для замедления
-        speed = Math.min(speed * 1.15, 600);
-
-        // Останавливаемся на целевом предмете когда скорость достаточно медленная
-        if (currentPosition === targetIndex && speed > 300) {
-          animationPhaseRef = 'stopped';
-          setAnimationPhase('stopped');
-          setTimeout(() => {
-            handleAnimationComplete();
-          }, 4000); // показываем результат 4 секунды
-        } else {
-          setTimeout(animateSlider, speed);
-        }
+      // Если дошли до цели - останавливаемся
+      if (currentPosition >= targetIndex) {
+        setAnimationPhase('stopped');
+        setTimeout(() => {
+          handleAnimationComplete();
+        }, 3000); // показываем результат 3 секунды
+        return;
       }
+
+      // Двигаемся на следующую позицию
+      currentPosition++;
+      setSliderPosition(currentPosition);
+
+      // Если еще не дошли до зоны замедления - быстро крутим
+      if (currentPosition <= slowDownStart) {
+        setAnimationPhase('spinning');
+        currentSpeed = initialSpeed;
+      } else {
+        // Начинаем замедляться
+        setAnimationPhase('slowing');
+        const stepsLeft = targetIndex - currentPosition;
+        const slowdownFactor = Math.max(0.1, stepsLeft / 7);
+        currentSpeed = initialSpeed + (300 * (1 - slowdownFactor));
+      }
+
+      // Продолжаем анимацию
+      setTimeout(animateSlider, currentSpeed);
     };
 
-    // Запускаем анимацию
-    setTimeout(animateSlider, 800); // задержка перед началом
+    // Запускаем анимацию после небольшой задержки
+    setTimeout(() => {
+      animateSlider();
+    }, 500);
   };
 
   const handleAnimationComplete = () => {
