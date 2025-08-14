@@ -11,6 +11,9 @@ const PublicProfilePage: React.FC = () => {
   // State для переключения между превью и полным отображением инвентаря
   const [showFullInventory, setShowFullInventory] = useState(false);
 
+  // State для переключения между категориями инвентаря
+  const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white p-4">
@@ -101,6 +104,34 @@ const PublicProfilePage: React.FC = () => {
   const inventory = user.inventory || [];
   const achievements = user.achievements || [];
   const dropBonuses = user.dropBonuses || { achievements: 0, subscription: 0, level: 0, total: 0 };
+
+  // Функции для фильтрации инвентаря
+  const getActiveInventory = () => {
+    return inventory.filter(item =>
+      item.status !== 'sold' && item.status !== 'withdrawn' && item.status !== 'used'
+    );
+  };
+
+  const getOpenedCases = () => {
+    // Предметы, полученные из кейсов
+    return inventory.filter(item =>
+      item.source === 'case'
+    );
+  };
+
+  // Получаем инвентарь в зависимости от активного таба
+  const getFilteredInventory = () => {
+    switch (activeInventoryTab) {
+      case 'active':
+        return getActiveInventory();
+      case 'opened':
+        return getOpenedCases();
+      default:
+        return getActiveInventory();
+    }
+  };
+
+  const filteredInventory = getFilteredInventory();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
@@ -364,11 +395,6 @@ const PublicProfilePage: React.FC = () => {
                 <div className="flex-1">
                   <h4 className="text-lg font-bold text-white mb-2">
                     {bestWeapon.name}
-                    {bestWeapon.isRecord && (
-                      <span className="ml-2 px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded-full">
-                        РЕКОРД
-                      </span>
-                    )}
                   </h4>
                   <div className="flex items-center gap-4 mb-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity)} text-white`}>
@@ -378,9 +404,6 @@ const PublicProfilePage: React.FC = () => {
                   </div>
                   <p className="text-gray-400 text-sm">
                     Тип: {bestWeapon.weapon_type || 'Оружие'}
-                    {bestWeapon.isRecord && (
-                      <span className="ml-2 text-yellow-400 text-xs">(рекордная цена)</span>
-                    )}
                   </p>
                 </div>
               </div>
@@ -408,11 +431,51 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
-                Инвентарь ({inventory.length} предметов)
+                Инвентарь ({filteredInventory.length} предметов)
               </h3>
 
+              {/* Вкладки инвентаря */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setActiveInventoryTab('active')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    activeInventoryTab === 'active'
+                      ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                      : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                    <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Предметы
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveInventoryTab('opened')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    activeInventoryTab === 'opened'
+                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
+                      : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Открытые кейсы
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
+                </button>
+              </div>
+
+              {/* Описание активной вкладки */}
+              <div className="mb-4 text-sm text-gray-400">
+                {activeInventoryTab === 'active' && '🎮 Активные предметы пользователя'}
+                {activeInventoryTab === 'opened' && '📦 Предметы, полученные из открытых кейсов'}
+              </div>
+
               {/* Toggle Button для показа всех предметов */}
-              {inventory.length > 12 && (
+              {filteredInventory.length > 12 && (
                 <button
                   onClick={() => setShowFullInventory(!showFullInventory)}
                   className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
@@ -436,8 +499,9 @@ const PublicProfilePage: React.FC = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {(showFullInventory ? inventory : inventory.slice(0, 12)).map((inventoryItem: any) => (
+            {filteredInventory.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {(showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => (
                 <div
                   key={inventoryItem.id}
                   className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
@@ -487,23 +551,41 @@ const PublicProfilePage: React.FC = () => {
                 </div>
               ))}
 
-              {/* Показываем карточку "Ещё предметов" только если не показываем все предметы */}
-              {!showFullInventory && inventory.length > 12 && (
+                {/* Показываем карточку "Ещё предметов" только если не показываем все предметы */}
+                {!showFullInventory && filteredInventory.length > 12 && (
                 <div
                   className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400/50 transition-all duration-300"
                   onClick={() => setShowFullInventory(true)}
                 >
-                  <div className="text-2xl font-bold text-gray-400 mb-2">+{inventory.length - 12}</div>
+                  <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 12}</div>
                   <p className="text-gray-400 text-xs text-center mb-2">Ещё предметов</p>
                   <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </div>
               )}
-            </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+                    <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h4 className="text-lg font-semibold text-gray-300 mb-2">
+                  {activeInventoryTab === 'active' && 'Нет активных предметов'}
+                  {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
+                </h4>
+                <p className="text-gray-400 text-sm">
+                  {activeInventoryTab === 'active' && 'У пользователя пока нет предметов в инвентаре'}
+                  {activeInventoryTab === 'opened' && 'Пользователь пока не открывал кейсы'}
+                </p>
+              </div>
+            )}
 
             {/* Кнопка "Показать меньше" в конце, если показан полный инвентарь */}
-            {showFullInventory && inventory.length > 12 && (
+            {showFullInventory && filteredInventory.length > 12 && (
               <div className="flex justify-center mt-6">
                 <button
                   onClick={() => setShowFullInventory(false)}

@@ -462,6 +462,9 @@ export const userApi = baseApi.injectEndpoints({
               skin_name?: string;
               image_url?: string;
             };
+            source?: string;
+            status?: string;
+            acquisition_date?: string;
           }>;
           bestWeapon?: {
             id: string;
