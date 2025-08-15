@@ -462,9 +462,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         <Monetary value={parseFloat(item.price || '0')} />
                       </p>
 
-                      {item.drop_weight && !showOpeningAnimation && (
+                      {!showOpeningAnimation && (
                         <p className="text-gray-400 text-xs mt-1">
-                          Шанс: {item.drop_weight}%
+                          Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent}%` : `${item.drop_weight || 0}%`}
+                          {item.bonus_applied > 0 && (
+                            <span className="text-yellow-400 ml-1">
+                              (+{(item.bonus_applied * 100).toFixed(1)}% бонус)
+                            </span>
+                          )}
                         </p>
                       )}
                     </div>

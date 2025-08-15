@@ -97,6 +97,11 @@ export interface Item {
   is_tradable?: boolean;
   category?: string;
   category_id?: string | null;
+  // Новые поля для отображения модифицированных шансов
+  drop_chance_percent?: number;
+  modified_weight?: number;
+  weight_multiplier?: number;
+  bonus_applied?: number;
   createdAt?: string;
   updatedAt?: string;
   created_at?: string;
