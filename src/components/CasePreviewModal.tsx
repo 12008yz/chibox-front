@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
+import { useUserData } from '../hooks/useUserData';
 
 interface CasePreviewModalProps {
   isOpen: boolean;
@@ -20,6 +21,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   fixedPrices = false,
   onDataUpdate
 }) => {
+  // Получаем данные пользователя для учета бонусов (должно быть в начале)
+  const { userData } = useUserData();
+
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
@@ -197,7 +201,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setAnimationPhase('spinning');
 
     // Находим индекс выигранного предмета
-    const wonItemIndex = items.findIndex(item => item.id === wonItem.id);
+    const wonItemIndex = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
     // Сбрасываем позицию в начало
@@ -275,9 +279,73 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     return defaultCaseImages[Math.abs(hash) % defaultCaseImages.length];
   }, [caseData.name]);
 
-  if (!isVisible) return null;
-
   const items = itemsData?.data?.items || [];
+
+  // Функция для расчета правильного веса предмета на основе его цены (по логике dropWeightCalculator.js)
+  const calculateCorrectWeightByPrice = (price: number) => {
+    price = parseFloat(String(price)) || 0;
+
+    // Система весов на основе цены для создания правильного распределения
+    if (price >= 50000) return 0.005;     // 0.5% - легендарные
+    if (price >= 30000) return 0.008;     // 0.8% - мифические
+    if (price >= 20000) return 0.015;     // 1.5% - эпические
+    if (price >= 15000) return 0.025;     // 2.5% - очень редкие
+    if (price >= 10000) return 0.04;      // 4% - редкие
+    if (price >= 8000) return 0.06;       // 6% - необычные+
+    if (price >= 5000) return 0.1;        // 10% - необычные
+    if (price >= 3000) return 0.2;        // 20% - обычные+
+    if (price >= 1000) return 0.35;       // 35% - обычные
+    if (price >= 500) return 0.5;         // 50% - частые
+    if (price >= 100) return 0.7;         // 70% - очень частые
+    return 1.0;                           // 100% - базовые/дешевые
+  };
+
+  // Получаем бонус пользователя
+  const userDropBonus = userData?.total_drop_bonus_percentage || 0;
+
+  // Пересчитываем шансы для всех предметов по логике dropWeightCalculator.js
+  const itemsWithAdjustedChances = useMemo(() => {
+    if (!items || items.length === 0) return [];
+
+    // Применяем бонус (максимум 30%)
+    const totalBonus = Math.min(userDropBonus / 100, 0.30);
+
+    const itemsWithWeights = items.map(item => {
+      const itemPrice = parseFloat(item.price) || 0;
+      // Используем правильный вес на основе цены
+      const baseWeight = calculateCorrectWeightByPrice(itemPrice);
+
+      // Бонус применяется больше к дорогим предметам
+      let weightMultiplier = 1;
+      if (totalBonus > 0) {
+        // Для дорогих предметов (≥100₽) бонус работает сильнее
+        const priceCategory = Math.min(Math.max(itemPrice - 100, 0) / 100, 50); // категория от 0 до 50
+        const bonusEffect = 1 + (totalBonus * (1 + priceCategory / 50));
+        weightMultiplier = bonusEffect;
+      }
+
+      const modifiedWeight = baseWeight * weightMultiplier;
+
+      return {
+        ...item,
+        baseWeight: baseWeight,
+        modifiedWeight: modifiedWeight,
+        weightMultiplier: weightMultiplier,
+        bonusApplied: totalBonus
+      };
+    });
+
+    // Рассчитываем общий вес для получения шансов в процентах
+    const totalWeight = itemsWithWeights.reduce((sum, item) => sum + item.modifiedWeight, 0);
+
+    // Добавляем шансы в процентах
+    return itemsWithWeights.map(item => ({
+      ...item,
+      drop_chance_percent: totalWeight > 0 ? (item.modifiedWeight / totalWeight) * 100 : 0
+    }));
+  }, [items, userDropBonus]);
+
+  if (!isVisible) return null;
 
   // Определяем изображение кейса
   const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
@@ -384,7 +452,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   showOpeningAnimation ? 'transform scale-75 origin-top -mt-3' : ''
                 }`}
               >
-                {items.map((item: any, index: number) => (
+                {itemsWithAdjustedChances.map((item: any, index: number) => (
                   <div
                     key={item.id || index}
                     className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
@@ -464,10 +532,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
                       {!showOpeningAnimation && (
                         <p className="text-gray-400 text-xs mt-1">
-                          Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent}%` : `${item.drop_weight || 0}%`}
-                          {item.bonus_applied > 0 && (
+                          Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
+                          {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
                             <span className="text-yellow-400 ml-1">
-                              (+{(item.bonus_applied * 100).toFixed(1)}% бонус)
+                              (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
                             </span>
                           )}
                         </p>
