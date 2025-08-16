@@ -337,7 +337,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: exchangeData,
       }),
-      invalidatesTags: ['User', 'Inventory'], // Инвалидируем все кэши инвентаря
+      invalidatesTags: ['User', 'Inventory', 'Subscription', 'CaseTemplates'], // Инвалидируем все кэши инвентаря
       // Оптимистичное обновление инвентаря и подписки
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         // Оптимистичное обновление инвентаря - удаляем обмененный предмет из активного инвентаря

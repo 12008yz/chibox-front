@@ -135,7 +135,7 @@ export const authApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: updateData,
       }),
-      invalidatesTags: ['User', 'Profile'],
+      invalidatesTags: ['User', 'Profile', 'Inventory', 'Balance', 'CaseTemplates'],
     }),
   }),
 });

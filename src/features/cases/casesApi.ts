@@ -94,7 +94,7 @@ export const casesApi = baseApi.injectEndpoints({
         method: 'POST',
         body: caseData,
       }),
-      invalidatesTags: ['Cases', 'Inventory', 'Balance', 'User'],
+      invalidatesTags: ['Cases', 'Inventory', 'Balance', 'User', 'CaseTemplates'],
       // Обновляем баланс и инвентарь после открытия
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -125,6 +125,7 @@ export const casesApi = baseApi.injectEndpoints({
       string
     >({
       query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/items`,
+      providesTags: ['User'],
     }),
 
     // Получение статистики дропов (последние выпавшие предметы)
