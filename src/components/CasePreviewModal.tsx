@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
@@ -32,6 +32,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
+
+  // Ref для контейнера со скроллом
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
     caseData.id,
@@ -74,6 +77,49 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.overflow = 'unset';
     };
   }, []);
+
+  // Автоматический скроллинг за выделенным предметом
+  useEffect(() => {
+    if (!showOpeningAnimation || !scrollContainerRef.current) {
+      return;
+    }
+
+    // Небольшая задержка для более плавной анимации
+    const scrollTimeout = setTimeout(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      const items = container.querySelectorAll('[data-item-index]');
+      const currentItem = items[sliderPosition] as HTMLElement;
+
+      if (currentItem) {
+        const containerRect = container.getBoundingClientRect();
+        const itemRect = currentItem.getBoundingClientRect();
+
+        // Вычисляем позицию элемента относительно контейнера
+        const itemTop = itemRect.top - containerRect.top + container.scrollTop;
+        const containerHeight = container.clientHeight;
+
+        // Определяем целевую позицию скролла (центрируем элемент с небольшим смещением вверх)
+        const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2) - 50;
+
+        // Проверяем, виден ли элемент
+        const itemTopRelative = itemRect.top - containerRect.top;
+        const itemBottomRelative = itemRect.bottom - containerRect.top;
+        const isVisible = itemTopRelative >= 0 && itemBottomRelative <= containerHeight;
+
+        // Скроллим только если элемент не виден или находится слишком близко к краям
+        if (!isVisible || itemTopRelative < 100 || itemBottomRelative > containerHeight - 100) {
+          container.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            behavior: 'smooth'
+          });
+        }
+      }
+    }, animationPhase === 'spinning' ? 50 : 100); // Быстрее во время быстрой фазы
+
+    return () => clearTimeout(scrollTimeout);
+  }, [sliderPosition, showOpeningAnimation, animationPhase]);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -204,8 +250,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Сбрасываем позицию в начало
+    // Сбрасываем позицию в начало и скроллим к началу списка
     setSliderPosition(0);
+
+    // Прокручиваем контейнер к началу
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
 
     // Настройки анимации
     let currentPosition = 0;
@@ -222,7 +276,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setAnimationPhase('stopped');
         setTimeout(() => {
           handleAnimationComplete();
-        }, 3000); // показываем результат 3 секунды
+        }, 1500); // показываем результат 1.5 секунды
         return;
       }
 
@@ -434,7 +488,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Содержимое кейса */}
-        <div className="flex-1 p-6 overflow-y-auto relative" style={{ maxHeight: 'calc(90vh - 200px)' }}>
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 p-6 overflow-y-auto relative"
+          style={{ maxHeight: 'calc(90vh - 200px)' }}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="spinner" />
@@ -455,6 +513,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 {itemsWithAdjustedChances.map((item: any, index: number) => (
                   <div
                     key={item.id || index}
+                    data-item-index={index}
                     className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
                       !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : ''
                     } ${
@@ -544,41 +603,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   </div>
                 ))}
               </div>
-
-              {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
-              {showOpeningAnimation && (
-                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-30">
-                  <div className="text-center text-white bg-black/80 backdrop-blur-sm rounded-lg px-6 py-3 border border-yellow-400/50">
-                    {animationPhase === 'spinning' && (
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-lg font-bold">🎰 Выбираем предмет...</span>
-                      </div>
-                    )}
-                    {animationPhase === 'slowing' && (
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
-                        <span className="text-lg font-bold">⏳ Определяем результат...</span>
-                      </div>
-                    )}
-                    {animationPhase === 'stopped' && openingResult && (
-                      <div className="text-center">
-                        <div className="text-2xl font-bold mb-2">🎉 Поздравляем!</div>
-                        <div className="text-lg text-green-400 font-bold">{openingResult.item.name}</div>
-                        <div className="text-md mb-3">
-                          <Monetary value={parseFloat(openingResult.item.price || '0')} />
-                        </div>
-                        <button
-                          onClick={handleAnimationComplete}
-                          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold text-sm"
-                        >
-                          ✨ Забрать предмет ✨
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-12">
