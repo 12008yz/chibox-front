@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
+import { useGetUserInventoryQuery, useGetUserSubscriptionQuery } from '../features/user/userApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
 import { useUserData } from '../hooks/useUserData';
@@ -43,6 +44,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(
     caseData.id,
+    { skip: !isOpen }
+  );
+
+  // Получаем информацию о подписке пользователя
+  const { data: subscriptionData } = useGetUserSubscriptionQuery(undefined, { skip: !isOpen });
+
+  // Получаем инвентарь для определения уже выигранных предметов
+  const { data: inventoryData } = useGetUserInventoryQuery(
+    { page: 1, limit: 1000, status: 'inventory' },
     { skip: !isOpen }
   );
 
@@ -250,6 +260,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
+    // Проверяем, что целевой предмет не исключен (для безопасности)
+    const targetItem = itemsWithAdjustedChances[targetIndex];
+    if (targetItem?.isExcluded) {
+      console.warn('Целевой предмет исключен из выпадения, но все равно выпал. Возможная ошибка сервера.');
+    }
+
     // Сбрасываем позицию в начало и скроллим к началу списка
     setSliderPosition(0);
 
@@ -357,6 +373,30 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Получаем бонус пользователя
   const userDropBonus = userData?.total_drop_bonus_percentage || 0;
 
+  // Определяем, является ли пользователь "Статус++" (предположительно subscription_tier >= 3)
+  const isStatusPlusPlus = (subscriptionData?.data?.subscription_tier || 0) >= 3;
+
+  // Определяем, является ли это ежедневным кейсом
+  const isDailyCase = caseData.is_daily || caseData.type === 'daily' ||
+                     caseData.name.toLowerCase().includes('ежедневный') ||
+                     caseData.name.toLowerCase().includes('daily');
+
+  // Получаем ID предметов, которые пользователь уже выигрывал из этого кейса
+  const wonItemIds = useMemo(() => {
+    if (!isStatusPlusPlus || !isDailyCase || !inventoryData?.data?.items) {
+      return new Set<string>();
+    }
+
+    return new Set(
+      inventoryData.data.items
+        .filter(invItem =>
+          invItem.item_type === 'item' &&
+          invItem.case_template_id === caseData.id
+        )
+        .map(invItem => invItem.item.id)
+    );
+  }, [isStatusPlusPlus, isDailyCase, inventoryData, caseData.id]);
+
   // Пересчитываем шансы для всех предметов по логике dropWeightCalculator.js
   const itemsWithAdjustedChances = useMemo(() => {
     if (!items || items.length === 0) return [];
@@ -366,26 +406,36 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     const itemsWithWeights = items.map(item => {
       const itemPrice = parseFloat(item.price) || 0;
+      const isAlreadyWon = wonItemIds.has(item.id);
+
       // Используем правильный вес на основе цены
       const baseWeight = calculateCorrectWeightByPrice(itemPrice);
 
+      // Для "Статус++" пользователей в ежедневных кейсах: исключаем уже выигранные предметы
+      let finalWeight = baseWeight;
+      if (isStatusPlusPlus && isDailyCase && isAlreadyWon) {
+        finalWeight = 0; // Исключаем из возможного выпадения
+      }
+
       // Бонус применяется больше к дорогим предметам
       let weightMultiplier = 1;
-      if (totalBonus > 0) {
+      if (totalBonus > 0 && finalWeight > 0) {
         // Для дорогих предметов (≥100₽) бонус работает сильнее
         const priceCategory = Math.min(Math.max(itemPrice - 100, 0) / 100, 50); // категория от 0 до 50
         const bonusEffect = 1 + (totalBonus * (1 + priceCategory / 50));
         weightMultiplier = bonusEffect;
       }
 
-      const modifiedWeight = baseWeight * weightMultiplier;
+      const modifiedWeight = finalWeight * weightMultiplier;
 
       return {
         ...item,
         baseWeight: baseWeight,
         modifiedWeight: modifiedWeight,
         weightMultiplier: weightMultiplier,
-        bonusApplied: totalBonus
+        bonusApplied: totalBonus,
+        isAlreadyWon: isAlreadyWon,
+        isExcluded: isStatusPlusPlus && isDailyCase && isAlreadyWon
       };
     });
 
@@ -504,6 +554,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : items.length > 0 ? (
             <div className="relative">
+              {/* Информационное сообщение для "Статус++" пользователей */}
+              {isStatusPlusPlus && isDailyCase && wonItemIds.size > 0 && !showOpeningAnimation && (
+                <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="text-blue-400">👑</div>
+                    <div className="text-sm text-blue-300">
+                      <strong>Преимущество Статус++:</strong> Перечеркнутые предметы вы уже получали из этого кейса и они исключены из выпадения.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Сетка предметов с анимацией масштабирования */}
               <div
                 className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
@@ -524,6 +586,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
                         ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
                         : ''
+                    } ${
+                      item.isExcluded ? 'opacity-50 grayscale' : ''
                     }`}
                     style={{
                       animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
@@ -565,6 +629,23 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           Нет изображения
                         </div>
                       )}
+
+                      {/* Перечеркивание для уже выигранных предметов */}
+                      {item.isExcluded && (
+                        <>
+                          <div className="absolute inset-0 flex items-center justify-center z-10">
+                            <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
+                          </div>
+                          <div className="absolute inset-0 flex items-center justify-center z-10">
+                            <div className="w-full h-0.5 bg-red-500 transform -rotate-45"></div>
+                          </div>
+                          <div className="absolute top-1 right-1 z-20">
+                            <div className="bg-red-500 text-white text-xs px-1 rounded">
+                              ✓
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     <div className="text-center">
@@ -590,19 +671,56 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       </p>
 
                       {!showOpeningAnimation && (
-                        <p className="text-gray-400 text-xs mt-1">
-                          Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
-                          {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
-                            <span className="text-yellow-400 ml-1">
-                              (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
-                            </span>
+                        <div className="text-xs mt-1">
+                          {item.isExcluded ? (
+                            <p className="text-red-400">
+                              ✓ Уже получен
+                            </p>
+                          ) : (
+                            <p className="text-gray-400">
+                              Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
+                              {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                                <span className="text-yellow-400 ml-1">
+                                  (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
+                                </span>
+                              )}
+                            </p>
                           )}
-                        </p>
+                        </div>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
+
+              {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
+              {showOpeningAnimation && (
+                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+                  <div className="text-center text-white bg-black/90 backdrop-blur-md rounded-lg px-8 py-4 border-2 border-yellow-400/70 shadow-2xl shadow-yellow-400/30">
+                    {animationPhase === 'spinning' && (
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-lg font-bold">🎰 Выбираем предмет...</span>
+                      </div>
+                    )}
+                    {animationPhase === 'slowing' && (
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+                        <span className="text-lg font-bold">⏳ Определяем результат...</span>
+                      </div>
+                    )}
+                    {animationPhase === 'stopped' && openingResult && (
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mb-2">🎉 Выпал предмет!</div>
+                        <div className="text-lg text-green-400 font-bold">{openingResult.item.name}</div>
+                        <div className="text-md">
+                          <Monetary value={parseFloat(openingResult.item.price || '0')} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-12">
