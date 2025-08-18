@@ -63,10 +63,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const { data: subscriptionData } = useGetUserSubscriptionQuery(undefined, { skip: !isOpen });
 
   // Получаем инвентарь для определения уже выигранных предметов
-  const { data: inventoryData } = useGetUserInventoryQuery(
-    { page: 1, limit: 1000, status: 'inventory' },
-    { skip: !isOpen }
-  );
+  // const { data: inventoryData } = useGetUserInventoryQuery(
+  //   { page: 1, limit: 1000, status: 'inventory' },
+  //   { skip: !isOpen }
+  // );
 
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();

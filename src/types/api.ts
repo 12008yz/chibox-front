@@ -102,6 +102,9 @@ export interface Item {
   modified_weight?: number;
   weight_multiplier?: number;
   bonus_applied?: number;
+  // Поля для логики исключения предметов
+  is_excluded?: boolean;
+  is_already_dropped?: boolean;
   createdAt?: string;
   updatedAt?: string;
   created_at?: string;
