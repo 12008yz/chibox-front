@@ -388,78 +388,23 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Определяем, является ли пользователь "Статус++" (предположительно subscription_tier >= 3)
   const isStatusPlusPlus = (subscriptionData?.data?.subscription_tier || 0) >= 3;
 
-  // Определяем, является ли это ежедневным кейсом
-  const isDailyCase = caseData.is_daily || caseData.type === 'daily' ||
-                     caseData.name.toLowerCase().includes('ежедневный') ||
-                     caseData.name.toLowerCase().includes('daily');
-
-  // Получаем ID предметов, которые пользователь уже выигрывал из этого кейса
-  const wonItemIds = useMemo(() => {
-    if (!isStatusPlusPlus || !isDailyCase || !inventoryData?.data?.items) {
-      return new Set<string>();
-    }
-
-    return new Set(
-      inventoryData.data.items
-        .filter(invItem =>
-          invItem.item_type === 'item' &&
-          invItem.case_template_id === caseData.id
-        )
-        .map(invItem => invItem.item.id)
-    );
-  }, [isStatusPlusPlus, isDailyCase, inventoryData, caseData.id]);
-
-  // Пересчитываем шансы для всех предметов по логике dropWeightCalculator.js
+  // Теперь используем данные от API для определения исключённых предметов
   const itemsWithAdjustedChances = useMemo(() => {
     if (!items || items.length === 0) return [];
 
-    // Применяем бонус (максимум 30%)
-    const totalBonus = Math.min(userDropBonus / 100, 0.30);
-
-    const itemsWithWeights = items.map(item => {
-      const itemPrice = parseFloat(item.price) || 0;
-      const isAlreadyWon = wonItemIds.has(item.id);
-
-      // Используем правильный вес на основе цены
-      const baseWeight = calculateCorrectWeightByPrice(itemPrice);
-
-      // Для "Статус++" пользователей в ежедневных кейсах: исключаем уже выигранные предметы
-      let finalWeight = baseWeight;
-      if (isStatusPlusPlus && isDailyCase && isAlreadyWon) {
-        finalWeight = 0; // Исключаем из возможного выпадения
-      }
-
-      // Бонус применяется больше к дорогим предметам
-      let weightMultiplier = 1;
-      if (totalBonus > 0 && finalWeight > 0) {
-        // Для дорогих предметов (≥100₽) бонус работает сильнее
-        const priceCategory = Math.min(Math.max(itemPrice - 100, 0) / 100, 50); // категория от 0 до 50
-        const bonusEffect = 1 + (totalBonus * (1 + priceCategory / 50));
-        weightMultiplier = bonusEffect;
-      }
-
-      const modifiedWeight = finalWeight * weightMultiplier;
-
-      return {
-        ...item,
-        baseWeight: baseWeight,
-        modifiedWeight: modifiedWeight,
-        weightMultiplier: weightMultiplier,
-        bonusApplied: totalBonus,
-        isAlreadyWon: isAlreadyWon,
-        isExcluded: isStatusPlusPlus && isDailyCase && isAlreadyWon
-      };
-    });
-
-    // Рассчитываем общий вес для получения шансов в процентах
-    const totalWeight = itemsWithWeights.reduce((sum, item) => sum + item.modifiedWeight, 0);
-
-    // Добавляем шансы в процентах
-    return itemsWithWeights.map(item => ({
+    // Теперь просто используем данные от сервера, который уже рассчитал всё
+    return items.map(item => ({
       ...item,
-      drop_chance_percent: totalWeight > 0 ? (item.modifiedWeight / totalWeight) * 100 : 0
+      // Используем данные от сервера о том, исключён ли предмет
+      isExcluded: item.is_excluded || false,
+      isAlreadyWon: item.is_already_dropped || false,
+      // Остальные поля уже рассчитаны сервером
+      drop_chance_percent: item.drop_chance_percent || 0,
+      modifiedWeight: item.modified_weight || item.drop_weight || 0,
+      weightMultiplier: item.weight_multiplier || 1,
+      bonusApplied: item.bonus_applied || 0
     }));
-  }, [items, userDropBonus]);
+  }, [items]);
 
   if (!isVisible) return null;
 
@@ -567,7 +512,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           ) : items.length > 0 ? (
             <div className="relative">
               {/* Информационное сообщение для "Статус++" пользователей */}
-              {isStatusPlusPlus && isDailyCase && wonItemIds.size > 0 && !showOpeningAnimation && (
+              {isStatusPlusPlus && itemsWithAdjustedChances.some(item => item.isExcluded) && !showOpeningAnimation && (
                 <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="text-blue-400">👑</div>
