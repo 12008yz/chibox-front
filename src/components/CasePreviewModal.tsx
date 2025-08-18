@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useGetUserInventoryQuery, useGetUserSubscriptionQuery } from '../features/user/userApi';
 import { CaseTemplate } from '../types/api';
@@ -22,8 +23,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   fixedPrices = false,
   onDataUpdate
 }) => {
+  const navigate = useNavigate();
+
   // Получаем данные пользователя для учета бонусов (должно быть в начале)
   const { userData } = useUserData();
+
+  // Проверяем авторизацию пользователя
+  useEffect(() => {
+    if (isOpen && !userData) {
+      // Если модал открыт, но пользователь не авторизован, перенаправляем на страницу входа
+      onClose(); // Закрываем модал
+      navigate('/login'); // Перенаправляем на страницу входа
+    }
+  }, [isOpen, userData, navigate, onClose]);
 
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -858,7 +870,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     ) : (
                       <>
                         <span>Открыть кейс</span>
-                        <Monetary value={parseFloat(caseData.price)} />
                       </>
                     )}
                   </button>
