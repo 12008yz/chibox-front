@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetPublicProfileQuery } from '../features/user/userApi';
+import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import Avatar from '../components/Avatar';
+import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 const PublicProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: profileData, isLoading, error } = useGetPublicProfileQuery(id || '');
+
+  // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
+  const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
 
   // State для переключения между превью и полным отображением инвентаря
   const [showFullInventory, setShowFullInventory] = useState(false);
@@ -50,6 +55,12 @@ const PublicProfilePage: React.FC = () => {
   }
 
   const user = profileData.user;
+
+  // Функция для получения шаблона кейса по ID
+  const getCaseTemplateById = (templateId: string) => {
+    if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
+    return caseTemplatesData.data.find(template => template.id === templateId);
+  };
 
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
@@ -471,7 +482,7 @@ const PublicProfilePage: React.FC = () => {
               {/* Описание активной вкладки */}
               <div className="mb-4 text-sm text-gray-400">
                 {activeInventoryTab === 'active' && '🎮 Активные предметы пользователя'}
-                {activeInventoryTab === 'opened' && '📦 Предметы, полученные из открытых кейсов'}
+                {activeInventoryTab === 'opened' && '📦 Открытые кейсы - наведите на кейс, чтобы увидеть выпавший предмет'}
               </div>
 
               {/* Toggle Button для показа всех предметов */}
@@ -501,55 +512,73 @@ const PublicProfilePage: React.FC = () => {
 
             {filteredInventory.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {(showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => (
-                <div
-                  key={inventoryItem.id}
-                  className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
-                >
-                  <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
-                    <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                      {inventoryItem.item.image_url ? (
-                        <img
-                          src={inventoryItem.item.image_url}
-                          alt={inventoryItem.item.name}
-                          className="w-full h-full object-contain rounded"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextElement) nextElement.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
-                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
-                    {inventoryItem.item.name}
-                  </h5>
-                  <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
-                  <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
-                    {getRarityName(inventoryItem.item.rarity)}
-                  </p>
+                {activeInventoryTab === 'opened' ? (
+                  // Специальный рендеринг для открытых кейсов с анимацией
+                  (showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => {
+                    const caseTemplate = inventoryItem.case_template_id
+                      ? getCaseTemplateById(inventoryItem.case_template_id)
+                      : null;
 
-                  {/* Дополнительная информация о предмете */}
-                  {inventoryItem.acquisition_date && (
-                    <div className="mt-2 text-xs text-gray-400">
-                      <p>Получен: {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
-                      {inventoryItem.source && (
-                        <p className="capitalize">Источник: {
-                          inventoryItem.source === 'case' ? 'Кейс' :
-                          inventoryItem.source === 'purchase' ? 'Покупка' :
-                          inventoryItem.source
-                        }</p>
+                    return (
+                      <CaseWithDrop
+                        key={inventoryItem.id}
+                        droppedItem={inventoryItem}
+                        caseTemplate={caseTemplate}
+                      />
+                    );
+                  })
+                ) : (
+                  // Обычный рендеринг для активных предметов
+                  (showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => (
+                    <div
+                      key={inventoryItem.id}
+                      className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
+                    >
+                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
+                          {inventoryItem.item.image_url ? (
+                            <img
+                              src={inventoryItem.item.image_url}
+                              alt={inventoryItem.item.name}
+                              className="w-full h-full object-contain rounded"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (nextElement) nextElement.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
+                        {inventoryItem.item.name}
+                      </h5>
+                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
+                      <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
+                        {getRarityName(inventoryItem.item.rarity)}
+                      </p>
+
+                      {/* Дополнительная информация о предмете */}
+                      {inventoryItem.acquisition_date && (
+                        <div className="mt-2 text-xs text-gray-400">
+                          <p>Получен: {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
+                          {inventoryItem.source && (
+                            <p className="capitalize">Источник: {
+                              inventoryItem.source === 'case' ? 'Кейс' :
+                              inventoryItem.source === 'purchase' ? 'Покупка' :
+                              inventoryItem.source
+                            }</p>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  ))
+                )}
 
                 {/* Показываем карточку "Ещё предметов" только если не показываем все предметы */}
                 {!showFullInventory && filteredInventory.length > 12 && (
@@ -579,7 +608,7 @@ const PublicProfilePage: React.FC = () => {
                 </h4>
                 <p className="text-gray-400 text-sm">
                   {activeInventoryTab === 'active' && 'У пользователя пока нет предметов в инвентаре'}
-                  {activeInventoryTab === 'opened' && 'Пользователь пока не открывал кейсы'}
+                  {activeInventoryTab === 'opened' && 'Пользователь пока не открывал кейсы, или предметы из кейсов были проданы'}
                 </p>
               </div>
             )}
