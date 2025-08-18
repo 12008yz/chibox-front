@@ -268,14 +268,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
 
-    // Находим индекс выигранного предмета
-    const wonItemIndex = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+    // Создаем отфильтрованный список предметов БЕЗ исключенных для анимации
+    const nonExcludedItems = itemsWithAdjustedChances.filter(item => !item.isExcluded);
+
+    // Находим индекс выигранного предмета в отфильтрованном списке
+    const wonItemIndex = nonExcludedItems.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Проверяем, что целевой предмет не исключен (для безопасности)
-    const targetItem = itemsWithAdjustedChances[targetIndex];
-    if (targetItem?.isExcluded) {
-      console.warn('Целевой предмет исключен из выпадения, но все равно выпал. Возможная ошибка сервера.');
+    // Дополнительная проверка - выигранный предмет НЕ должен быть исключен
+    const targetItem = nonExcludedItems[targetIndex];
+    if (!targetItem) {
+      console.error('Не удалось найти целевой предмет среди неисключенных предметов');
+      return;
     }
 
     // Сбрасываем позицию в начало и скроллим к началу списка
@@ -294,7 +298,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     let initialSpeed = 150; // начальная скорость
     let currentSpeed = initialSpeed;
 
-    // Рассчитываем расстояние до цели
+    // Рассчитываем расстояние до цели в неисключенном списке
     const distance = targetIndex;
     const slowDownStart = Math.max(0, distance - 7); // начинаем замедляться за 7 шагов до цели
 
@@ -529,125 +533,144 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   showOpeningAnimation ? 'transform scale-75 origin-top -mt-3' : ''
                 }`}
               >
-                {itemsWithAdjustedChances.map((item: any, index: number) => (
-                  <div
-                    key={item.id || index}
-                    data-item-index={index}
-                    className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
-                      !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : ''
-                    } ${
-                      showOpeningAnimation && sliderPosition === index
-                        ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 scale-125 z-10 border-yellow-400'
-                        : ''
-                    } ${
-                      animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
-                        ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
-                        : ''
-                    } ${
-                      item.isExcluded ? 'opacity-50 grayscale' : ''
-                    }`}
-                    style={{
-                      animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
-                      boxShadow: showOpeningAnimation && sliderPosition === index
-                        ? '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
-                        : animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id
-                          ? '0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 25px rgba(34, 197, 94, 0.4)'
-                          : 'none'
-                    }}
-                  >
-                    <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center overflow-hidden relative">
-                      {item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          className="max-w-full max-h-full object-contain"
-                          style={{
-                            backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                            mixBlendMode: 'normal'
-                          }}
-                          onLoad={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.backgroundColor = 'transparent';
-                          }}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              const errorDiv = document.createElement('div');
-                              errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center';
-                              errorDiv.textContent = 'Нет изображения';
-                              parent.appendChild(errorDiv);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center">
-                          Нет изображения
-                        </div>
-                      )}
+                {itemsWithAdjustedChances.map((item: any, index: number) => {
+                  // Для Статус++ пользователей во время анимации скрываем исключенные предметы
+                  if (showOpeningAnimation && isStatusPlusPlus && item.isExcluded) {
+                    return null;
+                  }
 
-                      {/* Перечеркивание для уже выигранных предметов */}
-                      {item.isExcluded && (
-                        <>
-                          <div className="absolute inset-0 flex items-center justify-center z-10">
-                            <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
+                  // Для анимации нужно пересчитать индекс без учета исключенных предметов
+                  const nonExcludedItems = showOpeningAnimation && isStatusPlusPlus
+                    ? itemsWithAdjustedChances.filter(item => !item.isExcluded)
+                    : itemsWithAdjustedChances;
+
+                  const animationIndex = showOpeningAnimation && isStatusPlusPlus
+                    ? nonExcludedItems.findIndex(nonExcludedItem => nonExcludedItem.id === item.id)
+                    : index;
+
+                  const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
+                  const isWinningItem = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+
+                  return (
+                    <div
+                      key={item.id || index}
+                      data-item-index={animationIndex}
+                      className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
+                        !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : ''
+                      } ${
+                        isCurrentSliderPosition
+                          ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 scale-125 z-10 border-yellow-400'
+                          : ''
+                      } ${
+                        isWinningItem
+                          ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
+                          : ''
+                      } ${
+                        item.isExcluded ? 'opacity-50 grayscale' : ''
+                      }`}
+                      style={{
+                        animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
+                        boxShadow: isCurrentSliderPosition
+                          ? '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
+                          : isWinningItem
+                            ? '0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 25px rgba(34, 197, 94, 0.4)'
+                            : 'none'
+                      }}
+                    >
+                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center overflow-hidden relative">
+                        {item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="max-w-full max-h-full object-contain"
+                            style={{
+                              backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                              mixBlendMode: 'normal'
+                            }}
+                            onLoad={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.backgroundColor = 'transparent';
+                            }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center';
+                                errorDiv.textContent = 'Нет изображения';
+                                parent.appendChild(errorDiv);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center">
+                            Нет изображения
                           </div>
-                          <div className="absolute inset-0 flex items-center justify-center z-10">
-                            <div className="w-full h-0.5 bg-red-500 transform -rotate-45"></div>
-                          </div>
-                          <div className="absolute top-1 right-1 z-20">
-                            <div className="bg-red-500 text-white text-xs px-1 rounded">
-                              ✓
+                        )}
+
+                        {/* Перечеркивание для уже выигранных предметов */}
+                        {item.isExcluded && (
+                          <>
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                              <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
                             </div>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                              <div className="w-full h-0.5 bg-red-500 transform -rotate-45"></div>
+                            </div>
+                            <div className="absolute top-1 right-1 z-20">
+                              <div className="bg-red-500 text-white text-xs px-1 rounded">
+                                ✓
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
 
-                    <div className="text-center">
-                      <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            lineHeight: '1.2em',
-                            maxHeight: '2.4em'
-                          }}>
-                        {item.name}
-                      </h3>
+                      <div className="text-center">
+                        <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
+                            style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              lineHeight: '1.2em',
+                              maxHeight: '2.4em'
+                            }}>
+                          {item.name}
+                        </h3>
 
-                      {item.rarity && (
-                        <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
-                          {item.rarity}
+                        {item.rarity && (
+                          <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
+                            {item.rarity}
+                          </p>
+                        )}
+
+                        <p className="text-green-400 font-bold text-sm">
+                          <Monetary value={parseFloat(item.price || '0')} />
                         </p>
-                      )}
 
-                      <p className="text-green-400 font-bold text-sm">
-                        <Monetary value={parseFloat(item.price || '0')} />
-                      </p>
-
-                      {!showOpeningAnimation && (
-                        <div className="text-xs mt-1">
-                          {item.isExcluded ? (
-                            <p className="text-red-400">
-                              ✓ Уже получен
-                            </p>
-                          ) : (
-                            <p className="text-gray-400">
-                              Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
-                              {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
-                                <span className="text-yellow-400 ml-1">
-                                  (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
-                                </span>
-                              )}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                        {!showOpeningAnimation && (
+                          <div className="text-xs mt-1 z-99999">
+                            {item.isExcluded ? (
+                              <p className="text-red-400">
+                                ✓ Уже получен
+                              </p>
+                            ) : (
+                              <p className="text-gray-400">
+                                Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
+                                {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                                  <span className="text-yellow-400 ml-1">
+                                    (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
+                                  </span>
+                                )}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
