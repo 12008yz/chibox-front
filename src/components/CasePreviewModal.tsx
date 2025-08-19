@@ -268,22 +268,37 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
 
-    // ИСПРАВЛЕНИЕ: Используем ПОЛНЫЙ список предметов, включая исключенные
-    // Не фильтруем исключенные предметы для анимации
-    const allItems = itemsWithAdjustedChances;
+    // ИСПРАВЛЕНИЕ: Создаем два списка:
+    // 1. Полный список для отображения (включая исключенные)
+    const allItemsForDisplay = itemsWithAdjustedChances;
 
-    // Находим индекс выигранного предмета в ПОЛНОМ списке
-    const wonItemIndex = allItems.findIndex(item => item.id === wonItem.id);
-    const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
+    // 2. Отфильтрованный список только из неисключенных предметов для анимации
+    const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
 
-    // Дополнительная проверка
-    const targetItem = allItems[targetIndex];
-    if (!targetItem) {
-      console.error('Не удалось найти целевой предмет в полном списке предметов');
+    console.log('АНИМАЦИЯ: Всего предметов для отображения:', allItemsForDisplay.length);
+    console.log('АНИМАЦИЯ: Доступных для анимации:', availableItemsForAnimation.length);
+    console.log('АНИМАЦИЯ: Исключенных:', allItemsForDisplay.length - availableItemsForAnimation.length);
+
+    // Находим индекс выигранного предмета в отфильтрованном списке (только неисключенные)
+    const wonItemIndexInAvailable = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
+
+    if (wonItemIndexInAvailable === -1) {
+      console.error('ОШИБКА АНИМАЦИИ: Выигранный предмет не найден в доступных для анимации предметах');
+      console.log('Выигранный предмет:', wonItem);
+      console.log('Доступные предметы:', availableItemsForAnimation.map(item => ({ id: item.id, name: item.name, isExcluded: item.isExcluded })));
       return;
     }
 
-    console.log('АНИМАЦИЯ: Целевой предмет:', targetItem.name, 'в позиции:', targetIndex);
+    // Теперь находим соответствующий индекс в полном списке для отображения
+    const wonItemInAvailable = availableItemsForAnimation[wonItemIndexInAvailable];
+    const targetIndexInFullList = allItemsForDisplay.findIndex(item => item.id === wonItemInAvailable.id);
+
+    if (targetIndexInFullList === -1) {
+      console.error('ОШИБКА АНИМАЦИИ: Не удалось найти целевой предмет в полном списке');
+      return;
+    }
+
+    console.log('АНИМАЦИЯ: Целевой предмет:', wonItemInAvailable.name, 'в позиции полного списка:', targetIndexInFullList);
 
     // Сбрасываем позицию в начало и скроллим к началу списка
     setSliderPosition(0);
@@ -302,12 +317,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     let currentSpeed = initialSpeed;
 
     // Рассчитываем расстояние до цели в ПОЛНОМ списке
-    const distance = targetIndex;
+    const distance = targetIndexInFullList;
     const slowDownStart = Math.max(0, distance - 7); // начинаем замедляться за 7 шагов до цели
 
     const animateSlider = () => {
       // Если дошли до цели - останавливаемся
-      if (currentPosition >= targetIndex) {
+      if (currentPosition >= targetIndexInFullList) {
         setAnimationPhase('stopped');
         setTimeout(() => {
           handleAnimationComplete();
@@ -326,7 +341,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       } else {
         // Начинаем замедляться
         setAnimationPhase('slowing');
-        const stepsLeft = targetIndex - currentPosition;
+        const stepsLeft = targetIndexInFullList - currentPosition;
         const slowdownFactor = Math.max(0.1, stepsLeft / 7);
         currentSpeed = initialSpeed + (300 * (1 - slowdownFactor));
       }
@@ -556,6 +571,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     <p>Уровень подписки: {subscriptionData?.data?.subscription_tier || 'не определен'}</p>
                     <p>Статус++: {isStatusPlusPlus ? 'ДА' : 'НЕТ'}</p>
                     <p>Исключенных предметов: {itemsWithAdjustedChances.filter(item => item.isExcluded).length}</p>
+                    <p>Доступных для выпадения: {itemsWithAdjustedChances.filter(item => !item.isExcluded).length}</p>
                     <p>Всего предметов: {itemsWithAdjustedChances.length}</p>
                     <p>Предметы already_dropped: {itemsWithAdjustedChances.filter(item => item.isAlreadyWon).length}</p>
                     {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 0 && (
@@ -592,10 +608,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 }`}
               >
                 {itemsWithAdjustedChances.map((item: any, index: number) => {
-                  // ИСПРАВЛЕНИЕ: НЕ скрываем исключенные предметы во время анимации
-                  // Оставляем их видимыми, но с перечеркиванием
+                  // ИСПРАВЛЕНИЕ: Показываем все предметы для информативности,
+                  // но анимация теперь корректно работает только с неисключенными
 
-                  // Используем прямой индекс для анимации (больше не пересчитываем)
+                  // Используем прямой индекс для отображения
                   const animationIndex = index;
 
                   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
@@ -659,7 +675,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           </div>
                         )}
 
-                        {/* ИСПРАВЛЕНИЕ: Перечеркивание остается видимым даже во время анимации */}
+                        {/* Перечеркивание для уже полученных предметов - видимо всегда */}
                         {item.isExcluded && (
                           <>
                             {/* Полупрозрачный оверлей */}
