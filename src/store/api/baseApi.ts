@@ -8,6 +8,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   timeout: 30000, // 30 секунд таймаут
+  credentials: 'include', // Включаем отправку cookies для session-based аутентификации
   prepareHeaders: (headers, { getState }) => {
     // Добавляем токен авторизации из состояния
     const state = getState() as RootState;

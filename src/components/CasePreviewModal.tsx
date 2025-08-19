@@ -396,6 +396,21 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const itemsWithAdjustedChances = useMemo(() => {
     if (!items || items.length === 0) return [];
 
+    // Отладочная информация о сырых данных с сервера
+    console.log(`DEBUG: Получено ${items.length} предметов с сервера`);
+    const droppedFromServer = items.filter(item => item.is_already_dropped).length;
+    const excludedFromServer = items.filter(item => item.is_excluded).length;
+    console.log(`DEBUG: С сервера - is_already_dropped: ${droppedFromServer}, is_excluded: ${excludedFromServer}`);
+
+    if (droppedFromServer > 0) {
+      console.log('DEBUG: Предметы с is_already_dropped=true:', items.filter(item => item.is_already_dropped).map(item => ({
+        id: item.id,
+        name: item.name,
+        is_already_dropped: item.is_already_dropped,
+        is_excluded: item.is_excluded
+      })));
+    }
+
     // Теперь просто используем данные от сервера, который уже рассчитал всё
     const processedItems = items.map(item => ({
       ...item,
@@ -416,7 +431,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         id: item.id,
         name: item.name,
         isExcluded: item.isExcluded,
-        isAlreadyDropped: item.is_already_dropped
+        isAlreadyDropped: item.isAlreadyWon
       })));
     }
 
@@ -539,7 +554,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     <p>Статус++: {isStatusPlusPlus ? 'ДА' : 'НЕТ'}</p>
                     <p>Исключенных предметов: {itemsWithAdjustedChances.filter(item => item.isExcluded).length}</p>
                     <p>Всего предметов: {itemsWithAdjustedChances.length}</p>
-                    <p>Предметы already_dropped: {itemsWithAdjustedChances.filter(item => item.is_already_dropped).length}</p>
+                    <p>Предметы already_dropped: {itemsWithAdjustedChances.filter(item => item.isAlreadyWon).length}</p>
                     {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 0 && (
                       <div className="mt-2">
                         <p><strong>Исключенные предметы:</strong></p>
@@ -717,7 +732,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                                   )}
                                 </p>
                                 <p className="text-gray-500 text-xs">
-                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}, dropped={item.is_already_dropped ? 'true' : 'false'}
+                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}, dropped={item.isAlreadyWon ? 'true' : 'false'}
                                 </p>
                               </div>
                             )}
