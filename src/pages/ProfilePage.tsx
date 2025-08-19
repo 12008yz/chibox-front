@@ -582,15 +582,6 @@ const ProfilePage: React.FC = () => {
   // Завершенные достижения
   const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.completed).length;
 
-  // Отладочная информация
-  console.log('Achievements Debug:', {
-    achievementsProgressData,
-    achievementsProgress,
-    totalAchievements,
-    completedAchievementsCount,
-    achievementsLoading
-  });
-
   // Находим самый дорогой предмет как "лучшее оружие"
   const bestWeapon = inventory
     .filter((item): item is UserInventoryItem => item.status === 'inventory' && isUserItem(item) && !!item.item.price)

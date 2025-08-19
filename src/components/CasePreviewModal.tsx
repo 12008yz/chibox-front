@@ -512,19 +512,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     if (!items || items.length === 0) return [];
 
     // Отладочная информация о сырых данных с сервера
-    console.log(`DEBUG: Получено ${items.length} предметов с сервера`);
     const droppedFromServer = items.filter(item => item.is_already_dropped).length;
     const excludedFromServer = items.filter(item => item.is_excluded).length;
-    console.log(`DEBUG: С сервера - is_already_dropped: ${droppedFromServer}, is_excluded: ${excludedFromServer}`);
 
-    if (droppedFromServer > 0) {
-      console.log('DEBUG: Предметы с is_already_dropped=true:', items.filter(item => item.is_already_dropped).map(item => ({
-        id: item.id,
-        name: item.name,
-        is_already_dropped: item.is_already_dropped,
-        is_excluded: item.is_excluded
-      })));
-    }
 
     // Теперь просто используем данные от сервера, который уже рассчитал всё
     const processedItems = items.map(item => ({
@@ -658,45 +648,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : items.length > 0 ? (
             <div className="relative">
-              {/* Отладочная информация о пользователе */}
-              {!showOpeningAnimation && (
-                <div className="mb-4 p-3 bg-gray-800/50 border border-gray-600 rounded-lg">
-                  <div className="text-xs text-gray-300">
-                    <p><strong>DEBUG INFO:</strong></p>
-                    <p>Пользователь ID: {userData?.id || 'не найден'}</p>
-                    <p>Кейс ID: {caseData.id}</p>
-                    <p>Уровень подписки: {subscriptionData?.data?.subscription_tier || 'не определен'}</p>
-                    <p>Статус++: {isStatusPlusPlus ? 'ДА' : 'НЕТ'}</p>
-                    <p>Исключенных предметов: {itemsWithAdjustedChances.filter(item => item.isExcluded).length}</p>
-                    <p>Доступных для выпадения: {itemsWithAdjustedChances.filter(item => !item.isExcluded).length}</p>
-                    <p>Всего предметов: {itemsWithAdjustedChances.length}</p>
-                    <p>Предметы already_dropped: {itemsWithAdjustedChances.filter(item => item.isAlreadyWon).length}</p>
-                    {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 0 && (
-                      <div className="mt-2">
-                        <p><strong>Исключенные предметы:</strong></p>
-                        {itemsWithAdjustedChances.filter(item => item.isExcluded).slice(0, 3).map((item, index) => (
-                          <p key={index} className="text-red-400">- {item.name}</p>
-                        ))}
-                        {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 3 && (
-                          <p className="text-red-400">... и еще {itemsWithAdjustedChances.filter(item => item.isExcluded).length - 3}</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Информационное сообщение для "Статус++" пользователей */}
-              {isStatusPlusPlus && itemsWithAdjustedChances.some(item => item.isExcluded) && !showOpeningAnimation && (
-                <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="text-blue-400">👑</div>
-                    <div className="text-sm text-blue-300">
-                      <strong>Преимущество Статус++:</strong> Перечеркнутые предметы вы уже получали из этого кейса и они исключены из выпадения.
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Сетка предметов с анимацией масштабирования */}
               <div
@@ -782,15 +733,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             }`}></div>
 
                             {/* Перечеркивающие линии */}
-                            <div className="absolute inset-0 flex items-center justify-center z-30">
-                              <div className={`h-1 bg-red-500 shadow-lg transform rotate-45 ${
-                                isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-1' : 'w-full'
-                              }`} style={{ width: isWinningItemStopped && showStrikeThrough ? '0' : '100%' }}></div>
+                            <div className={`absolute inset-0 flex items-center justify-center z-30 ${
+                              isWinningItemStopped && showStrikeThrough ? 'animate-strike-through' : ''
+                            }`}>
+                              <div className="w-full h-1 bg-red-500 shadow-lg transform rotate-45"></div>
                             </div>
-                            <div className="absolute inset-0 flex items-center justify-center z-30">
-                              <div className={`h-1 bg-red-500 shadow-lg transform -rotate-45 ${
-                                isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-2' : 'w-full'
-                              }`} style={{ width: isWinningItemStopped && showStrikeThrough ? '0' : '100%' }}></div>
+                            <div className={`absolute inset-0 flex items-center justify-center z-30 ${
+                              isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-reverse' : ''
+                            }`}>
+                              <div className="w-full h-1 bg-red-500 shadow-lg transform -rotate-45"></div>
                             </div>
 
                             {/* Галочка */}
@@ -834,9 +785,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                                 <p className="text-red-400 font-bold">
                                   ✓ Уже получен
                                 </p>
-                                <p className="text-red-300 text-xs">
-                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}
-                                </p>
                               </div>
                             ) : (
                               <div>
@@ -847,9 +795,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                                       (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
                                     </span>
                                   )}
-                                </p>
-                                <p className="text-gray-500 text-xs">
-                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}, dropped={item.isAlreadyWon ? 'true' : 'false'}
                                 </p>
                               </div>
                             )}
