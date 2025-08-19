@@ -268,37 +268,32 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
 
-    // ИСПРАВЛЕНИЕ: Создаем два списка:
-    // 1. Полный список для отображения (включая исключенные)
-    const allItemsForDisplay = itemsWithAdjustedChances;
-
-    // 2. Отфильтрованный список только из неисключенных предметов для анимации
+    // ИСПРАВЛЕНИЕ: Используем ТОЛЬКО доступные (неисключенные) предметы для анимации
+    // Бэкенд выбирает предмет только из неисключенных, поэтому анимация должна показывать то же самое
     const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
 
-    console.log('АНИМАЦИЯ: Всего предметов для отображения:', allItemsForDisplay.length);
-    console.log('АНИМАЦИЯ: Доступных для анимации:', availableItemsForAnimation.length);
-    console.log('АНИМАЦИЯ: Исключенных:', allItemsForDisplay.length - availableItemsForAnimation.length);
+    console.log('АНИМАЦИЯ: Всего предметов в кейсе:', itemsWithAdjustedChances.length);
+    console.log('АНИМАЦИЯ: Доступных предметов для анимации:', availableItemsForAnimation.length);
+    console.log('АНИМАЦИЯ: Исключенных предметов:', itemsWithAdjustedChances.length - availableItemsForAnimation.length);
+    console.log('АНИМАЦИЯ: Выигранный предмет:', wonItem.name, wonItem.id);
 
-    // Находим индекс выигранного предмета в отфильтрованном списке (только неисключенные)
-    const wonItemIndexInAvailable = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
+    // Находим индекс выигранного предмета в списке ДОСТУПНЫХ предметов
+    const wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
 
-    if (wonItemIndexInAvailable === -1) {
-      console.error('ОШИБКА АНИМАЦИИ: Выигранный предмет не найден в доступных для анимации предметах');
+    if (wonItemIndex === -1) {
+      console.error('ОШИБКА АНИМАЦИИ: Выигранный предмет не найден в списке доступных предметов');
       console.log('Выигранный предмет:', wonItem);
-      console.log('Доступные предметы:', availableItemsForAnimation.map(item => ({ id: item.id, name: item.name, isExcluded: item.isExcluded })));
+      console.log('Доступные предметы:', availableItemsForAnimation.map(item => ({ id: item.id, name: item.name })));
+
+      // Fallback: показываем результат без анимации
+      setAnimationPhase('stopped');
+      setTimeout(() => {
+        handleAnimationComplete();
+      }, 1500);
       return;
     }
 
-    // Теперь находим соответствующий индекс в полном списке для отображения
-    const wonItemInAvailable = availableItemsForAnimation[wonItemIndexInAvailable];
-    const targetIndexInFullList = allItemsForDisplay.findIndex(item => item.id === wonItemInAvailable.id);
-
-    if (targetIndexInFullList === -1) {
-      console.error('ОШИБКА АНИМАЦИИ: Не удалось найти целевой предмет в полном списке');
-      return;
-    }
-
-    console.log('АНИМАЦИЯ: Целевой предмет:', wonItemInAvailable.name, 'в позиции полного списка:', targetIndexInFullList);
+    console.log('АНИМАЦИЯ: Целевой предмет:', wonItem.name, 'в позиции:', wonItemIndex, '(среди доступных)');
 
     // Сбрасываем позицию в начало и скроллим к началу списка
     setSliderPosition(0);
@@ -312,17 +307,20 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     // Настройки анимации
-    let currentPosition = 0;
+    let currentAvailablePosition = 0;
     let initialSpeed = 150; // начальная скорость
     let currentSpeed = initialSpeed;
 
-    // Рассчитываем расстояние до цели в ПОЛНОМ списке
-    const distance = targetIndexInFullList;
+    // Рассчитываем расстояние до цели в доступных предметах
+    const distance = wonItemIndex;
     const slowDownStart = Math.max(0, distance - 7); // начинаем замедляться за 7 шагов до цели
 
     const animateSlider = () => {
       // Если дошли до цели - останавливаемся
-      if (currentPosition >= targetIndexInFullList) {
+      if (currentAvailablePosition >= wonItemIndex) {
+        // Находим индекс выигранного предмета в полном списке для корректного отображения
+        const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+        setSliderPosition(wonItemInFullList);
         setAnimationPhase('stopped');
         setTimeout(() => {
           handleAnimationComplete();
@@ -330,18 +328,32 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         return;
       }
 
-      // Двигаемся на следующую позицию
-      currentPosition++;
-      setSliderPosition(currentPosition);
+      // Двигаемся на следующую позицию среди доступных предметов
+      currentAvailablePosition++;
+
+      // Находим соответствующую позицию в полном списке
+      let fullListPosition = 0;
+      let availableCount = 0;
+      for (let i = 0; i < itemsWithAdjustedChances.length; i++) {
+        if (!itemsWithAdjustedChances[i].isExcluded) {
+          if (availableCount === currentAvailablePosition) {
+            fullListPosition = i;
+            break;
+          }
+          availableCount++;
+        }
+      }
+
+      setSliderPosition(fullListPosition);
 
       // Если еще не дошли до зоны замедления - быстро крутим
-      if (currentPosition <= slowDownStart) {
+      if (currentAvailablePosition <= slowDownStart) {
         setAnimationPhase('spinning');
         currentSpeed = initialSpeed;
       } else {
         // Начинаем замедляться
         setAnimationPhase('slowing');
-        const stepsLeft = targetIndexInFullList - currentPosition;
+        const stepsLeft = wonItemIndex - currentAvailablePosition;
         const slowdownFactor = Math.max(0.1, stepsLeft / 7);
         currentSpeed = initialSpeed + (300 * (1 - slowdownFactor));
       }
