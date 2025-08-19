@@ -397,7 +397,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     if (!items || items.length === 0) return [];
 
     // Теперь просто используем данные от сервера, который уже рассчитал всё
-    return items.map(item => ({
+    const processedItems = items.map(item => ({
       ...item,
       // Используем данные от сервера о том, исключён ли предмет
       isExcluded: item.is_excluded || false,
@@ -408,6 +408,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       weightMultiplier: item.weight_multiplier || 1,
       bonusApplied: item.bonus_applied || 0
     }));
+
+    // Отладочная информация
+    const excludedItems = processedItems.filter(item => item.isExcluded);
+    if (excludedItems.length > 0) {
+      console.log('🚫 Исключенные предметы (уже получены):', excludedItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        isExcluded: item.isExcluded,
+        isAlreadyDropped: item.is_already_dropped
+      })));
+    }
+
+    return processedItems;
   }, [items]);
 
   if (!isVisible) return null;
@@ -515,6 +528,33 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : items.length > 0 ? (
             <div className="relative">
+              {/* Отладочная информация о пользователе */}
+              {!showOpeningAnimation && (
+                <div className="mb-4 p-3 bg-gray-800/50 border border-gray-600 rounded-lg">
+                  <div className="text-xs text-gray-300">
+                    <p><strong>DEBUG INFO:</strong></p>
+                    <p>Пользователь ID: {userData?.id || 'не найден'}</p>
+                    <p>Кейс ID: {caseData.id}</p>
+                    <p>Уровень подписки: {subscriptionData?.data?.subscription_tier || 'не определен'}</p>
+                    <p>Статус++: {isStatusPlusPlus ? 'ДА' : 'НЕТ'}</p>
+                    <p>Исключенных предметов: {itemsWithAdjustedChances.filter(item => item.isExcluded).length}</p>
+                    <p>Всего предметов: {itemsWithAdjustedChances.length}</p>
+                    <p>Предметы already_dropped: {itemsWithAdjustedChances.filter(item => item.is_already_dropped).length}</p>
+                    {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 0 && (
+                      <div className="mt-2">
+                        <p><strong>Исключенные предметы:</strong></p>
+                        {itemsWithAdjustedChances.filter(item => item.isExcluded).slice(0, 3).map((item, index) => (
+                          <p key={index} className="text-red-400">- {item.name}</p>
+                        ))}
+                        {itemsWithAdjustedChances.filter(item => item.isExcluded).length > 3 && (
+                          <p className="text-red-400">... и еще {itemsWithAdjustedChances.filter(item => item.isExcluded).length - 3}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Информационное сообщение для "Статус++" пользователей */}
               {isStatusPlusPlus && itemsWithAdjustedChances.some(item => item.isExcluded) && !showOpeningAnimation && (
                 <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
@@ -577,12 +617,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             : 'none'
                       }}
                     >
-                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center overflow-hidden relative">
+                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
                         {item.image_url ? (
                           <img
                             src={item.image_url}
                             alt={item.name}
-                            className="max-w-full max-h-full object-contain"
+                            className={`max-w-full max-h-full object-contain relative z-0 ${item.isExcluded ? 'opacity-70' : ''}`}
                             style={{
                               backgroundColor: 'rgba(17, 24, 39, 0.8)',
                               mixBlendMode: 'normal'
@@ -597,14 +637,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               const parent = target.parentElement;
                               if (parent) {
                                 const errorDiv = document.createElement('div');
-                                errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center';
+                                errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
                                 errorDiv.textContent = 'Нет изображения';
                                 parent.appendChild(errorDiv);
                               }
                             }}
                           />
                         ) : (
-                          <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center">
+                          <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0">
                             Нет изображения
                           </div>
                         )}
@@ -612,14 +652,20 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         {/* Перечеркивание для уже выигранных предметов */}
                         {item.isExcluded && (
                           <>
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                              <div className="w-full h-0.5 bg-red-500 transform rotate-45"></div>
+                            {/* Полупрозрачный оверлей */}
+                            <div className="absolute inset-0 bg-black bg-opacity-40 z-20"></div>
+
+                            {/* Перечеркивающие линии */}
+                            <div className="absolute inset-0 flex items-center justify-center z-30">
+                              <div className="w-full h-1 bg-red-500 shadow-lg transform rotate-45"></div>
                             </div>
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                              <div className="w-full h-0.5 bg-red-500 transform -rotate-45"></div>
+                            <div className="absolute inset-0 flex items-center justify-center z-30">
+                              <div className="w-full h-1 bg-red-500 shadow-lg transform -rotate-45"></div>
                             </div>
-                            <div className="absolute top-1 right-1 z-20">
-                              <div className="bg-red-500 text-white text-xs px-1 rounded">
+
+                            {/* Галочка */}
+                            <div className="absolute top-1 right-1 z-40">
+                              <div className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded shadow-lg font-bold">
                                 ✓
                               </div>
                             </div>
@@ -652,18 +698,28 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         {!showOpeningAnimation && (
                           <div className="text-xs mt-1 z-99999">
                             {item.isExcluded ? (
-                              <p className="text-red-400">
-                                ✓ Уже получен
-                              </p>
+                              <div>
+                                <p className="text-red-400 font-bold">
+                                  ✓ Уже получен
+                                </p>
+                                <p className="text-red-300 text-xs">
+                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}
+                                </p>
+                              </div>
                             ) : (
-                              <p className="text-gray-400">
-                                Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
-                                {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
-                                  <span className="text-yellow-400 ml-1">
-                                    (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
-                                  </span>
-                                )}
-                              </p>
+                              <div>
+                                <p className="text-gray-400">
+                                  Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
+                                  {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                                    <span className="text-yellow-400 ml-1">
+                                      (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="text-gray-500 text-xs">
+                                  DEBUG: excluded={item.isExcluded ? 'true' : 'false'}, dropped={item.is_already_dropped ? 'true' : 'false'}
+                                </p>
+                              </div>
                             )}
                           </div>
                         )}
