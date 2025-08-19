@@ -6,6 +6,81 @@ import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
 import { useUserData } from '../hooks/useUserData';
 
+// CSS стили для анимации перечеркивания
+const strikeAnimationStyles = `
+  @keyframes strike-through-1 {
+    0% {
+      width: 0;
+      opacity: 0;
+    }
+    100% {
+      width: 100%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes strike-through-2 {
+    0% {
+      width: 0;
+      opacity: 0;
+    }
+    100% {
+      width: 100%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes fade-in-delayed {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-strike-through-1 {
+    animation: strike-through-1 0.6s ease-out forwards;
+    transform-origin: center;
+  }
+
+  .animate-strike-through-2 {
+    animation: strike-through-2 0.6s ease-out forwards;
+    animation-delay: 0.3s;
+    transform-origin: center;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .animate-fade-in-delayed {
+    animation: fade-in-delayed 0.6s ease-out forwards;
+    animation-delay: 1s;
+  }
+`;
+
+// Добавляем стили в head
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = strikeAnimationStyles;
+  if (!document.head.querySelector('style[data-strike-animation]')) {
+    styleElement.setAttribute('data-strike-animation', 'true');
+    document.head.appendChild(styleElement);
+  }
+}
+
 interface CasePreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,6 +120,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
+  const [showStrikeThrough, setShowStrikeThrough] = useState(false);
 
   // Ref для контейнера со скроллом
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -79,6 +155,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setAnimationPhase('idle');
       setShowOpeningAnimation(false);
       setOpeningResult(null);
+      setShowStrikeThrough(false);
       // Блокируем скролл основной страницы
       document.body.style.overflow = 'hidden';
       // Небольшая задержка для запуска анимации после рендера
@@ -267,6 +344,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const startAnimation = (wonItem: any) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
+    setShowStrikeThrough(false); // Сбрасываем перечеркивание при начале анимации
 
     // ИСПРАВЛЕНИЕ: Используем ТОЛЬКО доступные (неисключенные) предметы для анимации
     // Бэкенд выбирает предмет только из неисключенных, поэтому анимация должна показывать то же самое
@@ -322,9 +400,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
         setSliderPosition(wonItemInFullList);
         setAnimationPhase('stopped');
+
+        // Показываем перечеркивание через 2 секунды после остановки
+        setTimeout(() => {
+          setShowStrikeThrough(true);
+        }, 2000);
+
         setTimeout(() => {
           handleAnimationComplete();
-        }, 1500); // показываем результат 1.5 секунды
+        }, 4000); // увеличиваем время показа результата до 4 секунд, чтобы пользователь увидел анимацию перечеркивания
         return;
       }
 
@@ -373,6 +457,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setOpeningResult(null);
     setAnimationPhase('idle');
     setSliderPosition(0);
+    setShowStrikeThrough(false);
     // Не закрываем модалку сразу, пусть пользователь сам закроет
   };
 
@@ -627,7 +712,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   const animationIndex = index;
 
                   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
-                  const isWinningItem = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+                  const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
+                  const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
 
                   return (
                     <div
@@ -640,17 +726,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 scale-125 z-10 border-yellow-400'
                           : ''
                       } ${
-                        isWinningItem
+                        isWinningItemStopped
                           ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
                           : ''
                       } ${
-                        item.isExcluded ? 'opacity-50 grayscale' : ''
+                        (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough) ? 'opacity-50 grayscale' : ''
                       }`}
                       style={{
                         animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
                         boxShadow: isCurrentSliderPosition
                           ? '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
-                          : isWinningItem
+                          : isWinningItemStopped
                             ? '0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 25px rgba(34, 197, 94, 0.4)'
                             : 'none'
                       }}
@@ -687,22 +773,30 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           </div>
                         )}
 
-                        {/* Перечеркивание для уже полученных предметов - видимо всегда */}
-                        {item.isExcluded && (
+                        {/* Перечеркивание для уже полученных предметов */}
+                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough)) && (
                           <>
                             {/* Полупрозрачный оверлей */}
-                            <div className="absolute inset-0 bg-black bg-opacity-40 z-20"></div>
+                            <div className={`absolute inset-0 bg-black bg-opacity-40 z-20 ${
+                              isWinningItemStopped && showStrikeThrough ? 'animate-fade-in' : ''
+                            }`}></div>
 
-                            {/* Перечеркивающие линии - остаются видимыми всегда */}
+                            {/* Перечеркивающие линии */}
                             <div className="absolute inset-0 flex items-center justify-center z-30">
-                              <div className="w-full h-1 bg-red-500 shadow-lg transform rotate-45"></div>
+                              <div className={`h-1 bg-red-500 shadow-lg transform rotate-45 ${
+                                isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-1' : 'w-full'
+                              }`} style={{ width: isWinningItemStopped && showStrikeThrough ? '0' : '100%' }}></div>
                             </div>
                             <div className="absolute inset-0 flex items-center justify-center z-30">
-                              <div className="w-full h-1 bg-red-500 shadow-lg transform -rotate-45"></div>
+                              <div className={`h-1 bg-red-500 shadow-lg transform -rotate-45 ${
+                                isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-2' : 'w-full'
+                              }`} style={{ width: isWinningItemStopped && showStrikeThrough ? '0' : '100%' }}></div>
                             </div>
 
                             {/* Галочка */}
-                            <div className="absolute top-1 right-1 z-40">
+                            <div className={`absolute top-1 right-1 z-40 ${
+                              isWinningItemStopped && showStrikeThrough ? 'animate-fade-in-delayed' : ''
+                            }`}>
                               <div className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded shadow-lg font-bold">
                                 ✓
                               </div>
@@ -761,40 +855,20 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             )}
                           </div>
                         )}
+
+                        {/* Показываем статус во время анимации для выигранного предмета */}
+                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && (
+                          <div className="text-xs mt-1 z-99999 animate-fade-in-delayed">
+                            <p className="text-red-400 font-bold">
+                              ✓ Получен!
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
                 })}
               </div>
-
-              {/* Статус анимации поверх предметов (только текст, без перекрытия) */}
-              {showOpeningAnimation && (
-                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-                  <div className="text-center text-white bg-black/90 backdrop-blur-md rounded-lg px-8 py-4 border-2 border-yellow-400/70 shadow-2xl shadow-yellow-400/30">
-                    {animationPhase === 'spinning' && (
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-lg font-bold">🎰 Выбираем предмет...</span>
-                      </div>
-                    )}
-                    {animationPhase === 'slowing' && (
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
-                        <span className="text-lg font-bold">⏳ Определяем результат...</span>
-                      </div>
-                    )}
-                    {animationPhase === 'stopped' && openingResult && (
-                      <div className="text-center">
-                        <div className="text-2xl font-bold mb-2">🎉 Выпал предмет!</div>
-                        <div className="text-lg text-green-400 font-bold">{openingResult.item.name}</div>
-                        <div className="text-md">
-                          <Monetary value={parseFloat(openingResult.item.price || '0')} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-12">
