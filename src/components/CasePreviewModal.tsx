@@ -268,19 +268,22 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
 
-    // Создаем отфильтрованный список предметов БЕЗ исключенных для анимации
-    const nonExcludedItems = itemsWithAdjustedChances.filter(item => !item.isExcluded);
+    // ИСПРАВЛЕНИЕ: Используем ПОЛНЫЙ список предметов, включая исключенные
+    // Не фильтруем исключенные предметы для анимации
+    const allItems = itemsWithAdjustedChances;
 
-    // Находим индекс выигранного предмета в отфильтрованном списке
-    const wonItemIndex = nonExcludedItems.findIndex(item => item.id === wonItem.id);
+    // Находим индекс выигранного предмета в ПОЛНОМ списке
+    const wonItemIndex = allItems.findIndex(item => item.id === wonItem.id);
     const targetIndex = wonItemIndex !== -1 ? wonItemIndex : 0;
 
-    // Дополнительная проверка - выигранный предмет НЕ должен быть исключен
-    const targetItem = nonExcludedItems[targetIndex];
+    // Дополнительная проверка
+    const targetItem = allItems[targetIndex];
     if (!targetItem) {
-      console.error('Не удалось найти целевой предмет среди неисключенных предметов');
+      console.error('Не удалось найти целевой предмет в полном списке предметов');
       return;
     }
+
+    console.log('АНИМАЦИЯ: Целевой предмет:', targetItem.name, 'в позиции:', targetIndex);
 
     // Сбрасываем позицию в начало и скроллим к началу списка
     setSliderPosition(0);
@@ -298,7 +301,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     let initialSpeed = 150; // начальная скорость
     let currentSpeed = initialSpeed;
 
-    // Рассчитываем расстояние до цели в неисключенном списке
+    // Рассчитываем расстояние до цели в ПОЛНОМ списке
     const distance = targetIndex;
     const slowDownStart = Math.max(0, distance - 7); // начинаем замедляться за 7 шагов до цели
 
@@ -589,19 +592,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 }`}
               >
                 {itemsWithAdjustedChances.map((item: any, index: number) => {
-                  // Для Статус++ пользователей во время анимации скрываем исключенные предметы
-                  if (showOpeningAnimation && isStatusPlusPlus && item.isExcluded) {
-                    return null;
-                  }
+                  // ИСПРАВЛЕНИЕ: НЕ скрываем исключенные предметы во время анимации
+                  // Оставляем их видимыми, но с перечеркиванием
 
-                  // Для анимации нужно пересчитать индекс без учета исключенных предметов
-                  const nonExcludedItems = showOpeningAnimation && isStatusPlusPlus
-                    ? itemsWithAdjustedChances.filter(item => !item.isExcluded)
-                    : itemsWithAdjustedChances;
-
-                  const animationIndex = showOpeningAnimation && isStatusPlusPlus
-                    ? nonExcludedItems.findIndex(nonExcludedItem => nonExcludedItem.id === item.id)
-                    : index;
+                  // Используем прямой индекс для анимации (больше не пересчитываем)
+                  const animationIndex = index;
 
                   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
                   const isWinningItem = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
@@ -664,13 +659,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           </div>
                         )}
 
-                        {/* Перечеркивание для уже выигранных предметов */}
+                        {/* ИСПРАВЛЕНИЕ: Перечеркивание остается видимым даже во время анимации */}
                         {item.isExcluded && (
                           <>
                             {/* Полупрозрачный оверлей */}
                             <div className="absolute inset-0 bg-black bg-opacity-40 z-20"></div>
 
-                            {/* Перечеркивающие линии */}
+                            {/* Перечеркивающие линии - остаются видимыми всегда */}
                             <div className="absolute inset-0 flex items-center justify-center z-30">
                               <div className="w-full h-1 bg-red-500 shadow-lg transform rotate-45"></div>
                             </div>
