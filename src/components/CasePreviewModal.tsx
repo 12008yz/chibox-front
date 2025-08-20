@@ -8,66 +8,108 @@ import { useUserData } from '../hooks/useUserData';
 
 // CSS стили для анимации перечеркивания
 const strikeAnimationStyles = `
-  @keyframes strike-through-1 {
+  @keyframes item-glow-pulse {
+    0% {
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.8), inset 0 0 15px rgba(34, 197, 94, 0.3);
+      border-color: rgb(34, 197, 94);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), inset 0 0 20px rgba(239, 68, 68, 0.3);
+      border-color: rgb(239, 68, 68);
+    }
+    100% {
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), inset 0 0 15px rgba(34, 197, 94, 0.3);
+      border-color: rgb(34, 197, 94);
+    }
+  }
+
+  @keyframes cross-line-draw {
     0% {
       width: 0;
+      height: 0;
       opacity: 0;
+      transform: scale(0) rotate(45deg);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1) rotate(45deg);
     }
     100% {
-      width: 100%;
+      width: 70%;
+      height: 4px;
       opacity: 1;
+      transform: scale(1) rotate(45deg);
     }
   }
 
-  @keyframes strike-through-2 {
+  @keyframes cross-line-draw-reverse {
     0% {
       width: 0;
+      height: 0;
       opacity: 0;
+      transform: scale(0) rotate(-45deg);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1) rotate(-45deg);
     }
     100% {
-      width: 100%;
+      width: 70%;
+      height: 4px;
       opacity: 1;
+      transform: scale(1) rotate(-45deg);
     }
   }
 
-  @keyframes fade-in {
+  @keyframes overlay-fade-in {
     0% {
       opacity: 0;
-    }
-    100% {
-      opacity: 0.4;
-    }
-  }
-
-  @keyframes fade-in-delayed {
-    0% {
-      opacity: 0;
-      transform: scale(0.5);
+      background-color: rgba(0, 0, 0, 0);
     }
     100% {
       opacity: 1;
-      transform: scale(1);
+      background-color: rgba(0, 0, 0, 0.6);
     }
   }
 
-  .animate-strike-through-1 {
-    animation: strike-through-1 0.6s ease-out forwards;
-    transform-origin: center;
+  @keyframes checkmark-bounce {
+    0% {
+      opacity: 0;
+      transform: scale(0) rotate(-10deg);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.3) rotate(5deg);
+    }
+    80% {
+      transform: scale(0.9) rotate(-2deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
   }
 
-  .animate-strike-through-2 {
-    animation: strike-through-2 0.6s ease-out forwards;
-    animation-delay: 0.3s;
-    transform-origin: center;
+  .animate-item-glow {
+    animation: item-glow-pulse 2s ease-in-out infinite;
   }
 
-  .animate-fade-in {
-    animation: fade-in 0.5s ease-out forwards;
+  .animate-cross-line-1 {
+    animation: cross-line-draw 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
-  .animate-fade-in-delayed {
-    animation: fade-in-delayed 0.6s ease-out forwards;
-    animation-delay: 1s;
+  .animate-cross-line-2 {
+    animation: cross-line-draw-reverse 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.4s;
+  }
+
+  .animate-overlay-fade {
+    animation: overlay-fade-in 0.6s ease-out forwards;
+  }
+
+  .animate-checkmark-bounce {
+    animation: checkmark-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: 1.4s;
   }
 `;
 
@@ -401,14 +443,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(wonItemInFullList);
         setAnimationPhase('stopped');
 
-        // Показываем перечеркивание через 2 секунды после остановки
+        // Показываем перечеркивание через 2 секунды после остановки (только для ежедневного кейса)
         setTimeout(() => {
-          setShowStrikeThrough(true);
+          // Анимация перечёркивания только для ежедневного кейса с ID 444444
+          if (caseData.id === "44444444-4444-4444-4444-444444444444" || caseData.id === '44444444-4444-4444-4444-444444444444') {
+            setShowStrikeThrough(true);
+          }
         }, 2000);
 
         setTimeout(() => {
           handleAnimationComplete();
-        }, 4000); // увеличиваем время показа результата до 4 секунд, чтобы пользователь увидел анимацию перечеркивания
+        }, caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444' ? 4000 : 2000); // Для ежедневного кейса 4 сек (с анимацией), для остальных 2 сек
         return;
       }
 
@@ -507,7 +552,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Определяем, является ли пользователь "Статус++" (предположительно subscription_tier >= 3)
   const isStatusPlusPlus = (subscriptionData?.data?.subscription_tier || 0) >= 3;
 
-  // Теперь используем данные от API для определения исключённых предметов
+  // Определяем, исключать ли предметы в зависимости от ID кейса
   const itemsWithAdjustedChances = useMemo(() => {
     if (!items || items.length === 0) return [];
 
@@ -515,12 +560,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const droppedFromServer = items.filter(item => item.is_already_dropped).length;
     const excludedFromServer = items.filter(item => item.is_excluded).length;
 
+    // Проверяем, является ли это ежедневным кейсом
+    const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444";
 
-    // Теперь просто используем данные от сервера, который уже рассчитал всё
+    // Теперь используем данные от сервера, но применяем исключение только для ежедневного кейса
     const processedItems = items.map(item => ({
       ...item,
-      // Используем данные от сервера о том, исключён ли предмет
-      isExcluded: item.is_excluded || false,
+      // Исключаем предметы только для ежедневного кейса с ID 444444...
+      isExcluded: isDailyCase ? (item.is_excluded || false) : false,
       isAlreadyWon: item.is_already_dropped || false,
       // Остальные поля уже рассчитаны сервером
       drop_chance_percent: item.drop_chance_percent || 0,
@@ -532,7 +579,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     // Отладочная информация
     const excludedItems = processedItems.filter(item => item.isExcluded);
     if (excludedItems.length > 0) {
-      console.log('🚫 Исключенные предметы (уже получены):', excludedItems.map(item => ({
+      console.log('🚫 Исключенные предметы (уже получены) для кейса', caseData.id, ':', excludedItems.map(item => ({
         id: item.id,
         name: item.name,
         isExcluded: item.isExcluded,
@@ -540,8 +587,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       })));
     }
 
+    if (!isDailyCase) {
+      console.log('ℹ️ Для кейса', caseData.id, 'предметы НЕ исключаются - могут выпадать повторно');
+    }
+
     return processedItems;
-  }, [items]);
+  }, [items, caseData.id]);
 
   if (!isVisible) return null;
 
@@ -681,7 +732,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
                           : ''
                       } ${
-                        (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough) ? 'opacity-50 grayscale' : ''
+                        isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')
+                          ? 'animate-item-glow'
+                          : ''
+                      } ${
+                        (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')) ? 'opacity-50 grayscale' : ''
                       }`}
                       style={{
                         animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
@@ -725,30 +780,31 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         )}
 
                         {/* Перечеркивание для уже полученных предметов */}
-                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough)) && (
+                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444'))) && (
                           <>
                             {/* Полупрозрачный оверлей */}
-                            <div className={`absolute inset-0 bg-black bg-opacity-40 z-20 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-fade-in' : ''
+                            <div className={`absolute inset-0 z-20 ${
+                              isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
                             }`}></div>
 
-                            {/* Перечеркивающие линии */}
-                            <div className={`absolute inset-0 flex items-center justify-center z-30 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-strike-through' : ''
-                            }`}>
-                              <div className="w-full h-1 bg-red-500 shadow-lg transform rotate-45"></div>
-                            </div>
-                            <div className={`absolute inset-0 flex items-center justify-center z-30 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-strike-through-reverse' : ''
-                            }`}>
-                              <div className="w-full h-1 bg-red-500 shadow-lg transform -rotate-45"></div>
+                            {/* Крест по центру */}
+                            <div className="absolute inset-0 flex items-center justify-center z-30">
+                              {/* Первая линия креста */}
+                              <div className={`absolute bg-red-500 shadow-lg rounded-full ${
+                                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
+                              }`}></div>
+
+                              {/* Вторая линия креста */}
+                              <div className={`absolute bg-red-500 shadow-lg rounded-full ${
+                                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
+                              }`}></div>
                             </div>
 
                             {/* Галочка */}
                             <div className={`absolute top-1 right-1 z-40 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-fade-in-delayed' : ''
+                              isWinningItemStopped && showStrikeThrough ? 'animate-checkmark-bounce' : ''
                             }`}>
-                              <div className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded shadow-lg font-bold">
+                              <div className="bg-gradient-to-r from-red-500 to-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg font-bold opacity-0">
                                 ✓
                               </div>
                             </div>
@@ -802,7 +858,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         )}
 
                         {/* Показываем статус во время анимации для выигранного предмета */}
-                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && (
+                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444') && (
                           <div className="text-xs mt-1 z-99999 animate-fade-in-delayed">
                             <p className="text-red-400 font-bold">
                               ✓ Получен!
