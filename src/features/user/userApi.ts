@@ -16,7 +16,8 @@ import type {
   BonusStatus,
   TicTacToeCurrentGameResponse,
   TicTacToeCreateGameResponse,
-  TicTacToeMakeMoveResponse
+  TicTacToeMakeMoveResponse,
+  PlaySlotResponse
 } from '../../types/api';
 
 // Расширяем базовый API для работы с пользователем
@@ -308,6 +309,15 @@ export const userApi = baseApi.injectEndpoints({
     >({
       query: () => ({
         url: 'v1/bonus/play-roulette',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Balance', 'User', 'Inventory'],
+    }),
+
+    // Игра в слот
+    playSlot: builder.mutation<PlaySlotResponse, void>({
+      query: () => ({
+        url: 'v1/games/play-slot',
         method: 'POST',
       }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
@@ -608,6 +618,7 @@ export const {
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   usePlayRouletteMutation,
+  usePlaySlotMutation,
   useResetBonusCooldownMutation,
 
   useExchangeItemForSubscriptionMutation,

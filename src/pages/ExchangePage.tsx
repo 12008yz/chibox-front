@@ -377,75 +377,131 @@ const ExchangePage: React.FC = () => {
       <ScrollToTopOnMount />
 
       <div className="container mx-auto px-4 py-8">
-        {/* Заголовок */}
+        {/* Простой игровой заголовок */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-violet-300 bg-clip-text text-transparent mb-4">
-            Обмен предметов
-          </h1>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Продавайте предметы за игровую валюту или обменивайте их на время вашего статуса
-          </p>
+          <div className="inline-flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 001.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-white">ОБМЕН ПРЕДМЕТОВ</h1>
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.383-1.835-.528-2.516zM16 11.459c-.145.681-.318 1.617-.528 2.516.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z" clipRule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+          <p className="text-gray-400 text-lg">Продавай • Обменивай • Получай статус</p>
         </div>
 
-        {/* Компактные информационные панели */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {/* Текущий баланс */}
-          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-green-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-green-300 font-medium text-sm mb-1">Баланс</h3>
-                <div className="text-xl font-bold text-green-400">
-                  <Monetary value={parseFloat(auth.user?.balance?.toString() || '0')} />
+        {/* Игровая панель управления */}
+        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
+          {/* Статистика игрока */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
+              <div className="flex items-center space-x-3">
+                <div className="text-green-400 text-2xl">💰</div>
+                <div>
+                  <div className="text-green-400 text-sm font-medium">БАЛАНС</div>
+                  <div className="text-white text-xl font-bold">
+                    <Monetary value={parseFloat(auth.user?.balance?.toString() || '0')} />
+                  </div>
                 </div>
               </div>
-              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 001.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
-                </svg>
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 border border-purple-500/50">
+              <div className="flex items-center space-x-3">
+                <div className="text-purple-400 text-2xl">⭐</div>
+                <div>
+                  <div className="text-purple-400 text-sm font-medium">СТАТУС</div>
+                  {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
+                    <div className="text-white text-xl font-bold">
+                      {formatDays(subscriptionData.data.subscription_days_left)}
+                    </div>
+                  ) : (
+                    <div className="text-gray-400 text-xl font-bold">НЕТ</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 border border-orange-500/50">
+              <div className="flex items-center space-x-3">
+                <div className="text-orange-400 text-2xl">🔄</div>
+                <div>
+                  <div className="text-orange-400 text-sm font-medium">КУРС</div>
+                  <div className="text-white text-xl font-bold">{pricePerDay}₽/день</div>
+                  <div className="text-gray-500 text-xs">Тариф {subscriptionData?.data?.subscription_tier || 1}</div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Статус подписки */}
-          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-purple-300 font-medium text-sm mb-1">Статус</h3>
-                {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
-                  <div className="text-xl font-bold text-purple-400">
-                    {formatDays(subscriptionData.data.subscription_days_left)}
-                  </div>
-                ) : (
-                  <div className="text-xl font-bold text-gray-400">Неактивен</div>
-                )}
-              </div>
-              <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.383-1.835-.528-2.516zM16 11.459c-.145.681-.318 1.617-.528 2.516.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z" clipRule="evenodd"/>
-                </svg>
+          {/* Переключатель режимов */}
+          <div className="flex justify-center mb-6">
+            <div className="bg-black/50 rounded-lg p-2 border border-gray-700">
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setSelectedTab('sell')}
+                  className={`px-6 py-3 rounded-md font-bold transition-all ${
+                    selectedTab === 'sell'
+                      ? 'bg-green-600 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                >
+                  💰 ПРОДАЖА
+                </button>
+                <button
+                  onClick={() => setSelectedTab('exchange')}
+                  className={`px-6 py-3 rounded-md font-bold transition-all ${
+                    selectedTab === 'exchange'
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                >
+                  ⭐ ОБМЕН
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Быстрая информация о курсе обмена */}
-          <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-amber-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-amber-300 font-medium text-sm mb-1">Курс обмена</h3>
-                <div className="text-xl font-bold text-amber-400">{pricePerDay}₽/день</div>
-                <div className="text-xs text-gray-400">Тариф {subscriptionData?.data?.subscription_tier || 1}</div>
-              </div>
-              <button
-                onClick={() => setShowExchangeInfo(!showExchangeInfo)}
-                className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center hover:bg-amber-500/30 transition-colors"
-                title="Подробная информация"
+          {/* Поиск и фильтры */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="🔍 Поиск предметов..."
+                className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <select
+                value={rarityFilter}
+                onChange={(e) => setRarityFilter(e.target.value)}
+                className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
               >
-                <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
-                </svg>
-              </button>
+                {rarities.map(rarity => (
+                  <option key={rarity} value={rarity} className="bg-[#1a1426] text-white">
+                    {rarity === 'all' ? 'Все редкости' : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+
+          {/* Кнопка информации */}
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setShowExchangeInfo(!showExchangeInfo)}
+              className="text-gray-400 hover:text-white transition-colors text-sm"
+            >
+              {showExchangeInfo ? '▼ Скрыть информацию' : '▶ Показать информацию о тарифах'}
+            </button>
           </div>
         </div>
 
@@ -497,66 +553,7 @@ const ExchangePage: React.FC = () => {
           </div>
         )}
 
-        {/* Переключатель вкладок */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-[#1a1426] rounded-xl p-1 border border-purple-800/30">
-            <button
-              onClick={() => setSelectedTab('sell')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                selectedTab === 'sell'
-                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              💰 Продажа за валюту
-            </button>
-            <button
-              onClick={() => setSelectedTab('exchange')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                selectedTab === 'exchange'
-                  ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              ⭐ Обмен на статус
-            </button>
-          </div>
-        </div>
 
-
-
-        {/* Фильтры */}
-        <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Поиск */}
-            <div>
-              <label className="block text-gray-300 font-medium mb-2">Поиск предметов</label>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Введите название предмета..."
-                className="w-full bg-[#0f0a1b] border border-purple-700/50 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none transition-colors"
-              />
-            </div>
-
-            {/* Фильтр по редкости */}
-            <div>
-              <label className="block text-gray-300 font-medium mb-2">Редкость</label>
-              <select
-                value={rarityFilter}
-                onChange={(e) => setRarityFilter(e.target.value)}
-                className="w-full bg-[#0f0a1b] border border-purple-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
-              >
-                {rarities.map(rarity => (
-                  <option key={rarity} value={rarity}>
-                    {rarity === 'all' ? 'Все редкости' : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
 
         {/* Инвентарь */}
         <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">

@@ -354,3 +354,26 @@ export interface TicTacToeMakeMoveResponse {
   game: TicTacToeGame;
   message?: string;
 }
+
+// Типы для слот игры
+export interface SlotItem {
+  id: string;
+  name: string;
+  image_url: string;
+  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic';
+  price: number;
+}
+
+export interface SlotResult {
+  items: SlotItem[];
+  isWin: boolean;
+  wonItem: SlotItem | null;
+  cost: number;
+  newBalance: number;
+}
+
+export interface PlaySlotResponse {
+  success: boolean;
+  result: SlotResult;
+  message?: string;
+}
