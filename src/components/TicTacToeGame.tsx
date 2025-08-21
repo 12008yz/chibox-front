@@ -12,11 +12,8 @@ interface TicTacToeGameProps {
 }
 
 const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
-  console.log('TicTacToeGame: Компонент рендерится с пропсами:', { isOpen, hasOnClose: !!onClose, hasOnRewardReceived: !!onRewardReceived });
 
-  if (isOpen) {
-    console.log('TicTacToeGame: ИГРА ДОЛЖНА БЫТЬ ОТКРЫТА!');
-  }
+ 
 
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
@@ -35,18 +32,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
   const game = currentGameData?.game;
   const canPlay = currentGameData?.canPlay ?? true;
-
-  console.log('TicTacToeGame: Данные игры:', {
-    currentGameData,
-    game,
-    canPlay,
-    hasGame: !!game,
-    gameState: game?.game_state,
-    board: game?.game_state?.board,
-    showResult,
-    gameResult,
-    finalBoard
-  });
 
   useEffect(() => {
     if (isOpen) {
@@ -70,11 +55,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   // Проверяем, завершена ли игра при обновлении данных
   useEffect(() => {
     if (game && game.game_state?.status === 'finished' && !showResult && !isProcessingResult) {
-      console.log('TicTacToeGame: Обнаружена завершенная игра при загрузке данных', {
-        result: game.result,
-        winner: game.game_state.winner,
-        board: game.game_state.board
-      });
 
       // Сохраняем финальную доску
       setFinalBoard(game.game_state.board);
@@ -88,9 +68,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
         // Если победа, вызываем callback
         if (game.result === 'win' && onRewardReceived) {
-          console.log('TicTacToeGame: Победа при загрузке! Вызываем onRewardReceived через 3 секунды...');
           setTimeout(() => {
-            console.log('TicTacToeGame: Вызываем onRewardReceived сейчас (из загрузки)!');
             onRewardReceived();
           }, 3000);
         }
@@ -99,23 +77,18 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   }, [game, showResult, isProcessingResult, onRewardReceived]);
 
   const handleStartNewGame = async () => {
-    console.log('TicTacToeGame: Начинаем создание новой игры...');
     setShowResult(false);
     setGameResult(null);
     setIsProcessingResult(false);
     setAnimatingCells([]);
     setFinalBoard(null);
     try {
-      console.log('TicTacToeGame: Вызываем createGame()...');
       const result = await createGame().unwrap();
-      console.log('TicTacToeGame: Результат создания игры:', result);
       if (result.success) {
-        console.log('TicTacToeGame: Игра успешно создана');
         setMessage('');
         refetchCurrentGame();
       }
     } catch (error: any) {
-      console.error('TicTacToeGame: Ошибка при создании игры:', error);
       setMessage(error?.data?.error || 'Ошибка при создании игры');
     }
   };
@@ -140,12 +113,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
         // Если игра завершена, показываем результат
         if (result.game?.game_state?.status === 'finished') {
-          console.log('TicTacToeGame: Игра завершена!', {
-            result: result.game.result,
-            gameState: result.game.game_state,
-            winner: result.game.game_state.winner,
-            board: result.game.game_state.board
-          });
 
           // Сохраняем финальную доску
           setFinalBoard(result.game.game_state.board);
@@ -184,7 +151,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     // Если показываем результат и есть сохраненная финальная доска
     if (showResult && finalBoard) {
       const cell = finalBoard[index];
-      console.log(`getCellContent (final): индекс ${index}, значение ячейки:`, cell, typeof cell);
       if (cell === 'X') return '✖️';
       if (cell === 'O') return '⭕';
       return '';
@@ -192,26 +158,21 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
     // Обычный режим игры
     if (!game) {
-      console.log('getCellContent: game не существует');
       return '';
     }
     if (!game.game_state) {
-      console.log('getCellContent: game.game_state не существует');
       return '';
     }
     if (!game.game_state.board) {
-      console.log('getCellContent: game.game_state.board не существует');
       return '';
     }
 
     const cell = game.game_state.board[index];
-    console.log(`getCellContent: индекс ${index}, значение ячейки:`, cell, typeof cell);
 
     if (cell === 'X') return '✖️';
     if (cell === 'O') return '⭕';
     if (cell === null) return '';
 
-    console.log(`getCellContent: неизвестное значение ячейки ${index}:`, cell);
     return '';
   };
 
@@ -262,10 +223,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   };
 
   if (!isOpen) {
-    console.log('TicTacToeGame: Не открыт, возвращаем null');
     return null;
   }
-  console.log('TicTacToeGame: Рендерим компонент игры');
 
   return (
     <div
@@ -273,7 +232,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
       style={{ zIndex: 9999 }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          console.log('TicTacToeGame: Клик по фону, закрываем игру');
           onClose();
         }
       }}

@@ -141,7 +141,10 @@ const LiveDrops: React.FC = () => {
             className="flex gap-6 overflow-x-auto pb-4 scroll-smooth live-drops-scroll px-6 live-drop-container"
             style={{
               scrollbarWidth: 'thin',
-              scrollbarColor: '#374151 transparent'
+              scrollbarColor: '#374151 transparent',
+              isolation: 'isolate',
+              zIndex: 100,
+              position: 'relative'
             }}
           >
             {allDrops.map((drop, index) => (

@@ -442,15 +442,27 @@
 
 /* Gaming Buttons */
 .gaming-button {
-  @apply px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300;
-  @apply border border-transparent;
-  @apply transform hover:scale-105 active:scale-95;
+  padding: 1rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+  transform: scale(1);
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   position: relative;
   overflow: hidden;
+}
+
+.gaming-button:hover {
+  transform: scale(1.05);
+}
+
+.gaming-button:active {
+  transform: scale(0.95);
 }
 
 .gaming-button::before {
@@ -1329,5 +1341,225 @@
   100% {
     opacity: 0;
     transform: translateX(100%) skewX(-15deg);
+  }
+}
+
+/* Fix для отображения изображений в LiveDrop */
+.live-drop-container img,
+.live-drop-item {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  background-color: transparent !important;
+  image-rendering: auto !important;
+  color-scheme: normal !important;
+  forced-color-adjust: none !important;
+}
+
+/* Дополнительные фиксы для изображений */
+.live-drop-container img {
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+
+  /* Принудительно сбрасываем любые возможные изменения цвета */
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+  transform: none !important;
+
+  /* Предотвращаем любое наложение цветов */
+  background-blend-mode: normal !important;
+  isolation: auto !important;
+}
+
+/* Убеждаемся что Tailwind reset не влияет на наши изображения */
+.live-drop-container img,
+.live-drop-item img {
+  all: unset !important;
+  /* Восстанавливаем только нужные свойства */
+  display: block !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНЫЕ ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ ОРУЖИЯ */
+
+/* Принудительно отключаем темную тему для изображений */
+@media (prefers-color-scheme: dark) {
+  .live-drop-container img,
+  .live-drop-item {
+    filter: none !important;
+    -webkit-filter: none !important;
+    color-scheme: light !important;
+    forced-color-adjust: none !important;
+  }
+}
+
+/* Специфичные стили для изображений оружия */
+.live-drop-container img[src*=".png"],
+.live-drop-container img[src*=".jpg"],
+.live-drop-container img[src*=".jpeg"],
+.live-drop-container img[src*=".webp"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Убираем влияние родительских элементов */
+.live-drop-container {
+  color-scheme: light !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  isolation: auto !important;
+}
+
+/* Специальный контейнер для изображений */
+.live-drop-image-container {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  background-blend-mode: normal !important;
+  isolation: isolate !important;
+  color-scheme: light !important;
+  contain: layout style !important;
+}
+
+.live-drop-image-container * {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  color-scheme: light !important;
+}
+
+/* Дополнительные стили для борьбы с темной темой браузера */
+.live-drop-container,
+.live-drop-container *,
+.live-drop-image-container,
+.live-drop-image-container * {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* МАКСИМАЛЬНО АГРЕССИВНЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ */
+.live-drop-container img,
+.live-drop-image-container img,
+img.live-drop-item {
+  /* Отключаем абсолютно все фильтры */
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+
+  /* Отключаем все blend modes */
+  mix-blend-mode: normal !important;
+  background-blend-mode: normal !important;
+
+  /* Принудительная прозрачность и фон */
+  opacity: 1 !important;
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  /* Цветовая схема */
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+
+  /* Убираем любые трансформации */
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+
+  /* Изоляция и z-index */
+  isolation: auto !important;
+  z-index: auto !important;
+  contain: none !important;
+
+  /* Размеры и отображение */
+  display: block !important;
+  visibility: visible !important;
+  object-fit: contain !important;
+  object-position: center !important;
+
+  /* Отключаем любые анимации которые могут влиять */
+  animation: none !important;
+  transition: none !important;
+
+  /* Отключаем любые outline или box-shadow которые могут влиять */
+  outline: none !important;
+  box-shadow: none !important;
+
+  /* Убеждаемся что изображение не инвертируется */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  /* Дополнительные свойства для предотвращения инверсии */
+  image-rendering: auto !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  -ms-interpolation-mode: bicubic !important;
+}
+
+/* Дополнительные правила для псевдоэлементов */
+.live-drop-container img::before,
+.live-drop-container img::after,
+.live-drop-image-container img::before,
+.live-drop-image-container img::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Правила для различных состояний изображения */
+.live-drop-container img:hover,
+.live-drop-container img:focus,
+.live-drop-container img:active {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Медиа-запрос для принудительного отключения темной темы */
+@media (prefers-color-scheme: dark) {
+  .live-drop-container img,
+  .live-drop-image-container img {
+    filter: none !important;
+    -webkit-filter: none !important;
+    mix-blend-mode: normal !important;
+    color-scheme: light !important;
+    forced-color-adjust: none !important;
+  }
+}
+
+/* Правила для high contrast mode */
+@media (prefers-contrast: high) {
+  .live-drop-container img,
+  .live-drop-image-container img {
+    filter: none !important;
+    forced-color-adjust: none !important;
+  }
+}
+
+/* Правила для reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .live-drop-container img,
+  .live-drop-image-container img {
+    animation: none !important;
+    transition: none !important;
   }
 }

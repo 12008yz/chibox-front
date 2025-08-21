@@ -95,15 +95,26 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
 
         {/* Изображение предмета (центр) */}
         <div className="flex items-center justify-center mt-6 mb-3">
-          <div className="w-20 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/20">
+          <div
+            className="w-20 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/20 live-drop-image-container"
+            style={{
+              filter: 'none',
+              mixBlendMode: 'normal',
+              colorScheme: 'light',
+              isolation: 'isolate'
+            }}
+          >
             <img
               src={drop.item.image}
               alt={drop.item.name}
-              className="max-w-18 max-h-18 object-contain drop-shadow-md live-drop-item"
+              className="max-w-18 max-h-18 object-contain live-drop-item"
               style={{
-                filter: 'none',
-                backgroundColor: 'transparent',
-                imageRendering: 'crisp-edges'
+                filter: 'none !important',
+                backgroundColor: 'transparent !important',
+                imageRendering: 'auto',
+                mixBlendMode: 'normal',
+                opacity: 1,
+                colorScheme: 'normal'
               }}
               onError={(e) => {
                 // Если изображение не загружается, заменяем на иконку
@@ -112,7 +123,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
                 const parent = target.parentElement;
                 if (parent && !parent.querySelector('.fallback-icon')) {
                   const fallbackIcon = document.createElement('div');
-                  fallbackIcon.className = 'fallback-icon text-gray-400 text-2xl';
+                  fallbackIcon.className = 'fallback-icon text-gray-400 text-2xl flex items-center justify-center';
                   fallbackIcon.innerHTML = '📦';
                   parent.appendChild(fallbackIcon);
                 }
@@ -121,6 +132,58 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
                 // Убеждаемся что изображение отображается корректно
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'block';
+
+                // Принудительно убираем любые фильтры и эффекты
+                target.style.setProperty('filter', 'none', 'important');
+                target.style.setProperty('-webkit-filter', 'none', 'important');
+                target.style.setProperty('mix-blend-mode', 'normal', 'important');
+                target.style.setProperty('opacity', '1', 'important');
+                target.style.setProperty('background-color', 'transparent', 'important');
+                target.style.setProperty('background', 'transparent', 'important');
+                target.style.setProperty('color-scheme', 'light', 'important');
+                target.style.setProperty('forced-color-adjust', 'none', 'important');
+                target.style.setProperty('image-rendering', 'auto', 'important');
+                target.style.setProperty('isolation', 'auto', 'important');
+
+                // Отладочная информация - можно убрать после исправления
+                const computedStyle = getComputedStyle(target);
+                const parentStyle = target.parentElement ? getComputedStyle(target.parentElement) : null;
+
+                console.log('LiveDrop image loaded:', {
+                  src: target.src,
+                  filter: computedStyle.filter,
+                  mixBlendMode: computedStyle.mixBlendMode,
+                  colorScheme: computedStyle.colorScheme,
+                  opacity: computedStyle.opacity,
+                  transform: computedStyle.transform,
+                  imageRendering: computedStyle.imageRendering,
+                  // Проверяем родительские стили
+                  parentFilter: parentStyle?.filter,
+                  parentMixBlendMode: parentStyle?.mixBlendMode,
+                  parentColorScheme: parentStyle?.colorScheme,
+                  // Проверяем HTML атрибуты
+                  htmlColorScheme: document.documentElement.style.colorScheme,
+                  bodyColorScheme: document.body.style.colorScheme,
+                  // Проверяем CSS переменные
+                  rootComputedStyle: getComputedStyle(document.documentElement).colorScheme
+                });
+
+                // Дополнительная проверка через небольшую задержку
+                setTimeout(() => {
+                  if (target && target.style) {
+                    target.style.setProperty('filter', 'none', 'important');
+                    target.style.setProperty('mix-blend-mode', 'normal', 'important');
+
+                    // Дополнительная отладка
+                    const computedStyle = getComputedStyle(target);
+                    if (computedStyle.filter !== 'none') {
+                      console.warn('Filter still applied after timeout:', computedStyle.filter);
+                    }
+                    if (computedStyle.mixBlendMode !== 'normal') {
+                      console.warn('Mix-blend-mode still applied:', computedStyle.mixBlendMode);
+                    }
+                  }
+                }, 100);
               }}
             />
           </div>
