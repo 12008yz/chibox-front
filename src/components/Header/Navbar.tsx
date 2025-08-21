@@ -5,6 +5,7 @@ import { BsCoin } from "react-icons/bs";
 import { SlPlane } from "react-icons/sl";
 import { GiUpgrade } from 'react-icons/gi';
 import { TbCat } from "react-icons/tb";
+import { FaDice } from "react-icons/fa";
 import { FaBars } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi';
 import RightContent from "./Navbar/RightContent";
@@ -37,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({
     },
     {
       to: "/slot",
-      icon: <TbCat className="text-xl" />,
+      icon: <FaDice className="text-xl" />,
       label: "Слот",
       color: "from-green-400 to-emerald-500"
     },

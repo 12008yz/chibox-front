@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { usePlaySlotMutation } from '../features/user/userApi';
 import { useAuth } from '../store/hooks';
 import toast from 'react-hot-toast';
@@ -25,12 +24,6 @@ const placeholderItems: SlotItem[] = [
   { id: '4', name: 'M4A4 | Howl', image_url: '/placeholder-m4a4.jpg', rarity: 'contraband', price: 5000.00 },
   { id: '5', name: 'Karambit | Fade', image_url: '/placeholder-karambit.jpg', rarity: 'covert', price: 1200.00 },
 ];
-
-interface SlotGameProps {
-  isOpen: boolean;
-  onClose: () => void;
-  className?: string;
-}
 
 interface ReelProps {
   items: SlotItem[];
@@ -112,7 +105,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
   );
 };
 
-const SlotGame: React.FC<SlotGameProps> = ({ isOpen, onClose, className = '' }) => {
+const SlotPage: React.FC = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<SlotItem[]>([]);
   const [showResult, setShowResult] = useState(false);
@@ -121,7 +114,7 @@ const SlotGame: React.FC<SlotGameProps> = ({ isOpen, onClose, className = '' }) 
 
   const [playSlot, { isLoading }] = usePlaySlotMutation();
 
-  const canPlay = !isSpinning && !isLoading && auth.user && auth.user.balance >= 10;
+  const canPlay = !isSpinning && !isLoading && auth.user && Number(auth.user.balance || 0) >= 10;
 
   const handleSpin = async () => {
     if (!canPlay) return;
@@ -169,95 +162,134 @@ const SlotGame: React.FC<SlotGameProps> = ({ isOpen, onClose, className = '' }) 
     });
   };
 
-  const handleClose = () => {
-    if (!isSpinning) {
-      onClose();
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className={`bg-gray-900 rounded-xl p-8 max-w-md w-full mx-4 ${className}`}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-white">🎰 Слот CS2</h2>
-          <button
-            onClick={handleClose}
-            disabled={isSpinning}
-            className="text-gray-400 hover:text-white disabled:opacity-50"
-          >
-            ✕
-          </button>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 py-8">
+      <div className="container mx-auto px-4">
+        {/* Заголовок страницы */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+            🎰 <span>Слот CS2</span> 🎰
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Собери три одинаковых предмета для выигрыша!
+          </p>
         </div>
 
-        {/* Игровое поле */}
-        <div className="flex justify-center gap-4 mb-6">
-          {[0, 1, 2].map((reelIndex) => (
-            <Reel
-              key={reelIndex}
-              items={placeholderItems}
-              isSpinning={isSpinning}
-              finalItem={result[reelIndex]}
-              delay={reelIndex * 300} // Задержка между барабанами
-              onSpinComplete={handleReelComplete}
-            />
-          ))}
-        </div>
+        {/* Основной игровой блок */}
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-gray-700/50">
+            {/* Игровое поле */}
+            <div className="flex justify-center gap-6 mb-8">
+              {[0, 1, 2].map((reelIndex) => (
+                <Reel
+                  key={reelIndex}
+                  items={placeholderItems}
+                  isSpinning={isSpinning}
+                  finalItem={result[reelIndex]}
+                  delay={reelIndex * 300} // Задержка между барабанами
+                  onSpinComplete={handleReelComplete}
+                />
+              ))}
+            </div>
 
-        {/* Результат */}
-        {showResult && result.length === 3 && (
-          <div className="mb-4 p-4 rounded-lg bg-gray-800">
-            <div className="text-center text-white">
-              {result[0]?.id === result[1]?.id && result[1]?.id === result[2]?.id ? (
-                <div className="text-green-400 font-bold">
-                  🎉 ВЫИГРЫШ! 🎉
-                  <div className="text-sm mt-1">Три одинаковых предмета!</div>
+            {/* Результат */}
+            {showResult && result.length === 3 && (
+              <div className="mb-6 p-6 rounded-xl bg-gray-700/50 border border-gray-600">
+                <div className="text-center text-white">
+                  {result[0]?.id === result[1]?.id && result[1]?.id === result[2]?.id ? (
+                    <div className="text-green-400 font-bold">
+                      <div className="text-2xl mb-2">🎉 ВЫИГРЫШ! 🎉</div>
+                      <div className="text-lg">Три одинаковых предмета!</div>
+                      <div className="text-sm mt-2 text-green-300">
+                        Вы получили: {result[0]?.name}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-red-400">
+                      <div className="text-xl mb-1">Не повезло в этот раз</div>
+                      <div className="text-sm text-gray-400">
+                        Попробуйте еще раз!
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-red-400">
-                  Не повезло в этот раз
+              </div>
+            )}
+
+            {/* Информация о игре */}
+            <div className="mb-8 text-center space-y-3">
+              <div className="text-lg text-gray-300">
+                Стоимость спина: <span className="text-yellow-400 font-bold text-xl">10 ₽</span>
+              </div>
+              <div className="text-lg text-gray-300">
+                Ваш баланс: <span className="text-green-400 font-bold text-xl">{Number(auth.user?.balance || 0).toFixed(2)} ₽</span>
+              </div>
+              <div className="text-sm text-gray-400 max-w-md mx-auto">
+                Соберите 3 одинаковых предмета на одной линии для выигрыша!
+                Чем реже предмет, тем больше выигрыш.
+              </div>
+            </div>
+
+            {/* Кнопка спина */}
+            <div className="text-center">
+              <button
+                onClick={handleSpin}
+                disabled={!canPlay}
+                className={`px-12 py-4 rounded-xl font-bold text-xl transition-all transform ${
+                  canPlay
+                    ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white shadow-lg hover:shadow-xl hover:scale-105'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {isLoading || isSpinning ? (
+                  <span className="flex items-center gap-2">
+                    🎰 <span>Крутится...</span>
+                  </span>
+                ) : (
+                  'СПИН (10 ₽)'
+                )}
+              </button>
+
+              {!canPlay && auth.user && Number(auth.user.balance || 0) < 10 && (
+                <div className="mt-4 text-center text-red-400">
+                  Недостаточно средств для игры
+                </div>
+              )}
+
+              {!auth.user && (
+                <div className="mt-4 text-center text-yellow-400">
+                  Войдите в аккаунт для игры
                 </div>
               )}
             </div>
           </div>
-        )}
 
-        {/* Информация */}
-        <div className="mb-6 text-center text-gray-300">
-          <div className="text-sm mb-2">
-            Стоимость спина: <span className="text-yellow-400 font-bold">10 ₽</span>
-          </div>
-          <div className="text-sm mb-2">
-            Ваш баланс: <span className="text-green-400 font-bold">{auth.user?.balance?.toFixed(2)} ₽</span>
-          </div>
-          <div className="text-xs text-gray-400">
-            Соберите 3 одинаковых предмета для выигрыша!
+          {/* Правила игры */}
+          <div className="mt-8 bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-gray-700/30">
+            <h3 className="text-xl font-bold text-white mb-4 text-center">📋 Правила игры</h3>
+            <div className="space-y-2 text-gray-300 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Соберите 3 одинаковых предмета для выигрыша</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Стоимость одного спина составляет 10 рублей</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Выигрыш зависит от редкости предмета</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-400">•</span>
+                <span>Выигранные предметы добавляются в ваш инвентарь</span>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Кнопка спина */}
-        <button
-          onClick={handleSpin}
-          disabled={!canPlay}
-          className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition-all ${
-            canPlay
-              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white'
-              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {isLoading || isSpinning ? '🎰 Крутится...' : 'СПИН (10 ₽)'}
-        </button>
-
-        {!canPlay && auth.user && auth.user.balance < 10 && (
-          <div className="mt-3 text-center text-red-400 text-sm">
-            Недостаточно средств для игры
-          </div>
-        )}
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 
-export default SlotGame;
+export default SlotPage;

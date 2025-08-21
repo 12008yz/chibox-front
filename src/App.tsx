@@ -17,6 +17,7 @@ import ProfilePage from './pages/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ExchangePage from './pages/ExchangePage';
+import SlotPage from './pages/SlotPage';
 import { useSocket } from './hooks/useSocket';
 
 const App: React.FC = () => {
@@ -255,12 +256,7 @@ const App: React.FC = () => {
             <Route
               path="/slot"
               element={
-                <div className="min-h-screen text-white p-8">
-                  <div className="container mx-auto">
-                    <h1 className="text-3xl font-bold">Slots</h1>
-                    <p>Coming soon...</p>
-                  </div>
-                </div>
+                auth.isAuthenticated ? <SlotPage /> : <Navigate to="/login" replace />
               }
             />
 
