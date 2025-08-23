@@ -323,6 +323,30 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
+    // Получение предметов для слота
+    getSlotItems: builder.query<
+      {
+        success: boolean;
+        data: {
+          items: Array<{
+            id: string;
+            name: string;
+            image_url: string;
+            price: number;
+            rarity: string;
+            weapon_type?: string;
+            skin_name?: string;
+          }>;
+          total_count: number;
+          rarity_distribution: Record<string, number>;
+        };
+      },
+      void
+    >({
+      query: () => 'v1/games/slot-items',
+      providesTags: ['SlotItems'],
+    }),
+
     // Сброс кулдауна бонуса
     resetBonusCooldown: builder.mutation<
       { message: string; user_id: string; previous_next_bonus_time?: string; current_next_bonus_time?: string },
@@ -619,6 +643,7 @@ export const {
   useGetBonusStatusQuery,
   usePlayRouletteMutation,
   usePlaySlotMutation,
+  useGetSlotItemsQuery,
   useResetBonusCooldownMutation,
 
   useExchangeItemForSubscriptionMutation,
