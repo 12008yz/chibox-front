@@ -75,7 +75,8 @@ export const baseApi = createApi({
     'Balance',
     'Profile',
     'Subscription',
-    'TicTacToe'
+    'TicTacToe',
+    'SlotItems'
   ],
   endpoints: () => ({}),
   // extractRehydrationInfo(action, { reducerPath }) {
