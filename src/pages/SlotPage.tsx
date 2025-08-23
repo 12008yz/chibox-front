@@ -21,14 +21,64 @@ const convertToSlotItem = (item: any): SlotItem => {
   };
 };
 
-// Создаем SVG заглушку для изображений в темном стиле
-const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-full" }) => (
-  <div className={`${className} bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-gray-700`}>
-    <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  </div>
-);
+// Создаем улучшенную заглушку для изображений с информацией о предмете
+const PlaceholderImage: React.FC<{
+  className?: string;
+  item: SlotItem;
+}> = ({ className = "w-full h-full", item }) => {
+  // Получаем цвет на основе редкости
+  const rarityGradient = getRarityColor(item.rarity);
+  const rarityGlow = getRarityGlow(item.rarity);
+
+  // Определяем иконку в зависимости от типа предмета
+  const getItemIcon = (name: string) => {
+    const nameLower = name.toLowerCase();
+    if (nameLower.includes('ak-47') || nameLower.includes('m4a4') || nameLower.includes('m4a1')) return '🔫';
+    if (nameLower.includes('awp') || nameLower.includes('ssg')) return '🎯';
+    if (nameLower.includes('knife') || nameLower.includes('karambit') || nameLower.includes('bayonet')) return '🔪';
+    if (nameLower.includes('gloves') || nameLower.includes('перчатки')) return '🧤';
+    if (nameLower.includes('case') || nameLower.includes('кейс')) return '📦';
+    if (nameLower.includes('glock') || nameLower.includes('usp') || nameLower.includes('p250')) return '🔫';
+    return '🎮'; // дефолтная иконка
+  };
+
+  return (
+    <div className={`${className} bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex flex-col items-center justify-center border border-gray-700 relative overflow-hidden ${rarityGlow}`}>
+      {/* Фоновый градиент редкости */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${rarityGradient} opacity-20`}></div>
+
+      {/* Анимированный фон */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+
+      {/* Основной контент */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full p-2 text-center">
+        {/* Иконка предмета */}
+        <div className="text-4xl mb-2 opacity-80">
+          {getItemIcon(item.name)}
+        </div>
+
+        {/* Название предмета */}
+        <div className="text-xs text-cyan-100 font-semibold mb-1 px-1 leading-tight">
+          {item.name.length > 20 ? `${item.name.substring(0, 20)}...` : item.name}
+        </div>
+
+        {/* Цена */}
+        <div className="text-sm text-yellow-300 font-bold">
+          <Monetary value={Number(item.price)} />
+        </div>
+
+        {/* Индикатор загрузки изображения */}
+        <div className="text-xs text-gray-400 mt-1 opacity-60">
+          🖼️ Изображение
+        </div>
+      </div>
+
+      {/* Декоративные элементы */}
+      <div className="absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-30"></div>
+      <div className="absolute bottom-1 left-1 w-1 h-1 bg-yellow-400 rounded-full animate-pulse"></div>
+    </div>
+  );
+};
 
 // Функции для работы с редкостью в неоновых цветах
 const getRarityColor = (rarity: string) => {
@@ -84,10 +134,28 @@ interface ReelProps {
 const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpinComplete }) => {
   const [currentOffset, setCurrentOffset] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const reelRef = useRef<HTMLDivElement>(null);
 
   const handleImageError = (itemId: string) => {
     setImageErrors(prev => new Set(prev).add(itemId));
+    setImageLoading(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(itemId);
+      return newSet;
+    });
+  };
+
+  const handleImageLoad = (itemId: string) => {
+    setImageLoading(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(itemId);
+      return newSet;
+    });
+  };
+
+  const handleImageStart = (itemId: string) => {
+    setImageLoading(prev => new Set(prev).add(itemId));
   };
 
   useEffect(() => {
@@ -131,21 +199,32 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               {/* Фоновый градиент редкости */}
               <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20`}></div>
 
-              {/* Изображение предмета во весь div */}
+              {/* Изображение предмета или улучшенная заглушка */}
               {!imageErrors.has(item.id) && item.image_url ? (
-                <img
-                  src={item.image_url}
-                  alt={item.name}
-                  className="absolute inset-0 w-full h-full object-contain z-10 p-2"
-                  onError={() => handleImageError(item.id)}
-                  style={{
-                    backgroundColor: 'transparent',
-                    filter: 'drop-shadow(0 0 12px rgba(0, 255, 255, 0.4))'
-                  }}
-                />
+                <div className="relative w-full h-full">
+                  {/* Загрузочный индикатор */}
+                  {imageLoading.has(item.id) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-5">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                    </div>
+                  )}
+
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-contain z-10 p-2"
+                    onLoad={() => handleImageLoad(item.id)}
+                    onLoadStart={() => handleImageStart(item.id)}
+                    onError={() => handleImageError(item.id)}
+                    style={{
+                      backgroundColor: 'transparent',
+                      filter: 'drop-shadow(0 0 12px rgba(0, 255, 255, 0.4))'
+                    }}
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <PlaceholderImage className="w-full h-full" />
+                  <PlaceholderImage className="w-full h-full" item={item} />
                 </div>
               )}
 
