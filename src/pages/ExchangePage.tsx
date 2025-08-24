@@ -11,6 +11,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import { formatDays } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -70,9 +71,9 @@ const ItemCard: React.FC<{
         {/* Изображение предмета */}
         <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
-          {!imageError && item.image_url ? (
+          {!imageError ? (
             <img
-              src={item.image_url}
+              src={getItemImageUrl(item.image_url, item.name)}
               alt={item.name}
               className="absolute inset-0 w-full h-full object-contain mix-blend-normal z-10"
               onError={() => setImageError(true)}

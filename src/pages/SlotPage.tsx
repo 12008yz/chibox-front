@@ -4,6 +4,7 @@ import { useAuth } from '../store/hooks';
 import toast from 'react-hot-toast';
 import Monetary from '../components/Monetary';
 import type { SlotItem } from '../types/api';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 // Функция для безопасного преобразования типов API в SlotItem
 const convertToSlotItem = (item: any): SlotItem => {
@@ -111,9 +112,9 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               className={`h-40 w-full border-b border-gray-200 ${getRarityColor(item.rarity)} flex items-center justify-center relative`}
             >
               {/* Изображение или заглушка */}
-              {!imageErrors.has(item.id) && item.image_url ? (
+              {!imageErrors.has(item.id) ? (
                 <img
-                  src={item.image_url}
+                  src={getItemImageUrl(item.image_url, item.name)}
                   alt={item.name}
                   className="w-full h-full object-contain p-3"
                   onError={() => {

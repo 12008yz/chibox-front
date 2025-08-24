@@ -1,5 +1,6 @@
 import React from 'react';
 import type { UserInventoryItem, CaseTemplate } from '../types/api';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 interface CaseWithDropProps {
   droppedItem: UserInventoryItem;
@@ -36,6 +37,9 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
   const caseName = caseTemplate?.name || `Кейс #${droppedItem.case_template_id?.slice(0, 8)}`;
   const caseImageUrl = caseTemplate?.image_url;
 
+  // Получаем корректный URL изображения предмета
+  const itemImageUrl = getItemImageUrl(droppedItem.item.image_url, droppedItem.item.name);
+
   return (
     <div className="group relative bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-500 cursor-pointer overflow-hidden">
       {/* Case Container */}
@@ -63,19 +67,17 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
 
         {/* Dropped Item Image (appears on hover) */}
         <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(droppedItem.item.rarity)} rounded-lg p-1 transition-all duration-500 opacity-0 translate-y-20 group-hover:opacity-100 group-hover:translate-y-0`}>
-          {droppedItem.item.image_url ? (
-            <img
-              src={droppedItem.item.image_url}
-              alt={droppedItem.item.name}
-              className="w-full h-full object-contain rounded"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                if (nextElement) nextElement.style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: droppedItem.item.image_url ? 'none' : 'flex' }}>
+          <img
+            src={itemImageUrl}
+            alt={droppedItem.item.name}
+            className="w-full h-full object-contain rounded"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+              if (nextElement) nextElement.style.display = 'flex';
+            }}
+          />
+          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: 'none' }}>
             <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
             </svg>

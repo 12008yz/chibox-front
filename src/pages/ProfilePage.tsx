@@ -15,6 +15,7 @@ import { validateUsername, suggestAlternativeUsername } from '../utils/profanity
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
 import PurchaseModal from '../components/PurchaseModal';
 import type { UserInventoryItem, UserCaseItem } from '../types/api';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 const ProfilePage: React.FC = () => {
   const auth = useAuth();
@@ -1103,19 +1104,17 @@ const ProfilePage: React.FC = () => {
               <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
                 <div className="flex items-center gap-6">
                   <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg`}>
-                    {bestWeapon.item.image_url ? (
-                      <img
-                        src={bestWeapon.item.image_url}
-                        alt={bestWeapon.item.name}
-                        className="w-full h-full object-contain rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (nextElement) nextElement.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: bestWeapon.item.image_url ? 'none' : 'flex' }}>
+                    <img
+                      src={getItemImageUrl(bestWeapon.item.image_url, bestWeapon.item.name)}
+                      alt={bestWeapon.item.name}
+                      className="w-full h-full object-contain rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (nextElement) nextElement.style.display = 'flex';
+                      }}
+                    />
+                    <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
                       <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                       </svg>
@@ -1361,19 +1360,17 @@ const ProfilePage: React.FC = () => {
                       // Рендеринг предмета
                       <>
                         <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
-                          {inventoryItem.item.image_url ? (
-                            <img
-                              src={inventoryItem.item.image_url}
-                              alt={inventoryItem.item.name}
-                              className="w-full h-full object-contain rounded"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (nextElement) nextElement.style.display = 'flex';
-                              }}
-                            />
-                          ) : null}
-                          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                          <img
+                            src={getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
+                            alt={inventoryItem.item.name}
+                            className="w-full h-full object-contain rounded"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
+                          />
+                          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: 'none' }}>
                             <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                             </svg>
