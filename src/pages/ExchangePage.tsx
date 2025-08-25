@@ -69,18 +69,14 @@ const ItemCard: React.FC<{
     <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
+        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
               src={getItemImageUrl(item.image_url, item.name)}
               alt={item.name}
-              className="absolute inset-0 w-full h-full object-contain mix-blend-normal z-10"
+              className="absolute inset-0 w-full h-full object-contain z-10 item-image"
               onError={() => setImageError(true)}
-              style={{
-                backgroundColor: 'transparent',
-                filter: 'none'
-              }}
             />
           ) : (
             <PlaceholderImage className="w-full h-full" />

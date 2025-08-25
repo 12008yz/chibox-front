@@ -109,14 +109,14 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
           items.map((item) => (
             <div
               key={`${repeatIndex}-${item.id}`}
-              className={`h-40 w-full border-b border-gray-200 ${getRarityColor(item.rarity)} flex items-center justify-center relative`}
+              className={`h-40 w-full border-b border-gray-200 ${getRarityColor(item.rarity)} flex items-center justify-center relative item-image-container`}
             >
               {/* Изображение или заглушка */}
               {!imageErrors.has(item.id) ? (
                 <img
                   src={getItemImageUrl(item.image_url, item.name)}
                   alt={item.name}
-                  className="w-full h-full object-contain p-3"
+                  className="w-full h-full object-contain p-3 item-image"
                   onError={() => {
                     console.log(`Image error for item ${item.id}: ${item.image_url}`);
                     handleImageError(item.id);

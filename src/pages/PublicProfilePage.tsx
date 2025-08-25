@@ -534,13 +534,13 @@ const PublicProfilePage: React.FC = () => {
                       key={inventoryItem.id}
                       className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
                     >
-                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center item-image-container`}>
                         <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
                           {inventoryItem.item.image_url ? (
                             <img
                               src={inventoryItem.item.image_url}
                               alt={inventoryItem.item.name}
-                              className="w-full h-full object-contain rounded"
+                              className="w-full h-full object-contain rounded item-image"
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
                                 const nextElement = e.currentTarget.nextElementSibling as HTMLElement;

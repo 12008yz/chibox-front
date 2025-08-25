@@ -50,7 +50,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
             <img
               src={caseImageUrl}
               alt={caseName}
-              className="w-full h-full object-contain rounded"
+              className="w-full h-full object-contain rounded item-image"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
@@ -70,7 +70,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
           <img
             src={itemImageUrl}
             alt={droppedItem.item.name}
-            className="w-full h-full object-contain rounded"
+            className="w-full h-full object-contain rounded item-image"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
               const nextElement = e.currentTarget.nextElementSibling as HTMLElement;

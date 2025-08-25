@@ -1103,11 +1103,11 @@ const ProfilePage: React.FC = () => {
             ) : bestWeapon && isUserItem(bestWeapon) ? (
               <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
                 <div className="flex items-center gap-6">
-                  <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg`}>
+                  <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg item-image-container`}>
                     <img
                       src={getItemImageUrl(bestWeapon.item.image_url, bestWeapon.item.name)}
                       alt={bestWeapon.item.name}
-                      className="w-full h-full object-contain rounded-lg"
+                      className="w-full h-full object-contain rounded-lg item-image"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
@@ -1359,11 +1359,11 @@ const ProfilePage: React.FC = () => {
                     {isUserItem(inventoryItem) ? (
                       // Рендеринг предмета
                       <>
-                        <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center`}>
+                        <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center item-image-container`}>
                           <img
                             src={getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                             alt={inventoryItem.item.name}
-                            className="w-full h-full object-contain rounded"
+                            className="w-full h-full object-contain rounded item-image"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
@@ -1437,7 +1437,7 @@ const ProfilePage: React.FC = () => {
                                 <img
                                   src={caseImageUrl}
                                   alt={caseName}
-                                  className="w-full h-full object-contain rounded"
+                                  className="w-full h-full object-contain rounded item-image"
                                   onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                     const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
