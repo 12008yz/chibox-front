@@ -1,18 +1,5 @@
 @import "tailwindcss";
 
-/* Анимации для рулетки */
-@keyframes spin-roulette {
-  0% {
-    transform: translateX(-200px);
-  }
-  100% {
-    transform: translateX(-2000px);
-  }
-}
-
-.animate-spin-roulette {
-  animation: spin-roulette 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-}
 
 @theme {
   --color-blue-50: #eff6ff;
