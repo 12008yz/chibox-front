@@ -360,7 +360,7 @@ export interface SlotItem {
   id: string;
   name: string;
   image_url: string;
-  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic';
+  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic' | 'empty';
   price: number;
 }
 
