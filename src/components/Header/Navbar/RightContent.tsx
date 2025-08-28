@@ -85,7 +85,7 @@ const RightContent: React.FC<RightContentProps> = ({
   }
 
   return (
-    <div className="flex items-center space-x-4 relative">
+    <div className="flex items-center space-x-4 relative overflow-visible">
       {/* Бонус игра */}
       <div className="relative">
         <button

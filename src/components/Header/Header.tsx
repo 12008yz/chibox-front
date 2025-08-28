@@ -137,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Main Navigation */}
-        <div className="w-full px-4 pb-4">
+        <div className="w-full px-4 pb-4 overflow-visible">
           <Navbar
             openNotifications={openNotifications}
             setOpenNotifications={setOpenNotifications}
