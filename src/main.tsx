@@ -5,6 +5,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "react-hot-toast";
 import { store, persistor } from "./store/index";
 import "./index.css";
+import "./i18n";
 import App from "./App.tsx";
 
 const rootElement = document.getElementById("root");

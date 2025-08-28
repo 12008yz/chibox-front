@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 import CaseTimer from './CaseTimer';
 
@@ -14,6 +15,7 @@ interface CaseProps {
 }
 
 const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame }) => {
+  const { t } = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -76,7 +78,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             </span>
           ) : (
             parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
-              <span>ежедневно</span>
+              <span>{t('common.daily')}</span>
             ) : (
               <Monetary value={parseFloat(price)} />
             )
@@ -107,7 +109,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             }}
             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
           >
-            🎮 Играть
+            🎮 {t('common.play')}
           </button>
         ) : (
           nextCaseAvailableTime && (parseFloat(price) === 0 || isNaN(parseFloat(price))) && (
@@ -119,7 +121,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         {/* Отображение описания */}
         {(description || title.toLowerCase().includes('бонус')) && (
           <div className="text-xs text-gray-400 text-center mt-1">
-            {description || (title.toLowerCase().includes('бонус') ? 'Выдается за выигрыш в бонус игре' : '')}
+            {description || (title.toLowerCase().includes('бонус') ? t('games.bonus_game') : '')}
           </div>
         )}
       </div>

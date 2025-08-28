@@ -12,6 +12,7 @@ import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../
 import Notifications from './Notifications';
 import RouletteGame from '../../RouletteGame';
 import PurchaseModal from '../../PurchaseModal';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -165,6 +166,9 @@ const RightContent: React.FC<RightContentProps> = ({
           />
         )}
       </div>
+
+      {/* Переключатель языков */}
+      <LanguageSwitcher />
 
       {/* Профиль пользователя */}
       <div
