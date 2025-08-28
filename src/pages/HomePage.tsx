@@ -8,7 +8,9 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import AppFeatures from '../components/AppFeatures';
+import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
+import RouletteGame from '../components/RouletteGame';
 import { formatDays } from '../utils/declension';
 
 
@@ -37,6 +39,9 @@ const HomePage: React.FC = () => {
   // Состояние игры крестики-нолики
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
+
+  // Состояние рулетки
+  const [showRouletteGame, setShowRouletteGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {
@@ -67,6 +72,24 @@ const HomePage: React.FC = () => {
     console.log('HomePage: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
     setBonusCase(caseTemplate);
     setShowTicTacToeGame(true);
+  };
+
+  // Обработчики для StatusDashboard
+  const handlePlayTicTacToe = () => {
+    console.log('HomePage: Открываем крестики-нолики из StatusDashboard');
+    setShowTicTacToeGame(true);
+  };
+
+  const handlePlayRoulette = () => {
+    console.log('HomePage: Открываем рулетку из StatusDashboard');
+    setShowRouletteGame(true);
+  };
+
+  const handleRouletteClose = () => {
+    console.log('HomePage: Закрываем рулетку');
+    setShowRouletteGame(false);
+    // Обновляем данные пользователя
+    refetchUser();
   };
 
 
@@ -478,9 +501,12 @@ const HomePage: React.FC = () => {
 
             {/* Статусы подписки */}
             <div className="mb-12">
-              <AppFeatures
+              <StatusDashboard
                 name="Статусы ChiBox"
-                description="Выбери подходящий статус и получай эксклюзивные привилегии каждый день"
+                description="Управляй своими привилегиями и получай эксклюзивные бонусы каждый день"
+                user={userData}
+                onPlayTicTacToe={handlePlayTicTacToe}
+                onPlayRoulette={handlePlayRoulette}
               />
             </div>
           </div>
@@ -508,6 +534,12 @@ const HomePage: React.FC = () => {
         isOpen={showTicTacToeGame}
         onClose={handleTicTacToeGameClose}
         onRewardReceived={handleTicTacToeWin}
+      />
+
+      {/* Бонусная рулетка */}
+      <RouletteGame
+        isOpen={showRouletteGame}
+        onClose={handleRouletteClose}
       />
 
     </div>
