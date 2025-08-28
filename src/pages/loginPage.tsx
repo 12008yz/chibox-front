@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useLoginMutation } from '../features/auth/authApi';
 import { useAuthHandlers } from '../hooks/useAuthHandlers';
 import SteamLoginButton from '../components/SteamLoginButton';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,11 +27,11 @@ const LoginPage: React.FC = () => {
         handleLoginSuccess(result.data);
         navigate('/');
       } else {
-        setError('Ошибка входа. Проверьте данные.');
+        setError(t('auth.login_error'));
       }
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(err?.data?.message || 'Ошибка входа. Попробуйте снова.');
+      setError(err?.data?.message || t('auth.login_error_generic'));
     }
   };
 
@@ -167,10 +169,10 @@ const LoginPage: React.FC = () => {
                   </div>
 
                   <h1 className="text-3xl font-bold text-white mb-3 gaming-font">
-                    Добро пожаловать
+                    {t('auth.welcome')}
                   </h1>
                   <p className="text-cyan-300/80 text-sm">
-                    Войдите в свою учетную запись ChiBox
+                    {t('auth.login_subtitle')}
                   </p>
                 </div>
 
@@ -178,7 +180,7 @@ const LoginPage: React.FC = () => {
                 <div className="mb-6 p-4 bg-blue-900/20 border border-blue-400/30 rounded-xl backdrop-blur-sm">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
-                    <span className="text-yellow-400 text-xs font-bold uppercase tracking-wide">Режим разработки</span>
+                    <span className="text-yellow-400 text-xs font-bold uppercase tracking-wide">{t('auth.development_mode')}</span>
                   </div>
 
                   <div className="text-xs text-blue-300 mb-3 space-y-1 font-mono">
@@ -191,7 +193,7 @@ const LoginPage: React.FC = () => {
                     onClick={fillTestCredentials}
                     className="w-full text-xs bg-blue-600/50 hover:bg-blue-600/70 border border-blue-400/50 text-blue-200 py-2 px-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-blue-400/25"
                   >
-                    Автозаполнение
+                    {t('auth.autofill')}
                   </button>
                 </div>
 
@@ -200,7 +202,7 @@ const LoginPage: React.FC = () => {
                   {/* Email Field */}
                   <div className="space-y-2">
                     <label className="block text-cyan-300 text-sm font-medium">
-                      Email адрес
+                      {t('auth.email_address')}
                     </label>
                     <div className="relative">
                       <input
@@ -209,7 +211,7 @@ const LoginPage: React.FC = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="your@email.com"
+                        placeholder={t('auth.email_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -220,7 +222,7 @@ const LoginPage: React.FC = () => {
                   {/* Password Field */}
                   <div className="space-y-2">
                     <label className="block text-cyan-300 text-sm font-medium">
-                      Пароль
+                      {t('auth.password')}
                     </label>
                     <div className="relative">
                       <input
@@ -229,7 +231,7 @@ const LoginPage: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="••••••••••"
+                        placeholder={t('auth.password_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -260,10 +262,10 @@ const LoginPage: React.FC = () => {
                       {isLoading ? (
                         <div className="flex items-center justify-center gap-3">
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Подключение...
+                          {t('auth.connecting')}
                         </div>
                       ) : (
-                        'Войти в аккаунт'
+                        t('auth.login_button')
                       )}
                     </div>
                   </button>
@@ -274,7 +276,7 @@ const LoginPage: React.FC = () => {
                       <div className="w-full border-t border-cyan-400/30" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-[#19172D] px-4 text-cyan-300/70 text-sm">или</span>
+                      <span className="bg-[#19172D] px-4 text-cyan-300/70 text-sm">{t('auth.or')}</span>
                     </div>
                   </div>
 
@@ -288,7 +290,7 @@ const LoginPage: React.FC = () => {
                     onClick={() => navigate('/register')}
                     className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-300 hover:underline"
                   >
-                    Нет аккаунта? Создать новый
+                    {t('auth.no_account_create')}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import { MdOutlineSell } from "react-icons/md";
 import { BsCoin } from "react-icons/bs";
 import { SlPlane } from "react-icons/sl";
@@ -25,6 +26,8 @@ const Navbar: React.FC<NavbarProps> = ({
   setOpenSidebar,
   user
 }) => {
+  const { t } = useTranslation();
+
   const toggleSidebar = () => {
     setOpenSidebar(!openSidebar);
   };
@@ -33,19 +36,19 @@ const Navbar: React.FC<NavbarProps> = ({
     {
       to: "/exchange",
       icon: <MdOutlineSell className="text-xl" />,
-      label: "Обмен предметов",
+      label: t('header.exchange_items'),
       color: "from-pink-500 to-violet-500"
     },
     {
       to: "/slot",
       icon: <FaDice className="text-xl" />,
-      label: "Слот",
+      label: t('header.slot'),
       color: "from-green-400 to-emerald-500"
     },
     {
       to: "/leaderboard",
       icon: <BsCoin className="text-xl" />,
-      label: "Таблица лидеров",
+      label: t('header.leaderboard_table'),
       color: "from-yellow-400 to-orange-500"
     }
   ];

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi';
 import { loginSuccess } from '../features/auth/authSlice';
 import SteamLoginButton from '../components/SteamLoginButton';
@@ -8,6 +9,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [email, setEmail] = useState('');
@@ -31,19 +33,19 @@ const RegisterPage: React.FC = () => {
     if (!usernameValidation.isValid) {
       const suggestions = suggestAlternativeUsername(username);
       const suggestionText = suggestions.length > 0
-        ? ` Попробуйте: ${suggestions.join(', ')}`
+        ? ` ${t('auth.try_suggestions')} ${suggestions.join(', ')}`
         : '';
       setError(`${usernameValidation.error}${suggestionText}`);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
+      setError(t('auth.passwords_not_match'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+      setError(t('auth.password_min_length'));
       return;
     }
 
@@ -72,11 +74,11 @@ const RegisterPage: React.FC = () => {
           }
         });
       } else {
-        setError('Ошибка регистрации. Попробуйте снова.');
+        setError(t('auth.registration_error'));
       }
     } catch (err: any) {
       console.error('Registration error:', err);
-      setError(err?.data?.message || 'Ошибка регистрации. Попробуйте снова.');
+      setError(err?.data?.message || t('auth.registration_error'));
     }
   };
 
@@ -228,10 +230,10 @@ const RegisterPage: React.FC = () => {
                   </div>
 
                   <h1 className="text-3xl font-bold text-white mb-3 gaming-font">
-                    Присоединиться
+                    {t('auth.join')}
                   </h1>
                   <p className="text-emerald-300/80 text-sm">
-                    Создайте новую учетную запись ChiBox
+                    {t('auth.register_subtitle')}
                   </p>
                 </div>
 
@@ -240,7 +242,7 @@ const RegisterPage: React.FC = () => {
                   {/* Username Field */}
                   <div className="space-y-2">
                     <label className="block text-emerald-300 text-sm font-medium">
-                      Имя пользователя
+                      {t('auth.username')}
                     </label>
                     <div className="relative">
                       <input
@@ -249,7 +251,7 @@ const RegisterPage: React.FC = () => {
                         onChange={(e) => setUsername(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="Ваше имя пользователя"
+                        placeholder={t('auth.username_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -260,7 +262,7 @@ const RegisterPage: React.FC = () => {
                   {/* Email Field */}
                   <div className="space-y-2">
                     <label className="block text-cyan-300 text-sm font-medium">
-                      Email адрес
+                      {t('auth.email_address')}
                     </label>
                     <div className="relative">
                       <input
@@ -269,7 +271,7 @@ const RegisterPage: React.FC = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="your@email.com"
+                        placeholder={t('auth.email_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -280,7 +282,7 @@ const RegisterPage: React.FC = () => {
                   {/* Password Field */}
                   <div className="space-y-2">
                     <label className="block text-cyan-300 text-sm font-medium">
-                      Пароль
+                      {t('auth.password')}
                     </label>
                     <div className="relative">
                       <input
@@ -289,19 +291,19 @@ const RegisterPage: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="••••••••••"
+                        placeholder={t('auth.password_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
                       </div>
                     </div>
-                    <div className="text-xs text-cyan-400/70">Минимум 6 символов</div>
+                    <div className="text-xs text-cyan-400/70">{t('auth.password_min_chars')}</div>
                   </div>
 
                   {/* Confirm Password Field */}
                   <div className="space-y-2">
                     <label className="block text-cyan-300 text-sm font-medium">
-                      Подтвердите пароль
+                      {t('auth.confirm_password')}
                     </label>
                     <div className="relative">
                       <input
@@ -310,7 +312,7 @@ const RegisterPage: React.FC = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 focus:bg-[#19172D]/70 transition-all duration-300 backdrop-blur-sm"
-                        placeholder="••••••••••"
+                        placeholder={t('auth.password_placeholder')}
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -334,17 +336,17 @@ const RegisterPage: React.FC = () => {
                   <div className="grid grid-cols-3 gap-3 my-6">
                     <div className="text-center p-3 bg-cyan-500/10 border border-cyan-400/30 rounded-xl backdrop-blur-sm hover:bg-cyan-500/20 transition-all duration-300">
                       <div className="text-cyan-400 text-xl mb-2">💰</div>
-                      <div className="text-xs text-cyan-300/80 font-medium">Бонусы</div>
+                      <div className="text-xs text-cyan-300/80 font-medium">{t('auth.bonuses')}</div>
                     </div>
                     <div className="text-center p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
                       <div className="text-blue-400 text-xl mb-2">🎁</div>
-                      <div className="text-xs text-blue-300/80 font-medium">Кейсы</div>
+                      <div className="text-xs text-blue-300/80 font-medium">{t('auth.cases')}</div>
                     </div>
                     <div className="text-center p-3 bg-lime-500/10 border border-lime-400/30 rounded-xl backdrop-blur-sm hover:bg-lime-500/20 transition-all duration-300 relative group">
                       <div className="text-lime-400 text-xl mb-2">⭐</div>
-                      <div className="text-xs text-lime-300/80 font-medium">Призы</div>
+                      <div className="text-xs text-lime-300/80 font-medium">{t('auth.prizes')}</div>
                       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-lime-300 text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap  shadow-lg">
-                        Ждут по кнопке ниже
+                        {t('auth.prizes_tooltip')}
                         <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 border-l border-t border-lime-400/30 rotate-45"></div>
                       </div>
                     </div>
@@ -361,10 +363,10 @@ const RegisterPage: React.FC = () => {
                       {isLoading ? (
                         <div className="flex items-center justify-center gap-3">
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          {isRegistering ? 'Создание аккаунта...' : 'Вход в систему...'}
+                          {isRegistering ? t('auth.creating_account') : t('auth.logging_in')}
                         </div>
                       ) : (
-                        'Создать аккаунт'
+                        t('auth.create_account')
                       )}
                     </div>
                   </button>
@@ -375,7 +377,7 @@ const RegisterPage: React.FC = () => {
                       <div className="w-full border-t border-cyan-400/30" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-[#19172D] px-4 text-cyan-300/70 text-sm">или</span>
+                      <span className="bg-[#19172D] px-4 text-cyan-300/70 text-sm">{t('auth.or')}</span>
                     </div>
                   </div>
 
@@ -389,7 +391,7 @@ const RegisterPage: React.FC = () => {
                     onClick={() => navigate('/login')}
                     className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors duration-300 hover:underline"
                   >
-                    Уже есть аккаунт? Войти
+                    {t('auth.have_account_login')}
                   </button>
                 </div>
               </div>

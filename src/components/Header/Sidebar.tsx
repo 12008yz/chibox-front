@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from "../../store/hooks";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
@@ -18,6 +19,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
@@ -39,37 +41,37 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
     };
     const links = [
         {
-            name: "Home",
+            name: t('header.home'),
             path: "/",
             icon: <FaHome className="text-2xl" />,
         },
         {
-            name: "Exchange",
+            name: t('header.exchange'),
             path: "/exchange",
             icon: <FaExchangeAlt className="text-2xl" />,
         },
         {
-            name: "Market",
+            name: t('header.market'),
             path: "/marketplace",
             icon: <MdOutlineSell className="text-2xl" />,
         },
         {
-            name: "Coin Flip",
+            name: t('header.coin_flip'),
             path: "/leaderboard",
             icon: <BsCoin className="text-2xl" />,
         },
         {
-            name: "Crash",
+            name: t('header.crash'),
             path: "/crash",
             icon: <SlPlane className="text-2xl" />,
         },
         {
-            name: "Upgrade",
+            name: t('header.upgrade'),
             path: "/upgrade",
             icon: <GiUpgrade className="text-2xl" />,
         },
         {
-            name: "Slots",
+            name: t('header.slots'),
             path: "/slot",
             icon: <TbCat className="text-2xl" />,
         }
@@ -112,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                         <div className="p-4 border-b border-gray-700">
                             <div className="flex items-center space-x-2 text-green-400 mb-3">
                                 <BiWallet className="text-lg" />
-                                <span className="text-sm">Баланс:</span>
+                                <span className="text-sm">{t('header.balance')}:</span>
                                 <Monetary value={user?.balance ?? 0} />
                             </div>
 
@@ -160,14 +162,14 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                                     onClick={closeSidebar}
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-center block"
                                 >
-                                    Профиль
+                                    {t('header.profile')}
                                 </Link>
                                 <button
                                     onClick={handleLogout}
                                     disabled={isLoggingOut}
                                     className={`w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    {isLoggingOut ? 'Выходим...' : 'Выйти'}
+                                    {isLoggingOut ? t('header.signing_out') : t('header.sign_out')}
                                 </button>
                             </div>
                         ) : (
@@ -177,14 +179,14 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                                     onClick={closeSidebar}
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors text-center block"
                                 >
-                                    Войти
+                                    {t('header.login')}
                                 </Link>
                                 <Link
                                     to="/register"
                                     onClick={closeSidebar}
                                     className="w-full bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white py-2 px-4 rounded-lg transition-colors text-center block"
                                 >
-                                    Регистрация
+                                    {t('header.register')}
                                 </Link>
                             </div>
                         )}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
 import { FaRegBell, FaBell, FaCoins, FaSignOutAlt, FaPlus } from "react-icons/fa";
 import { RiVipCrownFill } from "react-icons/ri";
@@ -25,6 +26,7 @@ const RightContent: React.FC<RightContentProps> = ({
   setOpenNotifications,
   user
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
@@ -72,13 +74,13 @@ const RightContent: React.FC<RightContentProps> = ({
           onClick={() => navigate('/login')}
           className="gaming-button gaming-button-secondary"
         >
-          Войти
+          {t('header.login')}
         </button>
         <button
           onClick={() => navigate('/register')}
           className="gaming-button gaming-button-primary"
         >
-          Регистрация
+          {t('header.register')}
         </button>
       </div>
     );
@@ -95,7 +97,7 @@ const RightContent: React.FC<RightContentProps> = ({
         >
           <div className="flex items-center space-x-2">
             <MdLocalFireDepartment className="text-lg gaming-icon-fire" />
-            <span className="font-bold text-sm">БОНУС</span>
+            <span className="font-bold text-sm">{t('header.bonus')}</span>
           </div>
           {bonusStatus && (bonusStatus.time_until_next_seconds || 0) > 0 && (
             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
@@ -121,7 +123,7 @@ const RightContent: React.FC<RightContentProps> = ({
             <div className="gaming-balance-value">
               <Monetary value={user?.balance ?? 0} />
             </div>
-            <div className="gaming-balance-label">Баланс</div>
+            <div className="gaming-balance-label">{t('header.balance')}</div>
           </div>
           <button
             onClick={() => {
@@ -129,7 +131,7 @@ const RightContent: React.FC<RightContentProps> = ({
               setIsPurchaseModalOpen(true);
             }}
             className="gaming-balance-add-button group"
-            title="Пополнить баланс"
+            title={t('header.top_up_balance')}
           >
             <FaPlus className="text-sm group-hover:scale-110 transition-transform duration-200" />
           </button>
@@ -200,7 +202,7 @@ const RightContent: React.FC<RightContentProps> = ({
         onClick={handleLogout}
         disabled={isLoggingOut}
         className="gaming-logout-button"
-        title="Выйти"
+        title={t('header.sign_out')}
       >
         <FaSignOutAlt className="text-lg" />
       </button>
