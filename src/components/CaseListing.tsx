@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Case from './Case';
 import Title from './Title';
 import CasePreviewModal from './CasePreviewModal';
@@ -27,7 +28,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
   onDataUpdate,
   onPlayBonusGame
 }) => {
-
+  const { t } = useTranslation();
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -88,7 +89,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       image={caseItem.image_url}
                       price={caseItem.price}
                       fixedPrices={fixedPrices}
-                      description="Выдается за выигрыш в бонус игре"
+                      description={t('homepage.win_bonus_game')}
                       nextCaseAvailableTime={nextCaseAvailableTime}
                       isBonusCase={true}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
@@ -108,7 +109,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       image={caseItem.image_url}
                       price={caseItem.price}
                       fixedPrices={fixedPrices}
-                      description={caseItem.name?.toLowerCase().includes('бонус') ? 'Выдается за выигрыш в бонус игре' : undefined}
+                      description={caseItem.name?.toLowerCase().includes('бонус') ? t('homepage.win_bonus_game') : undefined}
                       nextCaseAvailableTime={nextCaseAvailableTime}
                       isBonusCase={false}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
@@ -122,7 +123,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
           })
         ) : (
           <div className="text-gray-400 text-center py-8">
-            Кейсы не найдены
+            {t('homepage.cases_not_found')}
           </div>
         )}
       </div>

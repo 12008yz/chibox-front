@@ -1,54 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { Wheel } from 'react-custom-roulette';
 import { usePlayRouletteMutation } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 
-// Конфигурация 9 секций рулетки для библиотеки
-const wheelData = [
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 0
-  { option: '1 день', style: { backgroundColor: '#059669', textColor: '#FFFFFF' } },      // 1
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 2
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 3
-  { option: '2 дня', style: { backgroundColor: '#DC2626', textColor: '#FFFFFF' } },       // 4
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 5
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 6
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 7
-  { option: 'Пусто', style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } }        // 8
-];
+// Мы будем динамически создавать wheelData с переводами внутри компонента
 
-// Фразы для проигрыша
-const loseMessages = [
-  'Не в этот раз',
-  'Очень жаль',
-  'У вас будут ещё попытки',
-  'Увы ;(',
-  'Почти получилось!',
-  'Не расстраивайтесь',
-  'Попробуйте ещё раз, завтра',
-  'Удача отвернулась',
-  'В следующий раз повезёт',
-  'Не сегодня',
-  'Фортуна спит',
-  'Может в следующий раз?',
-  'Терпение и труд',
-  'Ничего страшного',
-  'Держите удар!'
-];
-
-// Фразы для выигрыша
-const winMessages = [
-  'Все мы рады этому',
-  'Поздравляем!',
-  'Невероятно!',
-  'Вы молодец!',
-  'Фантастика!',
-  'Отличная работа!',
-  'Удача на вашей стороне!',
-  'Великолепно!',
-  'Просто супер!',
-  'Вы везунчик!'
-];
+// Фразы теперь будут получаться из переводов
 
 // Функция для получения случайной фразы
 const getRandomMessage = (messages: string[]): string => {
@@ -62,6 +21,7 @@ interface RouletteGameProps {
 }
 
 const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className = '' }) => {
+  const { t } = useTranslation();
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
@@ -69,6 +29,23 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const [startingPosition, setStartingPosition] = useState(0);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
+
+  // Конфигурация 9 секций рулетки для библиотеки
+  const wheelData = [
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 0
+    { option: '1 ' + t('time.day'), style: { backgroundColor: '#059669', textColor: '#FFFFFF' } },      // 1
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 2
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 3
+    { option: '2 ' + t('time.days'), style: { backgroundColor: '#DC2626', textColor: '#FFFFFF' } },     // 4
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 5
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 6
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 7
+    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } }        // 8
+  ];
+
+  // Получаем локализованные сообщения
+  const loseMessages = t('roulette.lose_messages', { returnObjects: true }) as string[];
+  const winMessages = t('roulette.win_messages', { returnObjects: true }) as string[];
 
   // Проверяем, можно ли играть
   const canPlay = !mustSpin && !isLoading && !nextPlayTime && !isSpinning;
@@ -109,7 +86,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         localStorage.setItem('roulette_next_play_time', response.next_time);
       } else {
         setIsSpinning(false);
-        toast.error(response.message || 'Что-то пошло не так');
+        toast.error(response.message || t('roulette.something_went_wrong'));
         if (response.next_time) {
           setNextPlayTime(response.next_time);
           localStorage.setItem('roulette_next_play_time', response.next_time);
@@ -117,8 +94,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       }
     } catch (err: any) {
       setIsSpinning(false);
-      console.error('Ошибка при игре в рулетку:', err);
-      toast.error(err.data?.message || 'Произошла ошибка');
+      console.error(t('roulette.roulette_error'), err);
+      toast.error(err.data?.message || t('roulette.error_occurred'));
     }
   };
 
@@ -135,7 +112,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
     const wonSegment = wheelData[prizeNumber];
 
     // Показываем результат сразу
-    if (wonSegment.option === 'Пусто') {
+    if (wonSegment.option === t('roulette.empty')) {
       const randomLoseMessage = getRandomMessage(loseMessages);
       toast(randomLoseMessage, {
         icon: '😔',
@@ -210,7 +187,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <h3 className="text-xl font-bold text-white">
-            🎰 Колесо Фортуны
+            {t('roulette.wheel_of_fortune')}
           </h3>
           <button
             onClick={onClose}
@@ -225,8 +202,8 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         {/* Content */}
         <div className={`p-6 flex flex-col items-center space-y-4 ${className}`}>
           <div className="text-center">
-            <p className="text-gray-300 text-sm mb-1">Крути колесо и выигрывай дни подписки!</p>
-            <p className="text-xs text-gray-400">30 игр в день • Перезарядка каждые 48 минут</p>
+            <p className="text-gray-300 text-sm mb-1">{t('roulette.spin_and_win')}</p>
+            <p className="text-xs text-gray-400">{t('roulette.games_per_day')}</p>
           </div>
 
           {/* Колесо рулетки */}
@@ -263,7 +240,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
           <div className="text-center">
             {nextPlayTime ? (
               <div className="space-y-2">
-                <p className="text-gray-300">Следующая игра через:</p>
+                <p className="text-gray-300">{t('roulette.next_game_in')}</p>
                 <p className="text-xl font-bold text-yellow-400">
                   {formatTimeRemaining(nextPlayTime)}
                 </p>
@@ -278,7 +255,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
                     : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {isSpinning || mustSpin ? 'Крутится...' : isLoading ? 'Загрузка...' : 'Крутить колесо'}
+                {isSpinning || mustSpin ? t('roulette.spinning') : isLoading ? t('common.loading') : t('roulette.spin_wheel')}
               </button>
             )}
           </div>
@@ -289,26 +266,26 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
               <p className="text-red-200">
                 {'data' in error && error.data && typeof error.data === 'object' && 'message' in error.data
                   ? (error.data as any).message
-                  : 'Произошла ошибка'}
+                  : t('roulette.error_occurred')}
               </p>
             </div>
           )}
 
           {/* Легенда */}
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold text-white">Призы:</h3>
+            <h3 className="text-lg font-semibold text-white">{t('roulette.prizes')}</h3>
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#059669' }}></div>
-                <span className="text-gray-300 font-semibold">1 день подписки</span>
+                <span className="text-gray-300 font-semibold">{t('roulette.subscription_1_day')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#DC2626' }}></div>
-                <span className="text-gray-300 font-semibold">2 дня подписки</span>
+                <span className="text-gray-300 font-semibold">{t('roulette.subscription_2_days')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 bg-gray-600 rounded"></div>
-                <span className="text-gray-400">Пусто</span>
+                <span className="text-gray-400">{t('roulette.empty')}</span>
               </div>
             </div>
           </div>

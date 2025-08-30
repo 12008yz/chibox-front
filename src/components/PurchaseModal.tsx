@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { FaTimes, FaCoins, FaCrown, FaCheck, FaCreditCard, FaWallet } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import toast from 'react-hot-toast';
@@ -19,6 +20,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   onClose,
   initialTab = 'balance'
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [depositAmount, setDepositAmount] = useState('');
   const [selectedSubscription, setSelectedSubscription] = useState<number | null>(null);
@@ -38,12 +40,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
     const amount = parseFloat(depositAmount);
 
     if (!amount || amount <= 0) {
-      toast.error('Введите корректную сумму для пополнения');
+      toast.error(t('modals.enter_correct_amount'));
       return;
     }
 
     if (amount < 100) {
-      toast.error('Минимальная сумма пополнения: 100 рублей');
+      toast.error(t('modals.minimum_amount'));
       return;
     }
 
@@ -55,12 +57,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
       if (result.success && result.data?.payment_url) {
         window.open(result.data.payment_url, '_blank');
-        toast.success('Переходим к оплате...');
+        toast.success(t('modals.going_to_payment'));
         onClose();
       }
     } catch (error: any) {
       console.error('Ошибка при создании платежа:', error);
-      toast.error(error?.data?.message || 'Ошибка при создании платежа');
+      toast.error(error?.data?.message || t('modals.payment_error'));
     }
   };
 
@@ -74,15 +76,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       if (result.success) {
         if (result.data?.paymentUrl) {
           window.open(result.data.paymentUrl, '_blank');
-          toast.success('Переходим к оплате подписки...');
+          toast.success(t('modals.going_to_subscription_payment'));
         } else {
-          toast.success('Статус успешно приобретен!');
+          toast.success(t('modals.status_purchased'));
         }
         onClose();
       }
     } catch (error: any) {
       console.error('Ошибка при покупке подписки:', error);
-      toast.error(error?.data?.message || 'Ошибка при покупке подписки');
+      toast.error(error?.data?.message || t('modals.subscription_error'));
     }
   };
 
@@ -100,7 +102,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       <div className="relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Магазин</h2>
+          <h2 className="text-2xl font-bold text-white">{t('modals.shop')}</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-all duration-200"
@@ -120,7 +122,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             }`}
           >
             <FaCoins className="text-lg" />
-            <span>Пополнить баланс</span>
+            <span>{t('modals.top_up_balance')}</span>
           </button>
           <button
             onClick={() => setActiveTab('subscription')}
@@ -131,7 +133,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             }`}
           >
             <RiVipCrownFill className="text-lg" />
-            <span>Подписки</span>
+            <span>{t('modals.subscriptions')}</span>
           </button>
         </div>
 
@@ -140,7 +142,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
           {activeTab === 'balance' && (
             <div className="space-y-6">
               <div className="bg-black/20 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Пополнение баланса</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">{t('modals.balance_top_up')}</h3>
 
                 {/* Preset amounts */}
                 <div className="grid grid-cols-3 gap-3 mb-4">
@@ -163,14 +165,14 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Или введите свою сумму:
+                      {t('modals.or_enter_custom')}
                     </label>
                     <div className="relative">
                       <input
                         type="number"
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
-                        placeholder="Введите сумму"
+                        placeholder={t('modals.enter_amount')}
                         min="100"
                         className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none"
                       />
@@ -181,9 +183,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   </div>
 
                   <div className="text-xs text-gray-400">
-                    • Минимальная сумма пополнения: 100 ₽<br/>
-                    • Средства поступят на баланс после успешной оплаты<br/>
-                    • Поддерживаются банковские карты
+                    {t('modals.minimum_deposit_info')}<br/>
+                    {t('modals.deposit_info')}<br/>
+                    {t('modals.cards_supported')}
                   </div>
 
                   <button
@@ -193,7 +195,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   >
                     <FaCreditCard className="text-lg" />
                     <span>
-                      {isDepositLoading ? 'Создание платежа...' : `Пополнить на ${depositAmount || '0'} ₽`}
+                      {isDepositLoading ? t('modals.creating_payment') : t('modals.top_up_for', { amount: depositAmount || '0' })}
                     </span>
                   </button>
                 </div>
@@ -204,9 +206,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
           {activeTab === 'subscription' && (
             <div className="space-y-4">
               <div className="bg-black/20 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Выберите подписку</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">{t('modals.select_subscription')}</h3>
                 <p className="text-gray-400 text-sm mb-6">
-                  Статус дает бонус к шансу выпадения редких предметов и ежедневные бесплатные кейсы и многое другое
+                  {t('modals.subscription_description')}
                 </p>
 
                 <div className="space-y-3">
@@ -233,8 +235,8 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                             <div className="font-semibold text-white">{tier.name}</div>
                             <div className="text-sm text-gray-400">
                               {tier.name.includes('Статус++') || tier.name.includes('++') ?
-                                '+8% к дропу • 1 кейс в день • Без дубликатов' :
-                                `+${tier.bonus_percentage}% к дропу • ${tier.max_daily_cases} кейс в день`
+                                `+8% ${t('modals.drop_bonus')} • 1 ${t('modals.case_per_day')} • ${t('modals.no_duplicates')}` :
+                                `+${tier.bonus_percentage}% ${t('modals.drop_bonus')} • ${tier.max_daily_cases} ${t('modals.case_per_day')}`
                               }
                             </div>
                           </div>
@@ -243,7 +245,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                           <div className="font-bold text-white">
                             <Monetary value={tier.price} />
                           </div>
-                          <div className="text-xs text-gray-400">30 дней</div>
+                          <div className="text-xs text-gray-400">{t('modals.day_30')}</div>
                         </div>
                       </div>
                     </div>
@@ -257,7 +259,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 >
                   <FaCrown className="text-lg" />
                   <span>
-                    {isSubscriptionLoading ? 'Создание платежа...' : 'Купить подписку'}
+                    {isSubscriptionLoading ? t('modals.creating_payment') : t('modals.buy_subscription')}
                   </span>
                 </button>
               </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
@@ -19,6 +20,7 @@ import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 
 const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { onlineUsers } = useSocket();
@@ -110,8 +112,8 @@ const HomePage: React.FC = () => {
     {
       left: {
         image: 'https://static.vecteezy.com/system/resources/previews/033/170/491/non_2x/abstract-elegant-game-background-gradient-abstract-banner-template-for-landing-page-design-or-website-background-free-vector.jpg',
-        title: "CHIBOX",
-        description: "Делаем твой инвентарь лучше с каждым днём. Открывай кейсы и собирай редкие предметы!",
+        title: t('homepage.chibox_title'),
+        description: t('homepage.chibox_description'),
         link: "/cases",
       },
       right: (
@@ -123,8 +125,8 @@ const HomePage: React.FC = () => {
     {
       left: {
         image: 'https://img.freepik.com/premium-photo/christmas-gaming-background-new-year-neon-banner-neon-gaming-controller-banner-with-copy-space_1136325-4426.jpg?w=1480',
-        title: "ТВОЯ УДАЧА",
-        description: "Каждый открытый кейс — шанс на джекпот. Проверь свою фортуну сегодня!",
+        title: t('homepage.your_luck_title'),
+        description: t('homepage.your_luck_description'),
         link: "/cases",
       },
       right: (
@@ -136,8 +138,8 @@ const HomePage: React.FC = () => {
     {
       left: {
         image: 'https://img.freepik.com/free-vector/gaming-design-template_23-2149883126.jpg?ga=GA1.1.721176243.1754874666&semt=ais_hybrid&w=740&q=80',
-        title: "СООБЩЕСТВО",
-        description: "Присоединяйся к тысячам игроков. Соревнуйся в таблице лидеров и побеждай!",
+        title: t('homepage.community_title'),
+        description: t('homepage.community_description'),
         link: "/leaderboard",
       },
       right: (
@@ -274,7 +276,7 @@ const HomePage: React.FC = () => {
       console.error('Ошибка при покупке и открытии кейса:', error);
 
       // Показываем пользователю более понятное сообщение об ошибке
-      let errorMessage = 'Произошла ошибка при открытии кейса';
+      let errorMessage = t('homepage.buy_case_error');
       if (error?.data?.message) {
         errorMessage = error.data.message;
       } else if (error?.message) {
@@ -341,7 +343,7 @@ const HomePage: React.FC = () => {
             {casesLoading ? (
               <div className="flex items-center justify-center w-full mt-[164px]">
                 <div className="spinner" />
-                <p className="text-white ml-4">Загрузка кейсов...</p>
+                <p className="text-white ml-4">{t('homepage.loading_cases')}</p>
               </div>
             ) : casesData && (casesData.success || casesData.data) ? (
               <>
@@ -412,7 +414,7 @@ const HomePage: React.FC = () => {
                   // Определяем название и описание секции
                   const getSectionTitle = () => {
                     if (!hasActiveSubscription) {
-                      return "Бесплатные кейсы";
+                      return t('homepage.free_cases');
                     }
 
                     const tierNames: Record<number, string> = {
@@ -421,15 +423,15 @@ const HomePage: React.FC = () => {
                       3: "Статус++"
                     };
 
-                    return `${tierNames[userSubscriptionTier] || 'Статус'} кейсы`;
+                    return t('homepage.status_cases', { status: tierNames[userSubscriptionTier] || 'Статус' });
                   };
 
                   const getSectionDescription = () => {
                     if (!hasActiveSubscription) {
-                      return "Ежедневные бесплатные кейсы для всех игроков";
+                      return t('homepage.free_cases_description');
                     }
 
-                    return `Эксклюзивные кейсы для подписчиков. Осталось ${formatDays(subscriptionDaysLeft)} статуса`;
+                    return t('homepage.status_cases_description', { days: formatDays(subscriptionDaysLeft) });
                   };
 
                   return (
@@ -453,8 +455,8 @@ const HomePage: React.FC = () => {
                       {paidCases && paidCases.length > 0 && (
                         <div className="mb-12">
                           <CaseListing
-                            name="Премиум кейсы"
-                            description="Кейсы с эксклюзивными наградами"
+                            name={t('homepage.premium_cases')}
+                            description={t('homepage.premium_cases_description')}
                             cases={paidCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
                             fixedPrices={true}
@@ -467,15 +469,15 @@ const HomePage: React.FC = () => {
                       {/* Если нет кейсов, но данные есть */}
                       {(!subscriptionCases || subscriptionCases.length === 0) && (!paidCases || paidCases.length === 0) && (
                         <div className="text-center py-12">
-                          <p className="text-yellow-400">Кейсы не настроены</p>
+                          <p className="text-yellow-400">{t('homepage.cases_not_configured')}</p>
                           <p className="text-gray-400 text-sm mt-2">
-                            Данные получены, но список кейсов пуст
+                            {t('homepage.data_received_empty')}
                           </p>
                           <button
                             onClick={() => refetchCases()}
                             className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                           >
-                            Обновить кейсы
+                            {t('homepage.refresh_cases')}
                           </button>
                         </div>
                       )}
@@ -485,25 +487,25 @@ const HomePage: React.FC = () => {
               </>
             ) : casesError ? (
               <div className="text-center py-12">
-                <p className="text-red-400">Ошибка загрузки кейсов</p>
+                <p className="text-red-400">{t('homepage.cases_error')}</p>
                 <p className="text-gray-400 text-sm mt-2">
                   {typeof casesError === 'object' && 'status' in casesError
-                    ? `Код ошибки: ${casesError.status}`
-                    : 'Проверьте подключение к интернету'
+                    ? t('homepage.error_code', { code: casesError.status })
+                    : t('homepage.connection_error')
                   }
                 </p>
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-400">Кейсы временно недоступны</p>
+                <p className="text-gray-400">{t('homepage.cases_temporarily_unavailable')}</p>
               </div>
             )}
 
             {/* Статусы подписки */}
             <div className="mb-12">
               <StatusDashboard
-                name="Статусы ChiBox"
-                description="Управляй своими привилегиями и получай эксклюзивные бонусы каждый день"
+                name={t('homepage.chibox_statuses')}
+                description={t('homepage.chibox_statuses_description')}
                 user={userData}
                 onPlayTicTacToe={handlePlayTicTacToe}
                 onPlayRoulette={handlePlayRoulette}
