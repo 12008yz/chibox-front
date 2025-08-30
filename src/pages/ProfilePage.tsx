@@ -1567,7 +1567,7 @@ const ProfilePage: React.FC = () => {
                   type="text"
                   value={newUsername}
                   onChange={(e) => handleUsernameChange(e.target.value)}
-                  placeholder="Введите новый никнейм"
+                  placeholder={t('profile.settings.username_placeholder')}
                   className={`w-full px-3 py-2 bg-black/30 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors ${
                     usernameError
                       ? 'border-red-500 focus:border-red-400'
@@ -1581,7 +1581,7 @@ const ProfilePage: React.FC = () => {
                   </p>
                 ) : (
                   <p className="text-xs text-gray-400 mt-1">
-                    Ваше отображаемое имя на сайте (3-20 символов)
+                    {t('profile.settings.username_description')}
                   </p>
                 )}
               </div>
@@ -1595,12 +1595,12 @@ const ProfilePage: React.FC = () => {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Введите новый пароль"
+                  placeholder={t('profile.settings.new_password_placeholder')}
                   className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                   maxLength={128}
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Минимум 8 символов, заглавные и строчные буквы, цифры, спецсимволы
+                  {t('profile.settings.password_requirements')}
                 </p>
               </div>
 
@@ -1608,19 +1608,19 @@ const ProfilePage: React.FC = () => {
               {newPassword && (
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Подтвердите пароль
+                    {t('profile.settings.confirm_password')}
                   </label>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Повторите новый пароль"
+                    placeholder={t('profile.settings.confirm_password_placeholder')}
                     className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                     maxLength={128}
                   />
                   {newPassword !== confirmPassword && confirmPassword && (
                     <p className="text-xs text-red-400 mt-1">
-                      Пароли не совпадают
+                      {t('profile.settings.passwords_not_match')}
                     </p>
                   )}
                 </div>
@@ -1639,22 +1639,22 @@ const ProfilePage: React.FC = () => {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="text-xs text-green-400 font-medium">Установлен</span>
+                      <span className="text-xs text-green-400 font-medium">{t('profile.settings.trade_url_set')}</span>
                     </div>
                   )}
                   {!user?.steam_trade_url && (
                     <Tooltip
                       content={
                         <div className="space-y-2 text-sm max-w-xs">
-                          <div className="font-semibold text-white mb-2">Как найти Trade URL:</div>
+                          <div className="font-semibold text-white mb-2">{t('profile.settings.trade_url_tooltip.title')}</div>
                           <div className="space-y-1 text-xs">
-                            <div>1. Откройте Steam в браузере</div>
-                            <div>2. Перейдите в Инвентарь → Предложение обменов</div>
-                            <div>3. Нажмите "Кто может отправить мне запросы на обмен?"</div>
-                            <div>4. Скопируйте URL из поля "Trade URL"</div>
+                            <div>{t('profile.settings.trade_url_tooltip.step1')}</div>
+                            <div>{t('profile.settings.trade_url_tooltip.step2')}</div>
+                            <div>{t('profile.settings.trade_url_tooltip.step3')}</div>
+                            <div>{t('profile.settings.trade_url_tooltip.step4')}</div>
                           </div>
                           <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-600">
-                            Ссылка выглядит как: https://steamcommunity.com/tradeoffer/new/?partner=XXXXXXX&token=XXXXXXXX
+                            {t('profile.settings.trade_url_tooltip.example')}
                           </div>
                         </div>
                       }
@@ -1690,7 +1690,7 @@ const ProfilePage: React.FC = () => {
                         type="url"
                         value={tradeUrl}
                         onChange={(e) => setTradeUrl(e.target.value)}
-                        placeholder="https://steamcommunity.com/tradeoffer/new/?partner=..."
+                        placeholder={t('profile.settings.trade_url_placeholder')}
                         className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
                       />
 
@@ -1704,14 +1704,14 @@ const ProfilePage: React.FC = () => {
                           {isFetchingTradeUrl ? (
                             <>
                               <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                              Получение Trade URL...
+                              {t('profile.settings.fetching_trade_url')}
                             </>
                           ) : (
                             <>
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                               </svg>
-                              Получить Trade URL автоматически
+                              {t('profile.settings.fetch_trade_url_auto')}
                             </>
                           )}
                         </button>
@@ -1726,12 +1726,12 @@ const ProfilePage: React.FC = () => {
                       <svg className="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
                       </svg>
-                      Trade URL установлен и заблокирован для безопасности. Для изменения обратитесь в поддержку.
+                      {t('profile.settings.trade_url_locked')}
                     </span>
                   ) : user.steam_id ? (
-                    'Необходим для автоматической отправки предметов. Можно получить автоматически!'
+                    t('profile.settings.trade_url_required')
                   ) : (
-                    'Сначала подключите Steam аккаунт для автоматического получения Trade URL'
+                    t('profile.settings.connect_steam_first')
                   )}
                 </p>
               </div>
@@ -1739,7 +1739,7 @@ const ProfilePage: React.FC = () => {
               {/* Steam Profile */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Steam Профиль
+                  {t('profile.settings.steam_profile_label')}
                 </label>
                 <button
                   onClick={user.steam_id ? undefined : handleSteamLink}
@@ -1757,7 +1757,7 @@ const ProfilePage: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white">{user.steam_profile?.personaname}</p>
-                        <p className="text-xs text-gray-400">Steam подключен</p>
+                        <p className="text-xs text-gray-400">{t('profile.settings.steam_connected')}</p>
                       </div>
                     </>
                   ) : (
@@ -1768,8 +1768,8 @@ const ProfilePage: React.FC = () => {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-white">Подключить Steam</p>
-                        <p className="text-xs text-gray-400">Нажмите для привязки аккаунта</p>
+                        <p className="text-sm text-white">{t('profile.settings.connect_steam')}</p>
+                        <p className="text-xs text-gray-400">{t('profile.settings.click_to_connect')}</p>
                       </div>
                       <div className="text-blue-400">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1784,7 +1784,7 @@ const ProfilePage: React.FC = () => {
               {/* Email Verification */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email подтверждение
+                  {t('profile.settings.email_verification_label')}
                 </label>
                 <button
                   onClick={user.is_email_verified ? undefined : () => setIsEmailVerificationOpen(true)}
@@ -1801,7 +1801,7 @@ const ProfilePage: React.FC = () => {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-white">Email подтвержден</p>
+                        <p className="text-sm text-white">{t('profile.settings.email_verified')}</p>
                         <p className="text-xs text-gray-400">{user.email}</p>
                       </div>
                     </>
@@ -1813,8 +1813,8 @@ const ProfilePage: React.FC = () => {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-white">Подтвердить Email</p>
-                        <p className="text-xs text-gray-400">Нажмите для отправки кода</p>
+                        <p className="text-sm text-white">{t('profile.settings.verify_email_button')}</p>
+                        <p className="text-xs text-gray-400">{t('profile.settings.click_to_send_code')}</p>
                       </div>
                       <div className="text-orange-400">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1833,7 +1833,7 @@ const ProfilePage: React.FC = () => {
                 disabled={isUpdatingProfile}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
               >
-                {isUpdatingProfile ? 'Сохранение...' : 'Сохранить'}
+                {isUpdatingProfile ? t('profile.settings.saving') : t('common.save')}
               </button>
               <button
                 onClick={() => {
@@ -1843,7 +1843,7 @@ const ProfilePage: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 rounded-lg transition-colors"
               >
-                Отмена
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -1855,7 +1855,7 @@ const ProfilePage: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999999]" onClick={() => setIsEmailVerificationOpen(false)}>
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Подтверждение Email</h3>
+              <h3 className="text-xl font-bold text-white">{t('profile.settings.email_verification_modal.title')}</h3>
               <button
                 onClick={() => {
                   setIsEmailVerificationOpen(false);
@@ -1880,13 +1880,13 @@ const ProfilePage: React.FC = () => {
                     </svg>
                   </div>
                   <p className="text-gray-300 mb-2">
-                    Отправим код подтверждения на:
+                    {t('profile.settings.email_verification_modal.send_code_to')}
                   </p>
                   <p className="text-white font-semibold mb-4">
                     {user?.email}
                   </p>
                   <p className="text-sm text-gray-400">
-                    Код действителен в течение 15 минут
+                    {t('profile.settings.email_verification_modal.code_valid_time')}
                   </p>
                 </div>
 
@@ -1895,7 +1895,7 @@ const ProfilePage: React.FC = () => {
                   disabled={isResendingCode}
                   className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
                 >
-                  {isResendingCode ? 'Отправка кода...' : 'Отправить код'}
+                  {isResendingCode ? t('profile.settings.email_verification_modal.sending_code') : t('profile.settings.email_verification_modal.send_code')}
                 </button>
               </div>
             ) : (
@@ -1907,10 +1907,10 @@ const ProfilePage: React.FC = () => {
                     </svg>
                   </div>
                   <p className="text-white font-semibold mb-2">
-                    Код отправлен!
+                    {t('profile.settings.email_verification_modal.code_sent')}
                   </p>
                   <p className="text-gray-300 mb-4">
-                    Введите 6-значный код из письма
+                    {t('profile.settings.email_verification_modal.enter_code')}
                   </p>
                 </div>
 
@@ -1931,14 +1931,14 @@ const ProfilePage: React.FC = () => {
                     disabled={isVerifyingEmail || verificationCode.length !== 6}
                     className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200"
                   >
-                    {isVerifyingEmail ? 'Проверка...' : 'Подтвердить'}
+                    {isVerifyingEmail ? t('profile.settings.email_verification_modal.verifying') : t('profile.settings.email_verification_modal.verify')}
                   </button>
                   <button
                     onClick={handleSendVerificationCode}
                     disabled={isResendingCode}
                     className="px-4 py-3 bg-gray-600/30 hover:bg-gray-600/50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 rounded-lg transition-colors text-sm"
                   >
-                    {isResendingCode ? '...' : 'Повторить'}
+                    {isResendingCode ? t('profile.settings.email_verification_modal.resending') : t('profile.settings.email_verification_modal.resend')}
                   </button>
                 </div>
               </div>
