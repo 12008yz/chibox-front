@@ -137,26 +137,26 @@ const ProfilePage: React.FC = () => {
         console.log('Токен обновлен после привязки Steam');
       }
 
-      showNotification('Steam аккаунт успешно привязан!', 'success');
+      showNotification(t('profile.steam_linked_success'), 'success');
       // Очищаем URL от параметров
       window.history.replaceState({}, '', window.location.pathname);
     } else if (error) {
-      let errorMessage = 'Ошибка при привязке Steam аккаунта';
+      let errorMessage = t('profile.steam_link_error');
       switch (error) {
         case 'steam_link_failed':
-          errorMessage = 'Не удалось привязать Steam аккаунт. Попробуйте еще раз.';
+          errorMessage = t('profile.steam_link_try_again');
           break;
         case 'session_expired':
-          errorMessage = 'Сессия истекла. Попробуйте еще раз.';
+          errorMessage = t('profile.session_expired');
           break;
         case 'steam_already_linked':
-          errorMessage = 'Этот Steam аккаунт уже привязан к другому пользователю.';
+          errorMessage = t('profile.steam_already_linked');
           break;
         case 'not_linking_process':
-          errorMessage = 'Ошибка процесса привязки. Попробуйте еще раз.';
+          errorMessage = t('profile.linking_process_error');
           break;
         case 'link_failed':
-          errorMessage = 'Произошла ошибка при привязке аккаунта.';
+          errorMessage = t('profile.account_linking_error');
           break;
       }
       showNotification(errorMessage, 'error');
@@ -242,14 +242,14 @@ const ProfilePage: React.FC = () => {
     );
 
     if (!caseItem || !isUserCase(caseItem)) {
-      showNotification('Кейс не найден в инвентаре', 'error');
+      showNotification(t('profile.case_not_found'), 'error');
       return;
     }
 
     const caseTemplate = getCaseTemplateById(caseItem.case_template_id);
 
     if (!caseTemplate) {
-      showNotification('Шаблон кейса не найден', 'error');
+      showNotification(t('profile.case_template_not_found'), 'error');
       return;
     }
 
@@ -261,7 +261,7 @@ const ProfilePage: React.FC = () => {
 
       if (result.success && result.data?.item) {
         const item = result.data.item;
-        showNotification(`Поздравляем! Вы получили: ${item.name}`, 'success');
+        showNotification(t('profile.item_received', { itemName: item.name }), 'success');
 
         // Автоматически обновляем инвентарь через 2 секунды
         setTimeout(async () => {
@@ -273,12 +273,12 @@ const ProfilePage: React.FC = () => {
           }
         }, 2000);
       } else {
-        showNotification('Ошибка: Не удалось получить информацию о предмете', 'error');
+        showNotification(t('profile.item_info_error'), 'error');
       }
     } catch (error: any) {
       console.error('Ошибка при открытии кейса:', error);
-      const errorMessage = error?.data?.message || error?.message || 'Неизвестная ошибка';
-      showNotification(`Ошибка при открытии кейса: ${errorMessage}`, 'error');
+      const errorMessage = error?.data?.message || error?.message || t('common.error');
+      showNotification(t('profile.case_opening_error', { error: errorMessage }), 'error');
     } finally {
       setOpeningCaseId(null);
     }
@@ -769,27 +769,27 @@ const ProfilePage: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                              <span>Выполнение достижений</span>
+                              <span>{t('profile.level_bonus_tooltip.completing_achievements')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                              <span>Ежедневный вход в игру</span>
+                              <span>{t('profile.level_bonus_tooltip.daily_login')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                              <span>Покупки в магазине</span>
+                              <span>{t('profile.level_bonus_tooltip.shop_purchases')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                              <span>Участие в событиях</span>
+                              <span>{t('profile.level_bonus_tooltip.event_participation')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                              <span>Приглашение друзей</span>
+                              <span>{t('profile.level_bonus_tooltip.friend_invites')}</span>
                             </div>
                           </div>
                           <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-600">
-                            Повышение уровня увеличивает бонус к дропу: +0.02% за каждый уровень
+{t('profile.level_bonus_tooltip.level_drop_bonus')}
                           </div>
                         </div>
                       }
@@ -988,7 +988,7 @@ const ProfilePage: React.FC = () => {
                                 <div className="mb-2">
                                   <div className="flex items-center justify-between gap-2 mb-1">
                                     <h5 className="font-medium text-white text-sm leading-tight">
-                                      {achievement.name || 'Неизвестное достижение'}
+                                      {achievement.name || t('profile.unknown_achievement')}
                                     </h5>
                                   </div>
                                   <div className="flex items-center gap-1 text-xs text-blue-400">
@@ -1023,8 +1023,8 @@ const ProfilePage: React.FC = () => {
                                          achievement.requirement_type === 'daily_streak' ? ` ${getDaysDeclension(target)} подряд` :
                                          achievement.requirement_type === 'best_item_value' ? ' КР' :
                                          achievement.requirement_type === 'total_items_value' ? ' КР' :
-                                         achievement.requirement_type === 'rare_items_found' ? ' предметов' :
-                                         achievement.requirement_type === 'premium_items_found' ? ' предметов' : ''}
+                                         achievement.requirement_type === 'rare_items_found' ? t('profile.items_suffix') :
+                                         achievement.requirement_type === 'premium_items_found' ? t('profile.items_suffix') : ''}
                                       </span>
                                       <span>{progressPercentage}%</span>
                                     </div>
@@ -1047,9 +1047,9 @@ const ProfilePage: React.FC = () => {
                   <div className="p-6 text-center">
                     <p className="text-gray-400 text-sm mb-2">Достижения не загружены</p>
                     <p className="text-gray-500 text-xs">
-                      Загрузка: {achievementsLoading ? 'Да' : 'Нет'} |
-                      Достижений: {achievementsProgress.length} |
-                      Всего: {totalAchievements}
+                      {t('common.loading')}: {achievementsLoading ? t('profile.loading_yes') : t('profile.loading_no')} |
+                      {t('profile.achievements_count')}: {achievementsProgress.length} |
+                      {t('profile.total_count')}: {totalAchievements}
                     </p>
                   </div>
                 )}
@@ -1299,10 +1299,10 @@ const ProfilePage: React.FC = () => {
           {/* Tab Description */}
           <div className="mb-4 p-3 bg-black/20 rounded-lg border border-gray-700/30">
             <p className="text-sm text-gray-300">
-              {activeInventoryTab === 'active' && '🎮 Ваши текущие предметы и неоткрытые кейсы'}
-              {activeInventoryTab === 'opened' && '📦 Открытые кейсы - наведите на кейс, чтобы увидеть выпавший предмет'}
-              {activeInventoryTab === 'withdrawn' && '📤 Предметы на выводе: ожидающие отправки и уже отправленные в Steam'}
-              {activeInventoryTab === 'sold' && '💰 Предметы, проданные за валюту или обмененные на подписку'}
+              {activeInventoryTab === 'active' && t('profile.inventory_descriptions.active')}
+              {activeInventoryTab === 'opened' && t('profile.inventory_descriptions.opened')}
+              {activeInventoryTab === 'withdrawn' && t('profile.inventory_descriptions.withdrawn')}
+              {activeInventoryTab === 'sold' && t('profile.inventory_descriptions.sold')}
             </p>
           </div>
 
@@ -1310,7 +1310,7 @@ const ProfilePage: React.FC = () => {
           {(inventoryLoading && !user.inventory?.length) ? (
             <div className="text-center py-12">
               <div className="animate-spin w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-400">Загрузка инвентаря...</p>
+              <p className="text-gray-400">{t('profile.loading_inventory')}</p>
             </div>
           ) : filteredInventory.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
@@ -1351,9 +1351,9 @@ const ProfilePage: React.FC = () => {
                           'bg-orange-500'
                         }`}>
                           {activeInventoryTab === 'withdrawn' ?
-                            (inventoryItem.status === 'pending_withdrawal' ? 'Ожидает отправки' : 'Выведен') :
-                           activeInventoryTab === 'sold' ? 'Продан' :
-                           'Открыт'}
+                            (inventoryItem.status === 'pending_withdrawal' ? t('profile.status_pending_withdrawal') : t('profile.status_withdrawn')) :
+                           activeInventoryTab === 'sold' ? t('profile.status_sold') :
+                           t('profile.status_opened')}
                         </div>
                       </div>
                     )}
@@ -1400,7 +1400,7 @@ const ProfilePage: React.FC = () => {
                           <ItemWithdrawBanner
                             item={inventoryItem}
                             onWithdrawSuccess={() => {
-                              showNotification(`Предмет "${inventoryItem.item.name}" успешно отправлен на вывод!`, 'success');
+                              showNotification(t('profile.item_withdraw_success', { itemName: inventoryItem.item.name }), 'success');
                               // Обновляем данные пользователя и инвентарь
                               setTimeout(() => {
                                 refetchInventory();
@@ -1459,7 +1459,7 @@ const ProfilePage: React.FC = () => {
                             <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
                             <div className="flex items-center justify-between mt-2">
                               <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-                                КЕЙС
+{t('profile.case_label')}
                               </p>
                               {activeInventoryTab === 'active' && inventoryItem.status === 'inventory' && (
                                 <button
@@ -1476,7 +1476,7 @@ const ProfilePage: React.FC = () => {
                                     }
                                   }}
                                 >
-                                  {openingCaseId === inventoryItem.id ? 'Открываем...' : 'Открыть'}
+                                  {openingCaseId === inventoryItem.id ? t('profile.opening') : t('profile.open_button')}
                                 </button>
                               )}
                             </div>
@@ -1516,16 +1516,16 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <p className="text-gray-400 text-lg">
-                {activeInventoryTab === 'active' && 'Инвентарь пуст'}
-                {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
-                {activeInventoryTab === 'withdrawn' && 'Нет выведенных предметов'}
-                {activeInventoryTab === 'sold' && 'Нет обмененных предметов'}
+                {activeInventoryTab === 'active' && t('profile.inventory_empty')}
+                {activeInventoryTab === 'opened' && t('profile.no_opened_cases')}
+                {activeInventoryTab === 'withdrawn' && t('profile.no_withdrawn_items')}
+                {activeInventoryTab === 'sold' && t('profile.no_sold_items')}
               </p>
               <p className="text-gray-500 text-sm mt-2">
-                {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
-                {activeInventoryTab === 'opened' && 'Открытые кейсы будут отображаться здесь с возможностью увидеть выпавший предмет'}
-                {activeInventoryTab === 'withdrawn' && 'Предметы на выводе и выведенные в Steam будут отображаться здесь'}
-                {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
+                {activeInventoryTab === 'active' && t('profile.open_cases_hint')}
+                {activeInventoryTab === 'opened' && t('profile.opened_cases_hint')}
+                {activeInventoryTab === 'withdrawn' && t('profile.withdrawn_items_hint')}
+                {activeInventoryTab === 'sold' && t('profile.sold_items_hint')}
               </p>
             </div>
           )}
