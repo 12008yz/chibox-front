@@ -651,25 +651,17 @@ const ProfilePage: React.FC = () => {
   };
 
   const getRarityName = (rarity: string) => {
-    switch (rarity.toLowerCase()) {
-      case 'consumer': return 'Потребительское';
-      case 'industrial': return 'Промышленное';
-      case 'milspec': return 'Армейское';
-      case 'restricted': return 'Запрещённое';
-      case 'classified': return 'Засекреченное';
-      case 'covert': return 'Тайное';
-      case 'contraband': return 'Контрабанда';
-      default: return rarity;
-    }
+    const rarityKey = `profile.rarity.${rarity.toLowerCase()}`;
+    return t(rarityKey, { defaultValue: rarity });
   };
 
   const getSubscriptionName = (tier: string | number) => {
     const tierNumber = typeof tier === 'string' ? parseInt(tier) : tier;
     switch (tierNumber) {
-      case 1: return 'Статус';
-      case 2: return 'Статус+';
-      case 3: return 'Статус++';
-      default: return `Tier ${tier}`;
+      case 1: return t('profile.subscription_tier_1');
+      case 2: return t('profile.subscription_tier_2');
+      case 3: return t('profile.subscription_tier_3');
+      default: return t('profile.subscription_tier_default', { tier });
     }
   };
 
@@ -736,7 +728,7 @@ const ProfilePage: React.FC = () => {
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-red-500/20 text-red-400 border border-red-500/30'
                   }`}>
-                    {user.steam_id ? 'Steam подключен' : 'Steam не подключен'}
+                    {user.steam_id ? t('profile.steam_connected') : t('profile.steam_not_connected')}
                   </span>
                 </div>
               </div>
@@ -1004,7 +996,7 @@ const ProfilePage: React.FC = () => {
                                        achievement.name === 'Покупатель подписки' ? '2' :
                                        achievement.name === 'Удачливый' ? '2.5' :
                                        achievement.name === 'Миллионер' ? '6.25' :
-                                       achievement.name === 'Эксперт' ? '7.5' : '0.5')}% дроп</span>
+                                       achievement.name === 'Эксперт' ? '7.5' : '0.5')}{t('profile.drop_bonus_text')}</span>
                                   </div>
                                 </div>
 
@@ -1075,7 +1067,7 @@ const ProfilePage: React.FC = () => {
                       </span>
                     </>
                   ) : (
-                    <span className="text-gray-500 text-base">Нет</span>
+                    <span className="text-gray-500 text-base">{t('profile.no_subscription')}</span>
                   )}
                 </p>
               </div>
@@ -1180,35 +1172,35 @@ const ProfilePage: React.FC = () => {
               }}
               className="w-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-green-400/20 hover:border-green-400/50"
             >
-              Приобрести
+              {t('profile.purchase_button')}
             </button>
 
             {/* Drop Rate Bonuses */}
             <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
-              <h4 className="text-lg font-semibold mb-3">Бонусы к дропу</h4>
+              <h4 className="text-lg font-semibold mb-3">{t('profile.drop_bonuses')}</h4>
               <div className="space-y-2">
                 {(user.level_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Уровень:</span>
+                    <span className="text-gray-400 text-sm">{t('profile.level_bonus')}</span>
                     <span className="text-green-400 text-sm">+{parseFloat(Number(user.level_bonus_percentage).toFixed(2))}%</span>
                   </div>
                 )}
                 {(user.subscription_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Статус:</span>
+                    <span className="text-gray-400 text-sm">{t('profile.status_bonus')}</span>
                     <span className="text-blue-400 text-sm">+{parseFloat(Number(user.subscription_bonus_percentage).toFixed(1))}%</span>
                   </div>
                 )}
                 {(user.achievements_bonus_percentage ?? 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Достижения:</span>
+                    <span className="text-gray-400 text-sm">{t('profile.achievements_bonus')}</span>
                     <span className="text-purple-400 text-sm">+{parseFloat(Number(user.achievements_bonus_percentage).toFixed(1))}%</span>
                   </div>
                 )}
                 {(user.total_drop_bonus_percentage ?? 0) > 0 && (
                   <div className="border-t border-gray-600/30 pt-2 mt-3">
                     <div className="flex justify-between">
-                      <span className="text-white font-semibold text-sm">Общий бонус:</span>
+                      <span className="text-white font-semibold text-sm">{t('profile.total_bonus')}</span>
                       <span className="text-yellow-400 font-semibold text-sm">
                         +{parseFloat(Number(user.total_drop_bonus_percentage || 0).toFixed(2))}%
                       </span>
@@ -1229,7 +1221,7 @@ const ProfilePage: React.FC = () => {
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
             </div>
-            Инвентарь
+            {t('profile.inventory_title')}
           </h3>
 
           {/* Inventory Tabs */}
@@ -1387,10 +1379,10 @@ const ProfilePage: React.FC = () => {
                         </p>
                         {/* Acquisition info */}
                         <div className="mt-2 text-xs text-gray-400">
-                          <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                          <p className="capitalize">Источник: {
-                            inventoryItem.source === 'case' ? 'Кейс' :
-                            inventoryItem.source === 'purchase' ? 'Покупка' :
+                          <p>{t('profile.acquired_date')} {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                          <p className="capitalize">{t('profile.source')} {
+                            inventoryItem.source === 'case' ? t('profile.sources.case') :
+                            inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
                             inventoryItem.source
                           }</p>
                         </div>
@@ -1482,10 +1474,10 @@ const ProfilePage: React.FC = () => {
                             </div>
                             {/* Acquisition info */}
                             <div className="mt-2 text-xs text-gray-400">
-                              <p>Получен: {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                              <p className="capitalize">Источник: {
-                                inventoryItem.source === 'case' ? 'Кейс' :
-                                inventoryItem.source === 'purchase' ? 'Покупка' :
+                              <p>{t('profile.acquired_date')} {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
+                              <p className="capitalize">{t('profile.source')} {
+                                inventoryItem.source === 'case' ? t('profile.sources.case') :
+                                inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
                                 inventoryItem.source
                               }</p>
                             </div>
