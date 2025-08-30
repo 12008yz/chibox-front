@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery, useUpdateUserProfileMutation, useResendVerificationCodeMutation, useVerifyEmailMutation } from '../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../features/cases/casesApi';
@@ -18,6 +19,7 @@ import type { UserInventoryItem, UserCaseItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const auth = useAuth();
 
   // State для переключения между категориями инвентаря
@@ -502,8 +504,8 @@ const ProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold mb-2">Пользователь не найден</h1>
-              <p className="text-gray-400">Пожалуйста, войдите в систему</p>
+              <h1 className="text-2xl font-bold mb-2">{t('profile.user_not_found')}</h1>
+              <p className="text-gray-400">{t('profile.please_login')}</p>
             </div>
           </div>
         </div>
@@ -744,7 +746,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex-1 space-y-4">
               <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400 text-sm">Баланс</span>
+                  <span className="text-gray-400 text-sm">{t('common.balance')}</span>
                   <span className="text-2xl font-bold text-green-400">
                     {Number(user.balance).toFixed(2)} КР
                   </span>
@@ -755,7 +757,7 @@ const ProfilePage: React.FC = () => {
               <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-sm">Прогресс уровня</span>
+                    <span className="text-gray-400 text-sm">{t('profile.level_progress')}</span>
                     <Tooltip
                       content={
                         <div className="space-y-2">
@@ -826,7 +828,7 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Кейсов открыто</p>
+                <p className="text-gray-400 text-sm">{t('profile.cases_opened')}</p>
                 <p className="text-xl font-bold text-white">
                   {user.total_cases_opened || 0}
                 </p>
@@ -844,7 +846,7 @@ const ProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Предметов в инвентаре</p>
+                <p className="text-gray-400 text-sm">{t('profile.items_in_inventory')}</p>
                 <p className="text-xl font-bold text-white">{availableInventory.length}</p>
               </div>
             </div>
@@ -872,7 +874,7 @@ const ProfilePage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-400 text-sm">Достижения</p>
+                  <p className="text-gray-400 text-sm">{t('profile.achievements')}</p>
                   <p className="text-xl font-bold text-white">
                     {completedAchievementsCount}
                     <span className="text-gray-400 text-sm">/{totalAchievements}</span>
@@ -1092,13 +1094,13 @@ const ProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57-1.116-.334-.804-.614-1.768-.84-2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
                 </svg>
               </div>
-              Лучшее выбитое оружие
+{t('profile.best_weapon')}
             </h3>
 
             {(inventoryLoading && !user.inventory?.length) ? (
               <div className="text-center py-8">
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-400">Загрузка...</p>
+                <p className="text-gray-400">{t('common.loading')}</p>
               </div>
             ) : bestWeapon && isUserItem(bestWeapon) ? (
               <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
@@ -1153,16 +1155,16 @@ const ProfilePage: React.FC = () => {
                   </svg>
                 </div>
                 <p className="text-gray-400 text-lg">
-                  {activeInventoryTab === 'active' && 'Инвентарь пуст'}
-                  {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
-                  {activeInventoryTab === 'withdrawn' && 'Нет выведенных предметов'}
-                  {activeInventoryTab === 'sold' && 'Нет обмененных предметов'}
+                  {activeInventoryTab === 'active' && t('profile.inventory_empty')}
+                  {activeInventoryTab === 'opened' && t('profile.no_opened_cases')}
+                  {activeInventoryTab === 'withdrawn' && t('profile.no_withdrawn_items')}
+                  {activeInventoryTab === 'sold' && t('profile.no_sold_items')}
                 </p>
                 <p className="text-gray-500 text-sm mt-2">
-                  {activeInventoryTab === 'active' && 'Откройте кейсы, чтобы получить предметы'}
-                  {activeInventoryTab === 'opened' && 'Открытые кейсы будут отображаться здесь с возможностью увидеть выпавший предмет'}
-                  {activeInventoryTab === 'withdrawn' && 'Предметы на выводе и выведенные в Steam будут отображаться здесь'}
-                  {activeInventoryTab === 'sold' && 'Проданные и обмененные предметы будут отображаться здесь'}
+                  {activeInventoryTab === 'active' && t('profile.open_cases_hint')}
+                  {activeInventoryTab === 'opened' && t('profile.opened_cases_hint')}
+                  {activeInventoryTab === 'withdrawn' && t('profile.withdrawn_items_hint')}
+                  {activeInventoryTab === 'sold' && t('profile.sold_items_hint')}
                 </p>
               </div>
             )}
@@ -1244,7 +1246,7 @@ const ProfilePage: React.FC = () => {
                 <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
-              Активные
+{t('profile.inventory.active')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
             </button>
 
@@ -1259,7 +1261,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
               </svg>
-              Открытые кейсы
+{t('profile.inventory.opened_cases')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
             </button>
 
@@ -1274,7 +1276,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
-              Выведенные
+{t('profile.inventory.withdrawn')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getWithdrawnItems().length}</span>
             </button>
 
@@ -1289,7 +1291,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
               </svg>
-              Проданные
+{t('profile.inventory.sold')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getSoldItems().length}</span>
             </button>
           </div>
@@ -1540,7 +1542,7 @@ const ProfilePage: React.FC = () => {
         }}>
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white">Настройки профиля</h3>
+              <h3 className="text-xl font-bold text-white">{t('profile.settings.title')}</h3>
               <button
                 onClick={() => {
                   setIsSettingsOpen(false);
@@ -1559,7 +1561,7 @@ const ProfilePage: React.FC = () => {
               {/* Username */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Никнейм
+{t('profile.settings.username')}
                 </label>
                 <input
                   type="text"
@@ -1587,7 +1589,7 @@ const ProfilePage: React.FC = () => {
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Новый пароль
+                  {t('profile.settings.new_password')}
                 </label>
                 <input
                   type="password"
