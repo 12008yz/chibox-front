@@ -10,7 +10,7 @@ import Tooltip from '../components/Tooltip';
 import ScrollToTop from '../components/ScrollToTop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseWithDrop from '../components/CaseWithDrop';
-import { formatDays, getDaysDeclension } from '../utils/declension';
+import { formatDays, getDaysDeclension, formatDaysI18n, getDaysDeclensionKey } from '../utils/declension';
 import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 import ItemWithdrawBanner from '../components/ItemWithdrawBanner';
@@ -220,7 +220,7 @@ const ProfilePage: React.FC = () => {
 
     const validation = validateUsername(newValue);
     if (!validation.isValid) {
-      setUsernameError(validation.error || 'Недопустимое имя пользователя');
+      setUsernameError(validation.error || t('profile.settings.invalid_username'));
     } else {
       setUsernameError('');
     }
@@ -306,27 +306,27 @@ const ProfilePage: React.FC = () => {
       // Валидация пароля, если он введен
       if (newPassword) {
         if (newPassword.length < 8) {
-          showNotification('Пароль должен содержать минимум 8 символов', 'error');
+          showNotification(t('profile.settings.password_min_8_chars'), 'error');
           return;
         }
         if (!/[A-Z]/.test(newPassword)) {
-          showNotification('Пароль должен содержать заглавную букву', 'error');
+          showNotification(t('profile.settings.password_need_uppercase'), 'error');
           return;
         }
         if (!/[a-z]/.test(newPassword)) {
-          showNotification('Пароль должен содержать строчную букву', 'error');
+          showNotification(t('profile.settings.password_need_lowercase'), 'error');
           return;
         }
         if (!/[0-9]/.test(newPassword)) {
-          showNotification('Пароль должен содержать цифру', 'error');
+          showNotification(t('profile.settings.password_need_digit'), 'error');
           return;
         }
         if (!/[^A-Za-z0-9]/.test(newPassword)) {
-          showNotification('Пароль должен содержать специальный символ', 'error');
+          showNotification(t('profile.settings.password_need_special'), 'error');
           return;
         }
         if (newPassword !== confirmPassword) {
-          showNotification('Пароли не совпадают', 'error');
+          showNotification(t('profile.settings.passwords_not_match'), 'error');
           return;
         }
       }
@@ -373,7 +373,7 @@ const ProfilePage: React.FC = () => {
         console.log('Токен обновлен после изменения профиля');
       }
 
-      showNotification('Настройки сохранены успешно!', 'success');
+      showNotification(t('profile.settings.settings_saved'), 'success');
       setIsSettingsOpen(false);
 
       // Очищаем пароли
@@ -386,7 +386,7 @@ const ProfilePage: React.FC = () => {
       }, 500);
     } catch (error: any) {
       console.error('Ошибка при сохранении настроек:', error);
-      showNotification(error?.data?.message || 'Не удалось сохранить настройки', 'error');
+      showNotification(error?.data?.message || t('profile.settings.settings_save_error'), 'error');
     }
   };
 
@@ -394,7 +394,7 @@ const ProfilePage: React.FC = () => {
   const handleSteamLink = () => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      alert('Ошибка: токен авторизации не найден. Пожалуйста, войдите в систему заново.');
+      alert(t('profile.settings.steam_link_error'));
       return;
     }
 
@@ -418,10 +418,10 @@ const ProfilePage: React.FC = () => {
     try {
       await resendVerificationCode({ email: user.email }).unwrap();
       setEmailVerificationStep('verify');
-      alert('Код подтверждения отправлен на ваш email!');
+      alert(t('profile.settings.verification_code_sent'));
     } catch (error: any) {
       console.error('Ошибка при отправке кода:', error);
-      alert(`Ошибка: ${error?.data?.message || 'Не удалось отправить код'}`);
+      alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.verification_code_error')}`);
     }
   };
 
@@ -434,20 +434,20 @@ const ProfilePage: React.FC = () => {
         email: user.email,
         verificationCode: verificationCode.trim()
       }).unwrap();
-      alert('Email успешно подтвержден!');
+      alert(t('profile.settings.email_verified_success'));
       setIsEmailVerificationOpen(false);
       setVerificationCode('');
       setEmailVerificationStep('send');
     } catch (error: any) {
       console.error('Ошибка при подтверждении email:', error);
-      alert(`Ошибка: ${error?.data?.message || 'Неверный код подтверждения'}`);
+      alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.email_verify_error')}`);
     }
   };
 
   // Функция для автоматического получения Trade URL
   const handleFetchTradeUrl = async () => {
     if (!user?.steam_id) {
-      showNotification('Сначала подключите Steam аккаунт', 'error');
+      showNotification(t('profile.settings.steam_not_connected_error'), 'error');
       return;
     }
 
@@ -466,7 +466,7 @@ const ProfilePage: React.FC = () => {
 
       if (result.success && result.data.steam_trade_url) {
         setTradeUrl(result.data.steam_trade_url);
-        showNotification('Trade URL автоматически получен и сохранен!', 'success');
+        showNotification(t('profile.settings.trade_url_fetched'), 'success');
         // Обновляем данные пользователя
         setTimeout(() => {
           refetchUser();
@@ -475,19 +475,19 @@ const ProfilePage: React.FC = () => {
         // Если не удалось получить автоматически, показываем инструкции
         const instructions = result.data?.manual_instructions;
         if (instructions) {
-          showNotification('Получите Trade URL вручную', 'info');
+          showNotification(t('profile.settings.trade_url_manual_instructions'), 'info');
 
           // Открываем страницу настроек Steam в новой вкладке
           if (instructions.privacy_url) {
             window.open(instructions.privacy_url, '_blank');
           }
         } else {
-          showNotification('Не удалось получить Trade URL. Попробуйте позже.', 'error');
+          showNotification(t('profile.settings.trade_url_fetch_error'), 'error');
         }
       }
     } catch (error: any) {
       console.error('Ошибка при получении Trade URL:', error);
-      showNotification('Ошибка при получении Trade URL', 'error');
+      showNotification(t('profile.settings.trade_url_fetch_network_error'), 'error');
     } finally {
       setIsFetchingTradeUrl(false);
     }
@@ -685,7 +685,7 @@ const ProfilePage: React.FC = () => {
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="p-2 bg-black/30 hover:bg-black/50 rounded-lg transition-colors border border-gray-600/50 hover:border-gray-500"
-              title="Настройки профиля"
+              title={t('profile.profile_settings_title')}
             >
               <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.807-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
@@ -753,11 +753,11 @@ const ProfilePage: React.FC = () => {
                     <Tooltip
                       content={
                         <div className="space-y-2">
-                          <div className="font-semibold text-white mb-2">Опыт начисляется за:</div>
+                          <div className="font-semibold text-white mb-2">{t('profile.xp_earned_for')}</div>
                           <div className="space-y-1 text-xs">
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                              <span>Открытие кейсов</span>
+                              <span>{t('profile.opening_cases')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
@@ -802,7 +802,7 @@ const ProfilePage: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
                   <span>{xpInCurrentLevel.toLocaleString()}/{xpToNextLevel.toLocaleString()} XP</span>
-                  <span>Уровень {user.level}/100</span>
+                  <span>{t('profile.level_text')} {user.level}/{t('profile.level_max')}</span>
                 </div>
               </div>
             </div>
@@ -892,7 +892,7 @@ const ProfilePage: React.FC = () => {
                   ></div>
                 </div>
                 <div className="flex justify-end text-xs text-gray-400 mt-1">
-                  <span>{isAchievementsExpanded ? 'Нажмите чтобы свернуть' : 'Нажмите для подробностей'}</span>
+                  <span>{isAchievementsExpanded ? t('profile.achievements_collapse_hint') : t('profile.achievements_expand_hint')}</span>
                 </div>
               </div>
             </div>
@@ -1010,9 +1010,9 @@ const ProfilePage: React.FC = () => {
                                     <div className="flex justify-between text-xs text-gray-400">
                                       <span>
                                         {progress}/{target}
-                                        {achievement.requirement_type === 'subscription_days' ? ` ${getDaysDeclension(target)}` :
+                                        {achievement.requirement_type === 'subscription_days' ? ` ${t(getDaysDeclensionKey(target))}` :
                                          achievement.requirement_type === 'cases_opened' ? ' кейсов' :
-                                         achievement.requirement_type === 'daily_streak' ? ` ${getDaysDeclension(target)} подряд` :
+                                         achievement.requirement_type === 'daily_streak' ? ` ${t(getDaysDeclensionKey(target))} подряд` :
                                          achievement.requirement_type === 'best_item_value' ? ' КР' :
                                          achievement.requirement_type === 'total_items_value' ? ' КР' :
                                          achievement.requirement_type === 'rare_items_found' ? t('profile.items_suffix') :
@@ -1037,7 +1037,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="p-6 text-center">
-                    <p className="text-gray-400 text-sm mb-2">Достижения не загружены</p>
+                    <p className="text-gray-400 text-sm mb-2">{t('profile.achievements_not_loaded')}</p>
                     <p className="text-gray-500 text-xs">
                       {t('common.loading')}: {achievementsLoading ? t('profile.loading_yes') : t('profile.loading_no')} |
                       {t('profile.achievements_count')}: {achievementsProgress.length} |
@@ -1063,7 +1063,7 @@ const ProfilePage: React.FC = () => {
                     <>
                       {getSubscriptionName(user.subscription_tier)}
                       <span className="text-gray-400 text-sm block">
-                        {formatDays(user.subscription_days_left || 0)}
+                        {formatDaysI18n(user.subscription_days_left || 0, t)}
                       </span>
                     </>
                   ) : (
@@ -1123,7 +1123,7 @@ const ProfilePage: React.FC = () => {
                       <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.item.price).toFixed(2)} КР</span>
                     </div>
                     <p className="text-gray-400 text-sm">
-                      Получено: {new Date((bestWeapon as any).acquisition_date).toLocaleDateString()}
+                      {t('profile.acquired_date')} {new Date((bestWeapon as any).acquisition_date).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
