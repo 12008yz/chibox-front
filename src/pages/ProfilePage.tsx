@@ -1655,7 +1655,7 @@ const ProfilePage: React.FC = () => {
              <div>
                 <div className="flex items-center gap-2 mb-2">
                   <label className="text-sm font-medium text-gray-300">
-                    Steam Trade URL
+                    {t('profile.settings.steam_trade_url')}
                   </label>
                   {user?.steam_trade_url && (
                     <div className="flex items-center gap-1">

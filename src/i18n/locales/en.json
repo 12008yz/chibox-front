@@ -406,35 +406,67 @@
     "subscription_error": "Error purchasing subscription"
   },
   "achievements": {
-    "Novice": {
+    "Новичок": {
       "name": "Novice",
       "description": "Open 10 cases"
     },
-    "Collector": {
+    "Коллекционер": {
       "name": "Collector",
       "description": "Find 5 rare items"
     },
-    "Premium Player": {
+    "Премиум игрок": {
       "name": "Premium Player",
       "description": "Find 3 items worth 100+ rubles"
     },
-    "Subscriber": {
+    "Подписчик": {
       "name": "Subscriber",
       "description": "Have an active subscription for 30 days straight"
     },
-    "Subscription Buyer": {
+    "Покупатель подписки": {
       "name": "Subscription Buyer",
       "description": "Purchase any subscription tier"
     },
-    "Lucky": {
+    "Удачливый": {
       "name": "Lucky",
       "description": "Open cases 7 days in a row"
     },
-    "Millionaire": {
+    "Миллионер": {
       "name": "Millionaire",
       "description": "Total inventory value of 1,000,000 rubles"
     },
-    "Expert": {
+    "Эксперт": {
+      "name": "Expert",
+      "description": "Have an item worth over 50,000 rubles"
+    },
+    "Откройте 10 кейсов": {
+      "name": "Novice",
+      "description": "Open 10 cases"
+    },
+    "Найдите 5 редких предметов": {
+      "name": "Collector",
+      "description": "Find 5 rare items"
+    },
+    "Найдите 3 предмета стоимостью от 100 руб": {
+      "name": "Premium Player",
+      "description": "Find 3 items worth 100+ rubles"
+    },
+    "Иметь активную подписку 30 дней подряд": {
+      "name": "Subscriber",
+      "description": "Have an active subscription for 30 days straight"
+    },
+    "Приобрести любой уровень подписки": {
+      "name": "Subscription Buyer",
+      "description": "Purchase any subscription tier"
+    },
+    "Открыть кейс 7 дней подряд": {
+      "name": "Lucky",
+      "description": "Open cases 7 days in a row"
+    },
+    "Общая стоимость предметов в инвентаре 1,000,000 руб": {
+      "name": "Millionaire",
+      "description": "Total inventory value of 1,000,000 rubles"
+    },
+    "Иметь предмет с ценой выше 50,000 руб": {
       "name": "Expert",
       "description": "Have an item worth over 50,000 rubles"
     }
