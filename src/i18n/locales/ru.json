@@ -160,6 +160,9 @@
     "item_withdraw_success": "Предмет \"{{itemName}}\" успешно отправлен на вывод!",
     "opening": "Открываем...",
     "items_suffix": " предметов",
+    "cases_suffix": " кейсов",
+    "streak_suffix": " подряд",
+    "currency_suffix": " КР",
     "steam_connected": "Steam подключен",
     "steam_not_connected": "Steam не подключен",
     "subscription_status_days": "{{status}}\n{{days}}",
@@ -200,7 +203,7 @@
     "level_max": "100",
     "xp_earned_for": "Опыт начисляется за:",
     "opening_cases": "Открытие кейсов",
-    "inventory": {
+    "inventory_tabs": {
       "active": "Активные",
       "opened_cases": "Открытые кейсы",
       "withdrawn": "Выведенные",

@@ -987,21 +987,12 @@ const ProfilePage: React.FC = () => {
                                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                       <path d="M9.049 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822.88-.214-.33-.403-.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
                                     </svg>
-                                    <span>+{achievement.bonus_percentage ||
-                                      // Fallback для конкретных достижений с правильными значениями
-                                      (achievement.name === 'Новичок' ? '2.5' :
-                                       achievement.name === 'Коллекционер' ? '5' :
-                                       achievement.name === 'Премиум игрок' ? '7.5' :
-                                       achievement.name === 'Подписчик' ? '5' :
-                                       achievement.name === 'Покупатель подписки' ? '2' :
-                                       achievement.name === 'Удачливый' ? '2.5' :
-                                       achievement.name === 'Миллионер' ? '6.25' :
-                                       achievement.name === 'Эксперт' ? '7.5' : '0.5')}{t('profile.drop_bonus_text')}</span>
+                                    <span>+{achievement.bonus_percentage || '0.5'}{t('profile.drop_bonus_text')}</span>
                                   </div>
                                 </div>
 
                                 <p className="text-xs text-gray-400 mb-2 line-clamp-2">
-                                  {achievement.description || 'Описание отсутствует'}
+                                  {achievement.description || t('profile.no_description')}
                                 </p>
 
                                 {/* Progress */}
@@ -1011,10 +1002,10 @@ const ProfilePage: React.FC = () => {
                                       <span>
                                         {progress}/{target}
                                         {achievement.requirement_type === 'subscription_days' ? ` ${t(getDaysDeclensionKey(target))}` :
-                                         achievement.requirement_type === 'cases_opened' ? ' кейсов' :
-                                         achievement.requirement_type === 'daily_streak' ? ` ${t(getDaysDeclensionKey(target))} подряд` :
-                                         achievement.requirement_type === 'best_item_value' ? ' КР' :
-                                         achievement.requirement_type === 'total_items_value' ? ' КР' :
+                                         achievement.requirement_type === 'cases_opened' ? t('profile.cases_suffix') :
+                                         achievement.requirement_type === 'daily_streak' ? ` ${t(getDaysDeclensionKey(target))}${t('profile.streak_suffix')}` :
+                                         achievement.requirement_type === 'best_item_value' ? t('profile.currency_suffix') :
+                                         achievement.requirement_type === 'total_items_value' ? t('profile.currency_suffix') :
                                          achievement.requirement_type === 'rare_items_found' ? t('profile.items_suffix') :
                                          achievement.requirement_type === 'premium_items_found' ? t('profile.items_suffix') : ''}
                                       </span>
@@ -1238,7 +1229,7 @@ const ProfilePage: React.FC = () => {
                 <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
                 <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
               </svg>
-{t('profile.inventory.active')}
+{t('profile.inventory_tabs.active')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
             </button>
 
@@ -1253,7 +1244,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
               </svg>
-{t('profile.inventory.opened_cases')}
+{t('profile.inventory_tabs.opened_cases')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
             </button>
 
@@ -1268,7 +1259,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
-{t('profile.inventory.withdrawn')}
+{t('profile.inventory_tabs.withdrawn')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getWithdrawnItems().length}</span>
             </button>
 
@@ -1283,7 +1274,7 @@ const ProfilePage: React.FC = () => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
               </svg>
-{t('profile.inventory.sold')}
+{t('profile.inventory_tabs.sold')}
               <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getSoldItems().length}</span>
             </button>
           </div>

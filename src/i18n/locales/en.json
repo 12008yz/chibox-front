@@ -111,7 +111,6 @@
     "statistics": "Statistics",
     "achievements": "Achievements",
     "transactions": "Transactions",
-    "settings": "Settings",
     "level": "Level",
     "experience": "Experience",
     "cases_opened": "Cases Opened",
@@ -178,6 +177,9 @@
     "item_withdraw_success": "Item \"{{itemName}}\" successfully sent for withdrawal!",
     "opening": "Opening...",
     "items_suffix": " items",
+    "cases_suffix": " cases",
+    "streak_suffix": " in a row",
+    "currency_suffix": " CR",
     "steam_connected": "Steam Connected",
     "steam_not_connected": "Steam Not Connected",
     "subscription_status_days": "{{status}}\n{{days}}",
@@ -218,7 +220,7 @@
     "level_max": "100",
     "xp_earned_for": "XP is earned for:",
     "opening_cases": "Opening cases",
-    "inventory": {
+    "inventory_tabs": {
       "active": "Active",
       "opened_cases": "Opened Cases",
       "withdrawn": "Withdrawn",
@@ -252,7 +254,8 @@
       "trade_url_fetched": "Trade URL automatically fetched and saved!",
       "trade_url_manual_instructions": "Get Trade URL manually",
       "trade_url_fetch_error": "Failed to get Trade URL. Please try later.",
-      "trade_url_fetch_network_error": "Error fetching Trade URL",
+      "trade_url_fetch_network_error": "Error fetching Trade URL"
+    }
   },
   "inventory": {
     "title": "Inventory",
