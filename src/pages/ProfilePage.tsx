@@ -24,10 +24,33 @@ const ProfilePage: React.FC = () => {
 
   // Функция для перевода достижений
   const translateAchievement = (achievementName: string, field: 'name' | 'description') => {
+    // Убеждаемся, что achievementName существует
+    if (!achievementName) {
+      console.log('Achievement name is empty or undefined');
+      return field === 'name' ? t('profile.unknown_achievement') : t('profile.no_description');
+    }
+
     const key = `achievements.${achievementName}.${field}`;
     const translation = t(key);
-    // Если перевод не найден, возвращаем оригинальное значение
-    return translation === key ? achievementName : translation;
+
+    console.log('Translation attempt:', {
+      achievementName,
+      field,
+      key,
+      translation,
+      isKeyEqualToTranslation: translation === key,
+      currentLanguage: t('language.title')
+    });
+
+    // Если перевод не найден, пробуем найти по базовому названию
+    if (translation === key) {
+      console.warn(`Translation not found for key: ${key}`);
+
+      // Возвращаем оригинальное значение с fallback
+      return field === 'name' ? achievementName : t('profile.no_description');
+    }
+
+    return translation;
   };
 
   // State для переключения между категориями инвентаря
@@ -945,6 +968,17 @@ const ProfilePage: React.FC = () => {
                         const progress = achievement.progress || 0;
                         const target = achievement.target || 1;
                         const progressPercentage = Math.min(100, Math.round((progress / target) * 100));
+
+                        // Отладочная информация
+                        if (process.env.NODE_ENV === 'development') {
+                          console.log('Achievement data:', {
+                            id: achievement.id,
+                            name: achievement.name,
+                            description: achievement.description,
+                            translatedName: achievement.name ? translateAchievement(achievement.name, 'name') : 'N/A',
+                            translatedDesc: achievement.description ? translateAchievement(achievement.description, 'description') : 'N/A'
+                          });
+                        }
 
                         return (
                           <div
