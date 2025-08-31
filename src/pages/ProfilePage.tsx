@@ -22,6 +22,14 @@ const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuth();
 
+  // Функция для перевода достижений
+  const translateAchievement = (achievementName: string, field: 'name' | 'description') => {
+    const key = `achievements.${achievementName}.${field}`;
+    const translation = t(key);
+    // Если перевод не найден, возвращаем оригинальное значение
+    return translation === key ? achievementName : translation;
+  };
+
   // State для переключения между категориями инвентаря
   const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened' | 'withdrawn' | 'sold'>('active');
 
@@ -980,7 +988,7 @@ const ProfilePage: React.FC = () => {
                                 <div className="mb-2">
                                   <div className="flex items-center justify-between gap-2 mb-1">
                                     <h5 className="font-medium text-white text-sm leading-tight">
-                                      {achievement.name || t('profile.unknown_achievement')}
+                                      {achievement.name ? translateAchievement(achievement.name, 'name') : t('profile.unknown_achievement')}
                                     </h5>
                                   </div>
                                   <div className="flex items-center gap-1 text-xs text-blue-400">
@@ -992,7 +1000,7 @@ const ProfilePage: React.FC = () => {
                                 </div>
 
                                 <p className="text-xs text-gray-400 mb-2 line-clamp-2">
-                                  {achievement.description || t('profile.no_description')}
+                                  {achievement.description ? translateAchievement(achievement.description, 'description') : t('profile.no_description')}
                                 </p>
 
                                 {/* Progress */}

@@ -405,6 +405,40 @@
     "payment_error": "Error creating payment",
     "subscription_error": "Error purchasing subscription"
   },
+  "achievements": {
+    "Новичок": {
+      "name": "Novice",
+      "description": "Open 10 cases"
+    },
+    "Коллекционер": {
+      "name": "Collector",
+      "description": "Find 5 rare items"
+    },
+    "Премиум игрок": {
+      "name": "Premium Player",
+      "description": "Find 3 items worth 100+ rubles"
+    },
+    "Подписчик": {
+      "name": "Subscriber",
+      "description": "Have an active subscription for 30 days straight"
+    },
+    "Покупатель подписки": {
+      "name": "Subscription Buyer",
+      "description": "Purchase any subscription tier"
+    },
+    "Удачливый": {
+      "name": "Lucky",
+      "description": "Open cases 7 days in a row"
+    },
+    "Миллионер": {
+      "name": "Millionaire",
+      "description": "Total inventory value of 1,000,000 rubles"
+    },
+    "Эксперт": {
+      "name": "Expert",
+      "description": "Have an item worth over 50,000 rubles"
+    }
+  },
   "roulette": {
     "wheel_of_fortune": "🎰 Wheel of Fortune",
     "spin_and_win": "Spin the wheel and win subscription days!",
