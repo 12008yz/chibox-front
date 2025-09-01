@@ -19,8 +19,19 @@ import type { UserInventoryItem, UserCaseItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 
 const ProfilePage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const auth = useAuth();
+
+  // Отладка переводов для проблемных ключей
+  console.log('ProfilePage debug:', {
+    currentLanguage: i18n.language,
+    tradeUrlRequired: t('profile.settings.trade_url_required'),
+    steamProfileLabel: t('profile.settings.steam_profile_label'),
+    emailVerificationLabel: t('profile.settings.email_verification_label'),
+    verifyEmailButton: t('profile.settings.verify_email_button'),
+    clickToSendCode: t('profile.settings.click_to_send_code'),
+    isTranslationWorking: t('profile.settings.trade_url_required') !== 'profile.settings.trade_url_required'
+  });
 
   // Функция для перевода достижений
   const translateAchievement = (achievementName: string, field: 'name' | 'description') => {
