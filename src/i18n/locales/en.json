@@ -15,7 +15,8 @@
     "play": "Play",
     "daily": "daily",
     "online": "Online: {{count}}",
-    "balance": "Balance"
+    "balance": "Balance",
+    "currency_suffix": " CR"
   },
   "header": {
     "home": "Home",

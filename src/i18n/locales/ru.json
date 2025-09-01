@@ -15,7 +15,8 @@
     "play": "Играть",
     "daily": "ежедневно",
     "online": "Онлайн: {{count}}",
-    "balance": "Баланс"
+    "balance": "Баланс",
+    "currency_suffix": " КР"
   },
   "header": {
     "home": "Главная",
