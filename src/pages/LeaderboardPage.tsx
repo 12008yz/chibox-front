@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { RootState } from '../store';
 import Title from '../components/Title';
 import TopPlayer from '../components/TopPlayer';
@@ -35,6 +36,7 @@ interface TabConfig {
 }
 
 const LeaderboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<LeaderboardType>('cases_opened');
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,20 +46,20 @@ const LeaderboardPage: React.FC = () => {
   const tabs: TabConfig[] = [
     {
       id: 'cases_opened',
-      name: 'Открытые кейсы',
-      description: 'Топ игроков по количеству открытых кейсов',
+      name: t('leaderboard_page.cases_opened_tab'),
+      description: t('leaderboard_page.cases_opened_description'),
       icon: '📦'
     },
     {
       id: 'level',
-      name: 'Уровень',
-      description: 'Топ игроков по уровню и опыту',
+      name: t('leaderboard_page.level_tab'),
+      description: t('leaderboard_page.level_description'),
       icon: '⭐'
     },
     {
       id: 'most_expensive_item',
-      name: 'Лучший дроп',
-      description: 'Топ игроков по самому дорогому предмету',
+      name: t('leaderboard_page.best_drop_tab'),
+      description: t('leaderboard_page.best_drop_description'),
       icon: '💎'
     }
   ];
@@ -65,7 +67,7 @@ const LeaderboardPage: React.FC = () => {
   const fetchLeaderboard = async (type: LeaderboardType) => {
     if (!token) {
       setLoading(false);
-      setError('Требуется авторизация');
+      setError(t('leaderboard_page.auth_required'));
       return;
     }
 
@@ -81,17 +83,17 @@ const LeaderboardPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Ошибка загрузки лидерборда');
+        throw new Error(t('leaderboard_page.leaderboard_error'));
       }
 
       const result = await response.json();
       if (result.success) {
         setLeaderboardData(result.data);
       } else {
-        throw new Error(result.message || 'Ошибка загрузки данных');
+        throw new Error(result.message || t('leaderboard_page.data_error'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка');
+      setError(err instanceof Error ? err.message : t('leaderboard_page.data_error'));
       console.error('Ошибка загрузки лидерборда:', err);
     } finally {
       setLoading(false);
@@ -111,17 +113,17 @@ const LeaderboardPage: React.FC = () => {
   };
 
   const getScoreLabel = () => {
-    if (!leaderboardData) return 'Очки';
+    if (!leaderboardData) return t('leaderboard_page.score_label');
 
     switch (leaderboardData.type) {
       case 'level':
-        return 'Уровень';
+        return t('leaderboard_page.level_label');
       case 'cases_opened':
-        return 'Кейсов открыто';
+        return t('leaderboard_page.cases_opened_label');
       case 'most_expensive_item':
-        return 'Самый дорогой предмет';
+        return t('leaderboard_page.most_expensive_item_label');
       default:
-        return 'Очки';
+        return t('leaderboard_page.score_label');
     }
   };
 
@@ -159,7 +161,7 @@ const LeaderboardPage: React.FC = () => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none mx-auto">
-          <Title title="Таблица лидеров" />
+          <Title title={t('leaderboard_page.title')} />
 
           {/* Описание текущей вкладки */}
           {currentTab && (
@@ -201,7 +203,7 @@ const LeaderboardPage: React.FC = () => {
           ) : loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="spinner" />
-              <span className="ml-4">Загрузка данных...</span>
+              <span className="ml-4">{t('leaderboard_page.loading_data')}</span>
             </div>
           ) : leaderboardData && leaderboardData.leaderboard.length > 0 ? (
             <>
@@ -255,10 +257,10 @@ const LeaderboardPage: React.FC = () => {
                     <thead className="bg-[#19172d]">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Ранг
+                          {t('leaderboard_page.rank')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Игрок
+                          {t('leaderboard_page.player')}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {getScoreLabel()}
@@ -293,7 +295,7 @@ const LeaderboardPage: React.FC = () => {
                                 )}
                               </div>
                             ) : leaderboardData.type === 'level' ? (
-                              <span>Уровень {getScoreValue(user)}</span>
+                              <span>{t('leaderboard_page.level_prefix', { level: getScoreValue(user) })}</span>
                             ) : (
                               <span>{getScoreValue(user)}</span>
                             )}
@@ -307,7 +309,7 @@ const LeaderboardPage: React.FC = () => {
             </>
           ) : (
             <div className="text-gray-400 text-center py-8 bg-gray-900/30 rounded-lg">
-              Нет данных для отображения
+              {t('leaderboard_page.no_data')}
             </div>
           )}
         </div>
