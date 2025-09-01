@@ -1,6 +1,7 @@
 import React from 'react';
 import type { UserInventoryItem, CaseTemplate } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import { useTranslation } from 'react-i18next';
 
 interface CaseWithDropProps {
   droppedItem: UserInventoryItem;
@@ -8,6 +9,7 @@ interface CaseWithDropProps {
 }
 
 const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }) => {
+  const { t } = useTranslation();
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'from-gray-500 to-gray-600';
@@ -23,18 +25,18 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
 
   const getRarityName = (rarity: string) => {
     switch (rarity.toLowerCase()) {
-      case 'consumer': return 'Потребительское';
-      case 'industrial': return 'Промышленное';
-      case 'milspec': return 'Армейское';
-      case 'restricted': return 'Запрещённое';
-      case 'classified': return 'Засекреченное';
-      case 'covert': return 'Тайное';
-      case 'contraband': return 'Контрабанда';
+      case 'consumer': return t('profile.rarity.consumer');
+      case 'industrial': return t('profile.rarity.industrial');
+      case 'milspec': return t('profile.rarity.milspec');
+      case 'restricted': return t('profile.rarity.restricted');
+      case 'classified': return t('profile.rarity.classified');
+      case 'covert': return t('profile.rarity.covert');
+      case 'contraband': return t('profile.rarity.contraband');
       default: return rarity;
     }
   };
 
-  const caseName = caseTemplate?.name || `Кейс #${droppedItem.case_template_id?.slice(0, 8)}`;
+  const caseName = caseTemplate?.name || `${t('profile.case_label')} #${droppedItem.case_template_id?.slice(0, 8) || 'unknown'}`;
   const caseImageUrl = caseTemplate?.image_url;
 
   // Получаем корректный URL изображения предмета
@@ -98,14 +100,14 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
           {caseName}
         </h5>
         <p className="text-yellow-400 text-sm font-bold">
-          {Number(caseTemplate?.price || '0').toFixed(2)} КР
+          {Number(caseTemplate?.price || '0').toFixed(2)}{t('common.currency_suffix')}
         </p>
         <div className="flex items-center justify-between mt-2">
           <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-            КЕЙС
+            {t('profile.case_label')}
           </p>
           <div className="text-xs text-green-400 font-semibold">
-            ОТКРЫТ
+            {t('profile.status_opened')}
           </div>
         </div>
       </div>
