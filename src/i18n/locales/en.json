@@ -270,7 +270,46 @@
       "trade_url_fetched": "Trade URL automatically fetched and saved!",
       "trade_url_manual_instructions": "Get Trade URL manually",
       "trade_url_fetch_error": "Failed to get Trade URL. Please try later.",
-      "trade_url_fetch_network_error": "Error fetching Trade URL"
+      "trade_url_fetch_network_error": "Error fetching Trade URL",
+      "steam_trade_url": "Steam Trade URL",
+      "trade_url_label": "Steam Trade URL",
+      "trade_url_placeholder": "https://steamcommunity.com/tradeoffer/new/...",
+      "trade_url_required": "Required for automatic item sending. Can be obtained automatically!",
+      "trade_url_locked": "Trade URL saved and locked",
+      "trade_url_set": "Set",
+      "connect_steam_first": "Connect Steam account first",
+      "fetching_trade_url": "Fetching...",
+      "fetch_trade_url_auto": "Get automatically",
+      "steam_profile_label": "Steam Profile",
+      "steam_connected": "Steam connected",
+      "connect_steam": "Connect Steam",
+      "click_to_connect": "Click to connect",
+      "email_verification_label": "Email Verification",
+      "email_verified": "Email verified",
+      "verify_email_button": "Verify Email",
+      "click_to_send_code": "Click to send code",
+      "saving": "Saving...",
+      "email_verification_modal": {
+        "title": "Email Verification",
+        "send_code_to": "We'll send a verification code to:",
+        "code_valid_time": "Code is valid for 15 minutes",
+        "sending_code": "Sending code...",
+        "send_code": "Send code",
+        "code_sent": "Code sent!",
+        "enter_code": "Enter the 6-digit code from the email",
+        "verifying": "Verifying...",
+        "verify": "Verify",
+        "resend": "Resend",
+        "resending": "..."
+      },
+      "trade_url_tooltip": {
+        "title": "How to find Trade URL:",
+        "step1": "1. Open Steam in browser",
+        "step2": "2. Go to Inventory → Trade Offers",
+        "step3": "3. Click \"Who can send me trade offers?\"",
+        "step4": "4. Copy URL from \"Trade URL\" field",
+        "example": "URL looks like: https://steamcommunity.com/tradeoffer/new/?partner=XXXXXXX&token=XXXXXXXX"
+      }
     }
   },
   "inventory": {
