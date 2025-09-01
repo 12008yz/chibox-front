@@ -632,30 +632,22 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     >
       <div
         className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
-          isAnimating && !showOpeningAnimation
+          isAnimating
             ? 'scale-100 opacity-100 translate-y-0'
-            : showOpeningAnimation
-              ? 'scale-95 opacity-100 translate-y-0' // минимальное отдаление при анимации
-              : 'scale-75 opacity-0 translate-y-8'
+            : 'scale-75 opacity-0 translate-y-8'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Заголовок модального окна */}
-        <div className={`flex justify-between items-center p-6 border-b border-gray-700 transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-85 opacity-80' : ''
-        }`}>
+        <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <div className="flex items-center space-x-4">
             <img
               src={caseImageUrl}
               alt={caseData.name}
-              className={`object-cover rounded transition-all duration-1000 ${
-                showOpeningAnimation ? 'w-12 h-12' : 'w-16 h-16'
-              }`}
+              className="w-16 h-16 object-cover rounded"
             />
             <div>
-              <h2 className={`font-bold text-white transition-all duration-1000 ${
-                showOpeningAnimation ? 'text-xl' : 'text-2xl'
-              }`}>{caseData.name}</h2>
+              <h2 className="text-2xl font-bold text-white">{caseData.name}</h2>
               <p className="text-green-400 font-semibold">
                 {fixedPrices ? (
                   <span className="text-yellow-400 font-bold">
@@ -700,11 +692,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           ) : items.length > 0 ? (
             <div className="relative">
 
-              {/* Сетка предметов с анимацией масштабирования */}
+              {/* Сетка предметов без масштабирования */}
               <div
-                className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-7 gap-4 transition-all duration-1000 ${
-                  showOpeningAnimation ? 'transform scale-75 origin-top -mt-3' : ''
-                }`}
+                className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4"
               >
                 {itemsWithAdjustedChances.map((item: any, index: number) => {
                   // ИСПРАВЛЕНИЕ: Показываем все предметы для информативности,
@@ -722,14 +712,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       key={item.id || index}
                       data-item-index={animationIndex}
                       className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
-                        !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : ''
+                        !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : 'animate-fade-in-up'
                       } ${
                         isCurrentSliderPosition
-                          ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 scale-125 z-10 border-yellow-400'
+                          ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 z-10 border-yellow-400'
                           : ''
                       } ${
                         isWinningItemStopped
-                          ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 scale-150 z-20 border-green-400'
+                          ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 z-20 border-green-400'
                           : ''
                       } ${
                         isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')
@@ -879,9 +869,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
 
         {/* Футер с кнопками */}
-        <div className={`flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629] transition-all duration-1000 ${
-          showOpeningAnimation ? 'scale-85 opacity-70' : ''
-        }`}>
+        <div className="flex-shrink-0 p-6 border-t border-gray-700 bg-[#1a1629]">
           <div className="text-sm text-gray-400 mb-4">
             {statusData?.data && !statusLoading && (
               <div>
