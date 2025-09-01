@@ -702,7 +702,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
               {/* Сетка предметов с анимацией масштабирования */}
               <div
-                className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6 gap-4 transition-all duration-1000 ${
+                className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-7 gap-4 transition-all duration-1000 ${
                   showOpeningAnimation ? 'transform scale-75 origin-top -mt-3' : ''
                 }`}
               >

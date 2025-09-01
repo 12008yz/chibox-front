@@ -202,6 +202,23 @@
     "level_max": "100",
     "xp_earned_for": "Опыт начисляется за:",
     "opening_cases": "Открытие кейсов",
+
+    "item_withdraw": {
+      "withdrawing": "Выводим...",
+      "withdraw_to_steam": "Вывести в Steam",
+      "subscription_required": "Требуется подписка",
+      "need_trade_url": "Нужен Steam Trade URL",
+      "cannot_withdraw": "Нельзя вывести в Steam",
+      "provide_trade_url": "Укажите Steam Trade URL",
+      "ok": "OK",
+      "cancel": "✕",
+      "send_to_steam": "Отправить на ваш Steam",
+      "error_withdrawal_impossible": "Невозможно вывести предмет",
+      "error_no_subscription": "Этот предмет нельзя вывести в Steam",
+      "error_no_item_name": "Не удалось определить название предмета для вывода",
+      "error_withdrawal_failed": "Ошибка при выводе предмета",
+      "error_not_found": "Не удалось вывести предмет"
+    },
     "inventory_tabs": {
       "active": "Активные",
       "opened_cases": "Открытые кейсы",

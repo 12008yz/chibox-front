@@ -3,6 +3,7 @@ import { useWithdrawItemMutation } from '../features/user/userApi';
 import { useAppSelector } from '../store/hooks';
 import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUtils';
 import type { UserInventoryItem } from '../types/api';
+import { useTranslation } from 'react-i18next';
 
 interface ItemWithdrawBannerProps {
   item: UserInventoryItem;
@@ -15,6 +16,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   onWithdrawSuccess,
   onError,
 }) => {
+  const { t } = useTranslation();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [steamTradeUrl, setSteamTradeUrl] = useState('');
@@ -42,13 +44,13 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       if (withdrawPermission.requiresSubscription) {
         onError(`${withdrawPermission.reason}. ${subscriptionStatus.statusText}.`);
       } else {
-        onError(withdrawPermission.reason || 'Невозможно вывести предмет');
+        onError(withdrawPermission.reason || t('item_withdraw.error_withdrawal_impossible'));
       }
       return;
     }
 
     if (!canWithdraw) {
-      onError('Этот предмет нельзя вывести в Steam');
+      onError(t('item_withdraw.error_no_subscription'));
       return;
     }
 
@@ -56,7 +58,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
     const marketHashName = item.item?.steam_market_hash_name || item.item?.name;
 
     if (!marketHashName) {
-      onError('Не удалось определить название предмета для вывода');
+      onError(t('item_withdraw.error_no_item_name'));
       return;
     }
 
@@ -77,7 +79,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
         onWithdrawSuccess();
         setShowConfirm(false);
       } else {
-        onError(result.message || 'Ошибка при выводе предмета');
+        onError(result.message || t('item_withdraw.error_withdrawal_failed'));
       }
     } catch (error: any) {
       console.error('Ошибка при выводе предмета:', error);
@@ -87,7 +89,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
         const subscriptionInfo = error.data.data?.subscription_status || 'Подписка отсутствует';
         onError(`${error.data.message}. Статус: ${subscriptionInfo}. Перейдите в профиль для покупки подписки.`);
       } else {
-        onError(error?.data?.message || 'Не удалось вывести предмет');
+        onError(error?.data?.message || t('item_withdraw.error_not_found'));
       }
     } finally {
       setIsWithdrawing(false);
@@ -124,16 +126,16 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
-                  {isWithdrawing ? 'Выводим...' : 'Вывести в Steam'}
+                  {isWithdrawing ? t('item_withdraw.withdrawing') : t('item_withdraw.withdraw_to_steam')}
                 </button>
                 <p className="text-xs text-gray-400 text-center">
                   {!withdrawPermission.canWithdraw
                     ? (withdrawPermission.requiresSubscription
-                        ? 'Требуется подписка'
+                        ? t('item_withdraw.subscription_required')
                         : withdrawPermission.reason)
                     : (userHasTradeUrl
-                        ? 'Отправить на ваш Steam'
-                        : 'Нужен Steam Trade URL')
+                        ? t('item_withdraw.send_to_steam')
+                        : t('item_withdraw.need_trade_url'))
                   }
                 </p>
               </div>
@@ -141,8 +143,8 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
               <div className="text-center">
                 <p className="text-xs text-gray-400 bg-gray-700/50 rounded py-1.5 px-2">
                   {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription
-                    ? 'Требуется подписка'
-                    : 'Нельзя вывести в Steam'
+                    ? t('item_withdraw.subscription_required')
+                    : t('item_withdraw.cannot_withdraw')
                   }
                 </p>
                 {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription && (
@@ -156,7 +158,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
         ) : (
           <>
             <div className="text-center mb-2">
-              <p className="text-white text-xs font-medium mb-1">Укажите Steam Trade URL</p>
+              <p className="text-white text-xs font-medium mb-1">{t('item_withdraw.provide_trade_url')}</p>
               <p className="text-gray-300 text-xs">{item.item.name}</p>
             </div>
 
@@ -179,7 +181,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
                   disabled={isWithdrawing || !steamTradeUrl.trim()}
                   className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-1 px-2 rounded text-xs transition-all duration-200"
                 >
-                  {isWithdrawing ? 'Выводим...' : 'OK'}
+                  {isWithdrawing ? t('item_withdraw.withdrawing') : t('item_withdraw.ok')}
                 </button>
                 <button
                   onClick={(e) => {

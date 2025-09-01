@@ -226,6 +226,22 @@
       "withdrawn": "Withdrawn",
       "sold": "Sold"
     },
+    "item_withdraw": {
+      "withdrawing": "Withdrawing...",
+      "withdraw_to_steam": "Withdraw to Steam",
+      "subscription_required": "Subscription required",
+      "need_trade_url": "Need Steam Trade URL",
+      "cannot_withdraw": "Cannot withdraw to Steam",
+      "provide_trade_url": "Provide Steam Trade URL",
+      "ok": "OK",
+      "cancel": "✕",
+      "send_to_steam": "Send to your Steam",
+      "error_withdrawal_impossible": "Unable to withdraw item",
+      "error_no_subscription": "This item cannot be withdrawn to Steam",
+      "error_no_item_name": "Could not determine item name for withdrawal",
+      "error_withdrawal_failed": "Error withdrawing item",
+      "error_not_found": "Failed to withdraw item"
+    },
     "settings": {
       "title": "Settings",
       "username": "Username",
