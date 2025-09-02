@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SteamLoginButtonProps {
   isLoading?: boolean;
@@ -9,6 +10,7 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
   isLoading = false,
   disabled = false
 }) => {
+  const { t } = useTranslation();
   const handleSteamLogin = () => {
     if (disabled || isLoading) return;
 
@@ -41,7 +43,7 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
       )}
 
       <span>
-        {isLoading ? 'Подключение...' : 'Войти через Steam'}
+        {isLoading ? t('auth.connecting_steam') : t('auth.steam_login_button')}
       </span>
     </button>
   );
