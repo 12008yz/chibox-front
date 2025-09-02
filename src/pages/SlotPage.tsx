@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePlaySlotMutation, useGetSlotItemsQuery } from '../features/user/userApi';
 import { useAuth } from '../store/hooks';
 import toast from 'react-hot-toast';
 import Monetary from '../components/Monetary';
 import type { SlotItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import { t } from 'i18next';
 
 // Функция для безопасного преобразования типов API в SlotItem
 const convertToSlotItem = (item: any): SlotItem => {
@@ -33,7 +35,7 @@ const PlaceholderImage: React.FC<{
       <div className={`${className} bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex flex-col items-center justify-center border border-gray-700/50`}>
         <div className="text-4xl mb-3 text-gray-600">❌</div>
         <div className="text-sm text-gray-500 font-medium px-3 text-center">
-          Пусто
+          {t('slots.empty')}
         </div>
       </div>
     );
@@ -148,7 +150,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               <div className="absolute bottom-2 left-2 right-2 text-center">
                 <div className="text-sm text-white font-medium bg-black/70 rounded px-2 py-1 truncate border border-gray-500/50">
                   {item.id === 'empty' || item.rarity === 'empty'
-                    ? 'Пусто'
+                    ? t('slots.empty')
                     : (item.name.length > 16 ? `${item.name.substring(0, 16)}...` : item.name)}
                 </div>
               </div>
@@ -182,6 +184,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 };
 
 const SlotPage: React.FC = () => {
+  const { t } = useTranslation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<SlotItem[]>([]);
   const [showResult, setShowResult] = useState(false);
@@ -221,20 +224,20 @@ const SlotPage: React.FC = () => {
           setShowResult(true);
 
           if (response.result.isWin) {
-            toast.success(`🎉 Поздравляем! Вы выиграли ${response.result.wonItem?.name}!`, {
+            toast.success(t('slots.game_result_congratulations', { itemName: response.result.wonItem?.name }), {
               duration: 5000,
             });
           } else {
-            toast('😔 Не повезло в этот раз', { icon: '🎰' });
+            toast(t('slots.game_result_no_luck'), { icon: '🎰' });
           }
         }, 3500);
       } else {
         setIsSpinning(false);
-        toast.error(response.message || 'Что-то пошло не так');
+        toast.error(response.message || t('slots.unknown_error'));
       }
     } catch (err: any) {
       setIsSpinning(false);
-      toast.error('Ошибка соединения с сервером');
+      toast.error(t('slots.connection_error'));
     }
   };
 
@@ -247,8 +250,8 @@ const SlotPage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-600 border-t-white mx-auto mb-4"></div>
-          <div className="text-white text-lg font-medium">Загружаем предметы...</div>
-          <div className="text-gray-400 text-sm mt-2">Подготавливаем игру</div>
+          <div className="text-white text-lg font-medium">{t('slots.loading_items')}</div>
+          <div className="text-gray-400 text-sm mt-2">{t('slots.preparing_game')}</div>
         </div>
       </div>
     );
@@ -258,13 +261,13 @@ const SlotPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
         <div className="text-center bg-gray-800 rounded-lg p-6 border border-red-400/50 max-w-md">
-          <div className="text-red-400 text-xl font-semibold mb-3">Ошибка загрузки</div>
-          <div className="text-gray-300 mb-4">Не удалось загрузить данные игры</div>
+          <div className="text-red-400 text-xl font-semibold mb-3">{t('slots.loading_error')}</div>
+          <div className="text-gray-300 mb-4">{t('slots.failed_to_load')}</div>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors border border-gray-600"
           >
-            Перезагрузить
+            {t('slots.reload')}
           </button>
         </div>
       </div>
@@ -277,10 +280,10 @@ const SlotPage: React.FC = () => {
         {/* Простой заголовок */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-4">
-            🎰 Слот-машина
+            🎰 {t('slots.title')}
           </h1>
           <div className="text-gray-300 text-lg mb-4">
-            Соберите <span className="text-yellow-400 font-semibold">3 одинаковых предмета</span> для победы
+            {t('slots.description')}
           </div>
           <div className="w-24 h-0.5 bg-gray-600 mx-auto rounded"></div>
         </div>
@@ -315,25 +318,25 @@ const SlotPage: React.FC = () => {
                     <div className="text-center">
                       <div className="text-4xl mb-4">🎉</div>
                       <div className="text-2xl mb-4 font-bold text-green-400">
-                        Поздравляем! Джекпот!
+                        {t('slots.congratulations_jackpot')}
                       </div>
                       <div className="bg-green-900/20 rounded-lg p-6 border border-green-400/50">
-                        <div className="text-gray-300 mb-3 font-medium">Выигрышный предмет:</div>
+                        <div className="text-gray-300 mb-3 font-medium">{t('slots.winning_item')}</div>
                         <div className="text-xl font-bold text-white mb-3">{result[0]?.name}</div>
                         <div className="text-lg text-green-400 font-semibold">
-                          Стоимость: <Monetary value={Number(result[0]?.price || 0)} />
+                          {t('slots.item_value')} <Monetary value={Number(result[0]?.price || 0)} />
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <div className="text-xl mb-3 font-semibold text-gray-300">Не повезло</div>
-                      <div className="text-gray-400 mb-4">Попробуйте еще раз!</div>
+                      <div className="text-xl mb-3 font-semibold text-gray-300">{t('slots.no_luck')}</div>
+                      <div className="text-gray-400 mb-4">{t('slots.try_again')}</div>
                       <div className="bg-gray-700/30 rounded p-4 border border-gray-600/50">
                         <div className="text-gray-300 font-medium">
-                          Выпало: {result.map(item =>
+                          {t('slots.result')} {result.map(item =>
                             item?.id === 'empty' || item?.rarity === 'empty'
-                              ? 'Пусто'
+                              ? t('slots.empty')
                               : (item?.name?.split(' ')[0] || '?')
                           ).join(' • ')}
                         </div>
@@ -350,7 +353,7 @@ const SlotPage: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">🎰</div>
                   <div>
-                    <div className="text-gray-400 text-sm font-medium">Стоимость спина</div>
+                    <div className="text-gray-400 text-sm font-medium">{t('slots.spin_cost')}</div>
                     <div className="text-white text-xl font-semibold">10 ₽</div>
                   </div>
                 </div>
@@ -360,7 +363,7 @@ const SlotPage: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <div className="text-2xl">💰</div>
                   <div>
-                    <div className="text-gray-400 text-sm font-medium">Ваш баланс</div>
+                    <div className="text-gray-400 text-sm font-medium">{t('slots.your_balance')}</div>
                     <div className="text-white text-xl font-semibold">
                       <Monetary value={Number(auth.user?.balance || 0)} />
                     </div>
@@ -383,29 +386,29 @@ const SlotPage: React.FC = () => {
                 {isLoading || isSpinning ? (
                   <span className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    <span>Крутится...</span>
+                    <span>{t('slots.spinning')}</span>
                   </span>
                 ) : (
-                  <span>Играть (10 ₽)</span>
+                  <span>{t('slots.play_button')}</span>
                 )}
               </button>
 
               {/* Сообщения */}
               {!canPlay && auth.user && Number(auth.user.balance || 0) < 10 && (
                 <div className="mt-4 p-4 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300 max-w-sm mx-auto">
-                  <div className="font-medium">Недостаточно средств для игры</div>
+                  <div className="font-medium">{t('slots.insufficient_funds')}</div>
                 </div>
               )}
 
               {!auth.user && (
                 <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
-                  <div className="font-medium">Войдите в аккаунт для игры</div>
+                  <div className="font-medium">{t('slots.please_login')}</div>
                 </div>
               )}
 
               {displayItems.length === 0 && (
                 <div className="mt-4 p-4 bg-blue-900/20 border border-blue-400/50 rounded-lg text-blue-300 max-w-sm mx-auto">
-                  <div className="font-medium">Загружаем предметы...</div>
+                  <div className="font-medium">{t('slots.loading_items_status')}</div>
                 </div>
               )}
             </div>
