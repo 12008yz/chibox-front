@@ -419,6 +419,33 @@
     "attempts_remaining": "Tentatives restantes :",
     "you_play": "Vous jouez :",
     "goal": "Objectif :",
-    "goal_description": "Alignez 3 symboles (horizontalement, verticalement ou en diagonale) pour gagner !"
+    "goal_description": "Rassemblez 3 symboles dans une rangée (horizontale, verticale ou diagonale) pour gagner !"
+  },
+  "homepage": {
+    "loading_cases": "Chargement des caisses...",
+    "cases_error": "Erreur lors du chargement des caisses",
+    "cases_temporarily_unavailable": "Caisses temporairement indisponibles",
+    "connection_error": "Vérifiez votre connexion internet",
+    "error_code": "Code d'erreur : {{code}}",
+    "cases_not_configured": "Caisses non configurées",
+    "data_received_empty": "Données reçues, mais la liste des caisses est vide",
+    "refresh_cases": "Actualiser les Caisses",
+    "buy_case_error": "Une erreur s'est produite lors de l'ouverture de la caisse",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "Nous améliorons votre inventaire chaque jour. Ouvrez des caisses et collectionnez des objets rares !",
+    "your_luck_title": "VOTRE CHANCE",
+    "your_luck_description": "Chaque caisse ouverte est une chance de jackpot. Testez votre fortune aujourd'hui !",
+    "community_title": "COMMUNAUTÉ",
+    "community_description": "Rejoignez des milliers de joueurs. Concourez dans le classement et gagnez !",
+    "free_cases": "Caisses Gratuites",
+    "free_cases_description": "Caisses gratuites quotidiennes pour tous les joueurs",
+    "premium_cases": "Caisses Premium",
+    "premium_cases_description": "Caisses avec des récompenses exclusives",
+    "status_cases": "Caisses {{status}}",
+    "status_cases_description": "Caisses exclusives pour les abonnés. {{days}} jours de statut restant",
+    "chibox_statuses": "Statuts ChiBox",
+    "chibox_statuses_description": "Gérez vos privilèges et obtenez des bonus exclusifs chaque jour",
+    "win_bonus_game": "Accordé pour avoir gagné le jeu bonus",
+    "cases_not_found": "Caisses introuvables"
   }
 }

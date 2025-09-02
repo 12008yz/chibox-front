@@ -419,6 +419,33 @@
     "attempts_remaining": "Intentos restantes:",
     "you_play": "Juegas:",
     "goal": "Objetivo:",
-    "goal_description": "¡Consigue 3 símbolos en fila (horizontal, vertical o diagonalmente) para ganar!"
+    "goal_description": "¡Reúne 3 símbolos en una fila (horizontal, vertical o diagonal) para ganar!"
+  },
+  "homepage": {
+    "loading_cases": "Cargando cajas...",
+    "cases_error": "Error al cargar las cajas",
+    "cases_temporarily_unavailable": "Cajas temporalmente no disponibles",
+    "connection_error": "Verifica tu conexión a internet",
+    "error_code": "Código de error: {{code}}",
+    "cases_not_configured": "Cajas no configuradas",
+    "data_received_empty": "Datos recibidos, pero la lista de cajas está vacía",
+    "refresh_cases": "Actualizar Cajas",
+    "buy_case_error": "Ocurrió un error al abrir la caja",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "Hacemos tu inventario mejor cada día. ¡Abre cajas y colecciona objetos raros!",
+    "your_luck_title": "TU SUERTE",
+    "your_luck_description": "Cada caja abierta es una oportunidad para el premio mayor. ¡Prueba tu fortuna hoy!",
+    "community_title": "COMUNIDAD",
+    "community_description": "Únete a miles de jugadores. ¡Compite en la tabla de clasificación y gana!",
+    "free_cases": "Cajas Gratis",
+    "free_cases_description": "Cajas gratis diarias para todos los jugadores",
+    "premium_cases": "Cajas Premium",
+    "premium_cases_description": "Cajas con recompensas exclusivas",
+    "status_cases": "Cajas {{status}}",
+    "status_cases_description": "Cajas exclusivas para suscriptores. {{days}} de estado restante",
+    "chibox_statuses": "Estados ChiBox",
+    "chibox_statuses_description": "Administra tus privilegios y obtén bonos exclusivos cada día",
+    "win_bonus_game": "Otorgado por ganar el juego de bonificación",
+    "cases_not_found": "Cajas no encontradas"
   }
 }

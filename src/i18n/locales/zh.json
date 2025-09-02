@@ -419,6 +419,33 @@
     "attempts_remaining": "剩余尝试次数：",
     "you_play": "你玩：",
     "goal": "目标：",
-    "goal_description": "连成三个相同符号（横、竖或斜线）即可获胜！"
+    "goal_description": "将3个符号排成一行（水平、垂直或对角线）即可获胜！"
+  },
+  "homepage": {
+    "loading_cases": "正在加载箱子...",
+    "cases_error": "加载箱子时出错",
+    "cases_temporarily_unavailable": "箱子暂时不可用",
+    "connection_error": "请检查您的网络连接",
+    "error_code": "错误代码：{{code}}",
+    "cases_not_configured": "箱子未配置",
+    "data_received_empty": "已接收数据，但箱子列表为空",
+    "refresh_cases": "刷新箱子",
+    "buy_case_error": "打开箱子时发生错误",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "每天让您的库存变得更好。打开箱子收集稀有物品！",
+    "your_luck_title": "您的运气",
+    "your_luck_description": "每个打开的箱子都是中大奖的机会。今天试试您的运气！",
+    "community_title": "社区",
+    "community_description": "加入数千名玩家。在排行榜上竞争并获胜！",
+    "free_cases": "免费箱子",
+    "free_cases_description": "为所有玩家提供的每日免费箱子",
+    "premium_cases": "高级箱子",
+    "premium_cases_description": "带有独家奖励的箱子",
+    "status_cases": "{{status}}箱子",
+    "status_cases_description": "订阅者专属箱子。剩余{{days}}天状态",
+    "chibox_statuses": "ChiBox状态",
+    "chibox_statuses_description": "管理您的特权并每天获得独家奖励",
+    "win_bonus_game": "因赢得奖励游戏而获得",
+    "cases_not_found": "未找到箱子"
   }
 }

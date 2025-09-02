@@ -419,6 +419,33 @@
     "attempts_remaining": "남은 시도 횟수:",
     "you_play": "당신이 플레이:",
     "goal": "목표:",
-    "goal_description": "3개의 기호를 한 줄로 만들어 (수평, 수직, 대각선) 승리하세요!"
+    "goal_description": "3개의 기호를 한 줄(가로, 세로 또는 대각선)로 모으면 승리하세요!"
+  },
+  "homepage": {
+    "loading_cases": "상자 로딩 중...",
+    "cases_error": "상자 로딩 오류",
+    "cases_temporarily_unavailable": "상자가 일시적으로 사용할 수 없습니다",
+    "connection_error": "인터넷 연결을 확인하세요",
+    "error_code": "오류 코드: {{code}}",
+    "cases_not_configured": "상자가 구성되지 않았습니다",
+    "data_received_empty": "데이터를 받았지만 상자 목록이 비어있습니다",
+    "refresh_cases": "상자 새로고침",
+    "buy_case_error": "상자를 여는 중 오류가 발생했습니다",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "매일 당신의 인벤토리를 더 좋게 만듭니다. 상자를 열고 희귀 아이템을 수집하세요!",
+    "your_luck_title": "당신의 행운",
+    "your_luck_description": "열린 상자마다 잭팟의 기회입니다. 오늘 운을 시험해보세요!",
+    "community_title": "커뮤니티",
+    "community_description": "수천 명의 플레이어와 함께하세요. 리더보드에서 경쟁하고 승리하세요!",
+    "free_cases": "무료 상자",
+    "free_cases_description": "모든 플레이어를 위한 매일 무료 상자",
+    "premium_cases": "프리미엄 상자",
+    "premium_cases_description": "독점 보상이 있는 상자",
+    "status_cases": "{{status}} 상자",
+    "status_cases_description": "구독자 전용 상자. {{days}}일 상태 남음",
+    "chibox_statuses": "ChiBox 상태",
+    "chibox_statuses_description": "특권을 관리하고 매일 독점 보너스를 받으세요",
+    "win_bonus_game": "보너스 게임 승리로 수여됨",
+    "cases_not_found": "상자를 찾을 수 없습니다"
   }
 }

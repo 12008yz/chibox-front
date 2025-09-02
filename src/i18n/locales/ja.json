@@ -419,6 +419,33 @@
     "attempts_remaining": "残り試行回数：",
     "you_play": "あなたのプレイ：",
     "goal": "目標：",
-    "goal_description": "3つのシンボルを一列に並べて（横、縦、斜め）勝利しよう！"
+    "goal_description": "3つのシンボルを一列（水平、垂直、または対角線）に揃えて勝利しよう！"
+  },
+  "homepage": {
+    "loading_cases": "ケースを読み込み中...",
+    "cases_error": "ケースの読み込みエラー",
+    "cases_temporarily_unavailable": "ケースが一時的に利用できません",
+    "connection_error": "インターネット接続を確認してください",
+    "error_code": "エラーコード：{{code}}",
+    "cases_not_configured": "ケースが設定されていません",
+    "data_received_empty": "データを受信しましたが、ケースリストが空です",
+    "refresh_cases": "ケースを更新",
+    "buy_case_error": "ケースを開く際にエラーが発生しました",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "毎日あなたのインベントリをより良くします。ケースを開いてレアアイテムを集めよう！",
+    "your_luck_title": "あなたの運",
+    "your_luck_description": "開いたケースごとにジャックポットのチャンス。今日運試しをしよう！",
+    "community_title": "コミュニティ",
+    "community_description": "何千人ものプレイヤーに参加しよう。リーダーボードで競争して勝利しよう！",
+    "free_cases": "無料ケース",
+    "free_cases_description": "全プレイヤー向け毎日無料ケース",
+    "premium_cases": "プレミアムケース",
+    "premium_cases_description": "限定報酬付きケース",
+    "status_cases": "{{status}}ケース",
+    "status_cases_description": "サブスクライバー限定ケース。ステータス残り{{days}}日",
+    "chibox_statuses": "ChiBoxステータス",
+    "chibox_statuses_description": "特権を管理し、毎日限定ボーナスを獲得しよう",
+    "win_bonus_game": "ボーナスゲーム勝利で付与",
+    "cases_not_found": "ケースが見つかりません"
   }
 }

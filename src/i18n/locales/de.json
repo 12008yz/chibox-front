@@ -424,5 +424,32 @@
     "you_play": "Sie spielen:",
     "goal": "Ziel:",
     "goal_description": "Sammeln Sie 3 Symbole in einer Reihe (horizontal, vertikal oder diagonal), um zu gewinnen!"
+  },
+  "homepage": {
+    "loading_cases": "Kisten werden geladen...",
+    "cases_error": "Fehler beim Laden der Kisten",
+    "cases_temporarily_unavailable": "Kisten vorübergehend nicht verfügbar",
+    "connection_error": "Überprüfen Sie Ihre Internetverbindung",
+    "error_code": "Fehlercode: {{code}}",
+    "cases_not_configured": "Kisten nicht konfiguriert",
+    "data_received_empty": "Daten erhalten, aber Kistenliste ist leer",
+    "refresh_cases": "Kisten aktualisieren",
+    "buy_case_error": "Ein Fehler trat beim Öffnen der Kiste auf",
+    "chibox_title": "CHIBOX",
+    "chibox_description": "Wir machen dein Inventar jeden Tag besser. Öffne Kisten und sammle seltene Gegenstände!",
+    "your_luck_title": "DEIN GLÜCK",
+    "your_luck_description": "Jede geöffnete Kiste ist eine Chance auf den Jackpot. Teste dein Glück heute!",
+    "community_title": "COMMUNITY",
+    "community_description": "Schließ dich Tausenden von Spielern an. Kämpfe in der Rangliste und gewinne!",
+    "free_cases": "Kostenlose Kisten",
+    "free_cases_description": "Tägliche kostenlose Kisten für alle Spieler",
+    "premium_cases": "Premium-Kisten",
+    "premium_cases_description": "Kisten mit exklusiven Belohnungen",
+    "status_cases": "{{status}} Kisten",
+    "status_cases_description": "Exklusive Kisten für Abonnenten. {{days}} Status verbleibend",
+    "chibox_statuses": "ChiBox Status",
+    "chibox_statuses_description": "Verwalte deine Privilegien und erhalte täglich exklusive Boni",
+    "win_bonus_game": "Vergeben für den Gewinn im Bonusspiel",
+    "cases_not_found": "Kisten nicht gefunden"
   }
 }
