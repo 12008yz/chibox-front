@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useGetUserInventoryQuery, useGetUserSubscriptionQuery } from '../features/user/userApi';
 import { CaseTemplate } from '../types/api';
@@ -140,6 +141,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   fixedPrices = false,
   onDataUpdate
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Получаем данные пользователя для учета бонусов (должно быть в начале)
@@ -658,7 +660,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   </span>
                 ) : (
                   parseFloat(caseData.price) === 0 || isNaN(parseFloat(caseData.price)) ? (
-                    <span>Бесплатный кейс</span>
+                    <span>{t('case_preview_modal.free_case')}</span>
                   ) : (
                     <Monetary value={parseFloat(caseData.price)} />
                   )
@@ -683,11 +685,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="spinner" />
-              <p className="text-white ml-4">Загрузка предметов...</p>
+              <p className="text-white ml-4">{t('case_preview_modal.loading_items')}</p>
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <p className="text-red-400">Ошибка загрузки предметов</p>
+              <p className="text-red-400">{t('case_preview_modal.loading_error')}</p>
             </div>
           ) : items.length > 0 ? (
             <div className="relative">
@@ -758,14 +760,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               if (parent) {
                                 const errorDiv = document.createElement('div');
                                 errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
-                                errorDiv.textContent = 'Нет изображения';
+                                errorDiv.textContent = t('case_preview_modal.no_image');
                                 parent.appendChild(errorDiv);
                               }
                             }}
                           />
                         ) : (
                           <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0">
-                            Нет изображения
+                            {t('case_preview_modal.no_image')}
                           </div>
                         )}
 
@@ -829,16 +831,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             {item.isExcluded ? (
                               <div>
                                 <p className="text-red-400 font-bold">
-                                  ✓ Уже получен
+                                  {t('case_preview_modal.already_received')}
                                 </p>
                               </div>
                             ) : (
                               <div>
                                 <p className="text-gray-400">
-                                  Шанс: {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
+                                  {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
                                   {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
                                     <span className="text-yellow-400 ml-1">
-                                      (+{(item.bonusApplied * 100).toFixed(1)}% бонус)
+                                      (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
                                     </span>
                                   )}
                                 </p>
@@ -851,7 +853,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444') && (
                           <div className="text-xs mt-1 z-99999 animate-fade-in-delayed">
                             <p className="text-red-400 font-bold">
-                              ✓ Получен!
+                              {t('case_preview_modal.received')}
                             </p>
                           </div>
                         )}
@@ -863,7 +865,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-400">Предметы не найдены</p>
+              <p className="text-gray-400">{t('case_preview_modal.no_items')}</p>
             </div>
           )}
         </div>
@@ -893,7 +895,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
               disabled={showOpeningAnimation}
             >
-              Закрыть
+              {t('case_preview_modal.close')}
             </button>
 
             {fixedPrices ? (
@@ -902,14 +904,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 {/* Селектор метода оплаты */}
                 {!showOpeningAnimation && (
                   <div className="flex items-center space-x-2">
-                    <label className="text-sm text-gray-400 whitespace-nowrap">Оплата:</label>
+                    <label className="text-sm text-gray-400 whitespace-nowrap">{t('case_preview_modal.payment_method')}</label>
                     <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value as 'balance' | 'bank_card')}
                       className="bg-gray-700 text-white rounded px-3 py-1 text-sm border border-gray-600 focus:border-purple-500 focus:outline-none"
                     >
-                      <option value="balance">Баланс</option>
-                      <option value="bank_card">Банковская карта</option>
+                      <option value="balance">{t('case_preview_modal.balance_payment')}</option>
+                      <option value="bank_card">{t('case_preview_modal.card_payment')}</option>
                     </select>
                   </div>
                 )}
@@ -923,11 +925,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   {buyLoading || openLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{paymentMethod === 'bank_card' ? 'Переход к оплате...' : 'Открытие...'}</span>
+                      <span>{paymentMethod === 'bank_card' ? t('case_preview_modal.going_to_payment') : t('case_preview_modal.opening')}</span>
                     </>
                   ) : (
                     <>
-                      <span>{paymentMethod === 'bank_card' ? 'Купить' : 'Открыть'}</span>
+                      <span>{paymentMethod === 'bank_card' ? t('case_preview_modal.buy') : t('case_preview_modal.open')}</span>
                       <span className="text-yellow-400 font-bold">
                         {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
                           ? '499₽'
@@ -952,11 +954,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         {buyLoading ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>Покупка...</span>
+                            <span>{t('case_preview_modal.buying')}</span>
                           </>
                         ) : (
                           <>
-                            <span>Купить и открыть</span>
+                            <span>{t('case_preview_modal.buy_and_open')}</span>
                             <Monetary value={statusData.data.price} />
                           </>
                         )}
@@ -972,10 +974,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         {openLoading ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>Открытие...</span>
+                            <span>{t('case_preview_modal.opening')}</span>
                           </>
                         ) : (
-                          <span>Открыть кейс</span>
+                          <span>{t('case_preview_modal.open_case')}</span>
                         )}
                       </button>
                     )}

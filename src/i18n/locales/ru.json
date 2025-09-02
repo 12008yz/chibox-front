@@ -754,6 +754,19 @@
     "welcome_bonus": "Приветственный бонус",
     "subscription_offer": "Специальное предложение",
     "limited_time": "Ограниченное время",
-    "get_status": "Получить статус"
+    "get_status": "Получить статус",
+    "go_to_page": "Перейти на страницу →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "Создание игры...",
+    "making_move": "Ход...",
+    "new_game": "Новая игра",
+    "no_games_left": "Игр не осталось",
+    "games_left": "Осталось игр:",
+    "won_currency": "Выиграли:",
+    "game_over": "Игра окончена",
+    "computer_thinking": "Компьютер думает...",
+    "play_tic_tac_toe": "Играть в крестики-нолики",
+    "close_game": "Закрыть игру"
   }
 }

@@ -773,6 +773,19 @@
     "welcome_bonus": "Welcome Bonus",
     "subscription_offer": "Special Offer",
     "limited_time": "Limited Time",
-    "get_status": "Get Status"
+    "get_status": "Get Status",
+    "go_to_page": "Go to page →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "Creating game...",
+    "making_move": "Making move...",
+    "new_game": "New Game",
+    "no_games_left": "No games left",
+    "games_left": "Games left:",
+    "won_currency": "Won:",
+    "game_over": "Game Over",
+    "computer_thinking": "Computer thinking...",
+    "play_tic_tac_toe": "Play Tic Tac Toe",
+    "close_game": "Close Game"
   }
 }

@@ -377,6 +377,19 @@
     "welcome_bonus": "Willkommens-Bonus",
     "subscription_offer": "Sonderangebot",
     "limited_time": "Begrenzte Zeit",
-    "get_status": "Status erhalten"
+    "get_status": "Status erhalten",
+    "go_to_page": "Zur Seite gehen →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "Erstelle Spiel...",
+    "making_move": "Zug wird gemacht...",
+    "new_game": "Neues Spiel",
+    "no_games_left": "Keine Spiele übrig",
+    "games_left": "Spiele übrig:",
+    "won_currency": "Gewonnen:",
+    "game_over": "Spiel beendet",
+    "computer_thinking": "Computer denkt...",
+    "play_tic_tac_toe": "Tic Tac Toe spielen",
+    "close_game": "Spiel schließen"
   }
 }

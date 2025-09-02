@@ -377,6 +377,19 @@
     "welcome_bonus": "Bonus de Bienvenue",
     "subscription_offer": "Offre Spéciale",
     "limited_time": "Temps Limité",
-    "get_status": "Obtenir un Statut"
+    "get_status": "Obtenir un Statut",
+    "go_to_page": "Aller à la page →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "Création du jeu...",
+    "making_move": "Coup en cours...",
+    "new_game": "Nouveau Jeu",
+    "no_games_left": "Plus de jeux",
+    "games_left": "Jeux restants :",
+    "won_currency": "Gagné :",
+    "game_over": "Jeu Terminé",
+    "computer_thinking": "L'ordinateur réfléchit...",
+    "play_tic_tac_toe": "Jouer au Morpion",
+    "close_game": "Fermer le Jeu"
   }
 }

@@ -377,6 +377,19 @@
     "welcome_bonus": "ウェルカムボーナス",
     "subscription_offer": "特別オファー",
     "limited_time": "期間限定",
-    "get_status": "ステータス取得"
+    "get_status": "ステータス取得",
+    "go_to_page": "ページに移動 →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "ゲーム作成中...",
+    "making_move": "手を指しています...",
+    "new_game": "新しいゲーム",
+    "no_games_left": "ゲームが残っていません",
+    "games_left": "残りゲーム数：",
+    "won_currency": "獲得：",
+    "game_over": "ゲーム終了",
+    "computer_thinking": "コンピューターが考えています...",
+    "play_tic_tac_toe": "三目並べをプレイ",
+    "close_game": "ゲームを閉じる"
   }
 }

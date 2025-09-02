@@ -377,6 +377,19 @@
     "welcome_bonus": "欢迎奖励",
     "subscription_offer": "特别优惠",
     "limited_time": "限时",
-    "get_status": "获得状态"
+    "get_status": "获得状态",
+    "go_to_page": "前往页面 →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "创建游戏中...",
+    "making_move": "正在下棋...",
+    "new_game": "新游戏",
+    "no_games_left": "没有剩余游戏",
+    "games_left": "剩余游戏:",
+    "won_currency": "获得:",
+    "game_over": "游戏结束",
+    "computer_thinking": "电脑思考中...",
+    "play_tic_tac_toe": "玩井字棋",
+    "close_game": "关闭游戏"
   }
 }

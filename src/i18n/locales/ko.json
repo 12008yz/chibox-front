@@ -377,6 +377,19 @@
     "welcome_bonus": "환영 보너스",
     "subscription_offer": "특별 제안",
     "limited_time": "한정 시간",
-    "get_status": "상태 획득"
+    "get_status": "상태 획득",
+    "go_to_page": "페이지로 이동 →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "게임 생성 중...",
+    "making_move": "수를 두는 중...",
+    "new_game": "새 게임",
+    "no_games_left": "남은 게임이 없습니다",
+    "games_left": "남은 게임:",
+    "won_currency": "획득:",
+    "game_over": "게임 종료",
+    "computer_thinking": "컴퓨터가 생각 중...",
+    "play_tic_tac_toe": "틱택토 플레이",
+    "close_game": "게임 닫기"
   }
 }

@@ -377,6 +377,19 @@
     "welcome_bonus": "Bonus de Bienvenida",
     "subscription_offer": "Oferta Especial",
     "limited_time": "Tiempo Limitado",
-    "get_status": "Obtener Estado"
+    "get_status": "Obtener Estado",
+    "go_to_page": "Ir a la página →"
+  },
+  "tic_tac_toe_game": {
+    "creating_game": "Creando juego...",
+    "making_move": "Haciendo movimiento...",
+    "new_game": "Nuevo Juego",
+    "no_games_left": "No quedan juegos",
+    "games_left": "Juegos restantes:",
+    "won_currency": "Ganado:",
+    "game_over": "Juego Terminado",
+    "computer_thinking": "La computadora piensa...",
+    "play_tic_tac_toe": "Jugar Tres en Línea",
+    "close_game": "Cerrar Juego"
   }
 }
