@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   useCreateTicTacToeGameMutation,
   useGetCurrentTicTacToeGameQuery,
@@ -13,8 +14,9 @@ interface TicTacToeGameProps {
 
 const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
 
- 
 
+
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -140,7 +142,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         }
       }
     } catch (error: any) {
-      setMessage(error?.data?.error || 'Ошибка при совершении хода');
+      setMessage(error?.data?.error || t('tic_tac_toe_game.move_error'));
     } finally {
       setSelectedCell(null);
       setTimeout(() => setAnimatingCells([]), 600);
@@ -207,18 +209,18 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
     if (game.game_state.status === 'finished') {
       if (game.game_state.winner === 'player') {
-        return '🎉 Вы выиграли!';
+        return t('tic_tac_toe_game.you_won');
       } else if (game.game_state.winner === 'bot') {
-        return '😞 Вы проиграли';
+        return t('tic_tac_toe_game.you_lost');
       } else {
-        return '🤝 Ничья';
+        return t('tic_tac_toe_game.draw');
       }
     }
 
     if (game.game_state.currentPlayer === 'player') {
-      return '🎮 Ваш ход';
+      return t('tic_tac_toe_game.your_turn');
     } else {
-      return '🤖 Ход бота...';
+      return t('tic_tac_toe_game.bot_turn');
     }
   };
 
@@ -240,7 +242,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 max-w-lg w-full mx-4 border-2 border-gray-700 shadow-2xl transform transition-all duration-300"
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Крестики-нолики</h2>
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">{t('tic_tac_toe_game.title')}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-2xl hover:rotate-90 transition-all duration-300"
@@ -252,13 +254,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         {!canPlay ? (
           <div className="text-center">
             <div className="text-6xl mb-6">😴</div>
-            <p className="text-red-400 mb-4 text-lg">У вас закончились попытки на сегодня!</p>
-            <p className="text-gray-400 mb-8">Приходите завтра за новыми попытками.</p>
+            <p className="text-red-400 mb-4 text-lg">{t('tic_tac_toe_game.no_attempts_left')}</p>
+            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.come_back_tomorrow')}</p>
             <button
               onClick={onClose}
               className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
             >
-              Закрыть
+{t('tic_tac_toe_game.close')}
             </button>
           </div>
         ) : showResult && gameResult === 'win' ? (
@@ -267,15 +269,15 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             <div className="mb-8">
               <div className="animate-bounce">
                 <div className="text-8xl mb-6">🎉</div>
-                <h3 className="text-3xl font-bold text-green-400 mb-4">Поздравляем!</h3>
-                <p className="text-white mb-6 text-lg">Вы выиграли и получили бонусный кейс!</p>
+                <h3 className="text-3xl font-bold text-green-400 mb-4">{t('tic_tac_toe_game.congratulations')}</h3>
+                <p className="text-white mb-6 text-lg">{t('tic_tac_toe_game.won_bonus_case')}</p>
               </div>
             </div>
 
             {/* Финальная доска с результатами */}
             {game && game.game_state && (
               <div className="mb-8">
-                <p className="text-gray-300 mb-4 text-sm">Финальная доска:</p>
+                <p className="text-gray-300 mb-4 text-sm">{t('tic_tac_toe_game.final_board')}</p>
                 <div className="grid grid-cols-3 gap-3 mx-auto w-fit mb-6">
                   {Array.from({ length: 9 }, (_, index) => (
                     <div
@@ -288,7 +290,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                 </div>
 
                 <div className="text-sm text-gray-400">
-                  <p>🎮 Вы играли ✖️ и выиграли!</p>
+                  <p>{t('tic_tac_toe_game.you_played_x_won')}</p>
                 </div>
               </div>
             )}
@@ -300,7 +302,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                   disabled={isCreatingGame}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-500 hover:to-green-400 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 font-semibold"
                 >
-                  {isCreatingGame ? 'Создание...' : 'Играть еще'}
+                  {isCreatingGame ? t('tic_tac_toe_game.creating') : t('tic_tac_toe_game.play_again')}
                 </button>
               )}
 
@@ -308,13 +310,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                 onClick={onClose}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-500 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 font-semibold"
               >
-                Забрать приз
+{t('tic_tac_toe_game.claim_prize')}
               </button>
             </div>
 
             {game?.attempts_left !== undefined && (
               <p className="text-sm text-gray-400 mt-6 bg-gray-800 rounded-lg p-3">
-                Осталось попыток: <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
+                {t('tic_tac_toe_game.attempts_left')} <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
               </p>
             )}
           </div>
@@ -323,14 +325,14 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {/* Экран ожидания во время обработки результата */}
             <div className="mb-8">
               <div className="text-6xl mb-6 animate-spin">⏳</div>
-              <p className="text-white text-lg">Обрабатываем результат...</p>
+              <p className="text-white text-lg">{t('tic_tac_toe_game.processing_result')}</p>
             </div>
           </div>
         ) : (!game || !game.game_state) && !showResult ? (
           <div className="text-center">
             <div className="text-6xl mb-6">🎮</div>
             <div className="animate-pulse">
-              <p className="text-white text-lg">Создаем новую игру...</p>
+              <p className="text-white text-lg">{t('tic_tac_toe_game.creating_game')}</p>
             </div>
           </div>
         ) : (
@@ -358,17 +360,17 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                   {gameResult === 'lose' && (
                     <div>
                       <div className="text-6xl mb-4">😞</div>
-                      <h3 className="text-2xl font-bold text-red-400 mb-2">Поражение</h3>
-                      <p className="text-white mb-4">В этот раз не повезло, но не сдавайтесь!</p>
-                      <p className="text-sm text-gray-400">🤖 Бот играл ⭕ и выиграл</p>
+                      <h3 className="text-2xl font-bold text-red-400 mb-2">{t('tic_tac_toe_game.defeat')}</h3>
+                      <p className="text-white mb-4">{t('tic_tac_toe_game.no_luck_this_time')}</p>
+                      <p className="text-sm text-gray-400">{t('tic_tac_toe_game.bot_won')}</p>
                     </div>
                   )}
                   {gameResult === 'draw' && (
                     <div>
                       <div className="text-6xl mb-4">🤝</div>
-                      <h3 className="text-2xl font-bold text-yellow-400 mb-2">Ничья</h3>
-                      <p className="text-white mb-4">Хорошая игра! Попробуйте переиграть!</p>
-                      <p className="text-sm text-gray-400">🤝 Ничья - никто не выиграл</p>
+                      <h3 className="text-2xl font-bold text-yellow-400 mb-2">{t('tic_tac_toe_game.draw')}</h3>
+                      <p className="text-white mb-4">{t('tic_tac_toe_game.good_game')}</p>
+                      <p className="text-sm text-gray-400">{t('tic_tac_toe_game.draw_nobody_won')}</p>
                     </div>
                   )}
 
@@ -379,7 +381,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                         disabled={isCreatingGame}
                         className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-500 hover:to-green-400 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 font-semibold"
                       >
-                        {isCreatingGame ? 'Создание...' : 'Играть еще'}
+                        {isCreatingGame ? t('tic_tac_toe_game.creating') : t('tic_tac_toe_game.play_again')}
                       </button>
                     )}
 
@@ -387,14 +389,14 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                       onClick={onClose}
                       className="flex-1 px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105 font-semibold"
                     >
-                      Закрыть
+        {t('tic_tac_toe_game.close')}
                     </button>
                   </div>
                 </div>
 
                 {game?.attempts_left !== undefined && (
                   <p className="text-sm text-gray-400 mt-4 bg-gray-800 rounded-lg p-3">
-                    Осталось попыток: <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
+                    {t('tic_tac_toe_game.attempts_left')} <span className="text-yellow-400 font-semibold">{game.attempts_left}</span>
                   </p>
                 )}
               </div>
@@ -404,12 +406,12 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {!showResult && (
               <div className="text-center mb-6">
                 <p className="text-xl font-semibold text-white mb-4 bg-gray-800 rounded-xl p-4">
-                  {isProcessingResult ? '⏳ Обрабатываем результат...' : getStatusMessage()}
+                  {isProcessingResult ? t('tic_tac_toe_game.processing_result_status') : getStatusMessage()}
                 </p>
 
                 <div className="flex justify-between text-sm text-gray-400 bg-gray-800 rounded-lg p-3">
-                  <span>Попыток осталось: <span className="text-yellow-400 font-semibold">{game?.attempts_left || 0}</span></span>
-                  <span>Вы играете: <span className="text-blue-400 font-semibold">✖️</span></span>
+                  <span>{t('tic_tac_toe_game.attempts_remaining')} <span className="text-yellow-400 font-semibold">{game?.attempts_left || 0}</span></span>
+                  <span>{t('tic_tac_toe_game.you_play')} <span className="text-blue-400 font-semibold">✖️</span></span>
                 </div>
               </div>
             )}
@@ -425,7 +427,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {!isProcessingResult && !showResult && (
               <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 rounded-xl">
                 <p className="text-sm text-gray-300 text-center">
-                  <span className="font-semibold text-blue-400">Цель:</span> Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!
+                  <span className="font-semibold text-blue-400">{t('tic_tac_toe_game.goal')}</span> {t('tic_tac_toe_game.goal_description')}
                 </p>
               </div>
             )}
