@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface BannerProps {
   left: {
@@ -12,6 +13,8 @@ interface BannerProps {
 }
 
 const Banner: React.FC<BannerProps> = ({ left, right }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className="w-screen max-w-[1920px] h-[460px] bg-no-repeat hidden md:flex bg-cover"
@@ -31,7 +34,7 @@ const Banner: React.FC<BannerProps> = ({ left, right }) => {
                   </span>
                   <Link to={left?.link}>
                     <div className="flex items-center gap-2 mt-2 text-[#70699b] hover:text-[#CF3464] transition-all">
-                      Перейти на страницу →
+                      {t('banner.go_to_page')}
                     </div>
                   </Link>
                 </div>
