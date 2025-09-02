@@ -607,7 +607,8 @@
     "rarity_milspec": "АРМЕЙСКОЕ",
     "rarity_industrial": "ПРОМЫШЛЕННОЕ",
     "rarity_consumer": "ПОТРЕБИТЕЛЬСКОЕ",
-    "rarity_contraband": "КОНТРАБАНДА"
+    "rarity_contraband": "КОНТРАБАНДА",
+    "no_items_for_exchange": "Нет предметов для обмена"
   },
   "slots": {
     "title": "Слот-машина",

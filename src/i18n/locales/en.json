@@ -626,7 +626,8 @@
     "rarity_milspec": "MIL-SPEC",
     "rarity_industrial": "INDUSTRIAL",
     "rarity_consumer": "CONSUMER",
-    "rarity_contraband": "CONTRABAND"
+    "rarity_contraband": "CONTRABAND",
+    "no_items_for_exchange": "No items for exchange"
   },
   "slots": {
     "title": "Slot Machine",

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../store/hooks';
 import {
   useGetUserInventoryQuery,
@@ -32,6 +33,7 @@ const ItemCard: React.FC<{
   isLoading?: boolean;
   minExchangePrice: number;
 }> = ({ itemGroup, onSellItem, onExchangeItem, calculateSubscriptionDays, selectedTab, isLoading = false, minExchangePrice }) => {
+  const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const { item, count } = itemGroup;
   // Используем price как sellPrice (цена продажи = 70% от рыночной стоимости)
@@ -54,13 +56,13 @@ const ItemCard: React.FC<{
 
   const getRarityDisplayName = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
-      case 'covert': return 'СЕКРЕТНОЕ';
-      case 'classified': return 'ЗАСЕКРЕЧЕННОЕ';
-      case 'restricted': return 'ЗАПРЕЩЁННОЕ';
-      case 'milspec': return 'АРМЕЙСКОЕ';
-      case 'industrial': return 'ПРОМЫШЛЕННОЕ';
-      case 'consumer': return 'ПОТРЕБИТЕЛЬСКОЕ';
-      case 'contraband': return 'КОНТРАБАНДА';
+      case 'covert': return t('exchange.rarity_covert');
+      case 'classified': return t('exchange.rarity_classified');
+      case 'restricted': return t('exchange.rarity_restricted');
+      case 'milspec': return t('exchange.rarity_milspec');
+      case 'industrial': return t('exchange.rarity_industrial');
+      case 'consumer': return t('exchange.rarity_consumer');
+      case 'contraband': return t('exchange.rarity_contraband');
       default: return rarity?.toUpperCase() || 'ОБЫЧНОЕ';
     }
   };
@@ -106,7 +108,7 @@ const ItemCard: React.FC<{
           )}
 
           <div className="flex justify-between items-center text-xs">
-            <span className="text-purple-300">Цена:</span>
+            <span className="text-purple-300">{t('exchange.item_price')}</span>
             <span className="text-purple-300 font-semibold">
               <Monetary value={itemPrice} />
             </span>
@@ -114,7 +116,7 @@ const ItemCard: React.FC<{
 
           {sellPrice > 0 && selectedTab === 'sell' && (
             <div className="flex justify-between items-center text-xs">
-              <span className="text-green-300">Продажа:</span>
+              <span className="text-green-300">{t('exchange.item_sell_price')}</span>
               <span className="text-green-300 font-semibold">
                 <Monetary value={sellPrice} />
               </span>
@@ -123,9 +125,9 @@ const ItemCard: React.FC<{
 
           {selectedTab === 'exchange' && (
             <div className="flex justify-between items-center text-xs">
-              <span className="text-purple-300">Статус:</span>
+              <span className="text-purple-300">{t('exchange.item_subscription_days')}</span>
               <span className={`font-semibold ${subscriptionDays >= 1 ? 'text-purple-300' : 'text-red-400'}`}>
-                {subscriptionDays >= 1 ? formatDays(subscriptionDays) : 'Мало'}
+                {subscriptionDays >= 1 ? formatDays(subscriptionDays) : t('exchange.days_few')}
               </span>
             </div>
           )}
@@ -143,10 +145,10 @@ const ItemCard: React.FC<{
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Продаём...
+                  {t('exchange.selling')}
                 </div>
               ) : (
-                <>💸 Продать за {Math.round(sellPrice)}₽</>
+                <>{t('exchange.sell_for', { price: Math.round(sellPrice) })}</>
               )}
             </button>
           )}
@@ -161,17 +163,17 @@ const ItemCard: React.FC<{
                   ? 'bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 disabled:from-gray-600 disabled:to-gray-700 text-white'
                   : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 cursor-not-allowed'
               }`}
-              title={subscriptionDays < 1 ? `Предмет слишком дешевый для обмена (минимум ${minExchangePrice}₽)` : ''}
+              title={subscriptionDays < 1 ? t('exchange.min_exchange_price', { price: minExchangePrice }) : ''}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Обмениваем...
+                  {t('exchange.exchanging')}
                 </div>
               ) : subscriptionDays >= 1 ? (
-                <>⭐ Обменять на {formatDays(subscriptionDays)}</>
+                <>{t('exchange.exchange_for', { days: formatDays(subscriptionDays) })}</>
               ) : (
-                <>❌ Слишком дешевый</>
+                <>{t('exchange.too_cheap')}</>
               )}
             </button>
           )}
@@ -182,6 +184,7 @@ const ItemCard: React.FC<{
 };
 
 const ExchangePage: React.FC = () => {
+  const { t } = useTranslation();
   const auth = useAuth();
   const [selectedTab, setSelectedTab] = useState<'sell' | 'exchange'>('sell');
   const [searchTerm, setSearchTerm] = useState('');
@@ -265,13 +268,13 @@ const ExchangePage: React.FC = () => {
   const handleSellItem = async (itemId: string, itemName: string, sellPrice: number) => {
     try {
       if (!auth.user?.id) {
-        toast.error('Необходимо авторизоваться для продажи предметов');
+        toast.error(t('errors.access_denied'));
         return;
       }
 
       // Защита от множественных кликов
       if (isSellingItem) {
-        toast.error('Дождитесь завершения предыдущей продажи');
+        toast.error(t('exchange.selling'));
         return;
       }
 
@@ -280,14 +283,14 @@ const ExchangePage: React.FC = () => {
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
       if (!itemGroup || itemGroup.instances.length === 0) {
-        toast.error('Предмет не найден в инвентаре');
+        toast.error(t('errors.not_found'));
         return;
       }
 
       // Берем первый доступный экземпляр для продажи
       const availableInstances = itemGroup.instances.filter(instance => instance.status === 'inventory');
       if (availableInstances.length === 0) {
-        toast.error('Нет доступных для продажи экземпляров этого предмета');
+        toast.error(t('exchange.no_items_to_sell'));
         return;
       }
 
@@ -296,7 +299,7 @@ const ExchangePage: React.FC = () => {
 
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
-        toast.success(`Предмет "${itemName}" (1 шт.) продан за ${Math.round(sellPrice)}₽!`);
+        toast.success(t('exchange.sell_for', { price: Math.round(sellPrice) }) + ` - "${itemName}"`);
         // Принудительно обновляем инвентарь для ProfilePage
         setTimeout(() => {
           refetchInventory();
@@ -304,7 +307,7 @@ const ExchangePage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Ошибка при продаже предмета:', error);
-      const errorMessage = error?.data?.message || error?.message || 'Ошибка при продаже предмета';
+      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
     }
   };
@@ -313,7 +316,7 @@ const ExchangePage: React.FC = () => {
   const handleExchangeItem = async (itemId: string, itemName: string, itemPrice: number) => {
     try {
       if (!auth.user?.id) {
-        toast.error('Необходимо авторизоваться для обмена предметов');
+        toast.error(t('errors.access_denied'));
         return;
       }
 
@@ -321,7 +324,7 @@ const ExchangePage: React.FC = () => {
       const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
       if (subscriptionDays < 1 || itemPrice < minExchangePrice) {
-        toast.error(`Предмет слишком дешевый для обмена. Минимальная стоимость для тарифа ${currentTier}: ${minExchangePrice}₽ (стоимость предмета: ${Math.round(itemPrice)}₽)`);
+        toast.error(t('exchange.min_exchange_price', { price: minExchangePrice }) + ` (${Math.round(itemPrice)}₽)`);
         return;
       }
 
@@ -330,14 +333,14 @@ const ExchangePage: React.FC = () => {
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
       if (!itemGroup || itemGroup.instances.length === 0) {
-        toast.error('Предмет не найден в инвентаре');
+        toast.error(t('errors.not_found'));
         return;
       }
 
       // Берем первый доступный экземпляр для обмена
       const inventoryItem = itemGroup.instances[0];
       if (inventoryItem.status !== 'inventory') {
-        toast.error('Предмет недоступен для обмена');
+        toast.error(t('exchange.no_items_for_exchange'));
         return;
       }
 
@@ -350,9 +353,9 @@ const ExchangePage: React.FC = () => {
       if (result.success) {
         toast.success(
           <div>
-            <div className="font-semibold">Обмен успешен!</div>
-            <div className="text-sm">Предмет "{itemName}" обменян на {formatDays(result.data.subscription_days_added)} подписки</div>
-            <div className="text-xs text-gray-300">Всего {formatDays(result.data.subscription_days_left)}</div>
+            <div className="font-semibold">{t('common.success')}!</div>
+            <div className="text-sm">{t('exchange.exchange_for', { days: formatDays(result.data.subscription_days_added) })} - "{itemName}"</div>
+            <div className="text-xs text-gray-300">{t('exchange.tier')} {formatDays(result.data.subscription_days_left)}</div>
           </div>
         );
         // Принудительно обновляем инвентарь для ProfilePage
@@ -362,7 +365,7 @@ const ExchangePage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Ошибка при обмене предмета:', error);
-      const errorMessage = error?.data?.message || error?.message || 'Ошибка при обмене предмета';
+      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
     }
   };
@@ -383,14 +386,14 @@ const ExchangePage: React.FC = () => {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 001.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white">ОБМЕН ПРЕДМЕТОВ</h1>
+            <h1 className="text-3xl font-bold text-white">{t('exchange.title')}</h1>
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.383-1.835-.528-2.516zM16 11.459c-.145.681-.318 1.617-.528 2.516.508-.29 1.026-.564 1.554-.82a.75.75 0 00.419-.74 41.029 41.029 0 00-.39-3.114 29.848 29.848 0 00-2.455 1.158z" clipRule="evenodd"/>
               </svg>
             </div>
           </div>
-          <p className="text-gray-400 text-lg">Продавай • Обменивай • Получай статус</p>
+          <p className="text-gray-400 text-lg">{t('exchange.subtitle')}</p>
         </div>
 
         {/* Игровая панель управления */}
@@ -401,7 +404,7 @@ const ExchangePage: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <div className="text-green-400 text-2xl">💰</div>
                 <div>
-                  <div className="text-green-400 text-sm font-medium">БАЛАНС</div>
+                  <div className="text-green-400 text-sm font-medium">{t('exchange.balance')}</div>
                   <div className="text-white text-xl font-bold">
                     <Monetary value={parseFloat(auth.user?.balance?.toString() || '0')} />
                   </div>
@@ -413,13 +416,13 @@ const ExchangePage: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <div className="text-purple-400 text-2xl">⭐</div>
                 <div>
-                  <div className="text-purple-400 text-sm font-medium">СТАТУС</div>
+                  <div className="text-purple-400 text-sm font-medium">{t('exchange.status')}</div>
                   {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
                     <div className="text-white text-xl font-bold">
                       {formatDays(subscriptionData.data.subscription_days_left)}
                     </div>
                   ) : (
-                    <div className="text-gray-400 text-xl font-bold">НЕТ</div>
+                    <div className="text-gray-400 text-xl font-bold">{t('exchange.no_status')}</div>
                   )}
                 </div>
               </div>
@@ -429,9 +432,9 @@ const ExchangePage: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <div className="text-orange-400 text-2xl">🔄</div>
                 <div>
-                  <div className="text-orange-400 text-sm font-medium">КУРС</div>
-                  <div className="text-white text-xl font-bold">{pricePerDay}₽/день</div>
-                  <div className="text-gray-500 text-xs">Тариф {subscriptionData?.data?.subscription_tier || 1}</div>
+                  <div className="text-orange-400 text-sm font-medium">{t('exchange.exchange_rate')}</div>
+                  <div className="text-white text-xl font-bold">{pricePerDay}₽/{t('time.day')}</div>
+                  <div className="text-gray-500 text-xs">{t('exchange.tier', { tier: subscriptionData?.data?.subscription_tier || 1 })}</div>
                 </div>
               </div>
             </div>
@@ -449,7 +452,7 @@ const ExchangePage: React.FC = () => {
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
-                  💰 ПРОДАЖА
+                  {t('exchange.sell_mode')}
                 </button>
                 <button
                   onClick={() => setSelectedTab('exchange')}
@@ -459,7 +462,7 @@ const ExchangePage: React.FC = () => {
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
-                  ⭐ ОБМЕН
+                  {t('exchange.exchange_mode')}
                 </button>
               </div>
             </div>
@@ -472,7 +475,7 @@ const ExchangePage: React.FC = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="🔍 Поиск предметов..."
+                placeholder={t('exchange.search_placeholder')}
                 className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
               />
             </div>
@@ -484,7 +487,7 @@ const ExchangePage: React.FC = () => {
               >
                 {rarities.map(rarity => (
                   <option key={rarity} value={rarity} className="bg-[#1a1426] text-white">
-                    {rarity === 'all' ? 'Все редкости' : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                    {rarity === 'all' ? t('exchange.all_rarities') : rarity.charAt(0).toUpperCase() + rarity.slice(1)}
                   </option>
                 ))}
               </select>
@@ -497,7 +500,7 @@ const ExchangePage: React.FC = () => {
               onClick={() => setShowExchangeInfo(!showExchangeInfo)}
               className="text-gray-400 hover:text-white transition-colors text-sm"
             >
-              {showExchangeInfo ? '▼ Скрыть информацию' : '▶ Показать информацию о тарифах'}
+              {showExchangeInfo ? t('exchange.hide_info') : t('exchange.show_info')}
             </button>
           </div>
         </div>
@@ -507,8 +510,8 @@ const ExchangePage: React.FC = () => {
           <div className="mb-6 bg-gradient-to-r from-amber-600/10 to-orange-600/10 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h4 className="text-amber-300 font-semibold text-lg mb-2">Тарифы обмена</h4>
-                <p className="text-gray-300 text-sm">Подробная информация о ценах и условиях обмена</p>
+                <h4 className="text-amber-300 font-semibold text-lg mb-2">{t('exchange.exchange_rates_title')}</h4>
+                <p className="text-gray-300 text-sm">{t('exchange.exchange_rates_description')}</p>
               </div>
               <button
                 onClick={() => setShowExchangeInfo(false)}
@@ -522,29 +525,29 @@ const ExchangePage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-black/20 rounded-lg p-4">
-                <h5 className="text-blue-300 font-medium mb-2">Тариф 1 (Статус)</h5>
-                <p className="text-white text-lg font-bold">150₽ за день</p>
-                <p className="text-gray-400 text-sm">Базовая подписка</p>
+                <h5 className="text-blue-300 font-medium mb-2">{t('exchange.tier_1_title')}</h5>
+                <p className="text-white text-lg font-bold">{t('exchange.tier_1_price')}</p>
+                <p className="text-gray-400 text-sm">{t('exchange.tier_1_description')}</p>
               </div>
               <div className="bg-black/20 rounded-lg p-4">
-                <h5 className="text-purple-300 font-medium mb-2">Тариф 2 (Статус+)</h5>
-                <p className="text-white text-lg font-bold">150₽ за день</p>
-                <p className="text-gray-400 text-sm">Улучшенная подписка</p>
+                <h5 className="text-purple-300 font-medium mb-2">{t('exchange.tier_2_title')}</h5>
+                <p className="text-white text-lg font-bold">{t('exchange.tier_2_price')}</p>
+                <p className="text-gray-400 text-sm">{t('exchange.tier_2_description')}</p>
               </div>
               <div className="bg-black/20 rounded-lg p-4 border border-yellow-500/30">
-                <h5 className="text-yellow-300 font-medium mb-2">Тариф 3 (Статус++)</h5>
-                <p className="text-white text-lg font-bold">300₽ за день</p>
-                <p className="text-gray-400 text-sm">Премиум подписка</p>
+                <h5 className="text-yellow-300 font-medium mb-2">{t('exchange.tier_3_title')}</h5>
+                <p className="text-white text-lg font-bold">{t('exchange.tier_3_price')}</p>
+                <p className="text-gray-400 text-sm">{t('exchange.tier_3_description')}</p>
               </div>
             </div>
 
             <div className="mt-4 p-4 bg-purple-600/10 rounded-lg">
-              <h6 className="text-purple-300 font-medium mb-2">Важные условия:</h6>
+              <h6 className="text-purple-300 font-medium mb-2">{t('exchange.important_conditions')}</h6>
               <ul className="text-sm text-gray-300 space-y-1">
-                <li>• Минимальная стоимость предмета для обмена: <span className="text-purple-400 font-medium">{minExchangePrice}₽</span></li>
-                <li>• При продаже вы получаете <span className="text-green-400 font-medium">70% от стоимости</span> предмета</li>
-                <li>• Обменянные предметы нельзя вернуть</li>
-                <li>• Дни подписки суммируются с текущими</li>
+                <li>• {t('exchange.min_exchange_price', { price: minExchangePrice })}</li>
+                <li>• {t('exchange.sell_percentage')}</li>
+                <li>• {t('exchange.no_returns')}</li>
+                <li>• {t('exchange.days_accumulate')}</li>
               </ul>
             </div>
           </div>
@@ -556,26 +559,26 @@ const ExchangePage: React.FC = () => {
         <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">
-              {selectedTab === 'sell' ? 'Предметы для продажи' : 'Предметы для обмена'}
+              {selectedTab === 'sell' ? t('exchange.items_for_sale') : t('exchange.items_for_exchange')}
             </h2>
             <span className="text-gray-400">
-              {groupedAndFilteredItems.length} предметов
+              {t('exchange.items_count', { count: groupedAndFilteredItems.length })}
             </span>
           </div>
 
           {isLoadingInventory ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-              <span className="ml-3 text-gray-400">Загрузка инвентаря...</span>
+              <span className="ml-3 text-gray-400">{t('exchange.loading_inventory')}</span>
             </div>
           ) : inventoryError ? (
             <div className="text-center py-12">
-              <p className="text-red-400 mb-4">Ошибка загрузки инвентаря</p>
+              <p className="text-red-400 mb-4">{t('exchange.inventory_error')}</p>
               <button
                 onClick={() => refetchInventory()}
                 className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
               >
-                Попробовать снова
+                {t('exchange.try_again')}
               </button>
             </div>
           ) : groupedAndFilteredItems.length === 0 ? (
@@ -587,14 +590,14 @@ const ExchangePage: React.FC = () => {
               </div>
               <p className="text-gray-400 text-lg mb-2">
                 {selectedTab === 'sell'
-                  ? 'Нет предметов для продажи'
-                  : 'Нет предметов в инвентаре'
+                  ? t('exchange.no_items_to_sell')
+                  : t('exchange.no_items_in_inventory')
                 }
               </p>
               <p className="text-gray-500 text-sm">
                 {selectedTab === 'sell'
-                  ? 'Попробуйте открыть кейсы, чтобы получить предметы для продажи'
-                  : 'Попробуйте изменить фильтры или открыть кейсы'
+                  ? t('exchange.open_cases_to_sell')
+                  : t('exchange.change_filters_or_open_cases')
                 }
               </p>
             </div>
