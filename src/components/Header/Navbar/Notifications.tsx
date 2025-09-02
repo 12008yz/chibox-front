@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
 import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
@@ -10,6 +11,7 @@ interface NotificationsProps {
 }
 
 const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpenNotifications }) => {
+    const { t } = useTranslation();
     const notificationsRef = useRef<HTMLDivElement>(null);
 
     // Получаем уведомления из API
@@ -41,7 +43,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     }, 100);
                 })
                 .catch((error) => {
-                    console.error('Ошибка при прочтении уведомлений при закрытии:', error);
+                    console.error(t('notifications.error_marking_read_on_close'), error);
                 });
         }
 
@@ -54,7 +56,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             await markAsRead(notificationId).unwrap();
             refetchNotifications();
         } catch (error) {
-            console.error('Ошибка при отметке уведомления как прочитанного:', error);
+            console.error(t('notifications.error_marking_notification_read'), error);
         }
     };
 
@@ -64,7 +66,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             await markAllAsRead().unwrap();
             refetchNotifications();
         } catch (error) {
-            console.error('Ошибка при отметке всех уведомлений как прочитанных:', error);
+            console.error(t('notifications.error_marking_all_read'), error);
         }
     };
 
@@ -100,15 +102,106 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         };
     }, [openNotifications, unreadCount, markAllAsRead, refetchNotifications]);
 
+    // Функция для перевода уведомлений
+    const translateNotification = (notification: Notification) => {
+        const { title, message } = notification;
+
+        // Определяем тип уведомления по заголовку и переводим
+        if (title.includes('Покупка кейсов') || title.toLowerCase().includes('case purchase')) {
+            const match = message.match(/(\d+).+?(\d+)₽/);
+            if (match) {
+                return {
+                    title: t('notifications.notification_types.case_purchase'),
+                    message: t('notifications.notification_types.case_purchase_message', {
+                        count: match[1],
+                        amount: match[2]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Повышение уровня') || title.toLowerCase().includes('level up')) {
+            const levelMatch = message.match(/уровня (\d+)/);
+            const bonusMatch = message.match(/\+(\d+\.?\d*)%/);
+            if (levelMatch && bonusMatch) {
+                return {
+                    title: t('notifications.notification_types.level_up'),
+                    message: t('notifications.notification_types.level_up_message', {
+                        level: levelMatch[1],
+                        bonus: bonusMatch[1]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Новый кейс получен') || title.toLowerCase().includes('new case received')) {
+            const caseMatch = message.match(/кейс: (.+)$/);
+            if (caseMatch) {
+                return {
+                    title: t('notifications.notification_types.new_case_received'),
+                    message: t('notifications.notification_types.new_case_received_message', {
+                        caseName: caseMatch[1]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Кейс открыт') || title.toLowerCase().includes('case opened')) {
+            const itemMatch = message.match(/получили: (.+)$/);
+            if (itemMatch) {
+                return {
+                    title: t('notifications.notification_types.case_opened'),
+                    message: t('notifications.notification_types.case_opened_message', {
+                        itemName: itemMatch[1]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Бонус') || title.toLowerCase().includes('bonus')) {
+            const amountMatch = message.match(/(\d+)₽/);
+            if (amountMatch) {
+                return {
+                    title: t('notifications.notification_types.bonus_claimed'),
+                    message: t('notifications.notification_types.bonus_claimed_message', {
+                        amount: amountMatch[1]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Достижение') || title.toLowerCase().includes('achievement')) {
+            const achievementMatch = message.match(/достижение: (.+)$/);
+            if (achievementMatch) {
+                return {
+                    title: t('notifications.notification_types.achievement_unlocked'),
+                    message: t('notifications.notification_types.achievement_unlocked_message', {
+                        achievementName: achievementMatch[1]
+                    })
+                };
+            }
+        }
+
+        if (title.includes('Добро пожаловать') || title.toLowerCase().includes('welcome')) {
+            return {
+                title: t('notifications.notification_types.welcome'),
+                message: t('notifications.notification_types.welcome_message')
+            };
+        }
+
+        // Если не удалось определить тип, возвращаем оригинальный текст
+        return { title, message };
+    };
+
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
         const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-        if (diffInMinutes < 1) return 'Сейчас';
-        if (diffInMinutes < 60) return `${diffInMinutes} мин назад`;
-        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} ч назад`;
-        return `${Math.floor(diffInMinutes / 1440)} дн назад`;
+        if (diffInMinutes < 1) return t('notifications.just_now');
+        if (diffInMinutes < 60) return t('notifications.minutes_ago', { minutes: diffInMinutes });
+        if (diffInMinutes < 1440) return t('notifications.hours_ago', { hours: Math.floor(diffInMinutes / 60) });
+        return t('notifications.days_ago', { days: Math.floor(diffInMinutes / 1440) });
     };
 
     const getNotificationIcon = (type: string) => {
@@ -177,7 +270,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                 <div className="gaming-notifications-header">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-3">
-                            <h3 className="gaming-notifications-title">Уведомления</h3>
+                            <h3 className="gaming-notifications-title">{t('notifications.title')}</h3>
                             {unreadCount > 0 && (
                                 <div className="gaming-unread-badge">
                                     <span className="gaming-unread-count">{unreadCount}</span>
@@ -198,7 +291,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             onClick={handleMarkAllAsRead}
                             className="gaming-mark-all-button"
                         >
-                            Прочитать все уведомления
+                            {t('notifications.mark_all_notifications_read')}
                         </button>
                     )}
                 </div>
@@ -210,43 +303,46 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             <div className="gaming-empty-icon">
                                 <FaGift className="text-4xl text-purple-400" />
                             </div>
-                            <p className="gaming-empty-text">Нет новых уведомлений</p>
-                            <p className="gaming-empty-subtext">Новые уведомления появятся здесь</p>
+                            <p className="gaming-empty-text">{t('notifications.no_new_notifications')}</p>
+                            <p className="gaming-empty-subtext">{t('notifications.new_notifications_appear_here')}</p>
                         </div>
                     ) : (
-                        notifications.map((notification) => (
-                            <div
-                                key={notification.id}
-                                className={`gaming-notification-item ${getNotificationTypeClass(notification.type)} ${
-                                    !notification.is_read ? 'gaming-notification-unread' : 'gaming-notification-read'
-                                }`}
-                                onClick={() => handleNotificationClick(notification)}
-                            >
-                                <div className="gaming-notification-content">
-                                    <div className="gaming-notification-icon">
-                                        {getNotificationIcon(notification.type)}
-                                    </div>
-                                    <div className="gaming-notification-body">
-                                        <div className="flex items-center justify-between">
-                                            <h4 className={`gaming-notification-title ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
-                                                {notification.title}
-                                            </h4>
-                                            {!notification.is_read && (
-                                                <div className="gaming-unread-indicator"></div>
-                                            )}
+                        notifications.map((notification) => {
+                            const translatedNotification = translateNotification(notification);
+                            return (
+                                <div
+                                    key={notification.id}
+                                    className={`gaming-notification-item ${getNotificationTypeClass(notification.type)} ${
+                                        !notification.is_read ? 'gaming-notification-unread' : 'gaming-notification-read'
+                                    }`}
+                                    onClick={() => handleNotificationClick(notification)}
+                                >
+                                    <div className="gaming-notification-content">
+                                        <div className="gaming-notification-icon">
+                                            {getNotificationIcon(notification.type)}
                                         </div>
-                                        <div className="gaming-notification-message">
-                                            {notification.message.split('\n').map((line, index) => (
-                                                <p key={index}>{line}</p>
-                                            ))}
+                                        <div className="gaming-notification-body">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className={`gaming-notification-title ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
+                                                    {translatedNotification.title}
+                                                </h4>
+                                                {!notification.is_read && (
+                                                    <div className="gaming-unread-indicator"></div>
+                                                )}
+                                            </div>
+                                            <div className="gaming-notification-message">
+                                                {translatedNotification.message.split('\n').map((line, index) => (
+                                                    <p key={index}>{line}</p>
+                                                ))}
+                                            </div>
+                                            <p className="gaming-notification-time">
+                                                {formatTime(notification.created_at)}
+                                            </p>
                                         </div>
-                                        <p className="gaming-notification-time">
-                                            {formatTime(notification.created_at)}
-                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
 
@@ -255,21 +351,21 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     {notifications.length > 0 ? (
                         <div className="space-y-3">
                             <div className="gaming-footer-stats">
-                                Показано {notifications.length} уведомлений
-                                {unreadCount > 0 && ` • ${unreadCount} непрочитанных`}
+                                {t('notifications.showing_count_notifications', { count: notifications.length })}
+                                {unreadCount > 0 && ` • ${unreadCount} ${t('notifications.unread')}`}
                             </div>
                             {unreadCount > 0 && (
                                 <button
                                     onClick={handleMarkAllAsRead}
                                     className="gaming-footer-button"
                                 >
-                                    Отметить все как прочитанные
+                                    {t('notifications.mark_all_as_read')}
                                 </button>
                             )}
                         </div>
                     ) : (
                         <div className="gaming-footer-empty">
-                            Новые уведомления появятся здесь
+                            {t('notifications.new_notifications_appear_here')}
                         </div>
                     )}
                 </div>
