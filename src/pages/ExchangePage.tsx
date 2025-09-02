@@ -10,7 +10,7 @@ import {
 } from '../features/user/userApi';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
-import { formatDays } from '../utils/declension';
+import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 
@@ -127,7 +127,7 @@ const ItemCard: React.FC<{
             <div className="flex justify-between items-center text-xs">
               <span className="text-purple-300">{t('exchange.item_subscription_days')}</span>
               <span className={`font-semibold ${subscriptionDays >= 1 ? 'text-purple-300' : 'text-red-400'}`}>
-                {subscriptionDays >= 1 ? formatDays(subscriptionDays) : t('exchange.days_few')}
+                {subscriptionDays >= 1 ? formatDaysI18n(subscriptionDays, t) : t('exchange.days_few')}
               </span>
             </div>
           )}
@@ -171,7 +171,7 @@ const ItemCard: React.FC<{
                   {t('exchange.exchanging')}
                 </div>
               ) : subscriptionDays >= 1 ? (
-                <>{t('exchange.exchange_for', { days: formatDays(subscriptionDays) })}</>
+                <>{t('exchange.exchange_for', { days: formatDaysI18n(subscriptionDays, t) })}</>
               ) : (
                 <>{t('exchange.too_cheap')}</>
               )}
@@ -354,8 +354,8 @@ const ExchangePage: React.FC = () => {
         toast.success(
           <div>
             <div className="font-semibold">{t('common.success')}!</div>
-            <div className="text-sm">{t('exchange.exchange_for', { days: formatDays(result.data.subscription_days_added) })} - "{itemName}"</div>
-            <div className="text-xs text-gray-300">{t('exchange.tier')} {formatDays(result.data.subscription_days_left)}</div>
+            <div className="text-sm">{t('exchange.exchange_for', { days: formatDaysI18n(result.data.subscription_days_added, t) })} - "{itemName}"</div>
+            <div className="text-xs text-gray-300">{t('exchange.tier')} {formatDaysI18n(result.data.subscription_days_left, t)}</div>
           </div>
         );
         // Принудительно обновляем инвентарь для ProfilePage
@@ -419,7 +419,7 @@ const ExchangePage: React.FC = () => {
                   <div className="text-purple-400 text-sm font-medium">{t('exchange.status')}</div>
                   {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (
                     <div className="text-white text-xl font-bold">
-                      {formatDays(subscriptionData.data.subscription_days_left)}
+                      {formatDaysI18n(subscriptionData.data.subscription_days_left, t)}
                     </div>
                   ) : (
                     <div className="text-gray-400 text-xl font-bold">{t('exchange.no_status')}</div>

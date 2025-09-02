@@ -171,7 +171,10 @@
     "second": "Sekunde",
     "minute": "Minute",
     "hour": "Stunde",
-    "day": "Tag"
+    "day": "Tag",
+    "day_1": "Tag",
+    "day_2_4": "Tage",
+    "day_5_plus": "Tage"
   },
   "exchange": {
     "title": "GEGENSTAND-TAUSCH",

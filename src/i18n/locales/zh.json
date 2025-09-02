@@ -171,7 +171,10 @@
     "second": "秒",
     "minute": "分钟",
     "hour": "小时",
-    "day": "天"
+    "day": "天",
+    "day_1": "天",
+    "day_2_4": "天",
+    "day_5_plus": "天"
   },
   "exchange": {
     "title": "物品交换",

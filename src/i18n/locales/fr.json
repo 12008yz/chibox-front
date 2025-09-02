@@ -171,7 +171,10 @@
     "second": "seconde",
     "minute": "minute",
     "hour": "heure",
-    "day": "jour"
+    "day": "jour",
+    "day_1": "jour",
+    "day_2_4": "jours",
+    "day_5_plus": "jours"
   },
   "exchange": {
     "title": "ÉCHANGE D'OBJETS",
