@@ -880,9 +880,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 )}
                 {statusData.data.subscriptionRequired && (
                   <div className="mt-1">
-                    Требуется статус уровня {statusData.data.minSubscriptionTier}+
+                    {t('case_preview_modal.subscription_required', { tier: statusData.data.minSubscriptionTier })}
                     <br />
-                    Ваш уровень: {statusData.data.userSubscriptionTier}
+                    {t('case_preview_modal.your_level', { level: statusData.data.userSubscriptionTier })}
                   </div>
                 )}
               </div>
@@ -992,11 +992,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {buyLoading || openLoading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Открытие...</span>
+                        <span>{t('case_preview_modal.opening')}</span>
                       </>
                     ) : (
                       <>
-                        <span>Открыть кейс</span>
+                        <span>{t('case_preview_modal.open_case')}</span>
                       </>
                     )}
                   </button>

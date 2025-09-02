@@ -282,6 +282,10 @@
     "level_prefix": "Level {{level}}"
   },
   "case_preview_modal": {
+    "opening": "Öffnung...",
+    "open_case": "Kiste öffnen",
+    "subscription_required": "Abonnement Level {{tier}}+ erforderlich",
+    "your_level": "Ihr Level: {{level}}",
     "free_case": "Gratis-Kiste",
     "loading_items": "Lade Gegenstände...",
     "loading_error": "Fehler beim Laden der Gegenstände",

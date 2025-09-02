@@ -678,6 +678,10 @@
     "level_prefix": "Level {{level}}"
   },
   "case_preview_modal": {
+    "opening": "Opening...",
+    "open_case": "Open Case",
+    "subscription_required": "Subscription level {{tier}}+ required",
+    "your_level": "Your level: {{level}}",
     "free_case": "Free Case",
     "loading_items": "Loading items...",
     "loading_error": "Error loading items",

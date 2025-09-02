@@ -659,6 +659,10 @@
     "level_prefix": "Уровень {{level}}"
   },
   "case_preview_modal": {
+    "opening": "Открытие...",
+    "open_case": "Открыть кейс",
+    "subscription_required": "Требуется статус уровня {{tier}}+",
+    "your_level": "Ваш уровень: {{level}}",
     "free_case": "Бесплатный кейс",
     "loading_items": "Загрузка предметов...",
     "loading_error": "Ошибка загрузки предметов",
