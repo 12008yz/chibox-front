@@ -28,7 +28,20 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "logout": "Abmelden",
-    "notifications": "Benachrichtigungen"
+    "notifications": "Benachrichtigungen",
+    "exchange_items": "Items tauschen",
+    "slot": "Slot",
+    "leaderboard_table": "Bestenliste",
+    "bonus": "BONUS",
+    "balance": "Guthaben",
+    "top_up_balance": "Guthaben aufladen",
+    "sign_out": "Abmelden",
+    "signing_out": "Abmelden...",
+    "market": "Markt",
+    "marketplace": "Marktplatz",
+    "coin_flip": "Münzwurf",
+    "crash": "Crash",
+    "upgrade": "Upgrade"
   },
   "auth": {
     "login_title": "Anmelden",

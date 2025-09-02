@@ -28,7 +28,20 @@
     "login": "로그인",
     "register": "회원가입",
     "logout": "로그아웃",
-    "notifications": "알림"
+    "notifications": "알림",
+    "exchange_items": "아이템 교환",
+    "slot": "슬롯",
+    "leaderboard_table": "순위표",
+    "bonus": "보너스",
+    "balance": "잔액",
+    "top_up_balance": "잔액 충전",
+    "sign_out": "로그아웃",
+    "signing_out": "로그아웃 중...",
+    "market": "마켓",
+    "marketplace": "마켓플레이스",
+    "coin_flip": "동전 던지기",
+    "crash": "크래시",
+    "upgrade": "업그레이드"
   },
   "auth": {
     "login_title": "로그인",

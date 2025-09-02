@@ -115,7 +115,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     message: t('notifications.notification_types.case_purchase_message', {
                         count: match[1],
                         amount: match[2]
-                    })
+                    } as any)
                 };
             }
         }
@@ -331,7 +331,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                                 )}
                                             </div>
                                             <div className="gaming-notification-message">
-                                                {translatedNotification.message.split('\n').map((line, index) => (
+                                                {String(translatedNotification.message).split('\n').map((line: string, index: number) => (
                                                     <p key={index}>{line}</p>
                                                 ))}
                                             </div>

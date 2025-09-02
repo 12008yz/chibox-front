@@ -28,7 +28,20 @@
     "login": "ログイン",
     "register": "登録",
     "logout": "ログアウト",
-    "notifications": "通知"
+    "notifications": "通知",
+    "exchange_items": "アイテム交換",
+    "slot": "スロット",
+    "leaderboard_table": "リーダーボード",
+    "bonus": "ボーナス",
+    "balance": "残高",
+    "top_up_balance": "残高チャージ",
+    "sign_out": "ログアウト",
+    "signing_out": "ログアウト中...",
+    "market": "マーケット",
+    "marketplace": "マーケットプレイス",
+    "coin_flip": "コインフリップ",
+    "crash": "クラッシュ",
+    "upgrade": "アップグレード"
   },
   "auth": {
     "login_title": "ログイン",

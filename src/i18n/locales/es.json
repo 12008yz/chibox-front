@@ -28,7 +28,20 @@
     "login": "Iniciar sesión",
     "register": "Registrarse",
     "logout": "Cerrar sesión",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "exchange_items": "Intercambiar items",
+    "slot": "Tragamonedas",
+    "leaderboard_table": "Tabla de líderes",
+    "bonus": "BONO",
+    "balance": "Saldo",
+    "top_up_balance": "Recargar saldo",
+    "sign_out": "Cerrar sesión",
+    "signing_out": "Cerrando sesión...",
+    "market": "Mercado",
+    "marketplace": "Mercado",
+    "coin_flip": "Cara o Cruz",
+    "crash": "Crash",
+    "upgrade": "Mejora"
   },
   "auth": {
     "login_title": "Iniciar sesión",

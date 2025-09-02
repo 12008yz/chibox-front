@@ -51,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
             icon: <FaExchangeAlt className="text-2xl" />,
         },
         {
-            name: t('header.market'),
+            name: t('header.marketplace'),
             path: "/marketplace",
             icon: <MdOutlineSell className="text-2xl" />,
         },

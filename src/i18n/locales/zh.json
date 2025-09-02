@@ -28,7 +28,20 @@
     "login": "登录",
     "register": "注册",
     "logout": "退出",
-    "notifications": "通知"
+    "notifications": "通知",
+    "exchange_items": "物品交换",
+    "slot": "老虎机",
+    "leaderboard_table": "排行榜",
+    "bonus": "奖励",
+    "balance": "余额",
+    "top_up_balance": "充值余额",
+    "sign_out": "退出",
+    "signing_out": "退出中...",
+    "market": "市场",
+    "marketplace": "交易市场",
+    "coin_flip": "抛硬币",
+    "crash": "崩溃游戏",
+    "upgrade": "升级"
   },
   "auth": {
     "login_title": "登录账户",

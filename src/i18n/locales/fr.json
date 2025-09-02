@@ -28,7 +28,20 @@
     "login": "Connexion",
     "register": "S'inscrire",
     "logout": "Déconnexion",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "exchange_items": "Échanger des objets",
+    "slot": "Machine à sous",
+    "leaderboard_table": "Classement des joueurs",
+    "bonus": "BONUS",
+    "balance": "Solde",
+    "top_up_balance": "Recharger le solde",
+    "sign_out": "Se déconnecter",
+    "signing_out": "Déconnexion...",
+    "market": "Marché",
+    "marketplace": "Place de marché",
+    "coin_flip": "Pile ou Face",
+    "crash": "Crash",
+    "upgrade": "Amélioration"
   },
   "auth": {
     "login_title": "Se connecter",
