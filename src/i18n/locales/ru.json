@@ -16,7 +16,8 @@
     "daily": "ежедневно",
     "online": "Онлайн: {{count}}",
     "balance": "Баланс",
-    "currency_suffix": " КР"
+    "currency_suffix": " КР",
+    "bonus_keyword": "бонус"
   },
   "header": {
     "home": "Главная",
@@ -454,6 +455,13 @@
     "data_received_empty": "Данные получены, но список кейсов пуст",
     "refresh_cases": "Обновить кейсы",
     "buy_case_error": "Произошла ошибка при открытии кейса",
+    "need_bonus_game_win": "Нужно сначала выиграть в крестики-нолики для открытия бонусного кейса",
+    "status_keyword": "статус",
+    "status_plus_keyword": "статус+",
+    "status_plus_plus_keyword": "статус++",
+    "status_tier_1": "Статус",
+    "status_tier_2": "Статус+",
+    "status_tier_3": "Статус++",
     "chibox_title": "CHIBOX",
     "chibox_description": "Делаем твой инвентарь лучше с каждым днём. Открывай кейсы и собирай редкие предметы!",
     "your_luck_title": "ТВОЯ УДАЧА",

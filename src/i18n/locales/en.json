@@ -16,7 +16,8 @@
     "daily": "daily",
     "online": "Online: {{count}}",
     "balance": "Balance",
-    "currency_suffix": " CR"
+    "currency_suffix": " CR",
+    "bonus_keyword": "bonus"
   },
   "header": {
     "home": "Home",
@@ -455,6 +456,13 @@
     "data_received_empty": "Data received, but case list is empty",
     "refresh_cases": "Refresh Cases",
     "buy_case_error": "An error occurred while opening the case",
+    "need_bonus_game_win": "You need to win tic-tac-toe first to open the bonus case",
+    "status_keyword": "status",
+    "status_plus_keyword": "status+",
+    "status_plus_plus_keyword": "status++",
+    "status_tier_1": "Status",
+    "status_tier_2": "Status+",
+    "status_tier_3": "Status++",
     "chibox_title": "CHIBOX",
     "chibox_description": "Making your inventory better every day. Open cases and collect rare items!",
     "your_luck_title": "YOUR LUCK",

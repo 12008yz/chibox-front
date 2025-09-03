@@ -191,7 +191,7 @@ const HomePage: React.FC = () => {
 
         if (!hasWonRecently) {
           // Если не выиграл в крестики-нолики, не можем открыть бонусный кейс
-          console.log('Нужно сначала выиграть в крестики-нолики для открытия бонусного кейса');
+          console.log(t('homepage.need_bonus_game_win'));
           return null; // Не открываем кейс сейчас
         }
         // Если выиграл, продолжаем открытие кейса
@@ -418,12 +418,12 @@ const HomePage: React.FC = () => {
                     }
 
                     const tierNames: Record<number, string> = {
-                      1: "Статус",
-                      2: "Статус+",
-                      3: "Статус++"
+                      1: t('homepage.status_tier_1'),
+                      2: t('homepage.status_tier_2'),
+                      3: t('homepage.status_tier_3')
                     };
 
-                    return t('homepage.status_cases', { status: tierNames[userSubscriptionTier] || 'Статус' });
+                    return t('homepage.status_cases', { status: tierNames[userSubscriptionTier] || t('homepage.status_tier_1') });
                   };
 
                   const getSectionDescription = () => {

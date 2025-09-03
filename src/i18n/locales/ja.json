@@ -15,7 +15,8 @@
     "play": "プレイ",
     "daily": "毎日",
     "online": "オンライン: {{count}}",
-    "balance": "残高"
+    "balance": "残高",
+    "bonus_keyword": "ボーナス"
   },
   "header": {
     "home": "ホーム",
@@ -522,6 +523,13 @@
     "data_received_empty": "データを受信しましたが、ケースリストが空です",
     "refresh_cases": "ケースを更新",
     "buy_case_error": "ケースを開く際にエラーが発生しました",
+    "need_bonus_game_win": "ボーナスケースを開くには、まず三目並べで勝つ必要があります",
+    "status_keyword": "ステータス",
+    "status_plus_keyword": "ステータス+",
+    "status_plus_plus_keyword": "ステータス++",
+    "status_tier_1": "ステータス",
+    "status_tier_2": "ステータス+",
+    "status_tier_3": "ステータス++",
     "chibox_title": "CHIBOX",
     "chibox_description": "毎日あなたのインベントリをより良くします。ケースを開いてレアアイテムを集めよう！",
     "your_luck_title": "あなたの運",

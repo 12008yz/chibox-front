@@ -15,7 +15,8 @@
     "play": "플레이",
     "daily": "매일",
     "online": "온라인: {{count}}",
-    "balance": "잔액"
+    "balance": "잔액",
+    "bonus_keyword": "보너스"
   },
   "header": {
     "home": "홈",
@@ -522,6 +523,13 @@
     "data_received_empty": "데이터를 받았지만 상자 목록이 비어있습니다",
     "refresh_cases": "상자 새로고침",
     "buy_case_error": "상자를 여는 중 오류가 발생했습니다",
+    "need_bonus_game_win": "보너스 상자를 열려면 먼저 틱택토에서 승리해야 합니다",
+    "status_keyword": "상태",
+    "status_plus_keyword": "상태+",
+    "status_plus_plus_keyword": "상태++",
+    "status_tier_1": "상태",
+    "status_tier_2": "상태+",
+    "status_tier_3": "상태++",
     "chibox_title": "CHIBOX",
     "chibox_description": "매일 당신의 인벤토리를 더 좋게 만듭니다. 상자를 열고 희귀 아이템을 수집하세요!",
     "your_luck_title": "당신의 행운",
