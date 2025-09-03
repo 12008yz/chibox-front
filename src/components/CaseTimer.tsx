@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CaseTimerProps {
   nextAvailableTime?: string | null;
@@ -6,6 +7,7 @@ interface CaseTimerProps {
 }
 
 const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = '' }) => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isAvailable, setIsAvailable] = useState<boolean>(false);
 
@@ -42,11 +44,11 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
       if (hours > 0) {
-        setTimeLeft(`${hours}ч ${minutes}м ${seconds}с`);
+        setTimeLeft(`${hours}${t('common.hours_short')} ${minutes}${t('common.minutes_short')} ${seconds}${t('common.seconds_short')}`);
       } else if (minutes > 0) {
-        setTimeLeft(`${minutes}м ${seconds}с`);
+        setTimeLeft(`${minutes}${t('common.minutes_short')} ${seconds}${t('common.seconds_short')}`);
       } else {
-        setTimeLeft(`${seconds}с`);
+        setTimeLeft(`${seconds}${t('common.seconds_short')}`);
       }
     };
 
@@ -60,7 +62,7 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
     return (
       <div className={`inline-flex items-center space-x-2 ${className}`}>
         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-        <span className="text-green-400 text-sm font-medium">Кейсы доступны</span>
+        <span className="text-green-400 text-sm font-medium">{t('common.cases_available')}</span>
       </div>
     );
   }

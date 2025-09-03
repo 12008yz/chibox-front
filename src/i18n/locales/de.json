@@ -1,4 +1,12 @@
 {
+  "case_names": {
+    "Бонусный кейс": "Bonus-Kiste",
+    "Ежедневный кейс - Статус": "Tägliche Kiste - Status",
+    "Бесплатный кейс": "Kostenlose Kiste",
+    "Статус кейс": "Status-Kiste",
+    "Премиум кейс": "Premium-Kiste",
+    "Ежедневный кейс": "Tägliche Kiste"
+  },
   "common": {
     "loading": "Laden...",
     "error": "Fehler",

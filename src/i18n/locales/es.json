@@ -1,4 +1,12 @@
 {
+  "case_names": {
+    "Бонусный кейс": "Caja de Bonificación",
+    "Ежедневный кейс - Статус": "Caja Diaria - Estado",
+    "Бесплатный кейс": "Caja Gratuita",
+    "Статус кейс": "Caja de Estado",
+    "Премиум кейс": "Caja Premium",
+    "Ежедневный кейс": "Caja Diaria"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Erreur",
@@ -13,9 +21,13 @@
     "close": "Fermer",
     "open": "Ouvrir",
     "play": "Jouer",
-    "daily": "quotidien",
-    "online": "En ligne : {{count}}",
-    "balance": "Solde"
+    "daily": "diario",
+    "online": "En línea: {{count}}",
+    "balance": "Saldo",
+    "cases_available": "Cajas disponibles",
+    "hours_short": "h",
+    "minutes_short": "m",
+    "seconds_short": "s"
   },
   "header": {
     "home": "Accueil",

@@ -44,8 +44,8 @@ const getDefaultLanguage = () => {
   if (browserLanguage.startsWith('ja')) return 'ja';
   if (browserLanguage.startsWith('ko')) return 'ko';
 
-  // По умолчанию русский
-  return 'ru';
+  // По умолчанию английский
+  return 'en';
 };
 
 i18n
@@ -54,7 +54,7 @@ i18n
   .init({
     resources,
     lng: getDefaultLanguage(),
-    fallbackLng: 'ru',
+    fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
 
     interpolation: {

@@ -1,4 +1,12 @@
 {
+  "case_names": {
+    "Бонусный кейс": "Caisse Bonus",
+    "Ежедневный кейс - Статус": "Caisse Quotidienne - Statut",
+    "Бесплатный кейс": "Caisse Gratuite",
+    "Статус кейс": "Caisse de Statut",
+    "Премиум кейс": "Caisse Premium",
+    "Ежедневный кейс": "Caisse Quotidienne"
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Erreur",
@@ -15,7 +23,11 @@
     "play": "Jouer",
     "daily": "quotidien",
     "online": "En ligne : {{count}}",
-    "balance": "Solde"
+    "balance": "Solde",
+    "cases_available": "Caisses disponibles",
+    "hours_short": "h",
+    "minutes_short": "m",
+    "seconds_short": "s"
   },
   "header": {
     "home": "Accueil",

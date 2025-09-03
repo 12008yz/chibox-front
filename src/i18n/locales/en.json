@@ -17,7 +17,19 @@
     "online": "Online: {{count}}",
     "balance": "Balance",
     "currency_suffix": " CR",
-    "bonus_keyword": "bonus"
+    "bonus_keyword": "bonus",
+    "cases_available": "Cases available",
+    "hours_short": "h",
+    "minutes_short": "m",
+    "seconds_short": "s"
+  },
+  "case_names": {
+    "Бонусный кейс": "Bonus Case",
+    "Ежедневный кейс - Статус": "Daily Case - Status",
+    "Бесплатный кейс": "Free Case",
+    "Статус кейс": "Status Case",
+    "Премиум кейс": "Premium Case",
+    "Ежедневный кейс": "Daily Case"
   },
   "header": {
     "home": "Home",

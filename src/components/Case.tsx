@@ -16,6 +16,12 @@ interface CaseProps {
 
 const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame }) => {
   const { t } = useTranslation();
+
+  // Функция для перевода названий кейсов
+  const translateCaseName = (caseName: string) => {
+    const translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+    return translatedName;
+  };
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -67,7 +73,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       />
 
       <div className="flex flex-col gap-2 p-4 items-center">
-        <div className="font-bold text-lg text-white text-center">{title}</div>
+        <div className="font-bold text-lg text-white text-center">{translateCaseName(title)}</div>
         <div className="font-medium text-md text-green-400">
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
