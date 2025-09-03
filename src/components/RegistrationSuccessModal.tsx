@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import MainButton from './MainButton';
+import { useTranslation } from 'react-i18next';
 
 interface RegistrationSuccessModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
   email,
   previewUrl
 }) => {
+  const { t } = useTranslation();
   const [isClosing, setIsClosing] = useState(false);
 
   const handleClose = () => {
@@ -96,11 +98,11 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
         <div className={`${isClosing ? 'modal-content-exit' : 'modal-content-enter'} bg-black rounded-lg p-8 max-w-md w-full mx-4 border border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.6)]`}>
           <div className="text-center">
             <h2 className="text-white text-2xl font-semibold mb-4">
-              Регистрация завершена
+              {t('registration_success_modal.title')}
             </h2>
 
             <p className="text-gray-300 mb-6">
-              Проверьте почту {email}
+              {t('auth.email_verification')}: {email}
             </p>
 
             {previewUrl && (
@@ -111,7 +113,7 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white underline text-sm"
                 >
-                  Просмотреть письмо
+                  {t('auth.email_verification')}
                 </a>
               </div>
             )}
@@ -120,7 +122,7 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
               onClick={handleClose}
               className="bg-black text-white px-6 py-2 rounded border border-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.8)] transition-all duration-200"
             >
-              Закрыть
+              {t('modal.close')}
             </button>
           </div>
         </div>

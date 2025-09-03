@@ -804,7 +804,9 @@
     "hour_ago": "час назад",
     "hours_ago": "{{hours}} ч. назад",
     "no_drops": "Пока нет дропов",
-    "loading_drops": "Загрузка дропов..."
+    "loading_drops": "Загрузка дропов...",
+    "online": "Онлайн",
+    "offline": "Не подключено"
   },
   "banner": {
     "daily_bonus": "Ежедневный бонус",

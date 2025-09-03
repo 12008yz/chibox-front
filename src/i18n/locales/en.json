@@ -805,7 +805,9 @@
     "hour_ago": "an hour ago",
     "hours_ago": "{{hours}} h ago",
     "no_drops": "No drops yet",
-    "loading_drops": "Loading drops..."
+    "loading_drops": "Loading drops...",
+    "online": "Online",
+    "offline": "Disconnected"
   },
   "banner": {
     "daily_bonus": "Daily Bonus",

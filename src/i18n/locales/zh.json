@@ -538,5 +538,41 @@
     "chibox_statuses_description": "管理您的特权并每天获得独家奖励",
     "win_bonus_game": "因赢得奖励游戏而获得",
     "cases_not_found": "未找到箱子"
+  },
+  "modal": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "close": "关闭",
+    "save": "保存",
+    "delete": "删除",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "warning": "警告",
+    "info": "信息"
+  },
+  "registration_success_modal": {
+    "title": "注册完成！",
+    "welcome": "欢迎来到ChiBox！",
+    "account_created": "您的账户已成功创建",
+    "getting_started": "下一步：",
+    "step_1": "打开您的第一个免费箱子",
+    "step_2": "探索库存中的物品",
+    "step_3": "考虑获取状态以获得奖励",
+    "step_4": "参与游戏和竞赛",
+    "start_playing": "开始游戏",
+    "bonus_received": "您获得了启动奖励！"
+  },
+  "live_drops": {
+    "title": "🔥 最新掉落",
+    "player_won": "{{player}}获得了",
+    "just_now": "刚刚",
+    "minutes_ago": "{{minutes}}分钟前",
+    "hour_ago": "1小时前",
+    "hours_ago": "{{hours}}小时前",
+    "no_drops": "暂无掉落",
+    "loading_drops": "加载掉落中...",
+    "online": "在线",
+    "offline": "已断开"
   }
 }

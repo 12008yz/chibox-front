@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
 import { LiveDropData } from '../types/socket';
 import LiveDropItem from './LiveDropItem';
+import { useTranslation } from 'react-i18next';
 
 const LiveDrops: React.FC = () => {
+  const { t } = useTranslation();
   const { liveDrops, isConnected } = useSocket();
   const [allDrops, setAllDrops] = useState<LiveDropData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +22,7 @@ const LiveDrops: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('Ошибка загрузки живых падений:', error);
+        console.error('Error loading live drops:', error);
       } finally {
         setIsLoading(false);
       }
@@ -73,10 +75,10 @@ const LiveDrops: React.FC = () => {
       <div className="w-full bg-[#19172D] py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">Живые падения</h2>
+            <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-400">Загрузка...</span>
+              <span className="text-sm text-gray-400">{t('live_drops.loading_drops')}</span>
             </div>
           </div>
         </div>
@@ -102,7 +104,7 @@ const LiveDrops: React.FC = () => {
     <div className="w-full bg-[#19172D] py-6">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Живые падения</h2>
+          <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
           <div className="flex items-center space-x-2">
             <div
               className={`w-2 h-2 rounded-full ${
@@ -112,7 +114,7 @@ const LiveDrops: React.FC = () => {
               }`}
             ></div>
             <span className="text-sm text-gray-400">
-              {isConnected ? 'Онлайн' : 'Не подключено'}
+              {isConnected ? t('live_drops.online') : t('live_drops.offline')}
             </span>
           </div>
         </div>
@@ -125,9 +127,9 @@ const LiveDrops: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <p className="text-gray-400">Пока нет падений</p>
+          <p className="text-gray-400">{t('live_drops.no_drops')}</p>
           <p className="text-sm text-gray-500 mt-2">
-            Первые падения появятся здесь в реальном времени
+            {t('live_drops.loading_drops')}
           </p>
         </div>
       ) : (

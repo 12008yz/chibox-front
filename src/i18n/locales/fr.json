@@ -538,5 +538,41 @@
     "chibox_statuses_description": "Gérez vos privilèges et obtenez des bonus exclusifs chaque jour",
     "win_bonus_game": "Accordé pour avoir gagné le jeu bonus",
     "cases_not_found": "Caisses introuvables"
+  },
+  "modal": {
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information"
+  },
+  "registration_success_modal": {
+    "title": "Inscription terminée !",
+    "welcome": "Bienvenue sur ChiBox !",
+    "account_created": "Votre compte a été créé avec succès",
+    "getting_started": "Étapes suivantes :",
+    "step_1": "Ouvrez votre première caisse gratuite",
+    "step_2": "Explorez les objets dans votre inventaire",
+    "step_3": "Envisagez d'obtenir un statut pour des bonus",
+    "step_4": "Participez aux jeux et compétitions",
+    "start_playing": "Commencer à jouer",
+    "bonus_received": "Vous avez reçu un bonus de démarrage !"
+  },
+  "live_drops": {
+    "title": "🔥 Drops récents",
+    "player_won": "{{player}} a gagné",
+    "just_now": "à l'instant",
+    "minutes_ago": "il y a {{minutes}} min",
+    "hour_ago": "il y a une heure",
+    "hours_ago": "il y a {{hours}} h",
+    "no_drops": "Aucun drop pour le moment",
+    "loading_drops": "Chargement des drops...",
+    "online": "En ligne",
+    "offline": "Déconnecté"
   }
 }

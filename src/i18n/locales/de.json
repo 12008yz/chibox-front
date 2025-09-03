@@ -542,5 +542,41 @@
     "chibox_statuses_description": "Verwalte deine Privilegien und erhalte täglich exklusive Boni",
     "win_bonus_game": "Vergeben für den Gewinn im Bonusspiel",
     "cases_not_found": "Kisten nicht gefunden"
+  },
+  "modal": {
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolgreich",
+    "warning": "Warnung",
+    "info": "Information"
+  },
+  "registration_success_modal": {
+    "title": "Registrierung abgeschlossen!",
+    "welcome": "Willkommen bei ChiBox!",
+    "account_created": "Ihr Konto wurde erfolgreich erstellt",
+    "getting_started": "Was als nächstes:",
+    "step_1": "Öffnen Sie Ihre erste kostenlose Kiste",
+    "step_2": "Erkunden Sie Gegenstände in Ihrem Inventar",
+    "step_3": "Erwägen Sie den Kauf eines Status für Boni",
+    "step_4": "Nehmen Sie an Spielen und Wettbewerben teil",
+    "start_playing": "Spielen beginnen",
+    "bonus_received": "Sie haben einen Startbonus erhalten!"
+  },
+  "live_drops": {
+    "title": "🔥 Neueste Drops",
+    "player_won": "{{player}} hat gewonnen",
+    "just_now": "gerade eben",
+    "minutes_ago": "vor {{minutes}} Min",
+    "hour_ago": "vor einer Stunde",
+    "hours_ago": "vor {{hours}} Std",
+    "no_drops": "Noch keine Drops",
+    "loading_drops": "Lade Drops...",
+    "online": "Online",
+    "offline": "Getrennt"
   }
 }
