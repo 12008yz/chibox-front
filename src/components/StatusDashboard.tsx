@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaCrown, FaDice, FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins } from 'react-icons/fa';
 import { MdCasino, MdVideogameAsset, MdTrendingUp } from 'react-icons/md';
 import { RiVipCrownFill } from 'react-icons/ri';
 import { GiTicTacToe } from 'react-icons/gi';
 import { IoSparkles } from 'react-icons/io5';
-import { formatDays } from '../utils/declension';
+import { formatDaysI18n } from '../utils/declension';
 import Monetary from './Monetary';
 import Title from './Title';
 import AppFeatures from './AppFeatures';
@@ -40,6 +41,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   onOpenSlots
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('activities');
 
   // Проверяем активность подписки
@@ -161,7 +163,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                   <IoSparkles className="text-yellow-300" />
                 </h2>
                 <p className="text-white/80 text-lg">+{currentStatus.bonus}% бонус к дропу</p>
-                <p className="text-white/60">{formatDays(daysLeft)} до окончания</p>
+                <p className="text-white/60">{formatDaysI18n(daysLeft, t)} до окончания</p>
               </div>
             </div>
 

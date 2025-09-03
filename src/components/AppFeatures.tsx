@@ -1,7 +1,8 @@
 import React from 'react';
 import Title from './Title';
 import { Link } from 'react-router-dom';
-import { formatDays } from '../utils/declension';
+import { useTranslation } from 'react-i18next';
+import { formatDaysI18n } from '../utils/declension';
 
 interface StatusTier {
   name: string;
@@ -22,6 +23,7 @@ interface AppFeaturesProps {
 }
 
 const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
+  const { t } = useTranslation();
   const statusTiers: StatusTier[] = [
     {
       name: 'Статус',
@@ -138,7 +140,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                   {tier.price}₽
                 </div>
                 <div className="text-gray-400 text-sm">
-                  за {formatDays(tier.days)}
+                  за {formatDaysI18n(tier.days, t)}
                 </div>
               </div>
 

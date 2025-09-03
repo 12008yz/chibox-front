@@ -12,7 +12,7 @@ import AppFeatures from '../components/AppFeatures';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import RouletteGame from '../components/RouletteGame';
-import { formatDays } from '../utils/declension';
+import { formatDaysI18n } from '../utils/declension';
 
 
 import { useSocket } from '../hooks/useSocket';
@@ -431,7 +431,7 @@ const HomePage: React.FC = () => {
                       return t('homepage.free_cases_description');
                     }
 
-                    return t('homepage.status_cases_description', { days: formatDays(subscriptionDaysLeft) });
+                    return t('homepage.status_cases_description', { days: formatDaysI18n(subscriptionDaysLeft, t) });
                   };
 
                   return (
