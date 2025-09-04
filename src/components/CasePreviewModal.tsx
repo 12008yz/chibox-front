@@ -7,7 +7,7 @@ import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
 import { useUserData } from '../hooks/useUserData';
 
-// CSS стили для анимации перечеркивания
+// CSS стили для анимации перечеркивания и эффектов
 const strikeAnimationStyles = `
   @keyframes item-glow-pulse {
     0% {
@@ -21,6 +21,32 @@ const strikeAnimationStyles = `
     100% {
       box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), inset 0 0 15px rgba(34, 197, 94, 0.3);
       border-color: rgb(34, 197, 94);
+    }
+  }
+
+  @keyframes golden-spark {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--dx), var(--dy)) scale(0);
+      opacity: 0;
+    }
+  }
+
+  @keyframes victory-glow {
+    0% {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+      border-color: rgb(255, 215, 0);
+    }
+    50% {
+      box-shadow: 0 0 60px rgba(255, 215, 0, 1), 0 0 100px rgba(255, 215, 0, 0.6);
+      border-color: rgb(255, 255, 0);
+    }
+    100% {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+      border-color: rgb(255, 215, 0);
     }
   }
 
@@ -112,6 +138,21 @@ const strikeAnimationStyles = `
     animation: checkmark-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
     animation-delay: 1.4s;
   }
+
+  .golden-spark {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: golden-spark 1.5s ease-out forwards;
+    box-shadow: 0 0 6px #FFD700, 0 0 12px #FFD700;
+  }
+
+  .victory-glow {
+    animation: victory-glow 2s ease-in-out;
+  }
 `;
 
 // Добавляем стили в head
@@ -165,6 +206,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
+  const [showGoldenSparks, setShowGoldenSparks] = useState(false);
 
   // Ref для контейнера со скроллом
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -200,6 +242,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowOpeningAnimation(false);
       setOpeningResult(null);
       setShowStrikeThrough(false);
+      setShowGoldenSparks(false);
       // Блокируем скролл основной страницы
       document.body.style.overflow = 'hidden';
       // Небольшая задержка для запуска анимации после рендера
@@ -389,6 +432,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
     setShowStrikeThrough(false); // Сбрасываем перечеркивание при начале анимации
+    setShowGoldenSparks(false); // Сбрасываем эффект искр
 
     // ИСПРАВЛЕНИЕ: Используем ТОЛЬКО доступные (неисключенные) предметы для анимации
     // Бэкенд выбирает предмет только из неисключенных, поэтому анимация должна показывать то же самое
@@ -446,6 +490,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setAnimationPhase('stopped');
 
         // Показываем перечеркивание через 2 секунды после остановки (только для ежедневного кейса)
+        // Запускаем эффект золотых искр через 1 секунду после остановки
+        setTimeout(() => {
+          setShowGoldenSparks(true);
+        }, 1000);
+
         setTimeout(() => {
           // Анимация перечёркивания только для ежедневного кейса с ID 444444
           if (caseData.id === "44444444-4444-4444-4444-444444444444" || caseData.id === '44444444-4444-4444-4444-444444444444') {
@@ -455,7 +504,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         setTimeout(() => {
           handleAnimationComplete();
-        }, caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444' ? 4000 : 2000); // Для ежедневного кейса 4 сек (с анимацией), для остальных 2 сек
+        }, caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 3500); // Увеличиваем время для показа эффекта искр
         return;
       }
 
@@ -505,7 +554,38 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setAnimationPhase('idle');
     setSliderPosition(0);
     setShowStrikeThrough(false);
+    setShowGoldenSparks(false);
     // Не закрываем модалку сразу, пусть пользователь сам закроет
+  };
+
+  // Функция для создания золотых искр
+  const generateGoldenSparks = () => {
+    const sparks = [];
+    const sparkCount = 12; // Количество искр
+
+    for (let i = 0; i < sparkCount; i++) {
+      const angle = (i * 360) / sparkCount; // Распределяем искры равномерно по кругу
+      const distance = 80 + Math.random() * 40; // Случайное расстояние от 80 до 120px
+      const dx = Math.cos(angle * Math.PI / 180) * distance;
+      const dy = Math.sin(angle * Math.PI / 180) * distance;
+
+      sparks.push(
+        <div
+          key={i}
+          className="golden-spark"
+          style={{
+            '--dx': `${dx}px`,
+            '--dy': `${dy}px`,
+            animationDelay: `${i * 0.1}s`, // Небольшая задержка между искрами
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)'
+          } as React.CSSProperties}
+        />
+      );
+    }
+
+    return sparks;
   };
 
   // Дефолтные изображения кейсов CS2
@@ -721,7 +801,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           : ''
                       } ${
                         isWinningItemStopped
-                          ? 'ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 z-20 border-green-400'
+                          ? `ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}`
                           : ''
                       } ${
                         isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')
@@ -801,6 +881,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               </div>
                             </div>
                           </>
+                        )}
+
+                        {/* Эффект золотых искр для выигранного предмета */}
+                        {showGoldenSparks && isWinningItemStopped && (
+                          <div className="absolute inset-0 pointer-events-none z-50">
+                            {generateGoldenSparks()}
+                          </div>
                         )}
                       </div>
 
