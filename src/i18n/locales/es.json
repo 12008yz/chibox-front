@@ -590,5 +590,49 @@
     "loading_drops": "Cargando drops...",
     "online": "En línea",
     "offline": "Desconectado"
+  },
+  "roulette": {
+    "wheel_of_fortune": "🎰 Rueda de la Fortuna",
+    "spin_and_win": "¡Gira la rueda y gana días de suscripción!",
+    "games_per_day": "30 juegos por día • Recarga cada 48 minutos",
+    "next_game_in": "Próximo juego en:",
+    "spin_wheel": "Girar Rueda",
+    "spinning": "Girando...",
+    "prizes": "Premios:",
+    "subscription_1_day": "1 día de suscripción",
+    "subscription_2_days": "2 días de suscripción",
+    "empty": "Vacío",
+    "error_occurred": "Ocurrió un error",
+    "something_went_wrong": "Algo salió mal",
+    "roulette_error": "Error al jugar la ruleta:",
+    "lose_messages": [
+      "No esta vez",
+      "Qué lástima",
+      "Tendrás más oportunidades",
+      "Ay ;(",
+      "¡Casi lo logras!",
+      "No te desanimes",
+      "Inténtalo de nuevo mañana",
+      "La suerte se alejó",
+      "Mejor suerte la próxima vez",
+      "Hoy no",
+      "La fortuna está durmiendo",
+      "¿Tal vez la próxima vez?",
+      "Paciencia y trabajo",
+      "No es nada terrible",
+      "¡Sigue así!"
+    ],
+    "win_messages": [
+      "Todos estamos felices por esto",
+      "¡Felicitaciones!",
+      "¡Increíble!",
+      "¡Bien hecho!",
+      "¡Fantástico!",
+      "¡Excelente trabajo!",
+      "¡La suerte está de tu lado!",
+      "¡Magnífico!",
+      "¡Simplemente genial!",
+      "¡Eres un afortunado!"
+    ]
   }
 }

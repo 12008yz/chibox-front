@@ -590,5 +590,49 @@
     "loading_drops": "Chargement des drops...",
     "online": "En ligne",
     "offline": "Déconnecté"
+  },
+  "roulette": {
+    "wheel_of_fortune": "🎰 Roue de la Fortune",
+    "spin_and_win": "Faites tourner la roue et gagnez des jours d'abonnement !",
+    "games_per_day": "30 jeux par jour • Recharge toutes les 48 minutes",
+    "next_game_in": "Prochain jeu dans :",
+    "spin_wheel": "Faire Tourner",
+    "spinning": "Tourne...",
+    "prizes": "Prix :",
+    "subscription_1_day": "1 jour d'abonnement",
+    "subscription_2_days": "2 jours d'abonnement",
+    "empty": "Vide",
+    "error_occurred": "Une erreur s'est produite",
+    "something_went_wrong": "Quelque chose s'est mal passé",
+    "roulette_error": "Erreur lors du jeu de roulette :",
+    "lose_messages": [
+      "Pas cette fois",
+      "Très désolé",
+      "Vous aurez d'autres chances",
+      "Hélas ;(",
+      "Presque réussi !",
+      "Ne soyez pas déçu",
+      "Essayez encore demain",
+      "La chance s'est détournée",
+      "Plus de chance la prochaine fois",
+      "Pas aujourd'hui",
+      "La fortune dort",
+      "Peut-être la prochaine fois ?",
+      "Patience et travail",
+      "Rien de grave",
+      "Tenez bon !"
+    ],
+    "win_messages": [
+      "Nous sommes tous contents",
+      "Félicitations !",
+      "Incroyable !",
+      "Bien joué !",
+      "Fantastique !",
+      "Excellent travail !",
+      "La chance est de votre côté !",
+      "Magnifique !",
+      "Tout simplement super !",
+      "Vous êtes un veinard !"
+    ]
   }
 }

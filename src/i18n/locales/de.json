@@ -590,5 +590,49 @@
     "loading_drops": "Lade Drops...",
     "online": "Online",
     "offline": "Getrennt"
+  },
+  "roulette": {
+    "wheel_of_fortune": "🎰 Glücksrad",
+    "spin_and_win": "Drehe das Rad und gewinne Abonnement-Tage!",
+    "games_per_day": "30 Spiele pro Tag • Aufladung alle 48 Minuten",
+    "next_game_in": "Nächstes Spiel in:",
+    "spin_wheel": "Rad drehen",
+    "spinning": "Dreht sich...",
+    "prizes": "Preise:",
+    "subscription_1_day": "1 Tag Abonnement",
+    "subscription_2_days": "2 Tage Abonnement",
+    "empty": "Leer",
+    "error_occurred": "Ein Fehler ist aufgetreten",
+    "something_went_wrong": "Etwas ist schief gelaufen",
+    "roulette_error": "Fehler beim Roulette-Spiel:",
+    "lose_messages": [
+      "Nicht diesmal",
+      "Sehr schade",
+      "Sie haben noch weitere Chancen",
+      "Leider ;(",
+      "Fast geschafft!",
+      "Seien Sie nicht traurig",
+      "Versuchen Sie es morgen noch einmal",
+      "Das Glück hat sich abgewandt",
+      "Beim nächsten Mal mehr Glück",
+      "Nicht heute",
+      "Fortuna schläft",
+      "Vielleicht beim nächsten Mal?",
+      "Geduld und Arbeit",
+      "Nichts Schlimmes",
+      "Halten Sie durch!"
+    ],
+    "win_messages": [
+      "Wir alle freuen uns darüber",
+      "Herzlichen Glückwunsch!",
+      "Unglaublich!",
+      "Gut gemacht!",
+      "Fantastisch!",
+      "Ausgezeichnete Arbeit!",
+      "Das Glück ist auf Ihrer Seite!",
+      "Großartig!",
+      "Einfach super!",
+      "Sie sind ein Glückspilz!"
+    ]
   }
 }
