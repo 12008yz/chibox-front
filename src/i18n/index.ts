@@ -54,7 +54,7 @@ i18n
   .init({
     resources,
     lng: getDefaultLanguage(),
-    fallbackLng: 'en',
+    fallbackLng: ['en', 'ru'],
     debug: process.env.NODE_ENV === 'development',
 
     interpolation: {
@@ -65,6 +65,23 @@ i18n
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'chibox-language',
+    },
+
+    // Настройки для обработки отсутствующих переводов
+    returnNull: false,
+    returnEmptyString: false,
+    returnObjects: false,
+    joinArrays: ' ',
+
+    // Настройки для лучшего fallback
+    load: 'languageOnly',
+    cleanCode: true,
+
+    // Настройки отладки
+    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Missing translation key: ${key} for language: ${lng}`);
+      }
     },
   });
 

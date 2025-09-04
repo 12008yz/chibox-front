@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
-import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes, FaLanguage } from 'react-icons/fa';
+import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
 import LanguageSwitcher from '../../LanguageSwitcher';
 
 interface NotificationsProps {
@@ -110,8 +110,8 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     };
 
     // Улучшенная логика определения типа уведомления
-    const detectNotificationType = (notification: Notification, translated: { title: string, message: string }) => {
-        const { title, message } = translated;
+    const detectNotificationType = (notification: Notification, translated: { title: string, message: string | any }) => {
+        const { title } = translated;
 
         // Success: Покупка кейса, повышение уровня, достижение, бонус получен, приветствие
         if (

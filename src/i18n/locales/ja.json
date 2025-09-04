@@ -32,7 +32,40 @@
     "cases_available": "ケース利用可能",
     "hours_short": "時",
     "minutes_short": "分",
-    "seconds_short": "秒"
+    "seconds_short": "秒",
+    "status": "ステータス",
+    "active": "アクティブ",
+    "opened": "開封済み",
+    "withdrawn": "引き出し済み",
+    "sold": "売却済み",
+    "consumer_grade": "コンシューマーグレード",
+    "industrial_grade": "インダストリアルグレード",
+    "mil_spec_grade": "ミルスペックグレード",
+    "restricted": "リストリクテッド",
+    "classified": "クラシファイド",
+    "covert": "コバート",
+    "contraband": "コントラバンド",
+    "opened_cases": "開封されたケース",
+    "Active": "アクティブ",
+    "Opened Cases": "開封されたケース",
+    "Withdrawn": "引き出し済み",
+    "Sold": "売却済み",
+    "Novice": "初心者",
+    "Collector": "コレクター",
+    "Premium Player": "プレミアムプレイヤー",
+    "Millionaire": "億万長者",
+    "Expert": "エキスパート",
+    "Subscriber": "サブスクライバー",
+    "Lucky": "幸運",
+    "Subscription Buyer": "サブスクリプション購入者",
+    "Open 10 cases": "10個のケースを開く",
+    "Find 5 rare items": "5つのレアアイテムを見つける",
+    "Find 3 items worth 100+ rubles": "100ルーブル以上の価値のある3つのアイテムを見つける",
+    "Total inventory value of 1,000,000 rubles": "インベントリの合計価値1,000,000ルーブル",
+    "Have an item worth over 50,000 rubles": "50,000ルーブル以上の価値のあるアイテムを持つ",
+    "Have an active subscription for 30 days straight": "30日間連続でアクティブなサブスクリプションを持つ",
+    "Open cases 7 days in a row": "7日連続でケースを開く",
+    "Purchase any subscription tier": "任意のサブスクリプションティアを購入"
   },
   "header": {
     "home": "ホーム",
@@ -143,7 +176,93 @@
     "steam_profile": "Steamプロフィール",
     "trade_url": "トレードURL",
     "case_not_found": "ケースがインベントリに見つかりません",
-    "subscription_required": "サブスクリプションレベル{{tier}}+が必要です"
+    "subscription_required": "サブスクリプションレベル{{tier}}+が必要です",
+    "user_not_found": "ユーザーが見つかりません",
+    "please_login": "ログインしてください",
+    "level_progress": "レベル進行度",
+    "items_in_inventory": "インベントリのアイテム",
+    "best_weapon": "最高の武器",
+    "inventory_empty": "インベントリが空です",
+    "no_opened_cases": "開封されたケースがありません",
+    "no_withdrawn_items": "引き出されたアイテムがありません",
+    "no_sold_items": "売却されたアイテムがありません",
+    "open_cases_hint": "ケースを開いてアイテムを取得",
+    "opened_cases_hint": "開封されたケースがここに表示され、ドロップされたアイテムを確認できます",
+    "withdrawn_items_hint": "引き出し待ちおよびSteamに引き出されたアイテムがここに表示されます",
+    "sold_items_hint": "売却および交換されたアイテムがここに表示されます",
+    "level_bonus_tooltip": {
+      "completing_achievements": "実績の完了",
+      "daily_login": "毎日のゲームログイン",
+      "shop_purchases": "ショップでの購入",
+      "event_participation": "イベント参加",
+      "friend_invites": "友達の招待",
+      "level_drop_bonus": "レベルアップによりドロップボーナスが増加: レベルごとに+0.02%"
+    },
+    "inventory_descriptions": {
+      "active": "🎮 現在のアイテムと未開封のケース",
+      "opened": "📦 開封されたケース - ケースにカーソルを合わせてドロップアイテムを確認",
+      "withdrawn": "📤 引き出し中のアイテム: 発送待ちおよびSteamに既に送信済み",
+      "sold": "💰 通貨で売却またはサブスクリプションと交換されたアイテム"
+    },
+    "loading_inventory": "インベントリ読み込み中...",
+    "case_template_not_found": "ケーステンプレートが見つかりません",
+    "item_received": "おめでとうございます！次を受け取りました: {{itemName}}",
+    "item_info_error": "エラー: アイテム情報の取得に失敗",
+    "case_opening_error": "ケース開封エラー: {{error}}",
+    "unknown_achievement": "不明な実績",
+    "steam_linked_success": "Steamアカウントが正常に連携されました！",
+    "steam_link_error": "Steamアカウント連携エラー",
+    "steam_link_try_again": "Steamアカウントの連携に失敗しました。もう一度お試しください。",
+    "session_expired": "セッションが期限切れです。もう一度お試しください。",
+    "steam_already_linked": "このSteamアカウントは既に別のユーザーに連携されています。",
+    "linking_process_error": "連携プロセスエラー。もう一度お試しください。",
+    "account_linking_error": "アカウント連携中にエラーが発生しました。",
+    "achievements_count": "実績",
+    "total_count": "合計",
+    "loading_yes": "はい",
+    "loading_no": "いいえ",
+    "case_label": "ケース",
+    "open_button": "開く",
+    "status_pending_withdrawal": "引き出し待ち",
+    "status_withdrawn": "引き出し済み",
+    "status_sold": "売却済み",
+    "status_opened": "開封済み",
+    "item_withdraw_success": "アイテム \"{{itemName}}\" が正常に引き出しに送信されました！",
+    "opening": "開封中...",
+    "items_suffix": " アイテム",
+    "cases_suffix": " ケース",
+    "streak_suffix": " 連続",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam接続済み",
+    "steam_not_connected": "Steam未接続",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "なし",
+    "drop_bonuses": "ドロップボーナス",
+    "level_bonus": "レベル:",
+    "status_bonus": "ステータス:",
+    "achievements_bonus": "実績:",
+    "total_bonus": "合計ボーナス:",
+    "inventory_title": "インベントリ",
+    "subscription_tier_1": "ステータス",
+    "subscription_tier_2": "ステータス+",
+    "subscription_tier_3": "ステータス++",
+    "subscription_tier_default": "ティア {{tier}}",
+    "rarity": {
+      "consumer": "コンシューマーグレード",
+      "industrial": "インダストリアルグレード",
+      "milspec": "ミルスペックグレード",
+      "restricted": "リストリクテッド",
+      "classified": "クラシファイド",
+      "covert": "コバート",
+      "contraband": "コントラバンド"
+    },
+    "drop_bonus_text": "ドロップ",
+    "inventory_tabs": {
+      "active": "アクティブ",
+      "opened_cases": "開封されたケース",
+      "withdrawn": "引き出し済み",
+      "sold": "売却済み"
+    }
   },
   "inventory": {
     "title": "インベントリ",
@@ -155,7 +274,25 @@
     "item_withdrawn": "アイテム出金済み",
     "rarity": "レア度",
     "price": "価格",
-    "value": "価値"
+    "value": "価値",
+    "active": "アクティブ",
+    "opened_cases": "開封されたケース",
+    "withdrawn": "引き出し済み",
+    "sold": "売却済み",
+    "filter_active": "アクティブ",
+    "filter_opened": "開封済み",
+    "filter_withdrawn": "引き出し済み",
+    "filter_sold": "売却済み",
+    "item_description": "アイテム説明",
+    "acquired_date": "取得日",
+    "source_case": "ケース",
+    "source_bonus": "ボーナス",
+    "source_purchase": "購入",
+    "item_actions": "アイテムアクション",
+    "sell_price": "売却価格",
+    "withdraw_steam": "Steamに引き出し",
+    "need_trade_url": "Steam トレードURLが必要",
+    "item_rarity": "レア度"
   },
   "leaderboard": {
     "title": "プレイヤーランキング",
@@ -531,6 +668,135 @@
     "goal": "目標：",
     "goal_description": "3つのシンボルを一列（水平、垂直、または対角線）に揃えて勝利しよう！"
   },
+  "achievements": {
+    "novice": "初心者",
+    "novice_description": "10個のケースを開く",
+    "collector": "コレクター",
+    "collector_description": "5つのレアアイテムを見つける",
+    "premium_player": "プレミアムプレイヤー",
+    "premium_player_description": "100ルーブル以上の価値のある3つのアイテムを見つける",
+    "millionaire": "億万長者",
+    "millionaire_description": "インベントリの合計価値1,000,000ルーブル",
+    "expert": "エキスパート",
+    "expert_description": "50,000ルーブル以上の価値のあるアイテムを持つ",
+    "subscriber": "サブスクライバー",
+    "subscriber_description": "30日間連続でアクティブなサブスクリプションを持つ",
+    "lucky": "幸運",
+    "lucky_description": "7日連続でケースを開く",
+    "subscription_buyer": "サブスクリプション購入者",
+    "subscription_buyer_description": "任意のサブスクリプションティアを購入",
+    "click_for_details": "詳細はクリック",
+    "drop_bonus": "+{{bonus}}% ドロップ",
+    "acquired": "取得:",
+    "source": "ソース:",
+    "purchase": "購入",
+    "case": "ケース",
+    "bonus": "ボーナス",
+    "withdraw_to_steam": "Steamに引き出し",
+    "need_steam_trade_url": "Steam トレードURL が必要",
+    "Новичок": {
+      "name": "初心者",
+      "description": "10個のケースを開く"
+    },
+    "Коллекционер": {
+      "name": "コレクター",
+      "description": "5つのレアアイテムを見つける"
+    },
+    "Премиум игрок": {
+      "name": "プレミアムプレイヤー",
+      "description": "100ルーブル以上の価値のある3つのアイテムを見つける"
+    },
+    "Подписчик": {
+      "name": "サブスクライバー",
+      "description": "30日間連続でアクティブなサブスクリプションを持つ"
+    },
+    "Покупатель подписки": {
+      "name": "サブスクリプション購入者",
+      "description": "任意のサブスクリプションティアを購入"
+    },
+    "Удачливый": {
+      "name": "幸運",
+      "description": "7日連続でケースを開く"
+    },
+    "Миллионер": {
+      "name": "億万長者",
+      "description": "インベントリの合計価値1,000,000ルーブル"
+    },
+    "Эксперт": {
+      "name": "エキスパート",
+      "description": "50,000ルーブル以上の価値のあるアイテムを持つ"
+    },
+    "Откройте 10 кейсов": {
+      "name": "初心者",
+      "description": "10個のケースを開く"
+    },
+    "Найдите 5 редких предметов": {
+      "name": "コレクター",
+      "description": "5つのレアアイテムを見つける"
+    },
+    "Найдите 3 предмета стоимостью от 100 руб": {
+      "name": "プレミアムプレイヤー",
+      "description": "100ルーブル以上の価値のある3つのアイテムを見つける"
+    },
+    "Иметь активную подписку 30 дней подряд": {
+      "name": "サブスクライバー",
+      "description": "30日間連続でアクティブなサブスクリプションを持つ"
+    },
+    "Приобрести любой уровень подписки": {
+      "name": "サブスクリプション購入者",
+      "description": "任意のサブスクリプションティアを購入"
+    },
+    "Открыть кейс 7 дней подряд": {
+      "name": "幸運",
+      "description": "7日連続でケースを開く"
+    },
+    "Общая стоимость предметов в инвентаре 1,000,000 руб": {
+      "name": "億万長者",
+      "description": "インベントリの合計価値1,000,000ルーブル"
+    },
+    "Иметь предмет с ценой выше 50,000 руб": {
+      "name": "エキスパート",
+      "description": "50,000ルーブル以上の価値のあるアイテムを持つ"
+    },
+    "tabs": {
+      "active": "アクティブ",
+      "opened_cases": "開封されたケース",
+      "withdrawn": "引き出し済み",
+      "sold": "売却済み"
+    },
+    "Novice": {
+      "name": "初心者",
+      "description": "10個のケースを開く"
+    },
+    "Collector": {
+      "name": "コレクター",
+      "description": "5つのレアアイテムを見つける"
+    },
+    "Premium Player": {
+      "name": "プレミアムプレイヤー",
+      "description": "100ルーブル以上の価値のある3つのアイテムを見つける"
+    },
+    "Subscriber": {
+      "name": "サブスクライバー",
+      "description": "30日間連続でアクティブなサブスクリプションを持つ"
+    },
+    "Subscription Buyer": {
+      "name": "サブスクリプション購入者",
+      "description": "任意のサブスクリプションティアを購入"
+    },
+    "Lucky": {
+      "name": "幸運",
+      "description": "7日連続でケースを開く"
+    },
+    "Millionaire": {
+      "name": "億万長者",
+      "description": "インベントリの合計価値1,000,000ルーブル"
+    },
+    "Expert": {
+      "name": "エキスパート",
+      "description": "50,000ルーブル以上の価値のあるアイテムを持つ"
+    }
+  },
   "homepage": {
     "loading_cases": "ケースを読み込み中...",
     "cases_error": "ケースの読み込みエラー",
@@ -601,6 +867,33 @@
     "online": "オンライン",
     "offline": "切断中"
   },
+  "modals": {
+  "shop": "ショップ",
+  "top_up_balance": "残高チャージ",
+  "subscriptions": "サブスクリプション",
+  "balance_top_up": "残高チャージ",
+  "or_enter_custom": "または独自の金額を入力:",
+  "enter_amount": "金額を入力",
+  "minimum_deposit_info": "• 最低入金額: 100 ₽",
+  "deposit_info": "• 支払い成功後に残高に資金が追加されます",
+  "cards_supported": "• 銀行カードに対応",
+  "top_up_for": "{{amount}} ₽でチャージ",
+  "creating_payment": "支払い作成中...",
+  "select_subscription": "サブスクリプションを選択",
+  "subscription_description": "ステータスはレアアイテムのドロップ確率ボーナスと毎日の無料ケースなどを提供します",
+  "buy_subscription": "サブスクリプション購入",
+  "day_30": "30日",
+  "drop_bonus": "ドロップボーナス",
+  "case_per_day": "1日1ケース",
+  "no_duplicates": "重複なし",
+  "going_to_payment": "支払いへ...",
+  "going_to_subscription_payment": "サブスクリプション支払いへ...",
+  "status_purchased": "ステータス購入成功！",
+  "enter_correct_amount": "チャージの正しい金額を入力",
+  "minimum_amount": "最低チャージ額: 100ルーブル",
+  "payment_error": "支払い作成エラー",
+  "subscription_error": "サブスクリプション購入エラー"
+},
   "roulette": {
     "wheel_of_fortune": "🎰 運命の輪",
     "spin_and_win": "ルーレットを回してサブスクリプション日数を獲得！",
