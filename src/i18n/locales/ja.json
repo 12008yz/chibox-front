@@ -262,7 +262,14 @@
       "opened_cases": "開封されたケース",
       "withdrawn": "引き出し済み",
       "sold": "売却済み"
-    }
+    },
+    "achievements_expand_hint": "詳細を見るにはクリック",
+    "achievements_collapse_hint": "クリックして折りたたむ",
+    "achievements_not_loaded": "実績が読み込まれていません",
+    "cannot_withdraw": "出金できません",
+    "profile_settings_title": "プロフィール設定",
+    "level_text": "レベル",
+    "level_max": "100"
   },
   "inventory": {
     "title": "インベントリ",
