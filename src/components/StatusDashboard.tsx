@@ -57,9 +57,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   // Конфигурация статусов
   const statusConfig = {
-    1: { name: 'Статус', icon: '👑', color: 'from-gray-400 to-gray-600', bonus: 3 },
-    2: { name: 'Статус+', icon: '💎', color: 'from-blue-400 to-purple-600', bonus: 5 },
-    3: { name: 'Статус++', icon: '🔥', color: 'from-yellow-400 to-red-500', bonus: 8 }
+    1: { name: t('homepage.status_tier_1'), icon: '👑', color: 'from-gray-400 to-gray-600', bonus: 3 },
+    2: { name: t('homepage.status_tier_2'), icon: '💎', color: 'from-blue-400 to-purple-600', bonus: 5 },
+    3: { name: t('homepage.status_tier_3'), icon: '🔥', color: 'from-yellow-400 to-red-500', bonus: 8 }
   };
 
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
@@ -68,8 +68,8 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const bonusActivities: BonusActivity[] = [
     {
       id: 'tic-tac-toe',
-      name: 'Крестики-нолики',
-      description: 'Выиграй и получи бонусный кейс',
+      name: t('tic_tac_toe.title'),
+      description: t('tic_tac_toe_game.won_bonus_case'),
       icon: <GiTicTacToe className="text-2xl" />,
       color: 'from-green-400 to-emerald-500',
       available: true,
@@ -77,8 +77,8 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     },
     {
       id: 'roulette',
-      name: 'Бонусная рулетка',
-      description: 'Крути рулетку каждый день',
+      name: t('games.roulette'),
+      description: t('homepage.win_bonus_game'),
       icon: <MdCasino className="text-2xl" />,
       color: 'from-purple-400 to-pink-500',
       available: true,
@@ -86,8 +86,8 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     },
     {
       id: 'slots',
-      name: 'Слот-машина',
-      description: 'Испытай удачу в слотах',
+      name: t('slots.title'),
+      description: t('slots.description'),
       icon: "a",
       color: 'from-yellow-400 to-orange-500',
       available: true,
@@ -95,8 +95,8 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     },
     {
       id: 'exchange',
-      name: 'Обмен предметов',
-      description: 'Меняй предметы на статус',
+      name: t('exchange.title'),
+      description: t('exchange.subtitle'),
       icon: <FaCoins className="text-2xl" />,
       color: 'from-pink-400 to-rose-500',
       available: subscriptionTier >= 1,
@@ -107,25 +107,25 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   // Статистика пользователя
   const userStats = [
     {
-      label: 'Открыто кейсов',
+      label: t('profile.cases_opened'),
       value: user.total_cases_opened || 0,
       icon: <FaGift className="text-green-400" />,
       color: 'text-green-400'
     },
     {
-      label: 'Текущий баланс',
+      label: t('common.balance'),
       value: <Monetary value={user.balance || 0} />,
       icon: <FaCoins className="text-yellow-400" />,
       color: 'text-yellow-400'
     },
     {
-      label: 'Уровень',
+      label: t('profile.level'),
       value: user.level || 1,
       icon: <FaChartLine className="text-blue-400" />,
       color: 'text-blue-400'
     },
     {
-      label: 'Дней статуса',
+      label: t('time.days'),
       value: daysLeft,
       icon: <FaClock className="text-purple-400" />,
       color: 'text-purple-400'
@@ -133,9 +133,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   ];
 
   const tabs = [
-    { id: 'activities', name: 'Активности', icon: <FaGamepad /> },
-    { id: 'stats', name: 'Статистика', icon: <FaChartLine /> },
-    { id: 'benefits', name: 'Привилегии', icon: <RiVipCrownFill /> }
+    { id: 'activities', name: t('profile.achievements'), icon: <FaGamepad /> },
+    { id: 'stats', name: t('profile.statistics'), icon: <FaChartLine /> },
+    { id: 'benefits', name: t('auth.bonuses'), icon: <RiVipCrownFill /> }
   ];
 
   return (
@@ -162,19 +162,19 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                   {currentStatus.name}
                   <IoSparkles className="text-yellow-300" />
                 </h2>
-                <p className="text-white/80 text-lg">+{currentStatus.bonus}% бонус к дропу</p>
-                <p className="text-white/60">{formatDaysI18n(daysLeft, t)} до окончания</p>
+                <p className="text-white/80 text-lg">+{currentStatus.bonus}% {t('common.bonus_keyword')}</p>
+                <p className="text-white/60">{formatDaysI18n(daysLeft, t)}</p>
               </div>
             </div>
 
             <div className="text-center md:text-right">
-              <div className="text-white/80 text-sm mb-1">Активных дней осталось</div>
+              <div className="text-white/80 text-sm mb-1">{t('time.days')}</div>
               <div className="text-4xl font-bold text-white">{daysLeft}</div>
               <button
                 onClick={() => navigate('/profile')}
                 className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
               >
-                Продлить статус
+                {t('profile.subscription')}
               </button>
             </div>
           </div>
@@ -238,7 +238,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
                   {activity.cooldown && (
                     <div className="mt-3 text-xs text-yellow-400">
-                      Доступно через: {activity.cooldown}мин
+                      {t('cases.available_in')}: {activity.cooldown}{t('common.minutes_short')}
                     </div>
                   )}
                 </div>
@@ -273,23 +273,23 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <FaFire className="text-orange-400" />
-                Активные бонусы
+                {t('auth.bonuses')}
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Бонус к дропу</span>
+                  <span className="text-gray-300">{t('common.bonus_keyword')}</span>
                   <span className="text-green-400 font-bold">+{currentStatus.bonus}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Ежедневных кейсов</span>
+                  <span className="text-gray-300">{t('cases.daily_case')}</span>
                   <span className="text-blue-400 font-bold">1</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Попыток в крестики-нолики</span>
+                  <span className="text-gray-300">{t('tic_tac_toe.title')}</span>
                   <span className="text-purple-400 font-bold">{subscriptionTier + 2}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Спинов рулетки</span>
+                  <span className="text-gray-300">{t('games.roulette')}</span>
                   <span className="text-yellow-400 font-bold">{subscriptionTier}</span>
                 </div>
               </div>
@@ -298,26 +298,26 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <MdTrendingUp className="text-green-400" />
-                Достижения
+                {t('profile.achievements')}
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                     <span className="text-green-400">✓</span>
                   </div>
-                  <span className="text-gray-300">Обладатель статуса</span>
+                  <span className="text-gray-300">{t('profile.subscription')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                     <span className="text-blue-400">✓</span>
                   </div>
-                  <span className="text-gray-300">Доступ к бонусам</span>
+                  <span className="text-gray-300">{t('auth.bonuses')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
                     <span className="text-purple-400">✓</span>
                   </div>
-                  <span className="text-gray-300">VIP привилегии</span>
+                  <span className="text-gray-300">VIP</span>
                 </div>
               </div>
             </div>
@@ -329,23 +329,23 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       <div className="mt-12 text-center max-w-4xl">
         <div className={`bg-gradient-to-r ${currentStatus.color} bg-opacity-10 border border-white/10 rounded-xl p-6`}>
           <h3 className="text-xl font-bold text-white mb-3 flex items-center justify-center gap-2">
-            🎯 Твой статус работает!
+            🎯 {t('profile.subscription_active')}!
           </h3>
           <p className="text-gray-300 leading-relaxed mb-4">
-            Используй все доступные бонусы и активности каждый день. Чем активнее ты играешь, тем больше наград получаешь!
+            {t('homepage.community_description')}
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm">
-              🎁 Ежедневные награды
+              🎁 {t('common.daily')}
             </span>
             <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-              🎮 Бонусные игры
+              🎮 {t('games.bonus_game')}
             </span>
             <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
-              📈 Увеличенные шансы
+              📈 {t('common.bonus_keyword')}
             </span>
             <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm">
-              👑 VIP доступ
+              👑 VIP
             </span>
           </div>
         </div>
