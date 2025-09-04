@@ -27,7 +27,13 @@
     "play": "Spielen",
     "daily": "täglich",
     "online": "Online: {{count}}",
-    "balance": "Guthaben"
+    "balance": "Guthaben",
+    "currency_suffix": " CR",
+    "bonus_keyword": "bonus",
+    "cases_available": "Kisten verfügbar",
+    "hours_short": "h",
+    "minutes_short": "m",
+    "seconds_short": "s"
   },
   "header": {
     "home": "Startseite",
@@ -136,7 +142,9 @@
     "subscription_expires": "Abonnement läuft ab",
     "subscription_days_left": "Verbleibende Tage: {{days}}",
     "steam_profile": "Steam-Profil",
-    "trade_url": "Handels-URL"
+    "trade_url": "Handels-URL",
+    "case_not_found": "Kiste nicht im Inventar gefunden",
+    "subscription_required": "Abonnement Level {{tier}}+ erforderlich"
   },
   "inventory": {
     "title": "Inventar",

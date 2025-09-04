@@ -141,7 +141,9 @@
     "subscription_expires": "サブスクリプション期限",
     "subscription_days_left": "残り日数: {{days}}",
     "steam_profile": "Steamプロフィール",
-    "trade_url": "トレードURL"
+    "trade_url": "トレードURL",
+    "case_not_found": "ケースがインベントリに見つかりません",
+    "subscription_required": "サブスクリプションレベル{{tier}}+が必要です"
   },
   "inventory": {
     "title": "インベントリ",

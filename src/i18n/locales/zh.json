@@ -28,6 +28,8 @@
     "daily": "每日",
     "online": "在线：{{count}}",
     "balance": "余额",
+    "currency_suffix": " CR",
+    "bonus_keyword": "奖励",
     "cases_available": "箱子可用",
     "hours_short": "时",
     "minutes_short": "分",
@@ -140,7 +142,9 @@
     "subscription_expires": "订阅到期",
     "subscription_days_left": "剩余天数：{{days}}",
     "steam_profile": "Steam资料",
-    "trade_url": "交易链接"
+    "trade_url": "交易链接",
+    "case_not_found": "在库存中找不到箱子",
+    "subscription_required": "需要订阅等级 {{tier}}+"
   },
   "inventory": {
     "title": "背包",

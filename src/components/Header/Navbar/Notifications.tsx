@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
-import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
+import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes, FaLanguage } from 'react-icons/fa';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 interface NotificationsProps {
     openNotifications: boolean;
@@ -108,6 +109,63 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         return translatedName;
     };
 
+    // Улучшенная логика определения типа уведомления
+    const detectNotificationType = (notification: Notification, translated: { title: string, message: string }) => {
+        const { title, message } = translated;
+
+        // Success: Покупка кейса, повышение уровня, достижение, бонус получен, приветствие
+        if (
+            /покупка кейсов|case purchase|повышение уровня|level up|достижение|achievement|бонус|bonus|добро пожаловать|welcome/i.test(title)
+        ) {
+            return 'success';
+        }
+
+        // Info: Новый кейс получен, кейс открыт, вывод предмета
+        if (
+            /новый кейс получен|new case received|кейс открыт|case opened|запрос на вывод предмета|item withdrawal/i.test(title)
+        ) {
+            return 'info';
+        }
+
+        // Bonus: бонус
+        if (/бонус|bonus/i.test(title)) {
+            return 'bonus';
+        }
+
+        // Case open: кейс открыт
+        if (/кейс открыт|case opened/i.test(title)) {
+            return 'caseOpen';
+        }
+
+        // Warning: предупреждение, alert, warning
+        if (/предупреждение|alert|warning/i.test(title)) {
+            return 'warning';
+        }
+
+        // Error: ошибка, error
+        if (/ошибка|error/i.test(title)) {
+            return 'error';
+        }
+
+        // System: system
+        if (/system|система/i.test(title)) {
+            return 'system';
+        }
+
+        // Friend request
+        if (/друг|friend/i.test(title)) {
+            return 'friendRequest';
+        }
+
+        // Message
+        if (/сообщение|message/i.test(title)) {
+            return 'message';
+        }
+
+        // Default
+        return notification.type || 'info';
+    };
+
     // Функция для перевода уведомлений
     const translateNotification = (notification: Notification) => {
         const { title, message } = notification;
@@ -140,13 +198,40 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             }
         }
 
-        if (title.includes('Новый кейс получен') || title.toLowerCase().includes('new case received')) {
-            const caseMatch = message.match(/кейс: (.+)$/);
-            if (caseMatch) {
+        // Поддержка китайских уведомлений о новых кейсах
+        if (title.includes('Новый кейс получен') || title.toLowerCase().includes('new case received') ||
+            title.includes('获得新箱子') || title.includes('新箱子')) {
+            let caseName = '';
+
+            // Для китайских уведомлений
+            const chineseCaseMatch = message.match(/箱子：(.+?)(?:\s|$)/);
+            if (chineseCaseMatch) {
+                caseName = chineseCaseMatch[1].trim();
+                // Переводим название кейса с китайского на текущий язык
+                if (caseName.includes('每日箱子 - 状态')) {
+                    caseName = 'Ежедневный кейс - Статус';
+                } else if (caseName.includes('每日箱子 - 免费')) {
+                    caseName = 'Ежедневный кейс - Бесплатный';
+                } else if (caseName.includes('每日箱子 - 状态+')) {
+                    caseName = 'Ежедневный кейс - Статус+';
+                } else if (caseName.includes('每日箱子 - 状态++')) {
+                    caseName = 'Ежедневный кейс - Статус++';
+                } else if (caseName.includes('奖励箱子')) {
+                    caseName = 'Бонусный кейс';
+                }
+            } else {
+                // Для русских уведомлений
+                const caseMatch = message.match(/кейс: (.+)$/);
+                if (caseMatch) {
+                    caseName = caseMatch[1];
+                }
+            }
+
+            if (caseName) {
                 return {
                     title: t('notifications.notification_types.new_case_received'),
                     message: t('notifications.notification_types.new_case_received_message', {
-                        caseName: translateCaseName(caseMatch[1])
+                        caseName: translateCaseName(caseName)
                     })
                 };
             }
@@ -158,6 +243,19 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                 return {
                     title: t('notifications.notification_types.case_opened'),
                     message: t('notifications.notification_types.case_opened_message', {
+                        itemName: itemMatch[1]
+                    })
+                };
+            }
+        }
+
+        // Поддержка уведомлений о выводе предметов
+        if (title.includes('Запрос на вывод предмета') || title.toLowerCase().includes('item withdrawal')) {
+            const itemMatch = message.match(/"(.+?)"/);
+            if (itemMatch) {
+                return {
+                    title: t('notifications.notification_types.item_withdrawn'),
+                    message: t('notifications.notification_types.item_withdrawn_message', {
                         itemName: itemMatch[1]
                     })
                 };
@@ -284,12 +382,15 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                 </div>
                             )}
                         </div>
-                        <button
-                            onClick={handleCloseNotifications}
-                            className="gaming-close-button"
-                        >
-                            <FaTimes className="text-lg" />
-                        </button>
+                        <div className="flex items-center space-x-2">
+                            <LanguageSwitcher />
+                            <button
+                                onClick={handleCloseNotifications}
+                                className="gaming-close-button"
+                            >
+                                <FaTimes className="text-lg" />
+                            </button>
+                        </div>
                     </div>
                     {/* Кнопка "Прочитать все" в заголовке */}
                     {unreadCount > 0 && (
@@ -315,17 +416,18 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     ) : (
                         notifications.map((notification) => {
                             const translatedNotification = translateNotification(notification);
+                            const detectedType = detectNotificationType(notification, translatedNotification);
                             return (
                                 <div
                                     key={notification.id}
-                                    className={`gaming-notification-item ${getNotificationTypeClass(notification.type)} ${
+                                    className={`gaming-notification-item ${getNotificationTypeClass(detectedType)} ${
                                         !notification.is_read ? 'gaming-notification-unread' : 'gaming-notification-read'
                                     }`}
                                     onClick={() => handleNotificationClick(notification)}
                                 >
                                     <div className="gaming-notification-content">
                                         <div className="gaming-notification-icon">
-                                            {getNotificationIcon(notification.type)}
+                                            {getNotificationIcon(detectedType)}
                                         </div>
                                         <div className="gaming-notification-body">
                                             <div className="flex items-center justify-between">

@@ -148,7 +148,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               <div className="mb-6 space-y-2">
                 <div className="flex items-center justify-center">
                   <span className={`text-lg font-bold bg-gradient-to-r ${tier.color} bg-clip-text text-transparent`}>
-                    +{tier.bonus_percentage}% бонус
+                    +{tier.bonus_percentage}% {t('common.bonus_keyword')}
                   </span>
                 </div>
                 <div className="text-center text-gray-300 text-sm">

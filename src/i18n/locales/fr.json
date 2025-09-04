@@ -28,6 +28,8 @@
     "daily": "quotidien",
     "online": "En ligne : {{count}}",
     "balance": "Solde",
+    "currency_suffix": " CR",
+    "bonus_keyword": "bonus",
     "cases_available": "Caisses disponibles",
     "hours_short": "h",
     "minutes_short": "m",
@@ -140,7 +142,9 @@
     "subscription_expires": "Abonnement Expire",
     "subscription_days_left": "Jours restants : {{days}}",
     "steam_profile": "Profil Steam",
-    "trade_url": "URL d'échange"
+    "trade_url": "URL d'échange",
+    "case_not_found": "Caisse non trouvée dans l'inventaire",
+    "subscription_required": "Abonnement niveau {{tier}}+ requis"
   },
   "inventory": {
     "title": "Inventaire",
