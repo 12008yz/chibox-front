@@ -1,10 +1,14 @@
 {
   "case_names": {
-    "Бонусный кейс": "Bonus-Kiste",
+    "Ежедневный кейс - Бесплатный": "Tägliche Kiste - Kostenlos",
     "Ежедневный кейс - Статус": "Tägliche Kiste - Status",
+    "Ежедневный кейс - Статус+": "Tägliche Kiste - Status+",
+    "Ежедневный кейс - Статус++": "Tägliche Kiste - Status++",
+    "Бонусный кейс": "Bonus-Kiste",
+    "Стандартный кейс": "Standard-Kiste",
+    "Премиум кейс": "Premium-Kiste",
     "Бесплатный кейс": "Kostenlose Kiste",
     "Статус кейс": "Status-Kiste",
-    "Премиум кейс": "Premium-Kiste",
     "Ежедневный кейс": "Tägliche Kiste"
   },
   "common": {

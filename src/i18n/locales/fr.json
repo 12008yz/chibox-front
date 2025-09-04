@@ -1,10 +1,14 @@
 {
   "case_names": {
-    "Бонусный кейс": "Caisse Bonus",
+    "Ежедневный кейс - Бесплатный": "Caisse Quotidienne - Gratuite",
     "Ежедневный кейс - Статус": "Caisse Quotidienne - Statut",
+    "Ежедневный кейс - Статус+": "Caisse Quotidienne - Statut+",
+    "Ежедневный кейс - Статус++": "Caisse Quotidienne - Statut++",
+    "Бонусный кейс": "Caisse Bonus",
+    "Стандартный кейс": "Caisse Standard",
+    "Премиум кейс": "Caisse Premium",
     "Бесплатный кейс": "Caisse Gratuite",
     "Статус кейс": "Caisse de Statut",
-    "Премиум кейс": "Caisse Premium",
     "Ежедневный кейс": "Caisse Quotidienne"
   },
   "common": {

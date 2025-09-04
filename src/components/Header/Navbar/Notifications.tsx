@@ -102,6 +102,12 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         };
     }, [openNotifications, unreadCount, markAllAsRead, refetchNotifications]);
 
+    // Функция для перевода названий кейсов
+    const translateCaseName = (caseName: string) => {
+        const translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+        return translatedName;
+    };
+
     // Функция для перевода уведомлений
     const translateNotification = (notification: Notification) => {
         const { title, message } = notification;
@@ -140,7 +146,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                 return {
                     title: t('notifications.notification_types.new_case_received'),
                     message: t('notifications.notification_types.new_case_received_message', {
-                        caseName: caseMatch[1]
+                        caseName: translateCaseName(caseMatch[1])
                     })
                 };
             }

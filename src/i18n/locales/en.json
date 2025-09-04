@@ -24,11 +24,15 @@
     "seconds_short": "s"
   },
   "case_names": {
-    "Бонусный кейс": "Bonus Case",
+    "Ежедневный кейс - Бесплатный": "Daily Case - Free",
     "Ежедневный кейс - Статус": "Daily Case - Status",
+    "Ежедневный кейс - Статус+": "Daily Case - Status+",
+    "Ежедневный кейс - Статус++": "Daily Case - Status++",
+    "Бонусный кейс": "Bonus Case",
+    "Стандартный кейс": "Standard Case",
+    "Премиум кейс": "Premium Case",
     "Бесплатный кейс": "Free Case",
     "Статус кейс": "Status Case",
-    "Премиум кейс": "Premium Case",
     "Ежедневный кейс": "Daily Case"
   },
   "header": {

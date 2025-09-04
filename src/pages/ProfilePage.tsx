@@ -326,6 +326,12 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  // Функция для перевода названий кейсов
+  const translateCaseName = (caseName: string) => {
+    const translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+    return translatedName;
+  };
+
   // Функция для показа уведомлений
   const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
     switch (type) {
@@ -1453,7 +1459,8 @@ const ProfilePage: React.FC = () => {
                       // Рендеринг кейса
                       (() => {
                         const caseTemplate = getCaseTemplateById(inventoryItem.case_template_id);
-                        const caseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
+                        const rawCaseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
+                        const caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
                         const casePrice = caseTemplate?.price || '0.00';
                         const caseImageUrl = caseTemplate?.image_url;
 

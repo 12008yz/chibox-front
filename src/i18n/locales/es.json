@@ -1,10 +1,14 @@
 {
   "case_names": {
-    "Бонусный кейс": "Caja de Bonificación",
+    "Ежедневный кейс - Бесплатный": "Caja Diaria - Gratis",
     "Ежедневный кейс - Статус": "Caja Diaria - Estado",
+    "Ежедневный кейс - Статус+": "Caja Diaria - Estado+",
+    "Ежедневный кейс - Статус++": "Caja Diaria - Estado++",
+    "Бонусный кейс": "Caja de Bonificación",
+    "Стандартный кейс": "Caja Estándar",
+    "Премиум кейс": "Caja Premium",
     "Бесплатный кейс": "Caja Gratuita",
     "Статус кейс": "Caja de Estado",
-    "Премиум кейс": "Caja Premium",
     "Ежедневный кейс": "Caja Diaria"
   },
   "common": {

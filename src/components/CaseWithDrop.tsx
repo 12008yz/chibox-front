@@ -10,6 +10,13 @@ interface CaseWithDropProps {
 
 const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }) => {
   const { t } = useTranslation();
+
+  // Функция для перевода названий кейсов
+  const translateCaseName = (caseName: string) => {
+    const translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+    return translatedName;
+  };
+
   const getRarityColor = (rarity: string) => {
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'from-gray-500 to-gray-600';
@@ -36,7 +43,8 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
     }
   };
 
-  const caseName = caseTemplate?.name || `${t('profile.case_label')} #${droppedItem.case_template_id?.slice(0, 8) || 'unknown'}`;
+  const rawCaseName = caseTemplate?.name || `${t('profile.case_label')} #${droppedItem.case_template_id?.slice(0, 8) || 'unknown'}`;
+  const caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
   const caseImageUrl = caseTemplate?.image_url;
 
   // Получаем корректный URL изображения предмета
