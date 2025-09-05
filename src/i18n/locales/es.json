@@ -144,7 +144,126 @@
     "steam_profile": "Perfil Steam",
     "trade_url": "URL de intercambio",
     "case_not_found": "Caja no encontrada en el inventario",
-    "subscription_required": "Se requiere suscripción nivel {{tier}}+"
+    "subscription_required": "Se requiere suscripción nivel {{tier}}+",
+    "user_not_found": "Usuario no encontrado",
+    "please_login": "Por favor inicia sesión",
+    "level_progress": "Progreso de Nivel",
+    "items_in_inventory": "Objetos en el Inventario",
+    "best_weapon": "Mejor Arma",
+    "inventory_empty": "El inventario está vacío",
+    "no_opened_cases": "No hay cajas abiertas",
+    "no_withdrawn_items": "No hay objetos retirados",
+    "no_sold_items": "No hay objetos vendidos",
+    "open_cases_hint": "Abre cajas para obtener objetos",
+    "opened_cases_hint": "Las cajas abiertas se mostrarán aquí con la posibilidad de ver el objeto obtenido",
+    "withdrawn_items_hint": "Los objetos pendientes de retiro y ya enviados a Steam se mostrarán aquí",
+    "sold_items_hint": "Los objetos vendidos y intercambiados por suscripción se mostrarán aquí",
+    "level_bonus_tooltip": {
+      "completing_achievements": "Completar logros",
+      "daily_login": "Inicio de sesión diario en el juego",
+      "shop_purchases": "Compras en la tienda",
+      "event_participation": "Participación en eventos",
+      "friend_invites": "Invitaciones de amigos",
+      "level_drop_bonus": "Subir de nivel aumenta el bonus de drop: +0.02% por nivel"
+    },
+    "inventory_descriptions": {
+      "active": "🎮 Tus objetos actuales y cajas sin abrir",
+      "opened": "📦 Cajas abiertas - pasa el cursor sobre la caja para ver el objeto obtenido",
+      "withdrawn": "📤 Objetos en retiro: pendientes de envío y ya enviados a Steam",
+      "sold": "💰 Objetos vendidos por moneda o intercambiados por suscripción"
+    },
+    "loading_inventory": "Cargando inventario...",
+    "case_template_not_found": "Plantilla de caja no encontrada",
+    "item_received": "¡Felicidades! Has recibido: {{itemName}}",
+    "item_info_error": "Error: No se pudo obtener información del objeto",
+    "case_opening_error": "Error al abrir la caja: {{error}}",
+    "unknown_achievement": "Logro desconocido",
+    "steam_linked_success": "¡Cuenta de Steam vinculada exitosamente!",
+    "steam_link_error": "Error al vincular cuenta de Steam",
+    "steam_link_try_again": "Error al vincular la cuenta de Steam. Por favor inténtalo de nuevo.",
+    "session_expired": "Sesión expirada. Por favor inténtalo de nuevo.",
+    "steam_already_linked": "Esta cuenta de Steam ya está vinculada a otro usuario.",
+    "linking_process_error": "Error en el proceso de vinculación. Por favor inténtalo de nuevo.",
+    "account_linking_error": "Ocurrió un error al vincular la cuenta.",
+    "achievements_count": "Logros",
+    "total_count": "Total",
+    "loading_yes": "Sí",
+    "loading_no": "No",
+    "case_label": "CAJA",
+    "open_button": "Abrir",
+    "status_pending_withdrawal": "Retiro Pendiente",
+    "status_withdrawn": "Retirado",
+    "status_sold": "Vendido",
+    "status_opened": "Abierto",
+    "item_withdraw_success": "¡Objeto \"{{itemName}}\" enviado exitosamente para retiro!",
+    "opening": "Abriendo...",
+    "items_suffix": " objetos",
+    "cases_suffix": " cajas",
+    "streak_suffix": " seguidos",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam Conectado",
+    "steam_not_connected": "Steam No Conectado",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "Ninguna",
+    "drop_bonuses": "Bonus de Drop",
+    "level_bonus": "Nivel:",
+    "status_bonus": "Estado:",
+    "achievements_bonus": "Logros:",
+    "total_bonus": "Bonus Total:",
+    "inventory_title": "Inventario",
+    "subscription_tier_1": "Estado",
+    "subscription_tier_2": "Estado+",
+    "subscription_tier_3": "Estado++",
+    "subscription_tier_default": "Tier {{tier}}",
+    "rarity": {
+      "consumer": "Grado de Consumidor",
+      "industrial": "Grado Industrial",
+      "milspec": "Grado Militar",
+      "restricted": "Restringido",
+      "classified": "Clasificado",
+      "covert": "Encubierto",
+      "contraband": "Contrabando"
+    },
+    "purchase_button": "Comprar",
+    "acquired_date": "Obtenido:",
+    "source": "Fuente:",
+    "sources": {
+      "case": "Caja",
+      "purchase": "Compra",
+      "bonus": "Bonus"
+    },
+    "drop_bonus_text": "% drop",
+    "no_description": "Sin descripción disponible",
+    "achievements_not_loaded": "Logros no cargados",
+    "achievements_expand_hint": "Haz clic para ver detalles",
+    "achievements_collapse_hint": "Haz clic para contraer",
+    "profile_settings_title": "Configuración del Perfil",
+    "level_text": "Nivel",
+    "level_max": "100",
+    "xp_earned_for": "XP se gana por:",
+    "opening_cases": "Abrir cajas",
+    "inventory_tabs": {
+      "active": "Activo",
+      "opened_cases": "Cajas Abiertas",
+      "withdrawn": "Retirado",
+      "sold": "Vendido"
+    },
+    "item_withdraw": {
+      "withdrawing": "Retirando...",
+      "withdraw_to_steam": "Retirar a Steam",
+      "subscription_required": "Suscripción requerida",
+      "need_trade_url": "Se necesita URL de Steam Trade",
+      "cannot_withdraw": "No se puede retirar a Steam",
+      "provide_trade_url": "Proporciona URL de Steam Trade",
+      "ok": "OK",
+      "cancel": "✕",
+      "send_to_steam": "Enviar a tu Steam",
+      "error_withdrawal_impossible": "No se puede retirar el objeto",
+      "error_no_subscription": "Este objeto no se puede retirar a Steam",
+      "error_no_item_name": "No se pudo determinar el nombre del objeto para retiro",
+      "error_withdrawal_failed": "Error al retirar el objeto",
+      "error_not_found": "No se pudo retirar el objeto"
+    }
   },
   "inventory": {
     "title": "Inventario",
@@ -703,6 +822,38 @@
     "Иметь предмет с ценой выше 50,000 руб": {
       "name": "Experto",
       "description": "Ten un objeto valorado en más de 50,000 rublos"
+    },
+    "Novice": {
+      "name": "Novato",
+      "description": "Abre 10 cajas"
+    },
+    "Collector": {
+      "name": "Coleccionista",
+      "description": "Encuentra 5 objetos raros"
+    },
+    "Premium Player": {
+      "name": "Jugador Premium",
+      "description": "Encuentra 3 objetos valorados en 100+ rublos"
+    },
+    "Subscriber": {
+      "name": "Suscriptor",
+      "description": "Ten una suscripción activa durante 30 días seguidos"
+    },
+    "Subscription Buyer": {
+      "name": "Comprador de Suscripción",
+      "description": "Compra cualquier nivel de suscripción"
+    },
+    "Lucky": {
+      "name": "Afortunado",
+      "description": "Abre cajas durante 7 días seguidos"
+    },
+    "Millionaire": {
+      "name": "Millonario",
+      "description": "Valor total de objetos en el inventario de 1,000,000 rublos"
+    },
+    "Expert": {
+      "name": "Experto",
+      "description": "Ten un objeto valorado en más de 50,000 rublos"
     }
   },
   "modals": {
@@ -894,6 +1045,6 @@
     "withdrawing": "Retirando",
     "withdrawn": "Retirado",
     "withdrawn_items_hint": "Consejo de objetos retirados",
-    "xp_earned_for": "XP ganado por"
+    "xp_earned_for": "XP ganado por:"
   }
 }

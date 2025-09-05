@@ -144,7 +144,126 @@
     "steam_profile": "Profil Steam",
     "trade_url": "URL d'échange",
     "case_not_found": "Caisse non trouvée dans l'inventaire",
-    "subscription_required": "Abonnement niveau {{tier}}+ requis"
+    "subscription_required": "Abonnement niveau {{tier}}+ requis",
+    "user_not_found": "Utilisateur non trouvé",
+    "please_login": "Veuillez vous connecter",
+    "level_progress": "Progression du Niveau",
+    "items_in_inventory": "Objets dans l'Inventaire",
+    "best_weapon": "Meilleure Arme",
+    "inventory_empty": "L'inventaire est vide",
+    "no_opened_cases": "Aucune caisse ouverte",
+    "no_withdrawn_items": "Aucun objet retiré",
+    "no_sold_items": "Aucun objet vendu",
+    "open_cases_hint": "Ouvrez des caisses pour obtenir des objets",
+    "opened_cases_hint": "Les caisses ouvertes s'afficheront ici avec la possibilité de voir l'objet obtenu",
+    "withdrawn_items_hint": "Les objets en cours de retrait et déjà envoyés à Steam s'afficheront ici",
+    "sold_items_hint": "Les objets vendus et échangés contre un abonnement s'afficheront ici",
+    "level_bonus_tooltip": {
+      "completing_achievements": "Compléter les succès",
+      "daily_login": "Connexion quotidienne au jeu",
+      "shop_purchases": "Achats en boutique",
+      "event_participation": "Participation aux événements",
+      "friend_invites": "Invitations d'amis",
+      "level_drop_bonus": "Monter de niveau augmente le bonus de drop : +0.02% par niveau"
+    },
+    "inventory_descriptions": {
+      "active": "🎮 Vos objets actuels et caisses non ouvertes",
+      "opened": "📦 Caisses ouvertes - survolez la caisse pour voir l'objet obtenu",
+      "withdrawn": "📤 Objets en retrait : en attente d'envoi et déjà envoyés à Steam",
+      "sold": "💰 Objets vendus pour de la monnaie ou échangés contre un abonnement"
+    },
+    "loading_inventory": "Chargement de l'inventaire...",
+    "case_template_not_found": "Modèle de caisse non trouvé",
+    "item_received": "Félicitations ! Vous avez reçu : {{itemName}}",
+    "item_info_error": "Erreur : Impossible d'obtenir les informations de l'objet",
+    "case_opening_error": "Erreur lors de l'ouverture de la caisse : {{error}}",
+    "unknown_achievement": "Succès inconnu",
+    "steam_linked_success": "Compte Steam lié avec succès !",
+    "steam_link_error": "Erreur lors de la liaison du compte Steam",
+    "steam_link_try_again": "Échec de la liaison du compte Steam. Veuillez réessayer.",
+    "session_expired": "Session expirée. Veuillez réessayer.",
+    "steam_already_linked": "Ce compte Steam est déjà lié à un autre utilisateur.",
+    "linking_process_error": "Erreur du processus de liaison. Veuillez réessayer.",
+    "account_linking_error": "Une erreur s'est produite lors de la liaison du compte.",
+    "achievements_count": "Succès",
+    "total_count": "Total",
+    "loading_yes": "Oui",
+    "loading_no": "Non",
+    "case_label": "CAISSE",
+    "open_button": "Ouvrir",
+    "status_pending_withdrawal": "Retrait en Attente",
+    "status_withdrawn": "Retiré",
+    "status_sold": "Vendu",
+    "status_opened": "Ouvert",
+    "item_withdraw_success": "Objet \"{{itemName}}\" envoyé avec succès pour retrait !",
+    "opening": "Ouverture...",
+    "items_suffix": " objets",
+    "cases_suffix": " caisses",
+    "streak_suffix": " d'affilée",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam Connecté",
+    "steam_not_connected": "Steam Non Connecté",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "Aucun",
+    "drop_bonuses": "Bonus de Drop",
+    "level_bonus": "Niveau :",
+    "status_bonus": "Statut :",
+    "achievements_bonus": "Succès :",
+    "total_bonus": "Bonus Total :",
+    "inventory_title": "Inventaire",
+    "subscription_tier_1": "Statut",
+    "subscription_tier_2": "Statut+",
+    "subscription_tier_3": "Statut++",
+    "subscription_tier_default": "Tier {{tier}}",
+    "rarity": {
+      "consumer": "Qualité Consommateur",
+      "industrial": "Qualité Industrielle",
+      "milspec": "Qualité Militaire",
+      "restricted": "Restreint",
+      "classified": "Classifié",
+      "covert": "Couvert",
+      "contraband": "Contrebande"
+    },
+    "purchase_button": "Acheter",
+    "acquired_date": "Obtenu :",
+    "source": "Source :",
+    "sources": {
+      "case": "Caisse",
+      "purchase": "Achat",
+      "bonus": "Bonus"
+    },
+    "drop_bonus_text": "% drop",
+    "no_description": "Aucune description disponible",
+    "achievements_not_loaded": "Succès non chargés",
+    "achievements_expand_hint": "Cliquez pour les détails",
+    "achievements_collapse_hint": "Cliquez pour réduire",
+    "profile_settings_title": "Paramètres du Profil",
+    "level_text": "Niveau",
+    "level_max": "100",
+    "xp_earned_for": "XP gagné pour :",
+    "opening_cases": "Ouverture de caisses",
+    "inventory_tabs": {
+      "active": "Actif",
+      "opened_cases": "Caisses Ouvertes",
+      "withdrawn": "Retiré",
+      "sold": "Vendu"
+    },
+    "item_withdraw": {
+      "withdrawing": "Retrait...",
+      "withdraw_to_steam": "Retirer vers Steam",
+      "subscription_required": "Abonnement requis",
+      "need_trade_url": "URL Steam Trade nécessaire",
+      "cannot_withdraw": "Impossible de retirer vers Steam",
+      "provide_trade_url": "Fournir l'URL Steam Trade",
+      "ok": "OK",
+      "cancel": "✕",
+      "send_to_steam": "Envoyer vers votre Steam",
+      "error_withdrawal_impossible": "Impossible de retirer l'objet",
+      "error_no_subscription": "Cet objet ne peut pas être retiré vers Steam",
+      "error_no_item_name": "Impossible de déterminer le nom de l'objet pour le retrait",
+      "error_withdrawal_failed": "Erreur lors du retrait de l'objet",
+      "error_not_found": "Impossible de retirer l'objet"
+    }
   },
   "inventory": {
     "title": "Inventaire",
@@ -641,7 +760,7 @@
   },
   "achievements": {
     "Новичок": {
-      "name": "Débutant",
+      "name": "Novice",
       "description": "Ouvrir 10 caisses"
     },
     "Коллекционер": {
@@ -673,7 +792,7 @@
       "description": "Avoir un objet d'une valeur supérieure à 50 000 roubles"
     },
     "Откройте 10 кейсов": {
-      "name": "Débutant",
+      "name": "Novice",
       "description": "Ouvrir 10 caisses"
     },
     "Найдите 5 редких предметов": {
@@ -894,6 +1013,6 @@
     "withdrawing": "Retrait en cours",
     "withdrawn": "Retiré",
     "withdrawn_items_hint": "Conseil des objets retirés",
-    "xp_earned_for": "XP gagné pour"
+    "xp_earned_for": "XP gagné pour :"
   }
 }

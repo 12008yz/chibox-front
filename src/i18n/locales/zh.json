@@ -144,7 +144,126 @@
     "steam_profile": "Steam资料",
     "trade_url": "交易链接",
     "case_not_found": "在库存中找不到箱子",
-    "subscription_required": "需要订阅等级 {{tier}}+"
+    "subscription_required": "需要订阅等级 {{tier}}+",
+    "user_not_found": "未找到用户",
+    "please_login": "请登录",
+    "level_progress": "等级进度",
+    "items_in_inventory": "背包物品数量",
+    "best_weapon": "最佳武器",
+    "inventory_empty": "背包为空",
+    "no_opened_cases": "没有开启的箱子",
+    "no_withdrawn_items": "没有提取的物品",
+    "no_sold_items": "没有出售的物品",
+    "open_cases_hint": "开启箱子以获得物品",
+    "opened_cases_hint": "已开启的箱子将显示在这里，可以查看掉落的物品",
+    "withdrawn_items_hint": "待提取和已提取到Steam的物品将显示在这里",
+    "sold_items_hint": "已出售和兑换的物品将显示在这里",
+    "level_bonus_tooltip": {
+      "completing_achievements": "完成成就",
+      "daily_login": "每日登录游戏",
+      "shop_purchases": "商店购买",
+      "event_participation": "参与活动",
+      "friend_invites": "邀请好友",
+      "level_drop_bonus": "升级增加掉落奖励：每级+0.02%"
+    },
+    "inventory_descriptions": {
+      "active": "🎮 您当前的物品和未开启的箱子",
+      "opened": "📦 已开启的箱子 - 悬停在箱子上查看掉落的物品",
+      "withdrawn": "📤 正在提取的物品：待发送和已发送到Steam的",
+      "sold": "💰 已出售货币或兑换订阅的物品"
+    },
+    "loading_inventory": "加载背包中...",
+    "case_template_not_found": "未找到箱子模板",
+    "item_received": "恭喜！您获得了：{{itemName}}",
+    "item_info_error": "错误：无法获取物品信息",
+    "case_opening_error": "开箱错误：{{error}}",
+    "unknown_achievement": "未知成就",
+    "steam_linked_success": "Steam账户成功关联！",
+    "steam_link_error": "Steam账户关联错误",
+    "steam_link_try_again": "Steam账户关联失败。请重试。",
+    "session_expired": "会话已过期。请重试。",
+    "steam_already_linked": "此Steam账户已关联到其他用户。",
+    "linking_process_error": "关联过程错误。请重试。",
+    "account_linking_error": "关联账户时发生错误。",
+    "achievements_count": "成就",
+    "total_count": "总数",
+    "loading_yes": "是",
+    "loading_no": "否",
+    "case_label": "箱子",
+    "open_button": "开启",
+    "status_pending_withdrawal": "待提取",
+    "status_withdrawn": "已提取",
+    "status_sold": "已出售",
+    "status_opened": "已开启",
+    "item_withdraw_success": "物品\"{{itemName}}\"成功发送提取！",
+    "opening": "开启中...",
+    "items_suffix": " 个物品",
+    "cases_suffix": " 个箱子",
+    "streak_suffix": " 连续",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam已连接",
+    "steam_not_connected": "Steam未连接",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "无",
+    "drop_bonuses": "掉落奖励",
+    "level_bonus": "等级：",
+    "status_bonus": "状态：",
+    "achievements_bonus": "成就：",
+    "total_bonus": "总奖励：",
+    "inventory_title": "背包",
+    "subscription_tier_1": "状态",
+    "subscription_tier_2": "状态+",
+    "subscription_tier_3": "状态++",
+    "subscription_tier_default": "等级 {{tier}}",
+    "rarity": {
+      "consumer": "消费级",
+      "industrial": "工业级",
+      "milspec": "军规级",
+      "restricted": "受限",
+      "classified": "机密",
+      "covert": "隐秘",
+      "contraband": "违禁品"
+    },
+    "purchase_button": "购买",
+    "acquired_date": "获得时间：",
+    "source": "来源：",
+    "sources": {
+      "case": "箱子",
+      "purchase": "购买",
+      "bonus": "奖励"
+    },
+    "drop_bonus_text": "% 掉落",
+    "no_description": "无描述",
+    "achievements_not_loaded": "成就未加载",
+    "achievements_expand_hint": "点击查看详情",
+    "achievements_collapse_hint": "点击收起",
+    "profile_settings_title": "个人资料设置",
+    "level_text": "等级",
+    "level_max": "100",
+    "xp_earned_for": "经验获得方式：",
+    "opening_cases": "开启箱子",
+    "inventory_tabs": {
+      "active": "活跃",
+      "opened_cases": "已开箱子",
+      "withdrawn": "已提取",
+      "sold": "已出售"
+    },
+    "item_withdraw": {
+      "withdrawing": "提取中...",
+      "withdraw_to_steam": "提取到Steam",
+      "subscription_required": "需要订阅",
+      "need_trade_url": "需要Steam交易链接",
+      "cannot_withdraw": "无法提取到Steam",
+      "provide_trade_url": "提供Steam交易链接",
+      "ok": "确定",
+      "cancel": "✕",
+      "send_to_steam": "发送到您的Steam",
+      "error_withdrawal_impossible": "无法提取物品",
+      "error_no_subscription": "此物品无法提取到Steam",
+      "error_no_item_name": "无法确定提取的物品名称",
+      "error_withdrawal_failed": "提取物品时出错",
+      "error_not_found": "提取物品失败"
+    }
   },
   "inventory": {
     "title": "背包",
@@ -405,11 +524,11 @@
     "account_created": "您的账户已成功创建",
     "getting_started": "下一步：",
     "step_1": "打开您的第一个免费箱子",
-    "step_2": "探索背包中的物品",
-    "step_3": "考虑获得状态以获得奖励",
+    "step_2": "探索库存中的物品",
+    "step_3": "考虑获取状态以获得奖励",
     "step_4": "参与游戏和竞赛",
     "start_playing": "开始游戏",
-    "bonus_received": "您获得了新手奖励！"
+    "bonus_received": "您获得了启动奖励！"
   },
   "notifications": {
     "no_notifications": "无通知",
@@ -472,13 +591,15 @@
   },
   "live_drops": {
     "title": "🔥 最新掉落",
-    "player_won": "{{player}} 获得了",
+    "player_won": "{{player}}获得了",
     "just_now": "刚刚",
-    "minutes_ago": "{{minutes}} 分钟前",
-    "hour_ago": "一小时前",
-    "hours_ago": "{{hours}} 小时前",
+    "minutes_ago": "{{minutes}}分钟前",
+    "hour_ago": "1小时前",
+    "hours_ago": "{{hours}}小时前",
     "no_drops": "暂无掉落",
-    "loading_drops": "加载掉落中..."
+    "loading_drops": "加载掉落中...",
+    "online": "在线",
+    "offline": "已断开"
   },
   "banner": {
     "daily_bonus": "每日奖励",
@@ -638,5 +759,71 @@
       "简直太好了！",
       "您真幸运！"
     ]
+  },
+  "achievements": {
+    "Новичок": {
+      "name": "新手",
+      "description": "开启10个箱子"
+    },
+    "Коллекционер": {
+      "name": "收藏家",
+      "description": "找到5个稀有物品"
+    },
+    "Премиум игрок": {
+      "name": "高级玩家",
+      "description": "找到3个价值100+卢布的物品"
+    },
+    "Подписчик": {
+      "name": "订阅者",
+      "description": "连续30天拥有活跃订阅"
+    },
+    "Покупатель подписки": {
+      "name": "订阅购买者",
+      "description": "购买任何订阅等级"
+    },
+    "Удачливый": {
+      "name": "幸运儿",
+      "description": "连续7天开启箱子"
+    },
+    "Миллионер": {
+      "name": "百万富翁",
+      "description": "背包总价值达到1,000,000卢布"
+    },
+    "Эксперт": {
+      "name": "专家",
+      "description": "拥有价值超过50,000卢布的物品"
+    },
+    "Откройте 10 кейсов": {
+      "name": "新手",
+      "description": "开启10个箱子"
+    },
+    "Найдите 5 редких предметов": {
+      "name": "收藏家",
+      "description": "找到5个稀有物品"
+    },
+    "Найдите 3 предмета стоимостью от 100 руб": {
+      "name": "高级玩家",
+      "description": "找到3个价值100+卢布的物品"
+    },
+    "Иметь активную подписку 30 дней подряд": {
+      "name": "订阅者",
+      "description": "连续30天拥有活跃订阅"
+    },
+    "Приобрести любой уровень подписки": {
+      "name": "订阅购买者",
+      "description": "购买任何订阅等级"
+    },
+    "Открыть кейс 7 дней подряд": {
+      "name": "幸运儿",
+      "description": "连续7天开启箱子"
+    },
+    "Общая стоимость предметов в инвентаре 1,000,000 руб": {
+      "name": "百万富翁",
+      "description": "背包总价值达到1,000,000卢布"
+    },
+    "Иметь предмет с ценой выше 50,000 руб": {
+      "name": "专家",
+      "description": "拥有价值超过50,000卢布的物品"
+    }
   }
 }

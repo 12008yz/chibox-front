@@ -141,7 +141,128 @@
     "subscription_expires": "구독 만료",
     "subscription_days_left": "남은 일수: {{days}}",
     "steam_profile": "Steam 프로필",
-    "trade_url": "거래 URL"
+    "trade_url": "거래 URL",
+    "case_not_found": "인벤토리에서 케이스를 찾을 수 없음",
+    "subscription_required": "구독 레벨 {{tier}}+ 필요",
+    "user_not_found": "사용자를 찾을 수 없음",
+    "please_login": "로그인하세요",
+    "level_progress": "레벨 진행도",
+    "items_in_inventory": "인벤토리 아이템",
+    "best_weapon": "최고 무기",
+    "inventory_empty": "인벤토리가 비어있습니다",
+    "no_opened_cases": "열린 케이스가 없습니다",
+    "no_withdrawn_items": "출금된 아이템이 없습니다",
+    "no_sold_items": "판매된 아이템이 없습니다",
+    "open_cases_hint": "케이스를 열어서 아이템을 획득하세요",
+    "opened_cases_hint": "열린 케이스가 여기에 표시되며 드롭된 아이템을 확인할 수 있습니다",
+    "withdrawn_items_hint": "출금 대기 중이거나 Steam으로 이미 전송된 아이템이 여기에 표시됩니다",
+    "sold_items_hint": "화폐로 판매되었거나 구독으로 교환된 아이템이 여기에 표시됩니다",
+    "level_bonus_tooltip": {
+      "completing_achievements": "업적 완료",
+      "daily_login": "일일 게임 로그인",
+      "shop_purchases": "상점 구매",
+      "event_participation": "이벤트 참여",
+      "friend_invites": "친구 초대",
+      "level_drop_bonus": "레벨업 시 드롭 보너스 증가: 레벨당 +0.02%"
+    },
+    "inventory_descriptions": {
+      "active": "🎮 현재 아이템과 열지 않은 케이스",
+      "opened": "📦 열린 케이스 - 케이스에 마우스를 올려 드롭된 아이템 확인",
+      "withdrawn": "📤 출금 중인 아이템: 전송 대기 중이거나 Steam으로 이미 전송됨",
+      "sold": "💰 화폐로 판매되었거나 구독으로 교환된 아이템"
+    },
+    "loading_inventory": "인벤토리 로딩 중...",
+    "case_template_not_found": "케이스 템플릿을 찾을 수 없음",
+    "item_received": "축하합니다! 받으신 아이템: {{itemName}}",
+    "item_info_error": "오류: 아이템 정보를 가져올 수 없습니다",
+    "case_opening_error": "케이스 열기 오류: {{error}}",
+    "unknown_achievement": "알 수 없는 업적",
+    "steam_linked_success": "Steam 계정이 성공적으로 연결되었습니다!",
+    "steam_link_error": "Steam 계정 연결 오류",
+    "steam_link_try_again": "Steam 계정 연결에 실패했습니다. 다시 시도해주세요.",
+    "session_expired": "세션이 만료되었습니다. 다시 시도해주세요.",
+    "steam_already_linked": "이 Steam 계정은 이미 다른 사용자에게 연결되어 있습니다.",
+    "linking_process_error": "연결 프로세스 오류. 다시 시도해주세요.",
+    "account_linking_error": "계정 연결 중 오류가 발생했습니다.",
+    "achievements_count": "업적",
+    "total_count": "총합",
+    "loading_yes": "예",
+    "loading_no": "아니오",
+    "case_label": "케이스",
+    "open_button": "열기",
+    "status_pending_withdrawal": "출금 대기 중",
+    "status_withdrawn": "출금됨",
+    "status_sold": "판매됨",
+    "status_opened": "열림",
+    "item_withdraw_success": "아이템 \"{{itemName}}\"이 성공적으로 출금 요청되었습니다!",
+    "opening": "열기...",
+    "items_suffix": " 아이템",
+    "cases_suffix": " 케이스",
+    "streak_suffix": " 연속",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam 연결됨",
+    "steam_not_connected": "Steam 연결되지 않음",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "없음",
+    "drop_bonuses": "드롭 보너스",
+    "level_bonus": "레벨:",
+    "status_bonus": "상태:",
+    "achievements_bonus": "업적:",
+    "total_bonus": "총 보너스:",
+    "inventory_title": "인벤토리",
+    "subscription_tier_1": "상태",
+    "subscription_tier_2": "상태+",
+    "subscription_tier_3": "상태++",
+    "subscription_tier_default": "Tier {{tier}}",
+    "rarity": {
+      "consumer": "소비자급",
+      "industrial": "산업급",
+      "milspec": "군용급",
+      "restricted": "제한",
+      "classified": "기밀",
+      "covert": "은밀",
+      "contraband": "밀수품"
+    },
+    "purchase_button": "구매",
+    "acquired_date": "획득:",
+    "source": "출처:",
+    "sources": {
+      "case": "케이스",
+      "purchase": "구매",
+      "bonus": "보너스"
+    },
+    "drop_bonus_text": "% 드롭",
+    "no_description": "설명이 없습니다",
+    "achievements_not_loaded": "업적이 로드되지 않았습니다",
+    "achievements_expand_hint": "자세한 내용을 보려면 클릭",
+    "achievements_collapse_hint": "접으려면 클릭",
+    "profile_settings_title": "프로필 설정",
+    "level_text": "레벨",
+    "level_max": "100",
+    "xp_earned_for": "XP 획득 방법:",
+    "opening_cases": "케이스 열기",
+    "inventory_tabs": {
+      "active": "활성",
+      "opened_cases": "열린 케이스",
+      "withdrawn": "출금됨",
+      "sold": "판매됨"
+    },
+    "item_withdraw": {
+      "withdrawing": "출금 중...",
+      "withdraw_to_steam": "Steam으로 출금",
+      "subscription_required": "구독 필요",
+      "need_trade_url": "Steam 거래 URL 필요",
+      "cannot_withdraw": "Steam으로 출금할 수 없음",
+      "provide_trade_url": "Steam 거래 URL 제공",
+      "ok": "확인",
+      "cancel": "✕",
+      "send_to_steam": "Steam으로 전송",
+      "error_withdrawal_impossible": "아이템을 출금할 수 없습니다",
+      "error_no_subscription": "이 아이템은 Steam으로 출금할 수 없습니다",
+      "error_no_item_name": "출금할 아이템 이름을 확인할 수 없습니다",
+      "error_withdrawal_failed": "아이템 출금 중 오류 발생",
+      "error_not_found": "아이템을 출금하지 못했습니다"
+    }
   },
   "inventory": {
     "title": "인벤토리",
@@ -646,7 +767,7 @@
   "achievements": {
     "Новичок": {
       "name": "초보자",
-      "description": "상자 10개 열기"
+      "description": "케이스 10개 열기"
     },
     "Коллекционер": {
       "name": "수집가",
@@ -658,15 +779,15 @@
     },
     "Подписчик": {
       "name": "구독자",
-      "description": "30일 연속 활성 구독 보유"
+      "description": "30일 연속 활성 구독 유지하기"
     },
     "Покупатель подписки": {
       "name": "구독 구매자",
-      "description": "모든 구독 티어 구매"
+      "description": "아무 구독 티어나 구매하기"
     },
     "Удачливый": {
       "name": "행운아",
-      "description": "7일 연속 상자 열기"
+      "description": "7일 연속 케이스 열기"
     },
     "Миллионер": {
       "name": "백만장자",
@@ -674,11 +795,11 @@
     },
     "Эксперт": {
       "name": "전문가",
-      "description": "50,000 루블 이상 가치의 아이템 보유"
+      "description": "50,000 루블 이상 가치의 아이템 보유하기"
     },
     "Откройте 10 кейсов": {
       "name": "초보자",
-      "description": "상자 10개 열기"
+      "description": "케이스 10개 열기"
     },
     "Найдите 5 редких предметов": {
       "name": "수집가",
@@ -690,15 +811,15 @@
     },
     "Иметь активную подписку 30 дней подряд": {
       "name": "구독자",
-      "description": "30일 연속 활성 구독 보유"
+      "description": "30일 연속 활성 구독 유지하기"
     },
     "Приобрести любой уровень подписки": {
       "name": "구독 구매자",
-      "description": "모든 구독 티어 구매"
+      "description": "아무 구독 티어나 구매하기"
     },
     "Открыть кейс 7 дней подряд": {
       "name": "행운아",
-      "description": "7일 연속 상자 열기"
+      "description": "7일 연속 케이스 열기"
     },
     "Общая стоимость предметов в инвентаре 1,000,000 руб": {
       "name": "백만장자",
@@ -706,7 +827,7 @@
     },
     "Иметь предмет с ценой выше 50,000 руб": {
       "name": "전문가",
-      "description": "50,000 루블 이상 가치의 아이템 보유"
+      "description": "50,000 루블 이상 가치의 아이템 보유하기"
     }
   },
   "modals": {
@@ -715,7 +836,7 @@
     "achievements_collapse_hint": "접으려면 클릭",
     "achievements_count": "업적",
     "achievements_expand_hint": "자세히 보려면 클릭",
-    "achievements_not_loaded": "업적이 로드되지 않음",
+    "achievements_not_loaded": "업적이 로드되지 않았습니다",
     "acquired_date": "획득",
     "active": "활성",
     "balance_top_up": "잔액 충전",
@@ -897,7 +1018,75 @@
     "withdraw_to_steam": "Steam으로 출금",
     "withdrawing": "출금 중",
     "withdrawn": "출금됨",
-    "withdrawn_items_hint": "출금된 아이템 힌트",
-    "xp_earned_for": "XP 획득"
+    "withdrawn_items_hint": "출금 대기 중이거나 Steam으로 이미 전송된 아이템이 여기에 표시됩니다",
+    "xp_earned_for": "XP 획득 방법:",
+    "opening": "열기...",
+    "items_suffix": " 아이템",
+    "cases_suffix": " 케이스",
+    "streak_suffix": " 연속",
+    "currency_suffix": " CR",
+    "steam_connected": "Steam 연결됨",
+    "steam_not_connected": "Steam 연결되지 않음",
+    "subscription_status_days": "{{status}}\n{{days}}",
+    "no_subscription": "없음",
+    "drop_bonuses": "드롭 보너스",
+    "level_bonus": "레벨:",
+    "status_bonus": "상태:",
+    "achievements_bonus": "업적:",
+    "total_bonus": "총 보너스:",
+    "inventory_title": "인벤토리",
+    "subscription_tier_1": "상태",
+    "subscription_tier_2": "상태+",
+    "subscription_tier_3": "상태++",
+    "subscription_tier_default": "Tier {{tier}}",
+    "rarity": {
+      "consumer": "소비자급",
+      "industrial": "산업급",
+      "milspec": "군용급",
+      "restricted": "제한",
+      "classified": "기밀",
+      "covert": "은밀",
+      "contraband": "밀수품"
+    },
+    "purchase_button": "구매",
+    "acquired_date": "획득:",
+    "source": "출처:",
+    "sources": {
+      "case": "케이스",
+      "purchase": "구매",
+      "bonus": "보너스"
+    },
+    "drop_bonus_text": "% 드롭",
+    "no_description": "설명이 없습니다",
+    "achievements_not_loaded": "업적이 로드되지 않았습니다",
+    "achievements_expand_hint": "자세한 내용을 보려면 클릭",
+    "achievements_collapse_hint": "접으려면 클릭",
+    "profile_settings_title": "프로필 설정",
+    "level_text": "레벨",
+    "level_max": "100",
+    "xp_earned_for": "XP 획득 방법:",
+    "opening_cases": "케이스 열기",
+    "inventory_tabs": {
+      "active": "활성",
+      "opened_cases": "열린 케이스",
+      "withdrawn": "출금됨",
+      "sold": "판매됨"
+    },
+    "item_withdraw": {
+      "withdrawing": "출금 중...",
+      "withdraw_to_steam": "Steam으로 출금",
+      "subscription_required": "구독 필요",
+      "need_trade_url": "Steam 거래 URL 필요",
+      "cannot_withdraw": "Steam으로 출금할 수 없음",
+      "provide_trade_url": "Steam 거래 URL 제공",
+      "ok": "확인",
+      "cancel": "✕",
+      "send_to_steam": "Steam으로 전송",
+      "error_withdrawal_impossible": "아이템을 출금할 수 없습니다",
+      "error_no_subscription": "이 아이템은 Steam으로 출금할 수 없습니다",
+      "error_no_item_name": "출금할 아이템 이름을 확인할 수 없습니다",
+      "error_withdrawal_failed": "아이템 출금 중 오류 발생",
+      "error_not_found": "아이템을 출금하지 못했습니다"
+    }
   }
 }
