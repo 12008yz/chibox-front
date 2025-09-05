@@ -686,6 +686,7 @@ const ProfilePage: React.FC = () => {
   const availableInventory = getActiveInventory();
 
   const getRarityColor = (rarity: string) => {
+    if (!rarity) return 'from-gray-500 to-gray-600';
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'from-gray-500 to-gray-600';
       case 'industrial': return 'from-blue-500 to-blue-600';
@@ -699,6 +700,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const getRarityName = (rarity: string) => {
+    if (!rarity) return t('profile.rarity.unknown', { defaultValue: 'Неизвестно' });
     const rarityKey = `profile.rarity.${rarity.toLowerCase()}`;
     return t(rarityKey, { defaultValue: rarity });
   };

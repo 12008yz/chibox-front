@@ -18,6 +18,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
   };
 
   const getRarityColor = (rarity: string) => {
+    if (!rarity) return 'from-gray-500 to-gray-600';
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'from-gray-500 to-gray-600';
       case 'industrial': return 'from-blue-500 to-blue-600';
@@ -31,6 +32,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
   };
 
   const getRarityName = (rarity: string) => {
+    if (!rarity) return t('profile.rarity.unknown', { defaultValue: 'Неизвестно' });
     switch (rarity.toLowerCase()) {
       case 'consumer': return t('profile.rarity.consumer');
       case 'industrial': return t('profile.rarity.industrial');

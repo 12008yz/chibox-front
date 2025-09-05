@@ -256,6 +256,7 @@
       "covert": "コバート",
       "contraband": "コントラバンド"
     },
+    "purchase_button": "購入",
     "drop_bonus_text": "ドロップ",
     "inventory_tabs": {
       "active": "アクティブ",
@@ -270,6 +271,12 @@
     "profile_settings_title": "プロフィール設定",
     "level_text": "レベル",
     "level_max": "100",
+    "acquired_date": "取得:",
+    "source": "ソース:",
+    "sources": {
+      "case": "ケース",
+      "purchase": "購入"
+    },
     "settings": {
       "title": "設定",
       "username": "ユーザー名",
@@ -321,7 +328,23 @@
       "trade_url_fetch_network_error": "ネットワークエラーによりトレード URL を取得できませんでした",
       "trade_url_required": "トレード URL が必要です"
     },
-    "subscription": {
+    "item_withdraw": {
+      "withdrawing": "引き出し中...",
+      "withdraw_to_steam": "Steamに引き出し",
+      "subscription_required": "サブスクリプションが必要です",
+      "need_trade_url": "Steam トレードURLが必要",
+      "cannot_withdraw": "Steamに引き出すことができません",
+      "provide_trade_url": "Steam トレードURLを提供してください",
+      "ok": "OK",
+      "cancel": "✕",
+      "send_to_steam": "あなたのSteamに送信",
+      "error_withdrawal_impossible": "アイテムを引き出すことができません",
+      "error_no_subscription": "このアイテムはSteamに引き出すことができません",
+      "error_no_item_name": "引き出すアイテム名を確認できませんでした",
+      "error_withdrawal_failed": "アイテムの引き出しエラー",
+      "error_not_found": "アイテムの引き出しに失敗しました"
+    },
+    "subscription_info": {
       "no_subscription": "サブスクリプションなし",
       "status": "ステータス",
       "purchase_suggestion": "サブスクリプション購入のためプロフィールに移動してください"
@@ -1000,8 +1023,5 @@
       "本当にすごい！",
       "あなたはラッキーです！"
     ]
-  },
-  "item_withdraw": {
-    "error_no_item_name": "引き出すアイテム名を確認できませんでした"
   }
 }

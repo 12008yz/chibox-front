@@ -43,6 +43,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
   }, [onClose]);
 
   const getRarityColor = (rarity: string): string => {
+    if (!rarity) return '#9ca3af';
     const rarityColors: { [key: string]: string } = {
       'common': '#9ca3af',      // серый
       'uncommon': '#22c55e',    // зеленый
@@ -57,6 +58,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
   };
 
   const getRarityName = (rarity: string): string => {
+    if (!rarity) return 'Неизвестно';
     const rarityNames: { [key: string]: string } = {
       'common': 'Обычный',
       'uncommon': 'Необычный',

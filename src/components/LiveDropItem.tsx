@@ -7,6 +7,7 @@ interface LiveDropItemProps {
 }
 
 const getRarityColor = (rarity: string) => {
+  if (!rarity) return 'border-gray-400 shadow-gray-400/30 bg-gray-400/5';
   switch (rarity.toLowerCase()) {
     case 'contraband':
       return 'border-orange-500 shadow-orange-500/30 bg-orange-500/5';

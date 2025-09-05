@@ -88,8 +88,8 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
 
       // Специальная обработка ошибки отсутствия подписки
       if (error?.data?.error_code === 'SUBSCRIPTION_REQUIRED') {
-        const subscriptionInfo = error.data.data?.subscription_status || t('profile.subscription.no_subscription');
-        onError(`${error.data.message}. ${t('profile.subscription.status')}: ${subscriptionInfo}. ${t('profile.subscription.purchase_suggestion')}.`);
+        const subscriptionInfo = error.data.data?.subscription_status || t('profile.subscription_info.no_subscription');
+        onError(`${error.data.message}. ${t('profile.subscription_info.status')}: ${subscriptionInfo}. ${t('profile.subscription_info.purchase_suggestion')}.`);
       } else {
         onError(error?.data?.message || t('profile.item_withdraw.error_not_found'));
       }

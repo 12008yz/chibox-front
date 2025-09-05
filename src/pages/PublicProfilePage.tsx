@@ -63,6 +63,7 @@ const PublicProfilePage: React.FC = () => {
   };
 
   const getRarityColor = (rarity: string) => {
+    if (!rarity) return 'from-gray-500 to-gray-600';
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'from-gray-500 to-gray-600';
       case 'industrial': return 'from-blue-500 to-blue-600';
@@ -76,6 +77,7 @@ const PublicProfilePage: React.FC = () => {
   };
 
   const getRarityName = (rarity: string) => {
+    if (!rarity) return 'Неизвестно';
     switch (rarity.toLowerCase()) {
       case 'consumer': return 'Потребительское';
       case 'industrial': return 'Промышленное';
