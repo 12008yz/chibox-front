@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useGetPublicProfileQuery } from '../features/user/userApi';
 import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import Avatar from '../components/Avatar';
@@ -7,6 +8,7 @@ import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 
 const PublicProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: profileData, isLoading, error } = useGetPublicProfileQuery(id || '');
 
@@ -26,7 +28,7 @@ const PublicProfilePage: React.FC = () => {
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="animate-spin w-16 h-16 mx-auto mb-4 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-              <p className="text-gray-400">Загрузка профиля...</p>
+              <p className="text-gray-400">{t('public_profile.loading_profile')}</p>
             </div>
           </div>
         </div>
@@ -45,8 +47,8 @@ const PublicProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold mb-2">Пользователь не найден</h1>
-              <p className="text-gray-400">Указанный профиль не существует или недоступен</p>
+              <h1 className="text-2xl font-bold mb-2">{t('profile.user_not_found')}</h1>
+              <p className="text-gray-400">{t('public_profile.profile_not_available')}</p>
             </div>
           </div>
         </div>
@@ -77,17 +79,9 @@ const PublicProfilePage: React.FC = () => {
   };
 
   const getRarityName = (rarity: string) => {
-    if (!rarity) return 'Неизвестно';
-    switch (rarity.toLowerCase()) {
-      case 'consumer': return 'Потребительское';
-      case 'industrial': return 'Промышленное';
-      case 'milspec': return 'Армейское';
-      case 'restricted': return 'Запрещённое';
-      case 'classified': return 'Засекреченное';
-      case 'covert': return 'Тайное';
-      case 'contraband': return 'Контрабанда';
-      default: return rarity;
-    }
+    if (!rarity) return t('common.unknown', 'Неизвестно');
+    const rarityKey = rarity.toLowerCase();
+    return t(`profile.rarity.${rarityKey}`, rarity);
   };
 
   const getAchievementCategoryColor = (category: string) => {
@@ -102,14 +96,7 @@ const PublicProfilePage: React.FC = () => {
   };
 
   const getAchievementCategoryName = (category: string) => {
-    switch (category) {
-      case 'beginner': return 'Новичок';
-      case 'collector': return 'Коллекционер';
-      case 'regular': return 'Активный';
-      case 'expert': return 'Эксперт';
-      case 'legendary': return 'Легендарный';
-      default: return category;
-    }
+    return t(`public_profile.achievement_categories.${category}`, category);
   };
 
   // Найти лучшее оружие (аналогично приватному профилю)
@@ -182,7 +169,7 @@ const PublicProfilePage: React.FC = () => {
                 <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   {user.username || user.steam_profile?.personaname}
                 </h1>
-                <p className="text-gray-400 text-sm">ID: {user.id}</p>
+                <p className="text-gray-400 text-sm">{t('public_profile.id_label')} {user.id}</p>
 
                 {/* Subscription Status */}
                 {user.subscriptionStatus && user.subscriptionStatus !== 'Без статуса' && (
@@ -206,7 +193,7 @@ const PublicProfilePage: React.FC = () => {
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                   }`}>
-                    {user.steam_profile ? 'Steam подключен' : 'Steam не подключен'}
+                    {user.steam_profile ? t('profile.steam_connected') : t('profile.steam_not_connected')}
                   </span>
                 </div>
 
@@ -216,7 +203,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm text-gray-300">
-                    Зарегистрирован: {new Date(user.createdAt).toLocaleDateString()}
+                    {t('public_profile.registered')} {new Date(user.createdAt).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -229,23 +216,23 @@ const PublicProfilePage: React.FC = () => {
                   <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
                   </svg>
-                  Бонус к дропу
+                  {t('public_profile.drop_bonus')}
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Уровень:</span>
+                    <span className="text-gray-400 text-sm">{t('public_profile.level_label')}</span>
                     <span className="text-green-400 font-bold">+{(dropBonuses.level || 0).toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Статус:</span>
+                    <span className="text-gray-400 text-sm">{t('public_profile.status_label')}</span>
                     <span className="text-blue-400 font-bold">+{(dropBonuses.subscription || 0).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Достижения:</span>
+                    <span className="text-gray-400 text-sm">{t('public_profile.achievements_label')}</span>
                     <span className="text-purple-400 font-bold">+{(dropBonuses.achievements || 0).toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between border-t border-gray-600 pt-2">
-                    <span className="text-white font-semibold">Общий бонус:</span>
+                    <span className="text-white font-semibold">{t('public_profile.total_bonus')}</span>
                     <span className="text-yellow-400 font-bold">+{(dropBonuses.total || 0).toFixed(2)}%</span>
                   </div>
                 </div>
@@ -265,7 +252,7 @@ const PublicProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Кейсов открыто</p>
+                <p className="text-gray-400 text-sm">{t('public_profile.cases_opened')}</p>
                 <p className="text-xl font-bold text-white">
                   {user.totalCasesOpened || 0}
                 </p>
@@ -283,7 +270,7 @@ const PublicProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Предметов в инвентаре</p>
+                <p className="text-gray-400 text-sm">{t('public_profile.items_in_inventory')}</p>
                 <p className="text-xl font-bold text-white">{inventory.length}</p>
               </div>
             </div>
@@ -299,7 +286,7 @@ const PublicProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Общая стоимость</p>
+                <p className="text-gray-400 text-sm">{t('public_profile.total_value')}</p>
                 <p className="text-xl font-bold text-white">
                   {(Number(user.totalItemsValue) || 0).toFixed(2)} КР
                 </p>
@@ -316,9 +303,9 @@ const PublicProfilePage: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-gray-400 text-sm">Ежедневная серия</p>
+                <p className="text-gray-400 text-sm">{t('public_profile.daily_streak')}</p>
                 <p className="text-xl font-bold text-white">
-                  {user.dailyStreak || 0} дн. (макс: {user.maxDailyStreak || 0})
+                  {t('public_profile.daily_streak_format', { current: user.dailyStreak || 0, max: user.maxDailyStreak || 0 })}
                 </p>
               </div>
             </div>
@@ -334,7 +321,7 @@ const PublicProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                 </svg>
               </div>
-              Достижения ({achievements.length})
+              {t('public_profile.achievements_section', { count: achievements.length })}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -369,7 +356,7 @@ const PublicProfilePage: React.FC = () => {
               {achievements.length > 6 && (
                 <div className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center">
                   <div className="text-2xl font-bold text-gray-400 mb-2">+{achievements.length - 6}</div>
-                  <p className="text-gray-400 text-xs text-center">Ещё достижений</p>
+                  <p className="text-gray-400 text-xs text-center">{t('public_profile.more_achievements')}</p>
                 </div>
               )}
             </div>
@@ -384,7 +371,7 @@ const PublicProfilePage: React.FC = () => {
                 <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
               </svg>
             </div>
-            Рекорд за всё время
+            {t('public_profile.all_time_record')}
           </h3>
 
           {bestWeapon ? (
@@ -416,7 +403,7 @@ const PublicProfilePage: React.FC = () => {
                     <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price).toFixed(2)} КР</span>
                   </div>
                   <p className="text-gray-400 text-sm">
-                    Тип: {bestWeapon.weapon_type || 'Оружие'}
+                    {t('public_profile.weapon_type')} {bestWeapon.weapon_type || t('public_profile.weapon_type_default')}
                   </p>
                 </div>
               </div>
@@ -428,7 +415,7 @@ const PublicProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                 </svg>
               </div>
-              <p className="text-gray-400 text-sm">Пока не установлен рекорд</p>
+              <p className="text-gray-400 text-sm">{t('public_profile.no_record_set')}</p>
             </div>
           )}
         </div>
@@ -444,7 +431,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
-                Инвентарь ({filteredInventory.length} предметов)
+                {t('public_profile.inventory_section', { count: filteredInventory.length })}
               </h3>
 
               {/* Вкладки инвентаря */}
@@ -461,7 +448,7 @@ const PublicProfilePage: React.FC = () => {
                     <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
-                  Предметы
+                  {t('public_profile.items_tab')}
                   <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
                 </button>
 
@@ -476,15 +463,15 @@ const PublicProfilePage: React.FC = () => {
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
-                  Открытые кейсы
+                  {t('public_profile.opened_cases_tab')}
                   <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
                 </button>
               </div>
 
               {/* Описание активной вкладки */}
               <div className="mb-4 text-sm text-gray-400">
-                {activeInventoryTab === 'active' && '🎮 Активные предметы пользователя'}
-                {activeInventoryTab === 'opened' && '📦 Открытые кейсы - наведите на кейс, чтобы увидеть выпавший предмет'}
+                {activeInventoryTab === 'active' && t('public_profile.inventory_description_active')}
+                {activeInventoryTab === 'opened' && t('public_profile.inventory_description_opened')}
               </div>
 
               {/* Toggle Button для показа всех предметов */}
@@ -498,14 +485,14 @@ const PublicProfilePage: React.FC = () => {
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                       </svg>
-                      Скрыть
+                      {t('public_profile.hide')}
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
-                      Показать все
+                      {t('public_profile.show_all')}
                     </>
                   )}
                 </button>
@@ -568,11 +555,11 @@ const PublicProfilePage: React.FC = () => {
                       {/* Дополнительная информация о предмете */}
                       {inventoryItem.acquisition_date && (
                         <div className="mt-2 text-xs text-gray-400">
-                          <p>Получен: {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
+                          <p>{t('public_profile.acquired')} {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
                           {inventoryItem.source && (
-                            <p className="capitalize">Источник: {
-                              inventoryItem.source === 'case' ? 'Кейс' :
-                              inventoryItem.source === 'purchase' ? 'Покупка' :
+                            <p className="capitalize">{t('public_profile.source')} {
+                              inventoryItem.source === 'case' ? t('profile.sources.case') :
+                              inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
                               inventoryItem.source
                             }</p>
                           )}
@@ -589,7 +576,7 @@ const PublicProfilePage: React.FC = () => {
                   onClick={() => setShowFullInventory(true)}
                 >
                   <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 12}</div>
-                  <p className="text-gray-400 text-xs text-center mb-2">Ещё предметов</p>
+                  <p className="text-gray-400 text-xs text-center mb-2">{t('public_profile.more_items')}</p>
                   <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
