@@ -269,7 +269,63 @@
     "cannot_withdraw": "出金できません",
     "profile_settings_title": "プロフィール設定",
     "level_text": "レベル",
-    "level_max": "100"
+    "level_max": "100",
+    "settings": {
+      "title": "設定",
+      "username": "ユーザー名",
+      "username_placeholder": "ユーザー名",
+      "username_description": "サイト上の表示名（3-20文字）",
+      "new_password": "新しいパスワード",
+      "new_password_placeholder": "新しいパスワードを入力",
+      "password_requirements": "最小8文字、大文字・小文字、数字、特殊文字",
+      "confirm_password": "パスワード確認",
+      "confirm_password_placeholder": "パスワード確認",
+      "passwords_not_match": "パスワードが一致しません",
+      "steam_trade_url": "Steam トレード URL",
+      "trade_url_set": "設定済み",
+      "trade_url_tooltip": {
+        "title": "トレード URL の見つけ方:",
+        "step1": "1. ブラウザでSteamを開く",
+        "step2": "2. インベントリ → トレードオファーに移動",
+        "step3": "3. 「誰がトレードオファーを送信できますか？」をクリック",
+        "step4": "4. 「トレード URL」フィールドからURLをコピー",
+        "example": "URL形式: https://steamcommunity.com/tradeoffer/new/?partner=XXXXXXX&token=XXXXXXXX"
+      },
+      "fetch_trade_url_auto": "自動で取得",
+      "steam_profile_label": "Steam プロフィール",
+      "steam_connected": "Steam 接続済み",
+      "connect_steam": "Steam を接続",
+      "click_to_connect": "クリックして接続",
+      "email_verification_label": "メール認証",
+      "email_verified": "メール認証済み",
+      "verify_email_button": "メール認証",
+      "click_to_send_code": "コードを送信するにはクリック",
+      "saving": "保存中...",
+      "invalid_username": "無効なユーザー名",
+      "password_min_8_chars": "パスワードは最低8文字である必要があります",
+      "password_need_uppercase": "パスワードに大文字が含まれている必要があります",
+      "password_need_lowercase": "パスワードに小文字が含まれている必要があります",
+      "password_need_digit": "パスワードに数字が含まれている必要があります",
+      "password_need_special": "パスワードに特殊文字が含まれている必要があります",
+      "settings_saved": "設定が保存されました",
+      "settings_save_error": "設定の保存中にエラーが発生しました",
+      "steam_link_error": "Steam 接続中にエラーが発生しました",
+      "verification_code_sent": "認証コードが送信されました",
+      "verification_code_error": "認証コード送信中にエラーが発生しました",
+      "email_verified_success": "メールが正常に認証されました",
+      "email_verify_error": "メール認証中にエラーが発生しました",
+      "steam_not_connected_error": "Steam が接続されていません",
+      "trade_url_fetched": "トレード URL が取得されました",
+      "trade_url_manual_instructions": "手動でトレード URL を入力してください",
+      "trade_url_fetch_error": "トレード URL の取得中にエラーが発生しました",
+      "trade_url_fetch_network_error": "ネットワークエラーによりトレード URL を取得できませんでした",
+      "trade_url_required": "トレード URL が必要です"
+    },
+    "subscription": {
+      "no_subscription": "サブスクリプションなし",
+      "status": "ステータス",
+      "purchase_suggestion": "サブスクリプション購入のためプロフィールに移動してください"
+    }
   },
   "inventory": {
     "title": "インベントリ",
@@ -944,5 +1000,8 @@
       "本当にすごい！",
       "あなたはラッキーです！"
     ]
+  },
+  "item_withdraw": {
+    "error_no_item_name": "引き出すアイテム名を確認できませんでした"
   }
 }
