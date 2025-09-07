@@ -121,6 +121,12 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       color: 'text-yellow-400'
     },
     {
+      label: t('public_profile.total_value'),
+      value: <Monetary value={user.total_items_value || 0} />,
+      icon: <FaCoins className="text-emerald-400" />,
+      color: 'text-emerald-400'
+    },
+    {
       label: t('profile.level'),
       value: user.level || 1,
       icon: <FaChartLine className="text-blue-400" />,
@@ -253,7 +259,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
         )}
 
         {activeTab === 'stats' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {userStats.map((stat, index) => (
               <div key={index} className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 text-center hover:border-gray-600/70 transition-all duration-300">
                 <div className="flex justify-center mb-3">

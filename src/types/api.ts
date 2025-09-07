@@ -16,6 +16,7 @@ export interface User {
   cases_available?: number;
   cases_opened_today?: number;
   total_cases_opened?: number;
+  total_items_value?: number;
   next_case_available_time?: string;
   max_daily_cases?: number;
   next_bonus_available_time?: string;
