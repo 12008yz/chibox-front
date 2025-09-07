@@ -288,7 +288,7 @@ const PublicProfilePage: React.FC = () => {
               <div>
                 <p className="text-gray-400 text-sm">{t('public_profile.total_value')}</p>
                 <p className="text-xl font-bold text-white">
-                  {(Number(user.totalItemsValue) || 0).toFixed(2)} КР
+                  {(Number(user.totalItemsValue) || 0).toFixed(2)}{t('common.currency_suffix')}
                 </p>
               </div>
             </div>
@@ -400,7 +400,7 @@ const PublicProfilePage: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity)} text-white`}>
                       {getRarityName(bestWeapon.rarity)}
                     </span>
-                    <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price).toFixed(2)} КР</span>
+                    <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price).toFixed(2)}{t('common.currency_suffix')}</span>
                   </div>
                   <p className="text-gray-400 text-sm">
                     {t('public_profile.weapon_type')} {bestWeapon.weapon_type || t('public_profile.weapon_type_default')}
@@ -547,7 +547,7 @@ const PublicProfilePage: React.FC = () => {
                       <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                         {inventoryItem.item.name}
                       </h5>
-                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
+                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)}{t('common.currency_suffix')}</p>
                       <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                         {getRarityName(inventoryItem.item.rarity)}
                       </p>
@@ -592,12 +592,12 @@ const PublicProfilePage: React.FC = () => {
                   </svg>
                 </div>
                 <h4 className="text-lg font-semibold text-gray-300 mb-2">
-                  {activeInventoryTab === 'active' && 'Нет активных предметов'}
-                  {activeInventoryTab === 'opened' && 'Нет открытых кейсов'}
+                  {activeInventoryTab === 'active' && t('public_profile.no_active_items')}
+                  {activeInventoryTab === 'opened' && t('public_profile.no_opened_cases')}
                 </h4>
                 <p className="text-gray-400 text-sm">
-                  {activeInventoryTab === 'active' && 'У пользователя пока нет предметов в инвентаре'}
-                  {activeInventoryTab === 'opened' && 'Пользователь пока не открывал кейсы, или предметы из кейсов были проданы'}
+                  {activeInventoryTab === 'active' && t('public_profile.no_active_items_description')}
+                  {activeInventoryTab === 'opened' && t('public_profile.no_opened_cases_description')}
                 </p>
               </div>
             )}
@@ -612,7 +612,7 @@ const PublicProfilePage: React.FC = () => {
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                   </svg>
-                  Показать меньше
+                  {t('public_profile.show_less')}
                 </button>
               </div>
             )}

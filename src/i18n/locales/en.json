@@ -366,6 +366,7 @@
     "source": "Source:",
     "weapon_type": "Type:",
     "weapon_type_default": "Weapon",
+    "show_less": "Show Less",
     "achievement_categories": {
       "beginner": "Beginner",
       "collector": "Collector",

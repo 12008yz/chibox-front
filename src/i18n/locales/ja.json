@@ -386,6 +386,7 @@
     "source": "ソース:",
     "weapon_type": "タイプ:",
     "weapon_type_default": "武器",
+    "show_less": "表示を減らす",
     "achievement_categories": {
       "beginner": "初心者",
       "collector": "コレクター",

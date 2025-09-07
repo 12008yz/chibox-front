@@ -370,6 +370,7 @@
     "source": "来源:",
     "weapon_type": "类型:",
     "weapon_type_default": "武器",
+    "show_less": "显示更少",
     "achievement_categories": {
       "beginner": "新手",
       "collector": "收藏家",

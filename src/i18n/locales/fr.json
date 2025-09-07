@@ -370,6 +370,7 @@
     "source": "Source :",
     "weapon_type": "Type :",
     "weapon_type_default": "Arme",
+    "show_less": "Afficher Moins",
     "achievement_categories": {
       "beginner": "Débutant",
       "collector": "Collectionneur",

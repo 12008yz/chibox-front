@@ -365,6 +365,7 @@
     "source": "Источник:",
     "weapon_type": "Тип:",
     "weapon_type_default": "Оружие",
+    "show_less": "Показать меньше",
     "achievement_categories": {
       "beginner": "Новичок",
       "collector": "Коллекционер",

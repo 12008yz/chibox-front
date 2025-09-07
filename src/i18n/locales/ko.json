@@ -369,6 +369,7 @@
     "source": "소스:",
     "weapon_type": "타입:",
     "weapon_type_default": "무기",
+    "show_less": "적게 보기",
     "achievement_categories": {
       "beginner": "초보자",
       "collector": "수집가",
