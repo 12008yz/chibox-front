@@ -9,7 +9,6 @@ import type {
   ExchangeItemForSubscriptionResponse,
   WithdrawItemRequest,
   ApplyPromoRequest,
-  DepositRequest,
   ApiResponse,
   PaginatedResponse,
   InventoryResponse,
@@ -237,17 +236,7 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['User', 'Balance'],
     }),
 
-    // Пополнение баланса
-    depositBalance: builder.mutation<
-      ApiResponse<{ payment_url: string }>,
-      DepositRequest
-    >({
-      query: (depositData) => ({
-        url: 'v1/deposit',
-        method: 'POST',
-        body: depositData,
-      }),
-    }),
+
 
     // Вывод баланса
     withdrawBalance: builder.mutation<
@@ -637,7 +626,6 @@ export const {
   useGetUserStatisticsQuery,
   useGetUserSubscriptionQuery,
   useApplyPromoCodeMutation,
-  useDepositBalanceMutation,
   useWithdrawBalanceMutation,
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,

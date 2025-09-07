@@ -10,6 +10,7 @@ import { formatDaysI18n } from '../utils/declension';
 import Monetary from './Monetary';
 import Title from './Title';
 import AppFeatures from './AppFeatures';
+import PurchaseModal from './PurchaseModal';
 
 interface StatusDashboardProps {
   name: string;
@@ -43,6 +44,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('activities');
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   // Проверяем активность подписки
   const hasActiveSubscription = user && user.subscription_tier > 0 && user.subscription_days_left > 0;
@@ -171,10 +173,10 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               <div className="text-white/80 text-sm mb-1">{t('time.days')}</div>
               <div className="text-4xl font-bold text-white">{daysLeft}</div>
               <button
-                onClick={() => navigate('/profile')}
+                onClick={() => setIsPurchaseModalOpen(true)}
                 className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
               >
-                {t('profile.subscription')}
+                {t('profile.extend_subscription')}
               </button>
             </div>
           </div>
@@ -350,6 +352,12 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+      />
     </div>
   );
 };

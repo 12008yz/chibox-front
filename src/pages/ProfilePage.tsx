@@ -92,7 +92,6 @@ const ProfilePage: React.FC = () => {
 
   // State для модального окна покупки
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
-  const [purchaseModalTab, setPurchaseModalTab] = useState<'balance' | 'subscription'>('balance');
 
   // Ref для области достижений
   const achievementsRef = useRef<HTMLDivElement>(null);
@@ -1219,12 +1218,11 @@ const ProfilePage: React.FC = () => {
             {/* Purchase Button */}
             <button
               onClick={() => {
-                setPurchaseModalTab('balance');
                 setIsPurchaseModalOpen(true);
               }}
-              className="w-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-green-400/20 hover:border-green-400/50"
+              className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-purple-400/20 hover:border-purple-400/50"
             >
-              {t('profile.purchase_button')}
+              {t('profile.purchase_subscription')}
             </button>
 
             {/* Drop Rate Bonuses */}
@@ -1998,7 +1996,6 @@ const ProfilePage: React.FC = () => {
       <PurchaseModal
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
-        initialTab={purchaseModalTab}
       />
 
       {/* Scroll to Top Button */}
