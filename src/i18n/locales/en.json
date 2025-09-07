@@ -164,7 +164,6 @@
     },
     "inventory_descriptions": {
       "active": "🎮 Your current items and unopened cases",
-      "opened": "📦 Opened cases - hover over case to see the dropped item",
       "withdrawn": "📤 Items being withdrawn: pending shipment and already sent to Steam",
       "sold": "💰 Items sold for currency or exchanged for subscription"
     },
@@ -352,8 +351,6 @@
     "inventory_section": "Inventory ({{count}} items)",
     "items_tab": "Items",
     "opened_cases_tab": "Opened Cases",
-    "inventory_description_active": "🎮 User's active items",
-    "inventory_description_opened": "📦 Opened cases - hover over case to see the dropped item",
     "show_all": "Show All",
     "hide": "Hide",
     "more_items": "More items",

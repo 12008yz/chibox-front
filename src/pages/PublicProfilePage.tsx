@@ -6,6 +6,7 @@ import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import Avatar from '../components/Avatar';
 import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -379,17 +380,11 @@ const PublicProfilePage: React.FC = () => {
               <div className="flex items-center gap-6">
                 <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.rarity)} p-1 flex items-center justify-center shadow-lg`}>
                   <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center">
-                    {bestWeapon.image_url ? (
-                      <img
-                        src={bestWeapon.image_url}
-                        alt={bestWeapon.name}
-                        className="w-full h-full object-contain rounded-lg"
-                      />
-                    ) : (
-                      <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                      </svg>
-                    )}
+                    <img
+                      src={getItemImageUrl(bestWeapon.image_url, bestWeapon.name)}
+                      alt={bestWeapon.name}
+                      className="w-full h-full object-contain rounded-lg"
+                    />
                   </div>
                 </div>
                 <div className="flex-1">
