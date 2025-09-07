@@ -1222,7 +1222,7 @@ const ProfilePage: React.FC = () => {
               }}
               className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-purple-400/20 hover:border-purple-400/50"
             >
-              {t('profile.purchase_subscription')}
+              {t('profile.purchase_button')}
             </button>
 
             {/* Drop Rate Bonuses */}

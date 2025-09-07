@@ -1055,7 +1055,6 @@
     "profile_settings_title": "프로필 설정",
     "provide_trade_url": "거래 URL 제공",
     "purchase": "구매",
-    "purchase_button": "구매",
     "resend": "재전송",
     "resending": "재전송 중",
     "restricted": "제한됨",
@@ -1162,7 +1161,6 @@
       "covert": "은밀",
       "contraband": "밀수품"
     },
-    "purchase_button": "구매",
     "acquired_date": "획득:",
     "source": "출처:",
     "sources": {

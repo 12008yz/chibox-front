@@ -176,7 +176,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                 onClick={() => setIsPurchaseModalOpen(true)}
                 className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
               >
-                {t('profile.extend_subscription')}
+                {t('profile.purchase_button')}
               </button>
             </div>
           </div>
