@@ -16,7 +16,11 @@ import type {
   TicTacToeCurrentGameResponse,
   TicTacToeCreateGameResponse,
   TicTacToeMakeMoveResponse,
-  PlaySlotResponse
+  PlaySlotResponse,
+  UpgradeableItemsResponse,
+  UpgradeOptionsResponse,
+  UpgradeRequest,
+  UpgradeResponse
 } from '../../types/api';
 
 // Расширяем базовый API для работы с пользователем

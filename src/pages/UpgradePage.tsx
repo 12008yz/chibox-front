@@ -12,9 +12,9 @@ import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 
 // Создаем SVG заглушку для изображений
-const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
+const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
   <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center`}>
-    <svg className="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   </div>
@@ -23,11 +23,13 @@ const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-ful
 interface UpgradeResult {
   upgrade_success: boolean;
   data: {
-    source_item: any;
+    source_items: any[];
     result_item?: any;
     target_item?: any;
     success_chance: number;
     rolled_value: number;
+    total_source_price: number;
+    quantity_bonus: number;
   };
 }
 
@@ -62,9 +64,18 @@ const UpgradeAnimation: React.FC<{
         </div>
 
         <div className="text-gray-300 mb-8">
-          {t('upgrade.chance_was', { chance: result.data.success_chance })}%
-          <br />
-          {t('upgrade.rolled_value', { value: result.data.rolled_value })}
+          <div className="mb-2">
+            {t('upgrade.chance_was', { chance: result.data.success_chance })}%
+            {result.data.quantity_bonus > 0 && (
+              <span className="text-green-400 ml-2">(+{result.data.quantity_bonus}% бонус за количество)</span>
+            )}
+          </div>
+          <div>
+            {t('upgrade.rolled_value', { value: result.data.rolled_value })}
+          </div>
+          <div className="text-cyan-400 mt-2">
+            Общая стоимость предметов: <Monetary value={result.data.total_source_price} />
+          </div>
         </div>
 
         {result.upgrade_success ? (
@@ -85,11 +96,17 @@ const UpgradeAnimation: React.FC<{
 const SourceItemCard: React.FC<{
   itemGroup: any;
   onSelect: (itemId: string) => void;
-  isSelected: boolean;
-}> = ({ itemGroup, onSelect, isSelected }) => {
+  selectedItemIds: string[];
+  selectedInventoryIds: string[];
+}> = ({ itemGroup, onSelect, selectedItemIds, selectedInventoryIds }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
-  const { item, count } = itemGroup;
+  const { item, count, instances } = itemGroup;
+
+  const isSelected = selectedItemIds.includes(item.id);
+  const selectedCount = selectedInventoryIds.filter(id =>
+    instances.some((inst: any) => inst.id === id)
+  ).length;
 
   const getRarityColor = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
@@ -106,7 +123,7 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -115,7 +132,7 @@ const SourceItemCard: React.FC<{
     >
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
+        <div className="relative mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '80px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
@@ -129,26 +146,22 @@ const SourceItemCard: React.FC<{
           )}
 
           {/* Количество предметов */}
-          {count > 1 && (
-            <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/80 text-white text-xs font-bold z-20">
-              x{count}
-            </div>
-          )}
+          <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-white text-xs font-bold z-20">
+            {selectedCount > 0 ? `${selectedCount}/${count}` : `x${count}`}
+          </div>
 
           {/* Индикатор выбора */}
-          {isSelected && (
+          {selectedCount > 0 && (
             <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
-              <div className="w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
+              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">{selectedCount}</span>
               </div>
             </div>
           )}
         </div>
 
-        <div className="space-y-2">
-          <h3 className="text-white font-semibold text-sm truncate" title={item.name}>
+        <div className="space-y-1">
+          <h3 className="text-white font-semibold text-xs truncate" title={item.name}>
             {item.name}
           </h3>
 
@@ -193,14 +206,14 @@ const TargetItemCard: React.FC<{
   };
 
   const getChanceColor = (chance: number) => {
-    if (chance >= 30) return 'text-green-400';
-    if (chance >= 15) return 'text-yellow-400';
+    if (chance >= 40) return 'text-green-400';
+    if (chance >= 20) return 'text-yellow-400';
     return 'text-red-400';
   };
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -209,7 +222,7 @@ const TargetItemCard: React.FC<{
     >
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
+        <div className="relative mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '80px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
@@ -223,15 +236,22 @@ const TargetItemCard: React.FC<{
           )}
 
           {/* Шанс успеха */}
-          <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-black/80 ${getChanceColor(item.upgrade_chance)} text-xs font-bold z-20`}>
+          <div className={`absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/80 ${getChanceColor(item.upgrade_chance)} text-xs font-bold z-20`}>
             {item.upgrade_chance}%
           </div>
+
+          {/* Бонус за количество */}
+          {item.quantity_bonus > 0 && (
+            <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-green-600/80 text-white text-xs font-bold z-20">
+              +{item.quantity_bonus}%
+            </div>
+          )}
 
           {/* Индикатор выбора */}
           {isSelected && (
             <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
-              <div className="w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -239,8 +259,8 @@ const TargetItemCard: React.FC<{
           )}
         </div>
 
-        <div className="space-y-2">
-          <h3 className="text-white font-semibold text-sm truncate" title={item.name}>
+        <div className="space-y-1">
+          <h3 className="text-white font-semibold text-xs truncate" title={item.name}>
             {item.name}
           </h3>
 
@@ -281,9 +301,9 @@ const TargetItemCard: React.FC<{
 const UpgradePage: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuth();
-  const [selectedSourceItem, setSelectedSourceItem] = useState<string>('');
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
   const [selectedTargetItem, setSelectedTargetItem] = useState<string>('');
-  const [selectedSourceInventoryId, setSelectedSourceInventoryId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAnimation, setShowAnimation] = useState(false);
   const [upgradeResult, setUpgradeResult] = useState<UpgradeResult | null>(null);
@@ -299,49 +319,99 @@ const UpgradePage: React.FC = () => {
   const {
     data: upgradeOptions,
     isLoading: isLoadingOptions,
-  } = useGetUpgradeOptionsQuery(selectedSourceItem, {
-    skip: !selectedSourceItem
+  } = useGetUpgradeOptionsQuery(selectedItemIds.join(','), {
+    skip: selectedItemIds.length === 0
   });
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
 
-  // Фильтрация предметов
+  // Фильтрация предметов (убираем ограничение по минимальной цене)
   const filteredItems = React.useMemo(() => {
     if (!upgradeableItems?.data?.items) return [];
 
     return upgradeableItems.data.items.filter(itemGroup =>
-      itemGroup.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      itemGroup.item.price >= 10 // Минимальная стоимость для апгрейда
+      itemGroup.item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      // Убрали: && itemGroup.item.price >= 10 - теперь можно улучшать любые предметы
     );
   }, [upgradeableItems, searchTerm]);
 
-  // Обработчик выбора исходного предмета
+  // Обработчик выбора исходных предметов
   const handleSelectSourceItem = useCallback((itemId: string) => {
-    setSelectedSourceItem(itemId);
-    setSelectedTargetItem('');
-
-    // Находим первый доступный экземпляр предмета
     const itemGroup = filteredItems.find(group => group.item.id === itemId);
-    if (itemGroup && itemGroup.instances.length > 0) {
-      setSelectedSourceInventoryId(itemGroup.instances[0].id);
+    if (!itemGroup) return;
+
+    // Находим доступные экземпляры этого предмета, которые еще не выбраны
+    const availableInstances = itemGroup.instances.filter((inst: any) =>
+      !selectedInventoryIds.includes(inst.id)
+    );
+
+    if (availableInstances.length > 0) {
+      // Добавляем один экземпляр
+      const newInventoryId = availableInstances[0].id;
+      setSelectedInventoryIds(prev => [...prev, newInventoryId]);
+
+      // Добавляем ID предмета, если его еще нет
+      if (!selectedItemIds.includes(itemId)) {
+        setSelectedItemIds(prev => [...prev, itemId]);
+      }
+    } else {
+      // Если экземпляров больше нет, убираем предмет из выбранных
+      const remainingInventoryIds = selectedInventoryIds.filter(id =>
+        !itemGroup.instances.some((inst: any) => inst.id === id)
+      );
+      setSelectedInventoryIds(remainingInventoryIds);
+
+      // Проверяем, есть ли еще экземпляры этого предмета в выборе
+      const hasOtherInstances = remainingInventoryIds.some(id =>
+        itemGroup.instances.some((inst: any) => inst.id === id)
+      );
+
+      if (!hasOtherInstances) {
+        setSelectedItemIds(prev => prev.filter(id => id !== itemId));
+      }
     }
-  }, [filteredItems]);
+
+    setSelectedTargetItem('');
+  }, [filteredItems, selectedInventoryIds, selectedItemIds]);
+
+  // Обработчик сброса выбора
+  const handleClearSelection = useCallback(() => {
+    setSelectedItemIds([]);
+    setSelectedInventoryIds([]);
+    setSelectedTargetItem('');
+  }, []);
 
   // Обработчик выбора целевого предмета
   const handleSelectTargetItem = useCallback((itemId: string) => {
     setSelectedTargetItem(itemId);
   }, []);
 
+  // Подсчет общей стоимости выбранных предметов
+  const totalSelectedPrice = React.useMemo(() => {
+    if (!upgradeableItems?.data?.items || selectedInventoryIds.length === 0) return 0;
+
+    let total = 0;
+    upgradeableItems.data.items.forEach(itemGroup => {
+      itemGroup.instances.forEach((inst: any) => {
+        if (selectedInventoryIds.includes(inst.id)) {
+          total += parseFloat(itemGroup.item.price);
+        }
+      });
+    });
+
+    return total;
+  }, [upgradeableItems, selectedInventoryIds]);
+
   // Обработчик выполнения апгрейда
   const handlePerformUpgrade = async () => {
     try {
-      if (!selectedSourceInventoryId || !selectedTargetItem) {
-        toast.error(t('upgrade.select_both_items'));
+      if (selectedInventoryIds.length === 0 || !selectedTargetItem) {
+        toast.error('Выберите предметы для улучшения и целевой предмет');
         return;
       }
 
       const result = await performUpgrade({
-        sourceInventoryId: selectedSourceInventoryId,
+        sourceInventoryIds: selectedInventoryIds,
         targetItemId: selectedTargetItem
       }).unwrap();
 
@@ -371,15 +441,15 @@ const UpgradePage: React.FC = () => {
         toast.error(
           <div>
             <div className="font-semibold">{t('upgrade.failed')}</div>
-            <div className="text-sm">{t('upgrade.item_lost', { item: upgradeResult.data.source_item?.name })}</div>
+            <div className="text-sm">Предметы потеряны</div>
           </div>
         );
       }
 
       // Сбрасываем выбор и обновляем данные
-      setSelectedSourceItem('');
+      setSelectedItemIds([]);
+      setSelectedInventoryIds([]);
       setSelectedTargetItem('');
-      setSelectedSourceInventoryId('');
       setUpgradeResult(null);
       refetchItems();
     }
@@ -422,10 +492,11 @@ const UpgradePage: React.FC = () => {
             <div>
               <h3 className="text-amber-300 font-semibold text-lg mb-2">{t('upgrade.warning_title')}</h3>
               <ul className="text-gray-300 text-sm space-y-1">
-                <li>• {t('upgrade.warning_lose_item')}</li>
-                <li>• {t('upgrade.warning_no_guarantee')}</li>
-                <li>• {t('upgrade.warning_higher_value')}</li>
-                <li>• {t('upgrade.warning_min_value')}</li>
+                <li>• При неудачном апгрейде все выбранные предметы будут потеряны</li>
+                <li>• Чем больше предметов выберете, тем больше шанс успеха (+2% за каждый дополнительный)</li>
+                <li>• Целевой предмет должен быть дороже общей стоимости ваших предметов</li>
+                <li>• Теперь можно улучшать предметы любой стоимости, даже копейки!</li>
+                <li>• Максимум 10 предметов можно выбрать для одного улучшения</li>
               </ul>
             </div>
           </div>
@@ -433,17 +504,16 @@ const UpgradePage: React.FC = () => {
 
         {/* Панель управления */}
         <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Информация о выбранных предметах */}
             <div className="bg-black/30 rounded-lg p-4 border border-cyan-500/50">
-              <div className="text-cyan-400 text-sm font-medium mb-2">{t('upgrade.selected_source')}</div>
-              {selectedSourceItem ? (
-                <div className="text-white">
-                  {filteredItems.find(group => group.item.id === selectedSourceItem)?.item.name || t('upgrade.not_selected')}
-                </div>
-              ) : (
-                <div className="text-gray-400">{t('upgrade.not_selected')}</div>
-              )}
+              <div className="text-cyan-400 text-sm font-medium mb-2">Выбрано предметов</div>
+              <div className="text-white text-xl font-bold">
+                {selectedInventoryIds.length}
+              </div>
+              <div className="text-gray-300 text-sm">
+                Общая стоимость: <Monetary value={totalSelectedPrice} />
+              </div>
             </div>
 
             <div className="bg-black/30 rounded-lg p-4 border border-purple-500/50">
@@ -456,24 +526,42 @@ const UpgradePage: React.FC = () => {
                 <div className="text-gray-400">{t('upgrade.not_selected')}</div>
               )}
             </div>
+
+            <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
+              <div className="text-green-400 text-sm font-medium mb-2">Бонус за количество</div>
+              <div className="text-white text-xl font-bold">
+                +{Math.min(18, (selectedInventoryIds.length - 1) * 2)}%
+              </div>
+              <div className="text-gray-300 text-sm">
+                Дополнительный шанс
+              </div>
+            </div>
           </div>
 
-          {/* Поиск */}
-          <div className="mb-6">
+          {/* Поиск и кнопки */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('upgrade.search_placeholder')}
-              className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
             />
+
+            <button
+              onClick={handleClearSelection}
+              disabled={selectedInventoryIds.length === 0}
+              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+            >
+              Сбросить выбор ({selectedInventoryIds.length})
+            </button>
           </div>
 
           {/* Кнопка апгрейда */}
           <div className="text-center">
             <button
               onClick={handlePerformUpgrade}
-              disabled={!selectedSourceItem || !selectedTargetItem || isUpgrading}
+              disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
               className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-8 rounded-lg font-semibold text-lg transition-all duration-200 disabled:cursor-not-allowed"
             >
               {isUpgrading ? (
@@ -482,17 +570,17 @@ const UpgradePage: React.FC = () => {
                   {t('upgrade.processing')}
                 </div>
               ) : (
-                t('upgrade.perform_upgrade')
+                `Улучшить ${selectedInventoryIds.length} предметов`
               )}
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Выбор исходного предмета */}
+          {/* Выбор исходных предметов */}
           <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
             <h2 className="text-xl font-bold text-white mb-6">
-              {t('upgrade.step_1_title')}
+              {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
             </h2>
 
             {isLoadingItems ? (
@@ -521,13 +609,14 @@ const UpgradePage: React.FC = () => {
                 <p className="text-gray-500 text-sm">{t('upgrade.open_cases_to_upgrade')}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
                 {filteredItems.map((itemGroup) => (
                   <SourceItemCard
                     key={itemGroup.item.id}
                     itemGroup={itemGroup}
                     onSelect={handleSelectSourceItem}
-                    isSelected={selectedSourceItem === itemGroup.item.id}
+                    selectedItemIds={selectedItemIds}
+                    selectedInventoryIds={selectedInventoryIds}
                   />
                 ))}
               </div>
@@ -540,14 +629,14 @@ const UpgradePage: React.FC = () => {
               {t('upgrade.step_2_title')}
             </h2>
 
-            {!selectedSourceItem ? (
+            {selectedInventoryIds.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
                   <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                   </svg>
                 </div>
-                <p className="text-gray-400">{t('upgrade.select_source_first')}</p>
+                <p className="text-gray-400">Сначала выберите предметы для улучшения</p>
               </div>
             ) : isLoadingOptions ? (
               <div className="flex items-center justify-center py-12">
@@ -557,17 +646,28 @@ const UpgradePage: React.FC = () => {
             ) : upgradeOptions?.data?.upgrade_options.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-400">{t('upgrade.no_upgrade_options')}</p>
+                <p className="text-gray-500 text-sm mt-2">Попробуйте выбрать предметы подешевле или больше предметов</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-                {upgradeOptions?.data?.upgrade_options.map((item) => (
-                  <TargetItemCard
-                    key={item.id}
-                    item={item}
-                    onSelect={() => handleSelectTargetItem(item.id)}
-                    isSelected={selectedTargetItem === item.id}
-                  />
-                ))}
+              <div>
+                {upgradeOptions?.data?.total_source_price && (
+                  <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                    <div className="text-cyan-300 text-sm">
+                      Общая стоимость ваших предметов: <span className="font-bold"><Monetary value={upgradeOptions.data.total_source_price} /></span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                  {upgradeOptions?.data?.upgrade_options.map((item) => (
+                    <TargetItemCard
+                      key={item.id}
+                      item={item}
+                      onSelect={() => handleSelectTargetItem(item.id)}
+                      isSelected={selectedTargetItem === item.id}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </div>

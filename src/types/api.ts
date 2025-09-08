@@ -378,3 +378,61 @@ export interface PlaySlotResponse {
   result: SlotResult;
   message?: string;
 }
+
+export interface UpgradeItem {
+  id: string;
+  name: string;
+  image_url: string;
+  price: number;
+  rarity: string;
+  weapon_type?: string;
+}
+
+export interface UpgradeItemGroup {
+  item: UpgradeItem;
+  instances: UserInventoryItem[];
+  count: number;
+}
+
+export interface UpgradeOption extends UpgradeItem {
+  upgrade_chance: number;
+  base_chance?: number;
+  quantity_bonus?: number;
+  price_ratio: number;
+}
+
+export interface UpgradeableItemsResponse {
+  success: boolean;
+  data: {
+    items: UpgradeItemGroup[];
+  };
+}
+
+export interface UpgradeOptionsResponse {
+  success: boolean;
+  data: {
+    source_items: UpgradeItem[];
+    total_source_price: number;
+    upgrade_options: UpgradeOption[];
+  };
+}
+
+export interface UpgradeRequest {
+  sourceInventoryIds: string[];
+  targetItemId: string;
+}
+
+export interface UpgradeResponse {
+  success: boolean;
+  upgrade_success: boolean;
+  message: string;
+  data: {
+    source_items: UpgradeItem[];
+    result_item?: UpgradeItem;
+    target_item?: UpgradeItem;
+    success_chance: number;
+    rolled_value: number;
+    total_source_price: number;
+    quantity_bonus: number;
+  };
+}
