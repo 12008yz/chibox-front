@@ -311,7 +311,7 @@ const UpgradePage: React.FC = () => {
 
     return upgradeableItems.data.items.filter(itemGroup =>
       itemGroup.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      parseFloat(itemGroup.item.price) >= 10 // Минимальная стоимость для апгрейда
+      itemGroup.item.price >= 10 // Минимальная стоимость для апгрейда
     );
   }, [upgradeableItems, searchTerm]);
 

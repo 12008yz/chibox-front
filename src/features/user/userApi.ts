@@ -655,7 +655,7 @@ export const userApi = baseApi.injectEndpoints({
       string
     >({
       query: (itemId) => `v1/upgrade/options/${itemId}`,
-      providesTags: ['Items'],
+      providesTags: ['Inventory'],
     }),
 
     performUpgrade: builder.mutation<
