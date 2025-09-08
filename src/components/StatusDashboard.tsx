@@ -332,34 +332,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
           </div>
         )}
       </div>
-
-      {/* Дополнительная информация */}
-      <div className="mt-12 text-center max-w-4xl">
-        <div className={`bg-gradient-to-r ${currentStatus.color} bg-opacity-10 border border-white/10 rounded-xl p-6`}>
-          <h3 className="text-xl font-bold text-white mb-3 flex items-center justify-center gap-2">
-            🎯 {t('profile.subscription_active')}!
-          </h3>
-          <p className="text-gray-300 leading-relaxed mb-4">
-            {t('homepage.community_description')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm">
-              🎁 {t('common.daily')}
-            </span>
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-              🎮 {t('games.bonus_game')}
-            </span>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
-              📈 {t('common.bonus_keyword')}
-            </span>
-            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm">
-              👑 VIP
-            </span>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Purchase Modal */}
+
       <PurchaseModal
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}

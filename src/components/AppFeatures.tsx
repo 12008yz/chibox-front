@@ -61,7 +61,6 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
         'Возможность обмена предметов',
         'Вывод предметов',
         '2 спина в день',
-        'Вывод баланса'
       ],
       popular: true
     },
@@ -83,7 +82,6 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
         'Не выпадают повторные предметы',
         'Вывод предметов',
         '3 спина в день',
-        'Вывод баланса',
       ]
     }
   ];
@@ -183,31 +181,6 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
             <div className={`absolute inset-0 bg-gradient-to-br ${tier.color} opacity-0 group-hover:opacity-5 rounded-xl blur-xl transition-opacity duration-300`}></div>
           </div>
         ))}
-      </div>
-
-      {/* Дополнительная информация */}
-      <div className="mt-12 text-center max-w-4xl">
-        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-6">
-          <h3 className="text-xl font-bold text-white mb-3">🎯 Преимущества статусов</h3>
-          <p className="text-gray-300 leading-relaxed mb-4">
-            Статусы дают вам доступ к эксклюзивным ежедневным кейсам и повышают ваши шансы на получение редких предметов.
-            Чем выше статус, тем больше возможностей и привилегий!
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-              🎁 Ежедневные кейсы
-            </span>
-            <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm">
-              📈 Повышенные шансы
-            </span>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
-              🛡️ Защита от дубликатов
-            </span>
-            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm">
-              👑 VIP привилегии
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
