@@ -605,6 +605,99 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['TicTacToe'],
     }),
+
+    // Upgrade API
+    getUserUpgradeableItems: builder.query<
+      ApiResponse<{
+        items: Array<{
+          item: {
+            id: string;
+            name: string;
+            image_url: string;
+            price: number;
+            rarity: string;
+            weapon_type?: string;
+          };
+          instances: Array<{
+            id: string;
+            status: string;
+          }>;
+          count: number;
+        }>;
+      }>,
+      void
+    >({
+      query: () => 'v1/upgrade/items',
+      providesTags: ['Inventory'],
+    }),
+
+    getUpgradeOptions: builder.query<
+      ApiResponse<{
+        source_item: {
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+          weapon_type?: string;
+        };
+        upgrade_options: Array<{
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+          weapon_type?: string;
+          upgrade_chance: number;
+          price_ratio: number;
+        }>;
+      }>,
+      string
+    >({
+      query: (itemId) => `v1/upgrade/options/${itemId}`,
+      providesTags: ['Items'],
+    }),
+
+    performUpgrade: builder.mutation<
+      ApiResponse<{
+        source_item: {
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+          weapon_type?: string;
+        };
+        result_item?: {
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+          weapon_type?: string;
+        };
+        target_item?: {
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+          weapon_type?: string;
+        };
+        success_chance: number;
+        rolled_value: number;
+      }> & {
+        upgrade_success: boolean;
+      },
+      { sourceInventoryId: string; targetItemId: string }
+    >({
+      query: (data) => ({
+        url: 'v1/upgrade/perform',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Inventory'],
+    }),
   }),
 });
 
@@ -649,4 +742,9 @@ export const {
   useCreateTicTacToeGameMutation,
   useGetCurrentTicTacToeGameQuery,
   useMakeTicTacToeMoveMutation,
+
+  // Upgrade хуки
+  useGetUserUpgradeableItemsQuery,
+  useGetUpgradeOptionsQuery,
+  usePerformUpgradeMutation,
 } = userApi;

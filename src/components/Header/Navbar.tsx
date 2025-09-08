@@ -40,6 +40,12 @@ const Navbar: React.FC<NavbarProps> = ({
       color: "from-pink-500 to-violet-500"
     },
     {
+      to: "/upgrade",
+      icon: <GiUpgrade className="text-xl" />,
+      label: t('header.upgrade'),
+      color: "from-cyan-500 to-blue-500"
+    },
+    {
       to: "/slot",
       icon: <FaDice className="text-xl" />,
       label: t('header.slot'),

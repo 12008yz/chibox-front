@@ -17,6 +17,7 @@ import ProfilePage from './pages/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ExchangePage from './pages/ExchangePage';
+import UpgradePage from './pages/UpgradePage';
 import SlotPage from './pages/SlotPage';
 import { useSocket } from './hooks/useSocket';
 
@@ -245,12 +246,7 @@ const App: React.FC = () => {
             <Route
               path="/upgrade"
               element={
-                <div className="min-h-screen text-white p-8">
-                  <div className="container mx-auto">
-                    <h1 className="text-3xl font-bold">Upgrade</h1>
-                    <p>Coming soon...</p>
-                  </div>
-                </div>
+                auth.isAuthenticated ? <UpgradePage /> : <Navigate to="/login" replace />
               }
             />
             <Route

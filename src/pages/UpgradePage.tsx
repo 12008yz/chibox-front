@@ -1,0 +1,580 @@
+import React, { useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../store/hooks';
+import {
+  useGetUserUpgradeableItemsQuery,
+  useGetUpgradeOptionsQuery,
+  usePerformUpgradeMutation,
+} from '../features/user/userApi';
+import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import Monetary from '../components/Monetary';
+import { getItemImageUrl } from '../utils/steamImageUtils';
+
+// Создаем SVG заглушку для изображений
+const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
+  <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center`}>
+    <svg className="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+);
+
+interface UpgradeResult {
+  upgrade_success: boolean;
+  data: {
+    source_item: any;
+    result_item?: any;
+    target_item?: any;
+    success_chance: number;
+    rolled_value: number;
+  };
+}
+
+// Компонент анимации апгрейда
+const UpgradeAnimation: React.FC<{
+  isActive: boolean;
+  result: UpgradeResult | null;
+  onComplete: () => void;
+}> = ({ isActive, result, onComplete }) => {
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    if (isActive && result) {
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 3000); // 3 секунды анимации
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, result, onComplete]);
+
+  if (!isActive || !result) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div className="text-center">
+        <div className="mb-8">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-cyan-500 mx-auto"></div>
+        </div>
+
+        <div className="text-white text-2xl font-bold mb-4">
+          {t('upgrade.processing')}
+        </div>
+
+        <div className="text-gray-300 mb-8">
+          {t('upgrade.chance_was', { chance: result.data.success_chance })}%
+          <br />
+          {t('upgrade.rolled_value', { value: result.data.rolled_value })}
+        </div>
+
+        {result.upgrade_success ? (
+          <div className="text-green-400 text-xl font-bold animate-pulse">
+            ✅ {t('upgrade.success')}!
+          </div>
+        ) : (
+          <div className="text-red-400 text-xl font-bold animate-pulse">
+            ❌ {t('upgrade.failed')}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Компонент карточки предмета для выбора
+const SourceItemCard: React.FC<{
+  itemGroup: any;
+  onSelect: (itemId: string) => void;
+  isSelected: boolean;
+}> = ({ itemGroup, onSelect, isSelected }) => {
+  const { t } = useTranslation();
+  const [imageError, setImageError] = useState(false);
+  const { item, count } = itemGroup;
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'covert':
+      case 'contraband': return 'from-yellow-500 to-orange-500';
+      case 'classified': return 'from-purple-500 to-pink-500';
+      case 'restricted': return 'from-blue-500 to-cyan-500';
+      case 'milspec': return 'from-green-500 to-emerald-500';
+      case 'industrial':
+      case 'consumer': return 'from-gray-500 to-slate-500';
+      default: return 'from-gray-500 to-slate-500';
+    }
+  };
+
+  return (
+    <div
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+        isSelected
+          ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
+          : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
+      }`}
+      onClick={() => onSelect(item.id)}
+    >
+      <div className="relative">
+        {/* Изображение предмета */}
+        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
+          <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
+          {!imageError ? (
+            <img
+              src={getItemImageUrl(item.image_url, item.name)}
+              alt={item.name}
+              className="absolute inset-0 w-full h-full object-contain z-10"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <PlaceholderImage className="w-full h-full" />
+          )}
+
+          {/* Количество предметов */}
+          {count > 1 && (
+            <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/80 text-white text-xs font-bold z-20">
+              x{count}
+            </div>
+          )}
+
+          {/* Индикатор выбора */}
+          {isSelected && (
+            <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
+              <div className="w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-white font-semibold text-sm truncate" title={item.name}>
+            {item.name}
+          </h3>
+
+          {item.weapon_type && (
+            <p className="text-gray-400 text-xs">
+              {item.weapon_type}
+            </p>
+          )}
+
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-cyan-300">{t('upgrade.item_value')}</span>
+            <span className="text-cyan-300 font-semibold">
+              <Monetary value={parseFloat(item.price)} />
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Компонент карточки целевого предмета
+const TargetItemCard: React.FC<{
+  item: any;
+  onSelect: () => void;
+  isSelected: boolean;
+}> = ({ item, onSelect, isSelected }) => {
+  const { t } = useTranslation();
+  const [imageError, setImageError] = useState(false);
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'covert':
+      case 'contraband': return 'from-yellow-500 to-orange-500';
+      case 'classified': return 'from-purple-500 to-pink-500';
+      case 'restricted': return 'from-blue-500 to-cyan-500';
+      case 'milspec': return 'from-green-500 to-emerald-500';
+      case 'industrial':
+      case 'consumer': return 'from-gray-500 to-slate-500';
+      default: return 'from-gray-500 to-slate-500';
+    }
+  };
+
+  const getChanceColor = (chance: number) => {
+    if (chance >= 30) return 'text-green-400';
+    if (chance >= 15) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+
+  return (
+    <div
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+        isSelected
+          ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
+          : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
+      }`}
+      onClick={onSelect}
+    >
+      <div className="relative">
+        {/* Изображение предмета */}
+        <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden">
+          <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
+          {!imageError ? (
+            <img
+              src={getItemImageUrl(item.image_url, item.name)}
+              alt={item.name}
+              className="absolute inset-0 w-full h-full object-contain z-10"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <PlaceholderImage className="w-full h-full" />
+          )}
+
+          {/* Шанс успеха */}
+          <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-black/80 ${getChanceColor(item.upgrade_chance)} text-xs font-bold z-20`}>
+            {item.upgrade_chance}%
+          </div>
+
+          {/* Индикатор выбора */}
+          {isSelected && (
+            <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
+              <div className="w-8 h-8 bg-cyan-400 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-white font-semibold text-sm truncate" title={item.name}>
+            {item.name}
+          </h3>
+
+          {item.weapon_type && (
+            <p className="text-gray-400 text-xs">
+              {item.weapon_type}
+            </p>
+          )}
+
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-cyan-300">{t('upgrade.target_value')}</span>
+              <span className="text-cyan-300 font-semibold">
+                <Monetary value={parseFloat(item.price)} />
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-purple-300">{t('upgrade.success_chance')}</span>
+              <span className={`font-semibold ${getChanceColor(item.upgrade_chance)}`}>
+                {item.upgrade_chance}%
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-400">{t('upgrade.price_ratio')}</span>
+              <span className="text-gray-400">
+                x{item.price_ratio}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const UpgradePage: React.FC = () => {
+  const { t } = useTranslation();
+  const auth = useAuth();
+  const [selectedSourceItem, setSelectedSourceItem] = useState<string>('');
+  const [selectedTargetItem, setSelectedTargetItem] = useState<string>('');
+  const [selectedSourceInventoryId, setSelectedSourceInventoryId] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [upgradeResult, setUpgradeResult] = useState<UpgradeResult | null>(null);
+
+  // API queries
+  const {
+    data: upgradeableItems,
+    isLoading: isLoadingItems,
+    error: itemsError,
+    refetch: refetchItems
+  } = useGetUserUpgradeableItemsQuery();
+
+  const {
+    data: upgradeOptions,
+    isLoading: isLoadingOptions,
+  } = useGetUpgradeOptionsQuery(selectedSourceItem, {
+    skip: !selectedSourceItem
+  });
+
+  const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
+
+  // Фильтрация предметов
+  const filteredItems = React.useMemo(() => {
+    if (!upgradeableItems?.data?.items) return [];
+
+    return upgradeableItems.data.items.filter(itemGroup =>
+      itemGroup.item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      parseFloat(itemGroup.item.price) >= 10 // Минимальная стоимость для апгрейда
+    );
+  }, [upgradeableItems, searchTerm]);
+
+  // Обработчик выбора исходного предмета
+  const handleSelectSourceItem = useCallback((itemId: string) => {
+    setSelectedSourceItem(itemId);
+    setSelectedTargetItem('');
+
+    // Находим первый доступный экземпляр предмета
+    const itemGroup = filteredItems.find(group => group.item.id === itemId);
+    if (itemGroup && itemGroup.instances.length > 0) {
+      setSelectedSourceInventoryId(itemGroup.instances[0].id);
+    }
+  }, [filteredItems]);
+
+  // Обработчик выбора целевого предмета
+  const handleSelectTargetItem = useCallback((itemId: string) => {
+    setSelectedTargetItem(itemId);
+  }, []);
+
+  // Обработчик выполнения апгрейда
+  const handlePerformUpgrade = async () => {
+    try {
+      if (!selectedSourceInventoryId || !selectedTargetItem) {
+        toast.error(t('upgrade.select_both_items'));
+        return;
+      }
+
+      const result = await performUpgrade({
+        sourceInventoryId: selectedSourceInventoryId,
+        targetItemId: selectedTargetItem
+      }).unwrap();
+
+      setUpgradeResult(result);
+      setShowAnimation(true);
+
+    } catch (error: any) {
+      console.error('Ошибка при апгрейде:', error);
+      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
+      toast.error(errorMessage);
+    }
+  };
+
+  // Обработчик завершения анимации
+  const handleAnimationComplete = () => {
+    setShowAnimation(false);
+
+    if (upgradeResult) {
+      if (upgradeResult.upgrade_success) {
+        toast.success(
+          <div>
+            <div className="font-semibold">{t('upgrade.success')}!</div>
+            <div className="text-sm">{t('upgrade.received_item', { item: upgradeResult.data.result_item?.name })}</div>
+          </div>
+        );
+      } else {
+        toast.error(
+          <div>
+            <div className="font-semibold">{t('upgrade.failed')}</div>
+            <div className="text-sm">{t('upgrade.item_lost', { item: upgradeResult.data.source_item?.name })}</div>
+          </div>
+        );
+      }
+
+      // Сбрасываем выбор и обновляем данные
+      setSelectedSourceItem('');
+      setSelectedTargetItem('');
+      setSelectedSourceInventoryId('');
+      setUpgradeResult(null);
+      refetchItems();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#151225] text-white">
+      <ScrollToTopOnMount />
+
+      {/* Анимация апгрейда */}
+      <UpgradeAnimation
+        isActive={showAnimation}
+        result={upgradeResult}
+        onComplete={handleAnimationComplete}
+      />
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Заголовок */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center space-x-3 mb-4">
+            <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-white">{t('upgrade.title')}</h1>
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+          <p className="text-gray-400 text-lg">{t('upgrade.subtitle')}</p>
+        </div>
+
+        {/* Информационная панель */}
+        <div className="bg-gradient-to-r from-amber-600/10 to-red-600/10 rounded-xl p-6 mb-8 border border-amber-500/30">
+          <div className="flex items-start space-x-4">
+            <div className="text-amber-400 text-2xl">⚠️</div>
+            <div>
+              <h3 className="text-amber-300 font-semibold text-lg mb-2">{t('upgrade.warning_title')}</h3>
+              <ul className="text-gray-300 text-sm space-y-1">
+                <li>• {t('upgrade.warning_lose_item')}</li>
+                <li>• {t('upgrade.warning_no_guarantee')}</li>
+                <li>• {t('upgrade.warning_higher_value')}</li>
+                <li>• {t('upgrade.warning_min_value')}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Панель управления */}
+        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Информация о выбранных предметах */}
+            <div className="bg-black/30 rounded-lg p-4 border border-cyan-500/50">
+              <div className="text-cyan-400 text-sm font-medium mb-2">{t('upgrade.selected_source')}</div>
+              {selectedSourceItem ? (
+                <div className="text-white">
+                  {filteredItems.find(group => group.item.id === selectedSourceItem)?.item.name || t('upgrade.not_selected')}
+                </div>
+              ) : (
+                <div className="text-gray-400">{t('upgrade.not_selected')}</div>
+              )}
+            </div>
+
+            <div className="bg-black/30 rounded-lg p-4 border border-purple-500/50">
+              <div className="text-purple-400 text-sm font-medium mb-2">{t('upgrade.selected_target')}</div>
+              {selectedTargetItem ? (
+                <div className="text-white">
+                  {upgradeOptions?.data?.upgrade_options.find(item => item.id === selectedTargetItem)?.name || t('upgrade.not_selected')}
+                </div>
+              ) : (
+                <div className="text-gray-400">{t('upgrade.not_selected')}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Поиск */}
+          <div className="mb-6">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('upgrade.search_placeholder')}
+              className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+            />
+          </div>
+
+          {/* Кнопка апгрейда */}
+          <div className="text-center">
+            <button
+              onClick={handlePerformUpgrade}
+              disabled={!selectedSourceItem || !selectedTargetItem || isUpgrading}
+              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-8 rounded-lg font-semibold text-lg transition-all duration-200 disabled:cursor-not-allowed"
+            >
+              {isUpgrading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  {t('upgrade.processing')}
+                </div>
+              ) : (
+                t('upgrade.perform_upgrade')
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Выбор исходного предмета */}
+          <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
+            <h2 className="text-xl font-bold text-white mb-6">
+              {t('upgrade.step_1_title')}
+            </h2>
+
+            {isLoadingItems ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
+                <span className="ml-3 text-gray-400">{t('upgrade.loading_items')}</span>
+              </div>
+            ) : itemsError ? (
+              <div className="text-center py-12">
+                <p className="text-red-400 mb-4">{t('upgrade.error_loading_items')}</p>
+                <button
+                  onClick={() => refetchItems()}
+                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  {t('upgrade.try_again')}
+                </button>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 mx-auto mb-4 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-lg mb-2">{t('upgrade.no_items_available')}</p>
+                <p className="text-gray-500 text-sm">{t('upgrade.open_cases_to_upgrade')}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                {filteredItems.map((itemGroup) => (
+                  <SourceItemCard
+                    key={itemGroup.item.id}
+                    itemGroup={itemGroup}
+                    onSelect={handleSelectSourceItem}
+                    isSelected={selectedSourceItem === itemGroup.item.id}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Выбор целевого предмета */}
+          <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
+            <h2 className="text-xl font-bold text-white mb-6">
+              {t('upgrade.step_2_title')}
+            </h2>
+
+            {!selectedSourceItem ? (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                  </svg>
+                </div>
+                <p className="text-gray-400">{t('upgrade.select_source_first')}</p>
+              </div>
+            ) : isLoadingOptions ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+                <span className="ml-3 text-gray-400">{t('upgrade.loading_options')}</span>
+              </div>
+            ) : upgradeOptions?.data?.upgrade_options.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">{t('upgrade.no_upgrade_options')}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                {upgradeOptions?.data?.upgrade_options.map((item) => (
+                  <TargetItemCard
+                    key={item.id}
+                    item={item}
+                    onSelect={() => handleSelectTargetItem(item.id)}
+                    isSelected={selectedTargetItem === item.id}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UpgradePage;
