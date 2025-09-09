@@ -300,7 +300,7 @@ const TargetItemCard: React.FC<{
 
 const UpgradePage: React.FC = () => {
   const { t } = useTranslation();
-  const auth = useAuth();
+
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
   const [selectedTargetItem, setSelectedTargetItem] = useState<string>('');
@@ -319,11 +319,13 @@ const UpgradePage: React.FC = () => {
   const {
     data: upgradeOptions,
     isLoading: isLoadingOptions,
-  } = useGetUpgradeOptionsQuery(selectedItemIds.join(','), {
-    skip: selectedItemIds.length === 0
+  } = useGetUpgradeOptionsQuery(selectedInventoryIds.join(','), {
+    skip: selectedInventoryIds.length === 0
   });
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
+
+
 
   // Фильтрация предметов (убираем ограничение по минимальной цене)
   const filteredItems = React.useMemo(() => {
@@ -394,7 +396,7 @@ const UpgradePage: React.FC = () => {
     upgradeableItems.data.items.forEach(itemGroup => {
       itemGroup.instances.forEach((inst: any) => {
         if (selectedInventoryIds.includes(inst.id)) {
-          total += parseFloat(itemGroup.item.price);
+          total += itemGroup.item.price;
         }
       });
     });
@@ -411,11 +413,23 @@ const UpgradePage: React.FC = () => {
       }
 
       const result = await performUpgrade({
-        sourceInventoryIds: selectedInventoryIds,
+        sourceInventoryId: selectedInventoryIds[0],
         targetItemId: selectedTargetItem
       }).unwrap();
 
-      setUpgradeResult(result);
+      const adaptedResult: UpgradeResult = {
+        upgrade_success: result.upgrade_success,
+        data: {
+          source_items: [result.data.source_item],
+          result_item: result.data.result_item,
+          target_item: result.data.target_item,
+          success_chance: result.data.success_chance,
+          rolled_value: result.data.rolled_value,
+          total_source_price: result.data.source_item.price,
+          quantity_bonus: 0
+        }
+      };
+      setUpgradeResult(adaptedResult);
       setShowAnimation(true);
 
     } catch (error: any) {
@@ -650,10 +664,10 @@ const UpgradePage: React.FC = () => {
               </div>
             ) : (
               <div>
-                {upgradeOptions?.data?.total_source_price && (
+                {totalSelectedPrice > 0 && (
                   <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
                     <div className="text-cyan-300 text-sm">
-                      Общая стоимость ваших предметов: <span className="font-bold"><Monetary value={upgradeOptions.data.total_source_price} /></span>
+                      Общая стоимость ваших предметов: <span className="font-bold"><Monetary value={totalSelectedPrice} /></span>
                     </div>
                   </div>
                 )}

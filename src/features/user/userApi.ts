@@ -658,7 +658,7 @@ export const userApi = baseApi.injectEndpoints({
       }>,
       string
     >({
-      query: (itemId) => `v1/upgrade/options/${itemId}`,
+      query: (inventoryId) => `v1/upgrade/options/${inventoryId}`,
       providesTags: ['Inventory'],
     }),
 
