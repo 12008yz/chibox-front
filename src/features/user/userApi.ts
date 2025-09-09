@@ -637,14 +637,15 @@ export const userApi = baseApi.injectEndpoints({
 
     getUpgradeOptions: builder.query<
       ApiResponse<{
-        source_item: {
+        source_items: Array<{
           id: string;
           name: string;
           image_url: string;
           price: number;
           rarity: string;
           weapon_type?: string;
-        };
+        }>;
+        total_source_price: number;
         upgrade_options: Array<{
           id: string;
           name: string;
@@ -654,24 +655,31 @@ export const userApi = baseApi.injectEndpoints({
           weapon_type?: string;
           upgrade_chance: number;
           price_ratio: number;
+          base_chance: number;
+          quantity_bonus: number;
         }>;
       }>,
-      string
+      string | string[]
     >({
-      query: (inventoryId) => `v1/upgrade/options/${inventoryId}`,
+      query: (itemIds) => {
+        if (Array.isArray(itemIds)) {
+          return `v1/upgrade/options/${itemIds.join(',')}`;
+        }
+        return `v1/upgrade/options/${itemIds}`;
+      },
       providesTags: ['Inventory'],
     }),
 
     performUpgrade: builder.mutation<
       ApiResponse<{
-        source_item: {
+        source_items: Array<{
           id: string;
           name: string;
           image_url: string;
           price: number;
           rarity: string;
           weapon_type?: string;
-        };
+        }>;
         result_item?: {
           id: string;
           name: string;
@@ -690,10 +698,12 @@ export const userApi = baseApi.injectEndpoints({
         };
         success_chance: number;
         rolled_value: number;
+        total_source_price: number;
+        quantity_bonus: number;
       }> & {
         upgrade_success: boolean;
       },
-      { sourceInventoryId: string; targetItemId: string }
+      { sourceInventoryIds: string[]; targetItemId: string }
     >({
       query: (data) => ({
         url: 'v1/upgrade/perform',

@@ -319,8 +319,8 @@ const UpgradePage: React.FC = () => {
   const {
     data: upgradeOptions,
     isLoading: isLoadingOptions,
-  } = useGetUpgradeOptionsQuery(selectedInventoryIds.join(','), {
-    skip: selectedInventoryIds.length === 0
+  } = useGetUpgradeOptionsQuery(selectedItemIds, {
+    skip: selectedItemIds.length === 0
   });
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
@@ -413,20 +413,20 @@ const UpgradePage: React.FC = () => {
       }
 
       const result = await performUpgrade({
-        sourceInventoryId: selectedInventoryIds[0],
+        sourceInventoryIds: selectedInventoryIds,
         targetItemId: selectedTargetItem
       }).unwrap();
 
       const adaptedResult: UpgradeResult = {
         upgrade_success: result.upgrade_success,
         data: {
-          source_items: [result.data.source_item],
+          source_items: result.data.source_items,
           result_item: result.data.result_item,
           target_item: result.data.target_item,
           success_chance: result.data.success_chance,
           rolled_value: result.data.rolled_value,
-          total_source_price: result.data.source_item.price,
-          quantity_bonus: 0
+          total_source_price: result.data.total_source_price,
+          quantity_bonus: result.data.quantity_bonus
         }
       };
       setUpgradeResult(adaptedResult);
@@ -643,7 +643,7 @@ const UpgradePage: React.FC = () => {
               {t('upgrade.step_2_title')}
             </h2>
 
-            {selectedInventoryIds.length === 0 ? (
+            {selectedItemIds.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
                   <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

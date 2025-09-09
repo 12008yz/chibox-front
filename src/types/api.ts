@@ -413,7 +413,10 @@ export interface UpgradeOptionsResponse {
   data: {
     source_items: UpgradeItem[];
     total_source_price: number;
-    upgrade_options: UpgradeOption[];
+    upgrade_options: Array<UpgradeOption & {
+      base_chance: number;
+      quantity_bonus: number;
+    }>;
   };
 }
 
