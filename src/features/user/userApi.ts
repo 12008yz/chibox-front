@@ -663,9 +663,9 @@ export const userApi = baseApi.injectEndpoints({
     >({
       query: (itemIds) => {
         if (Array.isArray(itemIds)) {
-          return `v1/upgrade/options/${itemIds.join(',')}`;
+          return `v1/upgrade/options?itemIds=${itemIds.join(',')}`;
         }
-        return `v1/upgrade/options/${itemIds}`;
+        return `v1/upgrade/options?itemIds=${itemIds}`;
       },
       providesTags: ['Inventory'],
     }),

@@ -33,60 +33,231 @@ interface UpgradeResult {
   };
 }
 
-// Компонент анимации апгрейда
+// Компонент анимации апгрейда с рулеткой
 const UpgradeAnimation: React.FC<{
   isActive: boolean;
   result: UpgradeResult | null;
   onComplete: () => void;
 }> = ({ isActive, result, onComplete }) => {
   const { t } = useTranslation();
+  const [animationPhase, setAnimationPhase] = useState<'spinning' | 'slowing' | 'stopped' | 'result'>('spinning');
+  const [currentRotation, setCurrentRotation] = useState(0);
+  const [finalRotation, setFinalRotation] = useState(0);
 
   React.useEffect(() => {
     if (isActive && result) {
-      const timer = setTimeout(() => {
-        onComplete();
-      }, 3000); // 3 секунды анимации
-      return () => clearTimeout(timer);
+      // Рассчитываем финальный поворот на основе результата
+      const successSector = result.upgrade_success;
+      const targetAngle = successSector ?
+        Math.random() * (result.data.success_chance * 3.6) : // Попадаем в зеленый сектор
+        (result.data.success_chance * 3.6) + Math.random() * ((100 - result.data.success_chance) * 3.6); // Попадаем в красный сектор
+
+      setFinalRotation(360 * 5 + targetAngle); // 5 полных оборотов + финальная позиция
+
+      // Фаза 1: Быстрое вращение (1.5 секунды)
+      setAnimationPhase('spinning');
+      setCurrentRotation(0);
+
+      const fastSpinTimer = setTimeout(() => {
+        setAnimationPhase('slowing');
+
+        // Фаза 2: Замедление к результату (2.5 секунды)
+        const slowSpinTimer = setTimeout(() => {
+          setAnimationPhase('stopped');
+
+          // Фаза 3: Пауза после остановки (1 секунда)
+          const pauseTimer = setTimeout(() => {
+            setAnimationPhase('result');
+
+            // Фаза 4: Показ результата (2 секунды)
+            const resultTimer = setTimeout(() => {
+              onComplete();
+            }, 2000);
+
+            return () => clearTimeout(resultTimer);
+          }, 1000);
+
+          return () => clearTimeout(pauseTimer);
+        }, 2500);
+
+        return () => clearTimeout(slowSpinTimer);
+      }, 1500);
+
+      return () => clearTimeout(fastSpinTimer);
     }
   }, [isActive, result, onComplete]);
 
+  // Эффект вращения
+  React.useEffect(() => {
+    if (animationPhase === 'spinning') {
+      const interval = setInterval(() => {
+        setCurrentRotation(prev => prev + 12); // Быстрое вращение
+      }, 16); // 60 FPS
+
+      return () => clearInterval(interval);
+    } else if (animationPhase === 'slowing') {
+      // Плавное замедление к финальной позиции
+      setCurrentRotation(finalRotation);
+    }
+  }, [animationPhase, finalRotation]);
+
   if (!isActive || !result) return null;
 
+  const getResultColor = (success: boolean) => {
+    return success ? 'from-green-500 to-emerald-600' : 'from-red-500 to-red-600';
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="text-center">
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+      <div className="text-center max-w-2xl mx-auto px-6">
+        {/* Заголовок */}
         <div className="mb-8">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-cyan-500 mx-auto"></div>
+          <h2 className="text-4xl font-bold text-white mb-2">
+            {animationPhase === 'result'
+              ? (result.upgrade_success ? '🎉 Успех!' : '💔 Неудача')
+              : animationPhase === 'stopped'
+                ? '⏳ Рулетка остановилась...'
+                : '🎰 Рулетка крутится...'
+            }
+          </h2>
+          <p className="text-gray-300 text-lg">
+            {animationPhase === 'result'
+              ? (result.upgrade_success
+                  ? 'Поздравляем с успешным апгрейдом!'
+                  : 'К сожалению, на этот раз не повезло'
+                )
+              : animationPhase === 'stopped'
+                ? 'Анализируем результат...'
+                : 'Определяем ваш результат...'
+            }
+          </p>
         </div>
 
-        <div className="text-white text-2xl font-bold mb-4">
-          {t('upgrade.processing')}
-        </div>
+        {/* Рулетка */}
+        <div className="relative mb-8">
+          <div className="relative w-80 h-80 mx-auto">
+            {/* Основной круг рулетки */}
+            <div
+              className="w-full h-full rounded-full border-8 border-gray-600 relative overflow-hidden shadow-2xl"
+              style={{
+                transform: `rotate(${currentRotation}deg)`,
+                transition: animationPhase === 'slowing' ? 'transform 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
+              }}
+            >
+              {/* Создаем секторы на основе шанса успеха */}
+              {Array.from({ length: 20 }).map((_, index) => {
+                const angle = (360 / 20) * index;
+                const isSuccess = (angle / 360 * 100) < result.data.success_chance;
 
-        <div className="text-gray-300 mb-8">
-          <div className="mb-2">
-            {t('upgrade.chance_was', { chance: result.data.success_chance })}%
-            {result.data.quantity_bonus > 0 && (
-              <span className="text-green-400 ml-2">(+{result.data.quantity_bonus}% бонус за количество)</span>
+                return (
+                  <div
+                    key={index}
+                    className="absolute top-0 left-1/2 origin-bottom"
+                    style={{
+                      width: '2px',
+                      height: '50%',
+                      backgroundColor: isSuccess ? '#10b981' : '#ef4444',
+                      transform: `translateX(-50%) rotate(${angle}deg)`,
+                      transformOrigin: 'bottom center',
+                      borderRadius: '2px 2px 0 0'
+                    }}
+                  />
+                );
+              })}
+
+              {/* Внутренние кольца для красоты */}
+              <div className="absolute inset-4 rounded-full border-4 border-gray-700"></div>
+              <div className="absolute inset-8 rounded-full border-2 border-gray-800"></div>
+
+              {/* Центральный круг с процентом */}
+              <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-gray-900 rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center border-4 border-yellow-400 shadow-lg">
+                <span className="text-yellow-400 font-bold text-sm">
+                  {result.data.success_chance}%
+                </span>
+              </div>
+            </div>
+
+            {/* Указатель */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+              <div
+                className="w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"
+                style={{
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
+                }}
+              ></div>
+            </div>
+
+            {/* Световые эффекты */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
+
+            {/* Результирующий эффект */}
+            {animationPhase === 'result' && (
+              <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${getResultColor(result.upgrade_success)} opacity-20 animate-pulse`}></div>
+            )}
+
+            {/* Эффект анализа во время остановки */}
+            {animationPhase === 'stopped' && (
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 opacity-10 animate-pulse"></div>
             )}
           </div>
-          <div>
-            {t('upgrade.rolled_value', { value: result.data.rolled_value })}
+        </div>
+
+        {/* Статистика */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="bg-black/40 rounded-xl p-4 border border-cyan-500/30">
+            <div className="text-cyan-400 text-sm font-medium mb-1">Шанс успеха</div>
+            <div className="text-white text-2xl font-bold">
+              {result.data.success_chance}%
+              {result.data.quantity_bonus > 0 && (
+                <span className="text-green-400 text-lg ml-2">+{result.data.quantity_bonus}%</span>
+              )}
+            </div>
           </div>
-          <div className="text-cyan-400 mt-2">
-            Общая стоимость предметов: <Monetary value={result.data.total_source_price} />
+
+          <div className="bg-black/40 rounded-xl p-4 border border-purple-500/30">
+            <div className="text-purple-400 text-sm font-medium mb-1">Выпавшее значение</div>
+            <div className="text-white text-2xl font-bold">{result.data.rolled_value}</div>
           </div>
         </div>
 
-        {result.upgrade_success ? (
-          <div className="text-green-400 text-xl font-bold animate-pulse">
-            ✅ {t('upgrade.success')}!
-          </div>
-        ) : (
-          <div className="text-red-400 text-xl font-bold animate-pulse">
-            ❌ {t('upgrade.failed')}
+        {/* Итоговый результат */}
+        {animationPhase === 'result' && (
+          <div className={`bg-gradient-to-r ${getResultColor(result.upgrade_success)} rounded-xl p-6 border-2 animate-pulse`}>
+            <div className="text-white">
+              <div className="text-2xl font-bold mb-2">
+                {result.upgrade_success ? '✅ УСПЕШНЫЙ АПГРЕЙД!' : '❌ НЕУДАЧНЫЙ АПГРЕЙД'}
+              </div>
+              <div className="text-lg">
+                Стоимость предметов: <Monetary value={result.data.total_source_price} />
+              </div>
+              {result.upgrade_success && result.data.result_item && (
+                <div className="text-lg mt-2">
+                  Получен: <span className="font-semibold">{result.data.result_item.name}</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
+
+        {/* Прогресс бар */}
+        <div className="mt-6">
+          <div className="w-full bg-gray-700 rounded-full h-3">
+            <div
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 h-3 rounded-full transition-all duration-500"
+              style={{
+                width: animationPhase === 'spinning' ? '20%' :
+                       animationPhase === 'slowing' ? '60%' :
+                       animationPhase === 'stopped' ? '90%' : '100%'
+              }}
+            ></div>
+          </div>
+          <div className="text-gray-400 text-sm mt-2">
+            {animationPhase === 'spinning' && 'Рулетка набирает скорость...'}
+            {animationPhase === 'slowing' && 'Рулетка замедляется...'}
+            {animationPhase === 'stopped' && 'Рулетка остановилась, анализируем...'}
+            {animationPhase === 'result' && 'Результат определен!'}
+          </div>
+        </div>
       </div>
     </div>
   );
