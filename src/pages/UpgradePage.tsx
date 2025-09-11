@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../store/hooks';
+import { Wheel } from 'react-custom-roulette';
 import {
   useGetUserUpgradeableItemsQuery,
   useGetUpgradeOptionsQuery,
@@ -40,68 +41,47 @@ const UpgradeAnimation: React.FC<{
   onComplete: () => void;
 }> = ({ isActive, result, onComplete }) => {
   const { t } = useTranslation();
-  const [animationPhase, setAnimationPhase] = useState<'spinning' | 'slowing' | 'stopped' | 'result'>('spinning');
-  const [currentRotation, setCurrentRotation] = useState(0);
-  const [finalRotation, setFinalRotation] = useState(0);
+  const [mustSpin, setMustSpin] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   React.useEffect(() => {
-    if (isActive && result) {
-      // Рассчитываем финальный поворот на основе результата
-      const successSector = result.upgrade_success;
-      const targetAngle = successSector ?
-        Math.random() * (result.data.success_chance * 3.6) : // Попадаем в зеленый сектор
-        (result.data.success_chance * 3.6) + Math.random() * ((100 - result.data.success_chance) * 3.6); // Попадаем в красный сектор
-
-      setFinalRotation(360 * 5 + targetAngle); // 5 полных оборотов + финальная позиция
-
-      // Фаза 1: Быстрое вращение (1.5 секунды)
-      setAnimationPhase('spinning');
-      setCurrentRotation(0);
-
-      const fastSpinTimer = setTimeout(() => {
-        setAnimationPhase('slowing');
-
-        // Фаза 2: Замедление к результату (2.5 секунды)
-        const slowSpinTimer = setTimeout(() => {
-          setAnimationPhase('stopped');
-
-          // Фаза 3: Пауза после остановки (1 секунда)
-          const pauseTimer = setTimeout(() => {
-            setAnimationPhase('result');
-
-            // Фаза 4: Показ результата (2 секунды)
-            const resultTimer = setTimeout(() => {
-              onComplete();
-            }, 2000);
-
-            return () => clearTimeout(resultTimer);
-          }, 1000);
-
-          return () => clearTimeout(pauseTimer);
-        }, 2500);
-
-        return () => clearTimeout(slowSpinTimer);
-      }, 1500);
-
-      return () => clearTimeout(fastSpinTimer);
+    if (isActive && result && !mustSpin) {
+      // Запускаем анимацию рулетки
+      setMustSpin(true);
+      setShowResult(false);
     }
-  }, [isActive, result, onComplete]);
+  }, [isActive, result, mustSpin]);
 
-  // Эффект вращения
-  React.useEffect(() => {
-    if (animationPhase === 'spinning') {
-      const interval = setInterval(() => {
-        setCurrentRotation(prev => prev + 12); // Быстрое вращение
-      }, 16); // 60 FPS
+  const handleSpinComplete = () => {
+    setMustSpin(false);
+    setShowResult(true);
 
-      return () => clearInterval(interval);
-    } else if (animationPhase === 'slowing') {
-      // Плавное замедление к финальной позиции
-      setCurrentRotation(finalRotation);
-    }
-  }, [animationPhase, finalRotation]);
+    // Показываем результат в течение 3 секунд
+    setTimeout(() => {
+      onComplete();
+    }, 3000);
+  };
 
   if (!isActive || !result) return null;
+
+  // Создаем данные для рулетки на основе шанса успеха
+  const wheelData = [];
+  const successChance = result.data.success_chance;
+  const segmentCount = 100; // 100 сегментов для точности
+
+  for (let i = 0; i < segmentCount; i++) {
+    const isSuccess = i < successChance;
+    wheelData.push({
+      option: isSuccess ? '✅' : '❌',
+      style: {
+        backgroundColor: isSuccess ? '#10b981' : '#ef4444',
+        textColor: '#FFFFFF'
+      }
+    });
+  }
+
+  // Вычисляем индекс сегмента на основе rolled_value
+  const prizeNumber = Math.floor((result.data.rolled_value / 100) * segmentCount);
 
   const getResultColor = (success: boolean) => {
     return success ? 'from-green-500 to-emerald-600' : 'from-red-500 to-red-600';
@@ -113,99 +93,53 @@ const UpgradeAnimation: React.FC<{
         {/* Заголовок */}
         <div className="mb-8">
           <h2 className="text-4xl font-bold text-white mb-2">
-            {animationPhase === 'result'
+            {showResult
               ? (result.upgrade_success ? '🎉 Успех!' : '💔 Неудача')
-              : animationPhase === 'stopped'
-                ? '⏳ Рулетка остановилась...'
-                : '🎰 Рулетка крутится...'
+              : '🎰 Рулетка крутится...'
             }
           </h2>
           <p className="text-gray-300 text-lg">
-            {animationPhase === 'result'
+            {showResult
               ? (result.upgrade_success
                   ? 'Поздравляем с успешным апгрейдом!'
                   : 'К сожалению, на этот раз не повезло'
                 )
-              : animationPhase === 'stopped'
-                ? 'Анализируем результат...'
-                : 'Определяем ваш результат...'
+              : 'Определяем ваш результат...'
             }
           </p>
         </div>
 
         {/* Рулетка */}
-        <div className="relative mb-8">
-          <div className="relative w-80 h-80 mx-auto">
-            {/* Основной круг рулетки */}
-            <div
-              className="w-full h-full rounded-full border-8 border-gray-600 relative overflow-hidden shadow-2xl"
-              style={{
-                transform: `rotate(${currentRotation}deg)`,
-                transition: animationPhase === 'slowing' ? 'transform 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
-              }}
-            >
-              {/* Создаем секторы на основе шанса успеха */}
-              {Array.from({ length: 20 }).map((_, index) => {
-                const angle = (360 / 20) * index;
-                const isSuccess = (angle / 360 * 100) < result.data.success_chance;
-
-                return (
-                  <div
-                    key={index}
-                    className="absolute top-0 left-1/2 origin-bottom"
-                    style={{
-                      width: '2px',
-                      height: '50%',
-                      backgroundColor: isSuccess ? '#10b981' : '#ef4444',
-                      transform: `translateX(-50%) rotate(${angle}deg)`,
-                      transformOrigin: 'bottom center',
-                      borderRadius: '2px 2px 0 0'
-                    }}
-                  />
-                );
-              })}
-
-              {/* Внутренние кольца для красоты */}
-              <div className="absolute inset-4 rounded-full border-4 border-gray-700"></div>
-              <div className="absolute inset-8 rounded-full border-2 border-gray-800"></div>
-
-              {/* Центральный круг с процентом */}
-              <div className="absolute top-1/2 left-1/2 w-20 h-20 bg-gray-900 rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center border-4 border-yellow-400 shadow-lg">
-                <span className="text-yellow-400 font-bold text-sm">
-                  {result.data.success_chance}%
-                </span>
-              </div>
-            </div>
-
-            {/* Указатель */}
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
-              <div
-                className="w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"
-                style={{
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
-                }}
-              ></div>
-            </div>
-
-            {/* Световые эффекты */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none"></div>
-
-            {/* Результирующий эффект */}
-            {animationPhase === 'result' && (
-              <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${getResultColor(result.upgrade_success)} opacity-20 animate-pulse`}></div>
-            )}
-
-            {/* Эффект анализа во время остановки */}
-            {animationPhase === 'stopped' && (
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 opacity-10 animate-pulse"></div>
-            )}
-          </div>
+        <div className="relative mb-8 flex justify-center">
+          <Wheel
+            mustStartSpinning={mustSpin}
+            prizeNumber={prizeNumber}
+            data={wheelData}
+            onStopSpinning={handleSpinComplete}
+            outerBorderColor="#374151"
+            outerBorderWidth={8}
+            innerRadius={20}
+            innerBorderColor="#1f2937"
+            innerBorderWidth={4}
+            radiusLineColor="#6b7280"
+            radiusLineWidth={1}
+            fontSize={12}
+            textDistance={60}
+            spinDuration={3}
+            pointerProps={{
+              src: undefined,
+              style: {
+                transform: 'rotate(0deg)',
+                color: '#fbbf24'
+              }
+            }}
+          />
         </div>
 
         {/* Статистика */}
         <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="bg-black/40 rounded-xl p-4 border border-cyan-500/30">
-            <div className="text-cyan-400 text-sm font-medium mb-1">Шанс успеха</div>
+            <div className="text-cyan-400 text-sm font-medium mb-1">Шанс успеха (зеленая зона)</div>
             <div className="text-white text-2xl font-bold">
               {result.data.success_chance}%
               {result.data.quantity_bonus > 0 && (
@@ -216,12 +150,19 @@ const UpgradeAnimation: React.FC<{
 
           <div className="bg-black/40 rounded-xl p-4 border border-purple-500/30">
             <div className="text-purple-400 text-sm font-medium mb-1">Выпавшее значение</div>
-            <div className="text-white text-2xl font-bold">{result.data.rolled_value}</div>
+            <div className="text-white text-2xl font-bold">
+              {showResult ? result.data.rolled_value : '?'}
+              {showResult && (
+                <span className={`text-lg ml-2 ${result.upgrade_success ? 'text-green-400' : 'text-red-400'}`}>
+                  ({result.upgrade_success ? 'Успех' : 'Неудача'})
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Итоговый результат */}
-        {animationPhase === 'result' && (
+        {showResult && (
           <div className={`bg-gradient-to-r ${getResultColor(result.upgrade_success)} rounded-xl p-6 border-2 animate-pulse`}>
             <div className="text-white">
               <div className="text-2xl font-bold mb-2">
@@ -245,17 +186,14 @@ const UpgradeAnimation: React.FC<{
             <div
               className="bg-gradient-to-r from-cyan-500 to-blue-500 h-3 rounded-full transition-all duration-500"
               style={{
-                width: animationPhase === 'spinning' ? '20%' :
-                       animationPhase === 'slowing' ? '60%' :
-                       animationPhase === 'stopped' ? '90%' : '100%'
+                width: mustSpin ? '50%' : showResult ? '100%' : '20%'
               }}
             ></div>
           </div>
           <div className="text-gray-400 text-sm mt-2">
-            {animationPhase === 'spinning' && 'Рулетка набирает скорость...'}
-            {animationPhase === 'slowing' && 'Рулетка замедляется...'}
-            {animationPhase === 'stopped' && 'Рулетка остановилась, анализируем...'}
-            {animationPhase === 'result' && 'Результат определен!'}
+            {mustSpin && 'Рулетка крутится...'}
+            {!mustSpin && !showResult && 'Подготовка рулетки...'}
+            {showResult && 'Результат определен!'}
           </div>
         </div>
       </div>
