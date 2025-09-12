@@ -181,7 +181,7 @@ const UpgradeAnimation: React.FC<{
                   #10b981 0% ${result.data.success_chance}%,
                   #ef4444 ${result.data.success_chance}% 100%
                 )`,
-                transform: phase === 'spinning' ? `rotate(${finalRotation}deg)` : 'rotate(0deg)',
+                transform: phase === 'spinning' || phase === 'showing_result' ? `rotate(${finalRotation}deg)` : 'rotate(0deg)',
                 transition: phase === 'spinning' ? 'transform 3s cubic-bezier(0.23, 1, 0.32, 1)' : 'none'
               }}
             >
@@ -223,9 +223,6 @@ const UpgradeAnimation: React.FC<{
             <div className="text-cyan-400 text-sm font-medium mb-1">Шанс успеха</div>
             <div className="text-white text-xl font-bold">
               {result.data.success_chance.toFixed(1)}%
-              {result.data.quantity_bonus > 0 && (
-                <span className="text-green-400 text-sm ml-2">+{result.data.quantity_bonus}%</span>
-              )}
             </div>
           </div>
 
@@ -320,7 +317,7 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -410,7 +407,7 @@ const TargetItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -437,12 +434,7 @@ const TargetItemCard: React.FC<{
             {item.upgrade_chance}%
           </div>
 
-          {/* Бонус за количество */}
-          {item.quantity_bonus > 0 && (
-            <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-green-600/80 text-white text-xs font-bold z-20">
-              +{item.quantity_bonus}%
-            </div>
-          )}
+          {/* Убираем отображение бонуса за количество */}
 
           {/* Индикатор выбора */}
           {isSelected && (
@@ -704,7 +696,7 @@ const UpgradePage: React.FC = () => {
               <h3 className="text-amber-300 font-semibold text-lg mb-2">{t('upgrade.warning_title')}</h3>
               <ul className="text-gray-300 text-sm space-y-1">
                 <li>• При неудачном апгрейде все выбранные предметы будут потеряны</li>
-                <li>• Чем больше предметов выберете, тем больше шанс успеха (+2% за каждый дополнительный)</li>
+                <li>• Шанс успеха зависит только от соотношения цен ваших предметов к целевому</li>
                 <li>• Целевой предмет должен быть дороже общей стоимости ваших предметов</li>
                 <li>• Теперь можно улучшать предметы любой стоимости, даже копейки!</li>
                 <li>• Максимум 10 предметов можно выбрать для одного улучшения</li>
@@ -739,12 +731,12 @@ const UpgradePage: React.FC = () => {
             </div>
 
             <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
-              <div className="text-green-400 text-sm font-medium mb-2">Бонус за количество</div>
+              <div className="text-green-400 text-sm font-medium mb-2">Количество предметов</div>
               <div className="text-white text-xl font-bold">
-                +{Math.min(18, (selectedInventoryIds.length - 1) * 2)}%
+                {selectedInventoryIds.length}
               </div>
               <div className="text-gray-300 text-sm">
-                Дополнительный шанс
+                Выбрано для апгрейда
               </div>
             </div>
           </div>
