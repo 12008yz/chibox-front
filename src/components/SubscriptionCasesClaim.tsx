@@ -12,6 +12,9 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
   className = ''
 }) => {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   const {
     data: statusData,
@@ -65,19 +68,57 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
     return () => clearInterval(interval);
   }, [statusData?.data?.next_available_time, refetchStatus]);
 
+  // Очистка сообщений через некоторое время
+  useEffect(() => {
+    if (errorMessage || successMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage('');
+        setSuccessMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage, successMessage]);
+
   const handleClaimCases = async () => {
+    // Защита от множественных кликов
+    const now = Date.now();
+    if (now - lastClickTime < 2000) {
+      setErrorMessage('Слишком частые нажатия. Подождите немного.');
+      return;
+    }
+    setLastClickTime(now);
+
+    // Очищаем предыдущие сообщения
+    setErrorMessage('');
+    setSuccessMessage('');
+
     try {
       const result = await claimCases().unwrap();
 
       if (result.success) {
-        // Показываем уведомление об успехе
-        alert(`Успешно получено кейсов: ${result.data.cases_claimed}`);
+        setSuccessMessage(`Успешно получено кейсов: ${result.data.cases_claimed}`);
         refetchStatus();
       }
     } catch (error: any) {
-      // Показываем ошибку
-      const errorMessage = error?.data?.message || 'Ошибка при получении кейсов';
-      alert(errorMessage);
+      // Улучшенная обработка ошибок
+      let errorMessage = 'Ошибка при получении кейсов';
+
+      if (error?.status === 429) {
+        errorMessage = 'Слишком частые запросы. Пожалуйста, подождите.';
+      } else if (error?.status === 409) {
+        errorMessage = 'Запрос уже обрабатывается. Подождите завершения.';
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      }
+
+      setErrorMessage(errorMessage);
+
+      // Если это ошибка множественных запросов, обновляем статус через короткое время
+      if (error?.status === 409 || error?.status === 429) {
+        setTimeout(() => {
+          refetchStatus();
+        }, 1000);
+      }
     }
   };
 
@@ -152,6 +193,19 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
           )}
         </button>
       </div>
+
+      {/* Отображение сообщений об ошибках и успехе */}
+      {errorMessage && (
+        <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 rounded text-red-300 text-sm">
+          ❌ {errorMessage}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="mt-3 p-2 bg-green-900/50 border border-green-500/50 rounded text-green-300 text-sm">
+          ✅ {successMessage}
+        </div>
+      )}
 
       {!can_claim && next_available_time && (
         <div className="mt-3 pt-3 border-t border-gray-700">
