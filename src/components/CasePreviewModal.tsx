@@ -229,6 +229,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  // Состояния для защиты от множественных кликов
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
@@ -249,8 +252,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     { skip: !isOpen }
   );
 
-  // Получаем информацию о подписке пользователя
-  const { data: subscriptionData } = useGetUserSubscriptionQuery(undefined, { skip: !isOpen });
+  // Получаем информацию о подписке пользователя (удалена для упрощения)
+  // const { data: subscriptionData } = useGetUserSubscriptionQuery(undefined, { skip: !isOpen });
 
   // Получаем инвентарь для определения уже выигранных предметов
   // const { data: inventoryData } = useGetUserInventoryQuery(
@@ -264,7 +267,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      // Сбрасываем состояние анимации
+      // Сбрасываем состояние анимации и обработки
+      setIsProcessing(false);
       setSliderPosition(0);
       setAnimationPhase('idle');
       setShowOpeningAnimation(false);
@@ -277,6 +281,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setTimeout(() => setIsAnimating(true), 10);
     } else {
       setIsAnimating(false);
+      setIsProcessing(false);
       // Возвращаем скролл основной страницы
       document.body.style.overflow = 'unset';
       // Скрываем модалку после завершения анимации закрытия
@@ -343,129 +348,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }, 300);
   };
 
-  const handleBuyCase = async () => {
-    console.log('handleBuyCase вызван:', { fixedPrices, paymentMethod, onBuyAndOpenCase: !!onBuyAndOpenCase });
-
-    // Если есть внешний обработчик, получаем результат и запускаем нашу анимацию
-    if (onBuyAndOpenCase) {
-      try {
-        console.log('Используем внешний обработчик onBuyAndOpenCase');
-        const result = await onBuyAndOpenCase(caseData);
-
-        // Если получили результат, запускаем анимацию в модале
-        if (result && result.item) {
-          setOpeningResult(result);
-          startAnimation(result.item);
-        }
-      } catch (error: any) {
-        console.error('Ошибка покупки кейса через внешний обработчик:', error);
-        alert('Ошибка покупки кейса: ' + (error?.message || 'Неизвестная ошибка'));
-      }
-      return;
-    }
-
-    // Иначе используем внутреннюю логику с выбором метода оплаты
-    try {
-      console.log('Используем внутреннюю логику покупки');
-      const buyParams = {
-        case_template_id: caseData.id,
-        caseTemplateId: caseData.id,
-        method: paymentMethod,
-        quantity: 1
-      };
-      console.log('Параметры покупки:', buyParams);
-
-      const result = await buyCase(buyParams).unwrap();
-      console.log('Результат покупки:', result);
-
-      if (result.success) {
-        if (paymentMethod === 'bank_card') {
-          // Если оплата через карту, перенаправляем на страницу оплаты
-          if (result.data?.paymentUrl) {
-            window.location.href = result.data.paymentUrl;
-          } else {
-            alert('Ошибка: не получена ссылка для оплаты');
-          }
-        } else {
-          // Если оплата через баланс, сразу открываем кейс
-          if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
-            const inventoryCase = result.data.inventory_cases[0];
-            console.log('Открываем кейс из инвентаря:', inventoryCase.id);
-            await handleOpenCase(undefined, inventoryCase.id);
-          } else {
-            console.log('Кейс куплен, но нет inventory_cases в ответе. Закрываем модалку.');
-            alert('Кейс успешно куплен!');
-            handleClose();
-          }
-        }
-      } else {
-        console.error('Покупка не удалась:', result);
-        alert('Ошибка покупки: ' + (result.message || 'Неизвестная ошибка'));
-      }
-    } catch (error: any) {
-      console.error('Ошибка покупки кейса:', error);
-
-      // Обрабатываем ошибку недостаточного баланса
-      if (error?.status === 400 && error?.data?.message?.includes('Недостаточно средств')) {
-        const requiredAmount = error?.data?.required || 0;
-        const availableAmount = error?.data?.available || 0;
-        const shortfall = requiredAmount - availableAmount;
-
-        alert(`Недостаточно средств на балансе!\nТребуется: ${requiredAmount}₽\nДоступно: ${availableAmount}₽\nНе хватает: ${shortfall}₽`);
-      } else {
-        alert('Ошибка покупки кейса: ' + (error?.data?.message || error?.message || 'Неизвестная ошибка'));
-      }
-    }
-  };
-
-  const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
-    try {
-      const openCaseParams: any = {};
-
-      if (inventoryItemId) {
-        // Открываем кейс из инвентаря (покупные кейсы)
-        openCaseParams.inventoryItemId = inventoryItemId;
-      } else if (caseId) {
-        // Открываем кейс по case_id (старый метод)
-        openCaseParams.case_id = caseId;
-      } else {
-        // Для бесплатных кейсов используем template_id
-        // Бэкенд сам найдет подходящий кейс пользователя по шаблону
-        console.log('Открываем бесплатный кейс по template_id:', caseData.id);
-        openCaseParams.template_id = caseData.id;
-      }
-
-      console.log('Параметры открытия кейса:', openCaseParams);
-      const result = await openCase(openCaseParams).unwrap();
-
-      if (result.success && result.data?.item) {
-        setOpeningResult(result.data);
-        startAnimation(result.data.item);
-      }
-    } catch (error: any) {
-      console.error('Ошибка открытия кейса:', error);
-
-      // Если ошибка связана с тем, что кейс уже получен сегодня, закрываем модал и обновляем данные
-      if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
-        // Показываем сообщение пользователю
-        alert(error.data.message || 'Кейс уже получен сегодня');
-
-        // Закрываем модал
-        onClose();
-
-        // Обновляем данные в родительском компоненте
-        if (onDataUpdate) {
-          setTimeout(() => {
-            onDataUpdate();
-          }, 100);
-        }
-      } else {
-        // Для других ошибок показываем общее сообщение
-        alert(error?.data?.message || 'Произошла ошибка при открытии кейса');
-      }
-    }
-  };
-
+  // Перемещаем объявления функций выше их использования
   const startAnimation = (wonItem: any) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
@@ -586,6 +469,150 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }, 500);
   };
 
+  const handleBuyCase = async () => {
+    // Защита от множественных кликов
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+      console.log('Операция уже выполняется, игнорируем клик');
+      return;
+    }
+
+    setIsProcessing(true);
+    console.log('handleBuyCase вызван:', { fixedPrices, paymentMethod, onBuyAndOpenCase: !!onBuyAndOpenCase });
+
+    try {
+      // Если есть внешний обработчик, получаем результат и запускаем нашу анимацию
+      if (onBuyAndOpenCase) {
+        try {
+          console.log('Используем внешний обработчик onBuyAndOpenCase');
+          const result = await onBuyAndOpenCase(caseData);
+
+          // Если получили результат, запускаем анимацию в модале
+          if (result && result.item) {
+            setOpeningResult(result);
+            startAnimation(result.item);
+          }
+        } catch (error: any) {
+          console.error('Ошибка покупки кейса через внешний обработчик:', error);
+          alert('Ошибка покупки кейса: ' + (error?.message || 'Неизвестная ошибка'));
+        }
+        return;
+      }
+
+      // Иначе используем внутреннюю логику с выбором метода оплаты
+      console.log('Используем внутреннюю логику покупки');
+      const buyParams = {
+        case_template_id: caseData.id,
+        caseTemplateId: caseData.id,
+        method: paymentMethod,
+        quantity: 1
+      };
+      console.log('Параметры покупки:', buyParams);
+
+      const result = await buyCase(buyParams).unwrap();
+      console.log('Результат покупки:', result);
+
+      if (result.success) {
+        if (paymentMethod === 'bank_card') {
+          // Если оплата через карту, перенаправляем на страницу оплаты
+          if (result.data?.paymentUrl) {
+            window.location.href = result.data.paymentUrl;
+          } else {
+            alert('Ошибка: не получена ссылка для оплаты');
+          }
+        } else {
+          // Если оплата через баланс, сразу открываем кейс
+          if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
+            const inventoryCase = result.data.inventory_cases[0];
+            console.log('Открываем кейс из инвентаря:', inventoryCase.id);
+            await handleOpenCase(undefined, inventoryCase.id);
+          } else {
+            console.log('Кейс куплен, но нет inventory_cases в ответе. Закрываем модалку.');
+            alert('Кейс успешно куплен!');
+            handleClose();
+          }
+        }
+      } else {
+        console.error('Покупка не удалась:', result);
+        alert('Ошибка покупки: ' + (result.message || 'Неизвестная ошибка'));
+      }
+    } catch (error: any) {
+      console.error('Ошибка покупки кейса:', error);
+
+      // Обрабатываем ошибку недостаточного баланса
+      if (error?.status === 400 && error?.data?.message?.includes('Недостаточно средств')) {
+        const requiredAmount = error?.data?.required || 0;
+        const availableAmount = error?.data?.available || 0;
+        const shortfall = requiredAmount - availableAmount;
+
+        alert(`Недостаточно средств на балансе!\nТребуется: ${requiredAmount}₽\nДоступно: ${availableAmount}₽\nНе хватает: ${shortfall}₽`);
+      } else {
+        alert('Ошибка покупки кейса: ' + (error?.data?.message || error?.message || 'Неизвестная ошибка'));
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+
+
+  const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
+    // Защита от множественных кликов
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+      console.log('Операция уже выполняется, игнорируем клик');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const openCaseParams: any = {};
+
+      if (inventoryItemId) {
+        // Открываем кейс из инвентаря (покупные кейсы)
+        openCaseParams.inventoryItemId = inventoryItemId;
+      } else if (caseId) {
+        // Открываем кейс по case_id (старый метод)
+        openCaseParams.case_id = caseId;
+      } else {
+        // Для бесплатных кейсов используем template_id
+        // Бэкенд сам найдет подходящий кейс пользователя по шаблону
+        console.log('Открываем бесплатный кейс по template_id:', caseData.id);
+        openCaseParams.template_id = caseData.id;
+      }
+
+      console.log('Параметры открытия кейса:', openCaseParams);
+      const result = await openCase(openCaseParams).unwrap();
+
+      if (result.success && result.data?.item) {
+        setOpeningResult(result.data);
+        startAnimation(result.data.item);
+      }
+    } catch (error: any) {
+      console.error('Ошибка открытия кейса:', error);
+
+      // Если ошибка связана с тем, что кейс уже получен сегодня, закрываем модал и обновляем данные
+      if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
+        // Показываем сообщение пользователю
+        alert(error.data.message || 'Кейс уже получен сегодня');
+
+        // Закрываем модал
+        onClose();
+
+        // Обновляем данные в родительском компоненте
+        if (onDataUpdate) {
+          setTimeout(() => {
+            onDataUpdate();
+          }, 100);
+        }
+      } else {
+        // Для других ошибок показываем общее сообщение
+        alert(error?.data?.message || 'Произошла ошибка при открытии кейса');
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleAnimationComplete = () => {
     setShowOpeningAnimation(false);
     setOpeningResult(null);
@@ -593,6 +620,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setSliderPosition(0);
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
+    setIsProcessing(false);
     // Не закрываем модалку сразу, пусть пользователь сам закроет
   };
 
@@ -991,7 +1019,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <button
               onClick={handleClose}
               className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
-              disabled={showOpeningAnimation}
+              disabled={isProcessing || showOpeningAnimation}
             >
               {t('case_preview_modal.close')}
             </button>
@@ -1000,7 +1028,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               // Показываем кнопки с выбором метода оплаты для премиум кейсов
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
                 {/* Селектор метода оплаты */}
-                {!showOpeningAnimation && (
+                {!showOpeningAnimation && !isProcessing && (
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                     <div className="flex items-center space-x-2">
                       <label className="text-sm text-gray-400 whitespace-nowrap">{t('case_preview_modal.payment_method')}</label>
@@ -1028,7 +1056,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 {(() => {
                   const price = getCasePrice(caseData);
                   const hasEnoughBalance = checkBalanceSufficient(price);
-                  const isDisabled = buyLoading || openLoading || showOpeningAnimation || (!hasEnoughBalance && paymentMethod === 'balance');
+                  const isDisabled = isProcessing || buyLoading || openLoading || showOpeningAnimation || (!hasEnoughBalance && paymentMethod === 'balance');
 
                   return (
                     <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -1042,7 +1070,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         }`}
                         title={!hasEnoughBalance && paymentMethod === 'balance' ? `Недостаточно средств! Требуется: ${price}₽, доступно: ${userData?.balance || 0}₽` : ''}
                       >
-                        {buyLoading || openLoading ? (
+                        {isProcessing || buyLoading || openLoading ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             <span>{paymentMethod === 'bank_card' ? t('case_preview_modal.going_to_payment') : t('case_preview_modal.opening')}</span>
@@ -1076,7 +1104,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {statusData.data.canBuy && statusData.data.price > 0 && (() => {
                       const price = statusData.data.price;
                       const hasEnoughBalance = checkBalanceSufficient(price);
-                      const isDisabled = buyLoading || openLoading || showOpeningAnimation || (!hasEnoughBalance && paymentMethod === 'balance');
+                      const isDisabled = isProcessing || buyLoading || openLoading || showOpeningAnimation || (!hasEnoughBalance && paymentMethod === 'balance');
 
                       return (
                         <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -1090,7 +1118,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             }`}
                             title={!hasEnoughBalance && paymentMethod === 'balance' ? `Недостаточно средств! Требуется: ${price}₽, доступно: ${userData?.balance || 0}₽` : ''}
                           >
-                            {buyLoading ? (
+                            {isProcessing || buyLoading ? (
                               <>
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                 <span>{t('case_preview_modal.buying')}</span>
@@ -1119,10 +1147,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {statusData.data.canOpen && (
                       <button
                         onClick={() => handleOpenCase()}
-                        disabled={buyLoading || openLoading || showOpeningAnimation}
+                        disabled={isProcessing || buyLoading || openLoading || showOpeningAnimation}
                         className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                       >
-                        {openLoading ? (
+                        {isProcessing || openLoading ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             <span>{t('case_preview_modal.opening')}</span>
@@ -1140,7 +1168,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     disabled={buyLoading || openLoading || showOpeningAnimation}
                     className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 whitespace-nowrap"
                   >
-                    {buyLoading || openLoading ? (
+                    {isProcessing || buyLoading || openLoading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>{t('case_preview_modal.opening')}</span>

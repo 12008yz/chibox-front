@@ -34,7 +34,7 @@ interface UpgradeResult {
   };
 }
 
-// Компонент анимации апгрейда с рулеткой
+// Компонент анимации апгрейда с элегантным дизайном
 const UpgradeAnimation: React.FC<{
   isActive: boolean;
   result: UpgradeResult | null;
@@ -43,110 +43,94 @@ const UpgradeAnimation: React.FC<{
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
+  const [progress, setProgress] = useState(0);
   const wheelRef = React.useRef<HTMLDivElement>(null);
   const animationStartedRef = React.useRef(false);
 
   React.useEffect(() => {
     if (isActive && result && !animationStartedRef.current) {
       animationStartedRef.current = true;
-      console.log('Upgrade result data:', result.data);
 
       // Сбрасываем состояние
       setPhase('preparing');
+      setProgress(0);
 
-      // Вычисляем финальный поворот на основе rolled_value
-      const rolledValue = result.data.rolled_value;
+      // Вычисляем финальный поворот на основе результата
       const successChance = result.data.success_chance;
-
-      // Используем ФАКТИЧЕСКИЙ результат с сервера, а не вычисляем логику сами
       const isActualSuccess = result.upgrade_success;
       let targetAngle: number;
 
-      console.log('🎰 Debug рулетки:', {
-        rolledValue,
-        successChance,
-        isActualSuccess,
-        serverSays: isActualSuccess ? 'УСПЕХ' : 'НЕУДАЧА'
-      });
-
-      // ПРОСТАЯ ЛОГИКА БЕЗ ЕБЛИ:
       if (isActualSuccess) {
-        // УСПЕХ - крутим так, чтобы стрелка попала в ЗЕЛЕНУЮ зону
-        // Зеленая зона: от 0° до (successChance/100 * 360)°
-        const greenZoneSize = (successChance / 100) * 360;
-        targetAngle = greenZoneSize / 2; // середина зеленой зоны
-        console.log('✅ УСПЕХ: угол =', targetAngle, '(зеленая зона 0°-' + greenZoneSize + '°)');
+        // УСПЕХ - попадаем в зону успеха
+        const successZoneSize = (successChance / 100) * 360;
+        targetAngle = successZoneSize / 2;
       } else {
-        // НЕУДАЧА - крутим так, чтобы стрелка попала в КРАСНУЮ зону
-        // Красная зона: от (successChance/100 * 360)° до 360°
-        const redZoneStart = (successChance / 100) * 360;
-        const redZoneSize = 360 - redZoneStart;
-        targetAngle = redZoneStart + (redZoneSize / 2); // середина красной зоны
-        console.log('❌ НЕУДАЧА: угол =', targetAngle, '(красная зона ' + redZoneStart + '°-360°)');
+        // НЕУДАЧА - попадаем в зону неудачи
+        const failZoneStart = (successChance / 100) * 360;
+        const failZoneSize = 360 - failZoneStart;
+        targetAngle = failZoneStart + (failZoneSize / 2);
       }
 
-      // Добавляем несколько полных оборотов для эффекта кручения
-      const fullRotations = 720 + 360; // 3 полных оборота
-
-      // ИНВЕРТИРУЕМ угол, потому что рулетка крутится ПРОТИВ часовой стрелки!
-      // Если нужно попасть в угол X, то крутим на -X
+      // Добавляем полные обороты для эффекта
+      const fullRotations = 1080 + 360; // 4 полных оборота
       const finalAngle = fullRotations - targetAngle;
-
-      console.log('🎯 ФИНАЛЬНЫЕ УГЛЫ:', {
-        targetAngle,
-        finalAngle,
-        successChance,
-        isActualSuccess
-      });
-
       setFinalRotation(finalAngle);
 
-      // Начинаем анимацию через небольшую задержку
+      // Короткая фаза подготовки (500мс)
       setTimeout(() => {
         setPhase('spinning');
 
-        // Завершаем кручение через время анимации
+        // Анимация прогресса во время кручения
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+          currentProgress += 3;
+          setProgress(currentProgress);
+
+          if (currentProgress >= 100) {
+            clearInterval(progressInterval);
+          }
+        }, 100); // Обновляем каждые 100мс
+
+        // Завершаем кручение
         setTimeout(() => {
           setPhase('showing_result');
+          clearInterval(progressInterval);
+          setProgress(100);
 
-          // Закрываем анимацию через 2 секунды
+          // Закрываем анимацию
           setTimeout(() => {
             onComplete();
-          }, 2000);
-        }, 3000); // 3 секунды на кручение
-      }, 500);
+          }, 2500);
+        }, 3200); // 3.2 секунды на кручение
+      }, 500); // Короткая подготовка
     } else if (!isActive) {
-      // Сбрасываем состояние когда анимация неактивна
       animationStartedRef.current = false;
       setPhase('preparing');
       setFinalRotation(0);
+      setProgress(0);
     }
   }, [isActive, result]);
 
   if (!isActive || !result) return null;
 
-  const getResultColor = (success: boolean) => {
-    return success ? 'from-green-500 to-emerald-600' : 'from-red-500 to-red-600';
-  };
-
   const getPhaseTitles = () => {
     switch (phase) {
       case 'preparing':
         return {
-          title: '🎲 Подготовка...',
-          subtitle: 'Настраиваем рулетку для вашего апгрейда'
+          title: 'Подготовка',
+          subtitle: 'Инициализация процесса улучшения'
         };
       case 'spinning':
         return {
-          title: '🎰 Рулетка крутится!',
-          subtitle: 'Определяем ваш результат...'
+          title: 'Обработка',
+          subtitle: 'Определяем исход вашей попытки'
         };
       case 'showing_result':
         return {
-          title: result.upgrade_success ? '🎉 УСПЕХ!' : '💔 НЕУДАЧА',
+          title: result.upgrade_success ? 'Успех' : 'Неудача',
           subtitle: result.upgrade_success
-            ? 'Поздравляем с успешным апгрейдом!'
-            : 'К сожалению, на этот раз не повезло'
+            ? 'Ваш предмет успешно улучшен'
+            : 'Попытка улучшения не удалась'
         };
     }
   };
@@ -154,133 +138,190 @@ const UpgradeAnimation: React.FC<{
   const titles = getPhaseTitles();
 
   return (
-    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
-      <div className="text-center max-w-3xl mx-auto px-6">
-        {/* Заголовок */}
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold text-white mb-2 transition-all duration-500">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center z-50 backdrop-blur-sm">
+      {/* Тонкие анимированные частицы */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-slate-400 rounded-full opacity-30 animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="text-center max-w-4xl mx-auto px-6 relative z-10">
+        {/* Элегантный заголовок */}
+        <div className="mb-12">
+          <h2 className={`text-4xl font-light mb-4 transition-all duration-700 ${
+            phase === 'showing_result'
+              ? (result.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
+              : 'text-slate-200'
+          }`}>
             {titles.title}
           </h2>
-          <p className="text-gray-300 text-lg transition-all duration-500">
+          <p className="text-slate-400 text-xl font-light">
             {titles.subtitle}
           </p>
         </div>
 
-        {/* Рулетка */}
-        <div className="relative mb-8 flex justify-center">
+        {/* Главная анимация - современная рулетка */}
+        <div className="relative mb-12 flex justify-center">
           <div className="relative">
-            {/* Указатель сверху - НЕПОДВИЖНЫЙ */}
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-b-10 border-l-transparent border-r-transparent border-b-yellow-400 z-20 drop-shadow-lg"></div>
+            {/* Внешнее свечение */}
+            <div className={`absolute -inset-12 rounded-full transition-all duration-1000 ${
+              phase === 'spinning'
+                ? 'bg-gradient-to-r from-slate-600/20 via-slate-500/30 to-slate-600/20 animate-pulse'
+                : 'bg-slate-800/20'
+            }`}></div>
 
-            {/* Круглая рулетка - ВРАЩАЕТСЯ */}
+            {/* Орбитальные кольца */}
+            {phase === 'spinning' && (
+              <>
+                <div className="absolute -inset-8 border border-slate-500/30 rounded-full animate-spin" style={{ animationDuration: '4s' }}></div>
+                <div className="absolute -inset-6 border border-slate-400/20 rounded-full animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}></div>
+              </>
+            )}
+
+            {/* Указатель */}
+            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+              <div className="w-0 h-0 border-l-6 border-r-6 border-b-8 border-l-transparent border-r-transparent border-b-slate-300 drop-shadow-lg"></div>
+            </div>
+
+            {/* Основная рулетка */}
             <div
               ref={wheelRef}
-              className="w-80 h-80 rounded-full border-8 border-gray-600 relative overflow-hidden shadow-2xl"
+              className="w-80 h-80 rounded-full border-4 border-slate-600/50 relative overflow-hidden shadow-2xl backdrop-blur-sm"
               style={{
                 background: `conic-gradient(
-                  #10b981 0% ${result.data.success_chance}%,
-                  #ef4444 ${result.data.success_chance}% 100%
+                  #059669 0% ${result.data.success_chance}%,
+                  #64748b ${result.data.success_chance}% 100%
                 )`,
                 transform: phase === 'spinning' || phase === 'showing_result' ? `rotate(${finalRotation}deg)` : 'rotate(0deg)',
-                transition: phase === 'spinning' ? 'transform 3s cubic-bezier(0.23, 1, 0.32, 1)' : 'none'
+                transition: phase === 'spinning' ? 'transform 3.2s cubic-bezier(0.05, 0.5, 0.3, 0.95)' : phase === 'preparing' ? 'transform 0.3s ease-out' : 'none',
+                boxShadow: phase === 'spinning' ? '0 0 40px rgba(100, 116, 139, 0.3)' : '0 0 20px rgba(0, 0, 0, 0.3)'
               }}
             >
-              {/* Центральный круг */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gray-900 rounded-full border-4 border-gray-700 flex items-center justify-center shadow-inner">
-                <div className="text-white font-bold text-sm text-center">
-                  <div>{result.data.success_chance}%</div>
-                  <div className="text-xs text-gray-300">шанс</div>
+              {/* Центральный элемент */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24">
+                <div className={`w-full h-full rounded-full flex items-center justify-center backdrop-blur-sm border transition-all duration-1000 ${
+                  phase === 'spinning'
+                    ? 'bg-slate-800/80 border-slate-500 shadow-lg'
+                    : 'bg-slate-900/90 border-slate-600'
+                }`}>
+                  <div className="text-slate-200 font-medium text-center">
+                    <div className="text-lg">{result.data.success_chance}%</div>
+                    <div className="text-xs text-slate-400">шанс</div>
+                  </div>
                 </div>
               </div>
 
-              {/* Метки на рулетке */}
-              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white font-bold text-xl drop-shadow-lg">
-                ✅
+              {/* Минималистичные метки */}
+              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
+                ●
               </div>
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white font-bold text-xl drop-shadow-lg">
-                ❌
+              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
+                ●
               </div>
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white font-bold text-lg drop-shadow-lg">
-                {result.upgrade_success ? '🍀' : '💀'}
+              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
+                ●
               </div>
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white font-bold text-lg drop-shadow-lg">
-                {result.upgrade_success ? '⭐' : '💥'}
+              <div className="absolute right-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
+                ●
               </div>
             </div>
 
             {/* Результат в центре */}
             {phase === 'showing_result' && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold animate-bounce z-10">
-                {result.upgrade_success ? '✅' : '❌'}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                <div className={`text-6xl font-light transition-all duration-1000 ${
+                  result.upgrade_success ? 'text-emerald-400' : 'text-rose-400'
+                }`}>
+                  {result.upgrade_success ? '✓' : '✕'}
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Детальная статистика */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-black/50 rounded-xl p-4 border border-cyan-500/30 backdrop-blur-sm">
-            <div className="text-cyan-400 text-sm font-medium mb-1">Шанс успеха</div>
-            <div className="text-white text-xl font-bold">
+        {/* Элегантная информационная панель */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
+            <div className="text-slate-400 text-sm font-medium mb-2">Вероятность успеха</div>
+            <div className="text-slate-200 text-2xl font-light">
               {result.data.success_chance.toFixed(1)}%
             </div>
-          </div>
-
-          <div className="bg-black/50 rounded-xl p-4 border border-purple-500/30 backdrop-blur-sm">
-            <div className="text-purple-400 text-sm font-medium mb-1">Выпавшее число</div>
-            <div className="text-white text-xl font-bold">
-              {phase === 'showing_result' ? result.data.rolled_value.toFixed(1) : '???'}
-              {phase === 'showing_result' && (
-                <div className={`text-sm mt-1 ${result.upgrade_success ? 'text-green-400' : 'text-red-400'}`}>
-                  {result.upgrade_success ? '≤ ' + result.data.success_chance.toFixed(1) : '> ' + result.data.success_chance.toFixed(1)}
-                </div>
-              )}
+            <div className="text-slate-500 text-sm mt-1">
+              {result.data.success_chance >= 50 ? 'Высокая вероятность' : result.data.success_chance >= 25 ? 'Средняя вероятность' : 'Низкая вероятность'}
             </div>
           </div>
 
-          <div className="bg-black/50 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm">
-            <div className="text-green-400 text-sm font-medium mb-1">Стоимость ставки</div>
-            <div className="text-white text-xl font-bold">
+          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
+            <div className="text-slate-400 text-sm font-medium mb-2">Стоимость улучшения</div>
+            <div className="text-slate-200 text-2xl font-light">
               <Monetary value={result.data.total_source_price} />
+            </div>
+            <div className="text-slate-500 text-sm mt-1">
+              Предметов: {result.data.source_items.length}
             </div>
           </div>
         </div>
 
-        {/* Итоговый результат */}
+        {/* Прогресс-бар */}
+        <div className="mb-8">
+          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div
+              className={`h-2 rounded-full transition-all duration-300 ${
+                phase === 'preparing'
+                  ? 'bg-gradient-to-r from-slate-500 to-slate-600'
+                  : phase === 'spinning'
+                  ? 'bg-gradient-to-r from-slate-400 to-slate-500'
+                  : result.upgrade_success
+                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
+                  : 'bg-gradient-to-r from-rose-500 to-rose-600'
+              }`}
+              style={{
+                width: `${progress}%`
+              }}
+            ></div>
+          </div>
+          <div className="text-slate-500 text-sm mt-2 font-light">
+            {phase === 'preparing' && `Подготовка... ${progress}%`}
+            {phase === 'spinning' && 'Обработка запроса...'}
+            {phase === 'showing_result' && (result.upgrade_success ? 'Успешно завершено' : 'Завершено')}
+          </div>
+        </div>
+
+        {/* Результат */}
         {phase === 'showing_result' && (
-          <div className={`bg-gradient-to-r ${getResultColor(result.upgrade_success)} rounded-xl p-6 border-2 animate-pulse shadow-2xl`}>
-            <div className="text-white">
-              <div className="text-3xl font-bold mb-3">
-                {result.upgrade_success ? '🎊 УСПЕШНЫЙ АПГРЕЙД! 🎊' : '💸 НЕУДАЧНЫЙ АПГРЕЙД 💸'}
+          <div className={`rounded-2xl p-8 border backdrop-blur-sm transition-all duration-1000 ${
+            result.upgrade_success
+              ? 'bg-emerald-900/20 border-emerald-500/30'
+              : 'bg-rose-900/20 border-rose-500/30'
+          }`}>
+            <div className="text-slate-200">
+              <div className="text-2xl font-light mb-4">
+                {result.upgrade_success ? 'Улучшение успешно' : 'Улучшение не удалось'}
               </div>
               {result.upgrade_success && result.data.result_item && (
-                <div className="text-xl mb-2">
-                  Получен: <span className="font-bold text-yellow-200">{result.data.result_item.name}</span>
+                <div className="text-lg mb-3 text-slate-300">
+                  Получен: <span className="font-medium text-emerald-400">{result.data.result_item.name}</span>
                 </div>
               )}
-              <div className="text-lg opacity-90">
-                Потрачено предметов на сумму: <Monetary value={result.data.total_source_price} />
+              <div className="text-slate-400 font-light">
+                {result.upgrade_success
+                  ? 'Ваши предметы были успешно трансформированы'
+                  : 'Предметы были утрачены в процессе улучшения'
+                }
               </div>
             </div>
           </div>
         )}
-
-        {/* Прогресс бар */}
-        <div className="mt-6">
-          <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 h-4 rounded-full transition-all duration-1000 shadow-lg"
-              style={{
-                width: phase === 'preparing' ? '20%' : phase === 'spinning' ? '80%' : '100%'
-              }}
-            ></div>
-          </div>
-          <div className="text-gray-400 text-sm mt-2 font-medium">
-            {phase === 'preparing' && 'Подготовка анимации...'}
-            {phase === 'spinning' && `Кручение рулетки... (${result.data.rolled_value.toFixed(1)} из 100)`}
-            {phase === 'showing_result' && 'Результат определен!'}
-          </div>
-        </div>
       </div>
     </div>
   );
