@@ -107,11 +107,27 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
   const startSliderAnimation = () => {
     let position = 0;
     let speed = 3; // начальная скорость
+    let lastTime = 0;
+    const FPS_LIMIT = 60;
+    const frameTime = 1000 / FPS_LIMIT;
     const itemWidth = 80; // ширина каждого предмета с отступами
     const totalItems = rollingItems.length;
     const maxPosition = (totalItems - 2) * itemWidth; // позиция выигранного предмета
 
-    const animateSlider = () => {
+    const animateSlider = (currentTime: number) => {
+      // Ограничение FPS
+      if (currentTime - lastTime < frameTime) {
+        requestAnimationFrame(animateSlider);
+        return;
+      }
+
+      lastTime = currentTime;
+
+      // Принудительная остановка анимации
+      if (animationStage === 'revealing' || animationStage === 'showing') {
+        return;
+      }
+
       // Замедляем при приближении к концу (stopping stage)
       if (animationStage === 'stopping') {
         const remainingDistance = maxPosition - position;
@@ -184,10 +200,10 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-purple-900/95 backdrop-blur-md flex items-center justify-center z-50 overflow-hidden">
-      {/* Animated Background */}
+      {/* Animated Background - ОПТИМИЗИРОВАНО */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-20">
-          {[...Array(50)].map((_, i) => (
+          {[...Array(10)].map((_, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
@@ -195,21 +211,28 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
+                animationDuration: `${2 + Math.random() * 2}s`,
+                willChange: 'transform'
               }}
             />
           ))}
         </div>
 
-        {/* Gradient orbs */}
-        <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-blue-500/30 to-purple-600/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        {/* Gradient orbs - УПРОЩЕНО */}
+        <div
+          className="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"
+          style={{ willChange: 'opacity' }}
+        ></div>
+        <div
+          className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-500/15 to-pink-600/15 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '1s', willChange: 'opacity' }}
+        ></div>
       </div>
 
-      {/* Enhanced Fireworks effect */}
+      {/* Enhanced Fireworks effect - ЗНАЧИТЕЛЬНО ОПТИМИЗИРОВАНО */}
       {showFireworks && (
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <div
               key={i}
               className="absolute w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-ping"
@@ -217,11 +240,12 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                 top: `${10 + Math.random() * 80}%`,
                 left: `${10 + Math.random() * 80}%`,
                 animationDelay: `${Math.random() * 2}s`,
-                animationDuration: '1.5s'
+                animationDuration: '1.5s',
+                willChange: 'transform, opacity'
               }}
             />
           ))}
-          {[...Array(20)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <div
               key={`spark-${i}`}
               className="absolute w-2 h-2 bg-white rounded-full animate-bounce"
@@ -229,11 +253,12 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                 top: `${20 + Math.random() * 60}%`,
                 left: `${20 + Math.random() * 60}%`,
                 animationDelay: `${Math.random() * 1.5}s`,
-                animationDuration: '0.8s'
+                animationDuration: '0.8s',
+                willChange: 'transform'
               }}
             />
           ))}
-          {[...Array(10)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <div
               key={`star-${i}`}
               className="absolute text-yellow-400 animate-spin"
@@ -241,7 +266,8 @@ const CaseOpeningAnimation: React.FC<CaseOpeningAnimationProps> = ({
                 top: `${15 + Math.random() * 70}%`,
                 left: `${15 + Math.random() * 70}%`,
                 animationDelay: `${Math.random() * 2}s`,
-                fontSize: `${12 + Math.random() * 8}px`
+                fontSize: `${12 + Math.random() * 8}px`,
+                willChange: 'transform'
               }}
             >
               ✨

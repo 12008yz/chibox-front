@@ -14,13 +14,13 @@ const FloatingWatermark: React.FC = () => {
   // Создаем массив для повторения иконок
   const createWatermarkPattern = () => {
     const pattern = [];
-    const rows = 4; // ещё больше уменьшено количество строк
-    const cols = 3; // ещё больше уменьшено количество колонок
+    const rows = 2; // значительно уменьшено с 4
+    const cols = 2; // значительно уменьшено с 3
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         // Добавляем смещение для шахматного расположения
-        const offsetX = row % 2 === 0 ? 0 : 300;
+        const offsetX = row % 2 === 0 ? 0 : 400; // увеличено расстояние
 
         // Выбираем случайную иконку
         const randomIcon = cs2Icons[Math.floor(Math.random() * cs2Icons.length)];
@@ -32,13 +32,13 @@ const FloatingWatermark: React.FC = () => {
             alt=""
             className="absolute select-none pointer-events-none transform -rotate-12"
             style={{
-              left: `${col * 600 + offsetX}px`,
-              top: `${row * 300}px`,
-              width: '80px',
-              height: '80px',
-              opacity: 0.04,
+              left: `${col * 800 + offsetX}px`, // увеличено расстояние с 600 до 800
+              top: `${row * 400}px`, // увеличено расстояние с 300 до 400
+              width: '60px', // уменьшено с 80px
+              height: '60px',
+              opacity: 0.02, // уменьшено с 0.04
               filter: 'grayscale(100%)',
-              animationDelay: `${(row + col) * 0.5}s`,
+              willChange: 'auto', // отключить аппаратное ускорение
             }}
           />
         );

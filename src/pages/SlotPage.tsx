@@ -96,7 +96,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       const delayTimeout = setTimeout(() => {
         setTimeout(() => {
           setUseTransition(true);
-          const spins = 5;
+          const spins = 3;
           const itemHeight = 160;
           const finalIndex = items.findIndex(item => item.id === finalItem.id);
           const totalOffset = spins * items.length * itemHeight + finalIndex * itemHeight - 80;
@@ -105,7 +105,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
           setTimeout(() => {
             onSpinComplete();
-          }, 2000);
+          }, 1500);
         }, 50);
       }, delay);
 
@@ -120,25 +120,34 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
       <div
         ref={reelRef}
-        className={`${useTransition ? 'transition-transform' : ''} ${isSpinning && useTransition ? 'duration-[2000ms] ease-out' : 'duration-0'}`}
-        style={{ transform: `translateY(${currentOffset}px)` }}
+        className={`${useTransition ? 'transition-transform' : ''} ${isSpinning && useTransition ? 'duration-[1500ms] ease-out' : 'duration-0'}`}
+        style={{
+          transform: `translateY(${currentOffset}px)`,
+          willChange: isSpinning ? 'transform' : 'auto'
+        }}
       >
-        {Array.from({ length: 8 }, (_, repeatIndex) =>
+        {Array.from({ length: 5 }, (_, repeatIndex) =>
           items.map((item) => (
             <div
               key={`${repeatIndex}-${item.id}`}
-              className={`h-40 w-full border-b border-gray-600/30 ${getRarityColor(item.rarity)} flex items-center justify-center relative transition-all duration-200`}
+              className={`h-40 w-full border-b border-gray-600/30 ${getRarityColor(item.rarity)} flex items-center justify-center relative`}
+              style={{
+                willChange: isSpinning ? 'transform' : 'auto'
+              }}
             >
               {/* Изображение или заглушка */}
               {!imageErrors.has(item.id) && item.id !== 'empty' && item.rarity !== 'empty' ? (
                 <img
                   src={getItemImageUrl(item.image_url, item.name)}
                   alt={item.name}
-                  className="w-full h-full object-contain p-3 transition-transform duration-200"
+                  className="w-full h-full object-contain p-3"
                   onError={() => {
                     handleImageError(item.id);
                   }}
                   onLoad={() => {}}
+                  style={{
+                    willChange: 'auto'
+                  }}
                 />
               ) : (
                 <>

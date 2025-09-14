@@ -206,34 +206,41 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
             <p className="text-xs text-gray-400">{t('roulette.games_per_day')}</p>
           </div>
 
-          {/* Колесо рулетки */}
+          {/* Колесо рулетки - ОПТИМИЗИРОВАНО */}
           <div className="relative flex justify-center">
-            <Wheel
-              mustStartSpinning={mustSpin}
-              prizeNumber={prizeNumber}
-              data={wheelData}
-              onStopSpinning={handleSpinComplete}
-              backgroundColors={['#3f3f46', '#71717a']}
-              textColors={['#ffffff']}
-              outerBorderColor="#374151"
-              outerBorderWidth={8}
-              innerRadius={30}
-              innerBorderColor="#1f2937"
-              innerBorderWidth={3}
-              radiusLineColor="#374151"
-              radiusLineWidth={2}
-              fontSize={14}
-              textDistance={80}
-              spinDuration={1.5}
-              startingOptionIndex={startingPosition}
-              disableInitialAnimation={true}
-              pointerProps={{
-                src: undefined,
-                style: {
-                  transform: 'rotate(0deg)',
-                }
-              }}
-            />
+            {isOpen && (
+              <Wheel
+                mustStartSpinning={mustSpin}
+                prizeNumber={prizeNumber}
+                data={wheelData}
+                onStopSpinning={handleSpinComplete}
+                backgroundColors={['#3f3f46', '#71717a']}
+                textColors={['#ffffff']}
+                outerBorderColor="#374151"
+                outerBorderWidth={4}
+                innerRadius={20}
+                innerBorderColor="#1f2937"
+                innerBorderWidth={2}
+                radiusLineColor="#374151"
+                radiusLineWidth={1}
+                fontSize={12}
+                textDistance={60}
+                spinDuration={2.0}
+                startingOptionIndex={startingPosition}
+                disableInitialAnimation={true}
+                perpendicularText={false}
+                pointerProps={{
+                  src: undefined,
+                  style: {
+                    transform: 'rotate(0deg)',
+                    willChange: 'auto'
+                  }
+                }}
+                style={{
+                  willChange: mustSpin ? 'transform' : 'auto'
+                }}
+              />
+            )}
           </div>
 
           {/* Кнопка для вращения */}

@@ -94,7 +94,7 @@
     position: relative;
   }
 
-  /* Gaming Hexagonal Background Pattern */
+  /* Gaming Hexagonal Background Pattern - ОПТИМИЗИРОВАНО */
   body::before {
     content: '';
     position: fixed;
@@ -103,26 +103,49 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-image:
-      radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.03) 2px, transparent 2px),
-      radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.03) 2px, transparent 2px);
-    background-size: 60px 52px;
-    background-position: 0 0, 30px 26px;
+    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+    will-change: auto; /* Отключить аппаратное ускорение для статичных элементов */
     pointer-events: none;
   }
 
-  /* Gaming Hexagonal Grid Pattern */
+  /* Gaming Hexagonal Grid Pattern - ВРЕМЕННО ОТКЛЮЧЕНО */
   body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 26L45 35.32V43.68L30 53L15 43.68V35.32L30 26z' stroke='%236366f1' stroke-opacity='0.04' stroke-width='1'/%3E%3Cpath d='M30 0L45 9.32V17.68L30 27L15 17.68V9.32L30 0z' stroke='%238b5cf6' stroke-opacity='0.04' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
-    animation: hexagonFloat 20s ease-in-out infinite;
-    pointer-events: none;
+    display: none; /* Отключено для снижения нагрузки на GPU */
+  }
+}
+
+/* GPU оптимизация для анимированных элементов */
+.animate-pulse,
+.animate-ping,
+.animate-bounce,
+.animate-spin {
+  will-change: transform;
+  transform: translateZ(0); /* Принудительное GPU ускорение */
+}
+
+/* Отключить анимации на слабых устройствах */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Оптимизация для мобильных устройств */
+@media (max-width: 768px) {
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce {
+    animation: none; /* Отключить на мобильных */
+  }
+
+  /* Упростить градиенты на мобильных */
+  body {
+    background: #151225;
   }
 }
 
