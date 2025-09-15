@@ -20,7 +20,9 @@ import type {
   UpgradeableItemsResponse,
   UpgradeOptionsResponse,
   UpgradeRequest,
-  UpgradeResponse
+  UpgradeResponse,
+  TopUpBalanceRequest,
+  TopUpBalanceResponse
 } from '../../types/api';
 
 // Расширяем базовый API для работы с пользователем
@@ -712,6 +714,16 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Inventory'],
     }),
+
+    // Добавляем мутацию для пополнения баланса
+    topUpBalance: builder.mutation<TopUpBalanceResponse, TopUpBalanceRequest>({
+      query: (body) => ({
+        url: 'balance/top-up',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -761,4 +773,7 @@ export const {
   useGetUserUpgradeableItemsQuery,
   useGetUpgradeOptionsQuery,
   usePerformUpgradeMutation,
+
+  // Пополнение баланса хук
+  useTopUpBalanceMutation,
 } = userApi;
