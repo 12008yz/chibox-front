@@ -439,3 +439,17 @@ export interface UpgradeResponse {
     quantity_bonus: number;
   };
 }
+
+// Типы для пополнения баланса
+export interface TopUpBalanceRequest {
+  amount: number;
+}
+
+export interface TopUpBalanceResponse {
+  success: boolean;
+  data: {
+    paymentUrl: string;
+    paymentId: string;
+  };
+  message?: string;
+}

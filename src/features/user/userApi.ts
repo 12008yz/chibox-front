@@ -17,10 +17,6 @@ import type {
   TicTacToeCreateGameResponse,
   TicTacToeMakeMoveResponse,
   PlaySlotResponse,
-  UpgradeableItemsResponse,
-  UpgradeOptionsResponse,
-  UpgradeRequest,
-  UpgradeResponse,
   TopUpBalanceRequest,
   TopUpBalanceResponse
 } from '../../types/api';
@@ -718,7 +714,7 @@ export const userApi = baseApi.injectEndpoints({
     // Добавляем мутацию для пополнения баланса
     topUpBalance: builder.mutation<TopUpBalanceResponse, TopUpBalanceRequest>({
       query: (body) => ({
-        url: 'balance/top-up',
+        url: 'v1/balance/top-up',
         method: 'POST',
         body,
       }),
