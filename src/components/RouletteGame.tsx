@@ -236,9 +236,6 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
                     willChange: 'auto'
                   }
                 }}
-                style={{
-                  willChange: mustSpin ? 'transform' : 'auto'
-                }}
               />
             )}
           </div>

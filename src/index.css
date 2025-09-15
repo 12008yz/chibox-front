@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @theme {
   --color-blue-50: #eff6ff;
   --color-blue-100: #dbeafe;
@@ -62,6 +61,13 @@
   --color-dark-900: #151225;
 }
 
+/* CSS переменные для динамического управления производительности */
+:root {
+  --animation-duration: 0.3s;
+  --enable-backdrop-filter: blur(5px);
+  --enable-animations: 1;
+}
+
 @layer base {
   * {
     margin: 0;
@@ -89,30 +95,60 @@
   }
 
   body {
-    background: linear-gradient(135deg, #151225 0%, #1a1630 100%);
+    background: #151225; /* Убираем градиент для снижения нагрузки */
     overflow-x: hidden;
     position: relative;
   }
 
-  /* Gaming Hexagonal Background Pattern - ОПТИМИЗИРОВАНО */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
-    background-size: 30px 30px;
-    will-change: auto; /* Отключить аппаратное ускорение для статичных элементов */
-    pointer-events: none;
-  }
-
-  /* Gaming Hexagonal Grid Pattern - ВРЕМЕННО ОТКЛЮЧЕНО */
+  /* ОТКЛЮЧЕНЫ ФОНОВЫЕ ПАТТЕРНЫ - ЭКОНОМИЯ GPU */
+  body::before,
   body::after {
-    display: none; /* Отключено для снижения нагрузки на GPU */
+    display: none;
   }
+}
+
+/* Классы производительности для body */
+.performance-low {
+  --animation-duration: 0.1s;
+  --enable-backdrop-filter: none;
+  --enable-animations: 0;
+}
+
+.performance-low *,
+.performance-low *::before,
+.performance-low *::after {
+  animation-duration: 0.1s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.1s !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.performance-low .animate-pulse,
+.performance-low .animate-ping,
+.performance-low .animate-bounce,
+.performance-low .animate-spin {
+  animation: none !important;
+}
+
+.performance-medium {
+  --animation-duration: 0.2s;
+  --enable-backdrop-filter: none;
+  --enable-animations: 1;
+}
+
+.performance-medium .animate-pulse,
+.performance-medium .animate-ping {
+  animation-duration: 1s !important;
+}
+
+.performance-high {
+  --animation-duration: 0.3s;
+  --enable-backdrop-filter: blur(5px);
+  --enable-animations: 1;
 }
 
 /* GPU оптимизация для анимированных элементов */
@@ -121,10 +157,33 @@
 .animate-bounce,
 .animate-spin {
   will-change: transform;
-  transform: translateZ(0); /* Принудительное GPU ускорение */
+  transform: translateZ(0);
 }
 
-/* Отключить анимации на слабых устройствах */
+/* ПОЛНОЕ ОТКЛЮЧЕНИЕ АНИМАЦИЙ НА СЛАБЫХ УСТРОЙСТВАХ */
+@media (max-width: 768px), (max-height: 600px) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important; /* Быстрые переходы вместо анимаций */
+  }
+
+  /* Отключаем backdrop-filter на мобильных */
+  .modern-header,
+  .modern-navbar,
+  .gaming-balance-container,
+  .gaming-notification-button,
+  .gaming-profile-container,
+  .gaming-logout-button,
+  .gaming-notifications-container {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Отключить анимации при предпочтении пользователя */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -135,20 +194,6 @@
   }
 }
 
-/* Оптимизация для мобильных устройств */
-@media (max-width: 768px) {
-  .animate-pulse,
-  .animate-ping,
-  .animate-bounce {
-    animation: none; /* Отключить на мобильных */
-  }
-
-  /* Упростить градиенты на мобильных */
-  body {
-    background: #151225;
-  }
-}
-
 /* Gaming Typography */
 .gaming-font {
   font-family: 'Inter', 'Orbitron', 'Rajdhani', monospace;
@@ -156,159 +201,55 @@
   letter-spacing: 0.5px;
 }
 
-/* Status Dashboard Animations */
+/* УПРОЩЕННЫЕ СТИЛИ БЕЗ ТЯЖЕЛЫХ АНИМАЦИЙ */
+
+/* Status Dashboard - упрощено */
 .status-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--animation-duration) ease;
 }
 
 .status-card-hover:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
 }
 
-.activity-glow {
-  position: relative;
-  overflow: hidden;
-}
-
-.activity-glow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s;
-}
-
-.activity-glow:hover::before {
-  left: 100%;
-}
-
-/* Floating Badge Animation */
-@keyframes floatBadge {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
-}
-
-.floating-badge {
-  animation: floatBadge 3s ease-in-out infinite;
-}
-
-/* Status Tab Animation */
-.status-tab-active {
-  position: relative;
-}
-
-.status-tab-active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffffff, transparent);
-  animation: tabGlow 2s ease-in-out infinite;
-}
-
-@keyframes tabGlow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* Modern Gaming Header */
+/* Упрощенный header без backdrop-filter на слабых устройствах */
 .modern-header {
-  background: linear-gradient(135deg,
-    rgba(21, 18, 37, 0.95) 0%,
-    rgba(26, 22, 48, 0.95) 50%,
-    rgba(30, 25, 60, 0.95) 100%);
-  backdrop-filter: blur(20px);
+  background: rgba(21, 18, 37, 0.95);
   border-bottom: 1px solid rgba(0, 255, 255, 0.2);
   position: relative;
   overflow: visible;
   width: 100%;
 }
 
-.header-glow {
-  background: radial-gradient(ellipse at center,
-    rgba(0, 255, 255, 0.1) 0%,
-    rgba(138, 43, 226, 0.05) 50%,
-    transparent 70%);
-  animation: headerPulse 6s ease-in-out infinite;
+/* Убираем тяжелые анимации header */
+@media (min-width: 769px) and (min-height: 601px) {
+  .modern-header {
+    backdrop-filter: blur(10px); /* Уменьшено с 20px */
+  }
 }
 
-/* Status Indicator */
-.status-indicator {
-  position: relative;
-  box-shadow:
-    0 0 20px rgba(0, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.status-indicator:hover {
-  transform: scale(1.02);
-  box-shadow:
-    0 0 30px rgba(0, 255, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.status-icon {
-  position: relative;
-  z-index: 2;
-}
-
-.status-pulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.6) 0%, transparent 70%);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: statusPulse 2s ease-in-out infinite;
-  z-index: 1;
-}
-
-/* Modern Navbar */
+/* Упрощенная navbar */
 .modern-navbar {
   position: relative;
   width: 100%;
   background: rgba(25, 23, 45, 0.8);
-  backdrop-filter: blur(16px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: border-color var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .modern-navbar {
+    backdrop-filter: blur(8px); /* Уменьшено */
+  }
 }
 
 .modern-navbar:hover {
   border-color: rgba(0, 255, 255, 0.3);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.4),
-    0 0 40px rgba(0, 255, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.navbar-border {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(0, 255, 255, 0.8) 50%,
-    transparent 100%);
-  animation: borderFlow 3s ease-in-out infinite;
-}
-
-/* Logo Styles */
+/* Logo Styles - упрощено */
 .gaming-logo {
   display: flex;
   align-items: center;
@@ -316,43 +257,14 @@
   position: relative;
   padding: 8px 12px;
   border-radius: 12px;
-  transition: all 0.3s ease;
+  transition: background-color var(--animation-duration) ease;
 }
 
 .gaming-logo:hover {
   background: rgba(0, 255, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
-.logo-container {
-  position: relative;
-}
-
-.logo-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, transparent 60%);
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-}
-
-.gaming-logo:hover .logo-glow {
-  opacity: 1;
-  animation: logoGlow 2s ease-in-out infinite;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Navigation Items */
+/* Navigation Items - упрощено */
 .gaming-nav-item {
   position: relative;
   display: flex;
@@ -360,7 +272,7 @@
   padding: 12px 20px;
   border-radius: 10px;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--animation-duration) ease;
   overflow: hidden;
 }
 
@@ -371,155 +283,21 @@
   position: relative;
   z-index: 2;
   color: #e5e7eb;
-  transition: all 0.3s ease;
-}
-
-.nav-icon {
-  transition: all 0.3s ease;
-}
-
-.nav-label {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
-
-.nav-item-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  opacity: 0;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  z-index: 1;
-}
-
-.nav-item-border {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-  z-index: 1;
+  transition: color var(--animation-duration) ease;
 }
 
 .gaming-nav-item:hover .nav-item-content {
   color: white;
-  transform: translateY(-1px);
 }
 
-.gaming-nav-item:hover .nav-icon {
-  transform: scale(1.1);
-}
-
-.gaming-nav-item:hover .nav-item-glow {
-  opacity: 0.2;
-}
-
-.gaming-nav-item:hover .nav-item-border {
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow:
-    0 0 20px rgba(0, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* Logo Star Animation */
-.logo-star {
-  animation: logoStarRotate 3s linear infinite;
-  transform-origin: center;
-  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.6));
-}
-
-.logo-star-mobile {
-  animation: logoStarRotate 3s linear infinite;
-  transform-origin: center;
-  filter: drop-shadow(0 0 3px rgba(34, 211, 238, 0.6));
-  font-size: 14px;
-}
-
-/* Animations */
-@keyframes headerPulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-@keyframes statusPulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(0.8);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    opacity: 0.3;
-  }
-}
-
-@keyframes borderFlow {
-  0%, 100% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes logoGlow {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.6;
-  }
-}
-
-@keyframes logoStarRotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Gaming Background Animations */
-@keyframes hexagonFloat {
-  0%, 100% {
-    transform: translateY(0px) translateX(0px);
-    opacity: 1;
-  }
-  25% {
-    transform: translateY(-10px) translateX(5px);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-5px) translateX(-3px);
-    opacity: 0.9;
-  }
-  75% {
-    transform: translateY(-15px) translateX(8px);
-    opacity: 0.7;
-  }
-}
-
-/* Gaming Buttons */
+/* Gaming Buttons - упрощено */
 .gaming-button {
   padding: 1rem 1rem;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  transition: all 0.3s;
+  transition: transform var(--animation-duration) ease;
   border: 1px solid transparent;
-  transform: scale(1);
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -529,116 +307,76 @@
 }
 
 .gaming-button:hover {
-  transform: scale(1.05);
+  transform: scale(1.02); /* Уменьшено с 1.05 */
 }
 
 .gaming-button:active {
-  transform: scale(0.95);
-}
-
-.gaming-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-  z-index: 1;
-}
-
-.gaming-button:hover::before {
-  left: 100%;
+  transform: scale(0.98);
 }
 
 .gaming-button-primary {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   @apply text-white shadow-lg;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
 }
 
 .gaming-button-primary:hover {
   background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
 }
 
 .gaming-button-secondary {
   @apply bg-transparent border-2;
   border-color: #6366f1;
   @apply text-indigo-400;
-  box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.1);
 }
 
 .gaming-button-secondary:hover {
   @apply bg-indigo-600 text-white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
 }
 
-/* Gaming Bonus Button */
+/* Gaming Bonus Button - УБРАНА ПОСТОЯННАЯ АНИМАЦИЯ */
 .gaming-bonus-button {
-  @apply px-4 py-2 rounded-lg font-bold text-sm transition-all duration-300;
+  @apply px-4 py-2 rounded-lg font-bold text-sm;
   @apply border-2 border-orange-500;
   background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
   @apply text-white relative overflow-hidden;
-  box-shadow: 0 0 20px rgba(234, 88, 12, 0.5);
-  animation: bonusPulse 2s infinite;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  transition: transform var(--animation-duration) ease;
 }
 
 .gaming-bonus-button:disabled {
   background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   @apply border-gray-500 cursor-not-allowed;
-  box-shadow: none;
-  animation: none;
 }
 
 .gaming-bonus-button:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(220, 38, 38, 0.8);
+  transform: scale(1.02);
 }
 
-.gaming-icon-fire {
-  animation: fireFlicker 1.5s infinite alternate;
-}
-
-@keyframes bonusPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
-  50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
-}
-
-@keyframes fireFlicker {
-  0% { color: #dc2626; }
-  25% { color: #b91c1c; }
-  50% { color: #ef4444; }
-  75% { color: #b91c1c; }
-  100% { color: #dc2626; }
-}
-
-/* Gaming Balance Container */
+/* Gaming Balance Container - упрощено */
 .gaming-balance-container {
   @apply px-4 py-2 rounded-lg;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
   @apply border border-green-500/30;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
-  transition: all 0.3s ease;
+  transition: transform var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .gaming-balance-container {
+    backdrop-filter: var(--enable-backdrop-filter);
+  }
 }
 
 .gaming-balance-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+  transform: translateY(-1px);
 }
 
 .gaming-coin-icon {
   @apply text-yellow-400;
-  animation: coinSpin 3s linear infinite;
 }
 
 .gaming-balance-value {
   @apply text-green-400 font-bold text-sm;
-  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
 }
 
 .gaming-balance-label {
@@ -647,24 +385,23 @@
   letter-spacing: 0.5px;
 }
 
-@keyframes coinSpin {
-  0% { transform: rotateY(0deg); }
-  100% { transform: rotateY(360deg); }
-}
-
 /* Gaming Balance Add Button */
 .gaming-balance-add-button {
-  @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300;
+  @apply w-8 h-8 rounded-full flex items-center justify-center;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
   @apply border border-green-500/40;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
   color: rgb(34, 197, 94);
+  transition: all var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .gaming-balance-add-button {
+    backdrop-filter: var(--enable-backdrop-filter);
+  }
 }
 
 .gaming-balance-add-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+  transform: scale(1.05);
   @apply border-green-400;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(16, 185, 129, 0.3) 100%);
   color: rgb(74, 222, 128);
@@ -672,35 +409,32 @@
 
 /* Gaming Notification Button */
 .gaming-notification-button {
-  @apply relative p-3 rounded-lg transition-all duration-300;
+  @apply relative p-3 rounded-lg;
   background: rgba(99, 102, 241, 0.1);
   @apply border border-indigo-500/30;
-  backdrop-filter: blur(10px);
   position: relative;
   overflow: visible;
+  transition: all var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .gaming-notification-button {
+    backdrop-filter: var(--enable-backdrop-filter);
+  }
 }
 
 .gaming-notification-button:hover {
   background: rgba(99, 102, 241, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
 }
 
 .gaming-notification-button:hover .gaming-notification-count {
-  transform: scale(1.1);
-  box-shadow:
-    0 4px 12px rgba(239, 68, 68, 0.6),
-    0 0 0 2px rgba(255, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
 }
 
 .gaming-notification-icon {
-  @apply text-xl text-indigo-400 transition-all duration-300;
-}
-
-.gaming-notification-active {
-  @apply text-indigo-300;
-  animation: notificationGlow 2s infinite;
+  @apply text-xl text-indigo-400;
+  transition: all var(--animation-duration) ease;
 }
 
 .gaming-notification-badge {
@@ -722,87 +456,37 @@
   justify-content: center;
   border-radius: 50%;
   padding: 0 6px;
-  box-shadow:
-    0 2px 8px rgba(239, 68, 68, 0.4),
-    0 0 0 2px rgba(255, 255, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   position: relative;
   z-index: 3;
-  animation: notificationBounce 0.6s ease-out;
-  transform-origin: center;
-  transition: all 0.3s ease;
+  transition: transform var(--animation-duration) ease;
   font-size: 10px;
   line-height: 1;
   white-space: nowrap;
 }
 
-/* Адаптивный размер для больших чисел */
 .gaming-notification-count-large {
   border-radius: 10px !important;
   padding: 0 4px !important;
   min-width: 24px !important;
 }
 
-.gaming-notification-pulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, #ef4444, #dc2626);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: notificationPulse 2s infinite;
-  z-index: 1;
-}
-
-@keyframes notificationGlow {
-  0%, 100% { text-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
-  50% { text-shadow: 0 0 15px rgba(99, 102, 241, 0.8); }
-}
-
-@keyframes notificationPulse {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.4);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.8);
-    opacity: 0;
-  }
-}
-
-@keyframes notificationBounce {
-  0% {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 /* Gaming Profile Container */
 .gaming-profile-container {
-  @apply cursor-pointer p-2 rounded-lg transition-all duration-300;
+  @apply cursor-pointer p-2 rounded-lg;
   background: rgba(139, 92, 246, 0.1);
   @apply border border-purple-500/30;
-  backdrop-filter: blur(10px);
+  transition: all var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .gaming-profile-container {
+    backdrop-filter: var(--enable-backdrop-filter);
+  }
 }
 
 .gaming-profile-container:hover {
   background: rgba(139, 92, 246, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
 }
 
 .gaming-avatar-wrapper {
@@ -811,12 +495,10 @@
 
 .gaming-avatar-border {
   @apply absolute inset-0 rounded-full border-2 border-purple-400;
-  animation: avatarGlow 3s infinite;
 }
 
 .gaming-username {
   @apply text-white font-semibold text-sm;
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .gaming-level {
@@ -825,30 +507,29 @@
   letter-spacing: 0.5px;
 }
 
-@keyframes avatarGlow {
-  0%, 100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
-  50% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.8); }
-}
-
 /* Gaming Logout Button */
 .gaming-logout-button {
-  @apply p-3 rounded-lg transition-all duration-300;
+  @apply p-3 rounded-lg;
   @apply text-gray-400 hover:text-red-400;
   background: rgba(239, 68, 68, 0.1);
   @apply border border-red-500/30;
-  backdrop-filter: blur(10px);
+  transition: all var(--animation-duration) ease;
+}
+
+@media (min-width: 769px) {
+  .gaming-logout-button {
+    backdrop-filter: var(--enable-backdrop-filter);
+  }
 }
 
 .gaming-logout-button:hover {
   background: rgba(239, 68, 68, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
 }
 
 .gaming-logout-button:disabled {
   @apply opacity-50 cursor-not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 /* Gaming Notifications Container */
@@ -859,17 +540,16 @@
   top: 6rem;
   right: 1.5rem;
   background: rgba(17, 24, 39, 0.98);
-  backdrop-filter: blur(20px);
   @apply border border-gray-700/50;
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.6),
-    0 10px 20px -5px rgba(0, 0, 0, 0.3),
-    0 0 40px rgba(99, 102, 241, 0.15);
-  animation: notificationsSlideIn 0.3s ease-out;
   z-index: 99999999 !important;
 }
 
-/* Responsive для мобильных устройств */
+@media (min-width: 769px) {
+  .gaming-notifications-container {
+    backdrop-filter: blur(10px);
+  }
+}
+
 @media (max-width: 768px) {
   .gaming-notifications-container {
     width: calc(100vw - 2rem);
@@ -877,24 +557,6 @@
     left: 1rem;
     top: 5rem;
     max-height: 80vh;
-  }
-}
-
-@keyframes notificationsSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.9);
-    filter: blur(4px);
-  }
-  50% {
-    opacity: 0.8;
-    transform: translateY(-5px) scale(0.95);
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
   }
 }
 
@@ -907,7 +569,6 @@
 
 .gaming-notifications-title {
   @apply text-white font-bold text-lg;
-  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -918,89 +579,53 @@
 
 .gaming-unread-count {
   @apply bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
   position: relative;
   z-index: 2;
 }
 
-.gaming-unread-pulse {
-  @apply absolute top-0 left-0 w-full h-full bg-red-500 rounded-full;
-  animation: unreadPulse 2s infinite;
-  z-index: 1;
-}
-
-@keyframes unreadPulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 0.4; }
-  100% { transform: scale(1.4); opacity: 0; }
-}
-
 .gaming-close-button {
-  @apply p-2 rounded-lg transition-all duration-300;
+  @apply p-2 rounded-lg;
   @apply text-gray-400 hover:text-red-400;
   background: rgba(239, 68, 68, 0.1);
   @apply border border-red-500/30;
+  transition: all var(--animation-duration) ease;
 }
 
 .gaming-close-button:hover {
   background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+  transform: scale(1.05);
 }
 
 .gaming-mark-all-button {
-  @apply text-sm font-medium transition-all duration-300;
+  @apply text-sm font-medium;
   @apply text-blue-400 hover:text-blue-300;
   background: rgba(99, 102, 241, 0.1);
   @apply px-3 py-1 rounded-lg border border-blue-500/30;
+  transition: all var(--animation-duration) ease;
 }
 
 .gaming-mark-all-button:hover {
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 /* Gaming Notifications List */
 .gaming-notifications-list {
   @apply max-h-80 overflow-y-auto;
-  /* Hide scrollbar */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .gaming-notifications-list::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
-}
-
-/* Empty State */
-.gaming-empty-state {
-  @apply p-8 text-center;
-}
-
-.gaming-empty-icon {
-  @apply mb-4;
-  animation: emptyFloat 3s ease-in-out infinite;
-}
-
-.gaming-empty-text {
-  @apply text-gray-300 font-medium text-lg mb-2;
-}
-
-.gaming-empty-subtext {
-  @apply text-gray-500 text-sm;
-}
-
-@keyframes emptyFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  display: none;
 }
 
 /* Gaming Notification Item */
 .gaming-notification-item {
-  @apply p-4 border-b cursor-pointer transition-all duration-300;
+  @apply p-4 border-b cursor-pointer;
   border-color: rgba(75, 85, 99, 0.3);
   position: relative;
+  transition: all var(--animation-duration) ease;
 }
 
 .gaming-notification-item:hover {
@@ -1019,28 +644,6 @@
     rgba(99, 102, 241, 0.15) 100%);
   border-left: 3px solid #6366f1;
   position: relative;
-  animation: newNotificationGlow 2s ease-in-out infinite;
-}
-
-.gaming-notification-unread::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg,
-    rgba(99, 102, 241, 0.1) 0%,
-    transparent 50%,
-    rgba(99, 102, 241, 0.1) 100%);
-  opacity: 0;
-  animation: notificationShimmer 3s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.gaming-notification-unread:hover::before {
-  animation-duration: 1.5s;
 }
 
 .gaming-notification-read {
@@ -1048,74 +651,24 @@
 }
 
 /* Notification Type Classes */
-.gaming-notification-success {
-  border-left-color: #22c55e;
-}
-
-.gaming-notification-info {
-  border-left-color: #3b82f6;
-}
-
-.gaming-notification-warning {
-  border-left-color: #f59e0b;
-}
-
-.gaming-notification-error {
-  border-left-color: #ef4444;
-}
-
-.gaming-notification-bonus {
-  border-left-color: #ec4899;
-  background: rgba(236, 72, 153, 0.05);
-}
-
-.gaming-notification-case {
-  border-left-color: #f97316;
-  background: rgba(249, 115, 22, 0.05);
-}
-
-.gaming-notification-default {
-  border-left-color: #6b7280;
-}
+.gaming-notification-success { border-left-color: #22c55e; }
+.gaming-notification-info { border-left-color: #3b82f6; }
+.gaming-notification-warning { border-left-color: #f59e0b; }
+.gaming-notification-error { border-left-color: #ef4444; }
+.gaming-notification-bonus { border-left-color: #ec4899; background: rgba(236, 72, 153, 0.05); }
+.gaming-notification-case { border-left-color: #f97316; background: rgba(249, 115, 22, 0.05); }
+.gaming-notification-default { border-left-color: #6b7280; }
 
 /* Notification Content */
-.gaming-notification-content {
-  @apply flex items-start space-x-3;
-}
-
-.gaming-notification-icon {
-  @apply mt-1;
-  filter: drop-shadow(0 0 4px currentColor);
-}
-
-.gaming-notification-body {
-  @apply flex-1 min-w-0;
-}
-
-.gaming-notification-title {
-  @apply text-sm font-semibold mb-1;
-}
-
-.gaming-notification-message {
-  @apply text-sm text-gray-400 mb-2 whitespace-pre-line;
-  line-height: 1.4;
-}
-
-.gaming-notification-time {
-  @apply text-xs text-gray-500;
-  font-weight: 500;
-  letter-spacing: 0.25px;
-}
+.gaming-notification-content { @apply flex items-start space-x-3; }
+.gaming-notification-icon { @apply mt-1; }
+.gaming-notification-body { @apply flex-1 min-w-0; }
+.gaming-notification-title { @apply text-sm font-semibold mb-1; }
+.gaming-notification-message { @apply text-sm text-gray-400 mb-2 whitespace-pre-line; line-height: 1.4; }
+.gaming-notification-time { @apply text-xs text-gray-500; font-weight: 500; letter-spacing: 0.25px; }
 
 .gaming-unread-indicator {
   @apply w-2 h-2 bg-blue-500 rounded-full;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
-  animation: unreadIndicatorPulse 2s infinite;
-}
-
-@keyframes unreadIndicatorPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 /* Gaming Notifications Footer */
@@ -1131,16 +684,16 @@
 }
 
 .gaming-footer-button {
-  @apply w-full text-sm font-medium py-2 px-3 rounded-lg transition-all duration-300;
+  @apply w-full text-sm font-medium py-2 px-3 rounded-lg;
   @apply text-blue-400 hover:text-blue-300;
   background: rgba(99, 102, 241, 0.1);
   @apply border border-blue-500/30;
+  transition: all var(--animation-duration) ease;
 }
 
 .gaming-footer-button:hover {
   background: rgba(99, 102, 241, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 .gaming-footer-empty {
@@ -1154,47 +707,27 @@
   text-align: center;
 }
 
-/* LiveDrops Animations */
+/* LiveDrops Animations - упрощено */
 @keyframes slideInLeft {
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 .animate-slideInLeft {
-  animation: slideInLeft 0.5s ease-out;
+  animation: slideInLeft var(--animation-duration) ease-out;
 }
 
 /* Кастомный скроллбар для LiveDrops */
-.live-drops-scroll::-webkit-scrollbar {
-  height: 8px;
-}
+.live-drops-scroll::-webkit-scrollbar { height: 8px; }
+.live-drops-scroll::-webkit-scrollbar-track { background: rgba(31, 41, 55, 0.3); border-radius: 4px; }
+.live-drops-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; border: 1px solid rgba(75, 85, 99, 0.3); }
+.live-drops-scroll::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-.live-drops-scroll::-webkit-scrollbar-track {
-  background: rgba(31, 41, 55, 0.3);
-  border-radius: 4px;
-}
-
-.live-drops-scroll::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-  border: 1px solid rgba(75, 85, 99, 0.3);
-}
-
-.live-drops-scroll::-webkit-scrollbar-thumb:hover {
-  background: #4B5563;
-}
-
-/* Улучшенные анимации для рулетки */
+/* Упрощенные анимации для рулетки */
 .roulette-result-enter {
   opacity: 0;
   transform: scale(0.8) translateY(20px);
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all var(--animation-duration) ease;
 }
 
 .roulette-result-enter-active {
@@ -1202,220 +735,115 @@
   transform: scale(1) translateY(0);
 }
 
-.roulette-celebration {
-  animation: celebration 0.6s ease-out;
+/* Простая анимация появления уведомлений */
+@keyframes simpleSlideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes celebration {
-  0% {
-    transform: scale(1);
-  }
-  20% {
-    transform: scale(1.1);
-  }
-  40% {
-    transform: scale(0.95);
-  }
-  60% {
-    transform: scale(1.05);
-  }
-  80% {
-    transform: scale(0.98);
-  }
-  100% {
-    transform: scale(1);
-  }
+.animate-simple-slide-in {
+  animation: simpleSlideIn var(--animation-duration) ease-out;
 }
 
-/* Улучшение анимации bounce для эмодзи */
-@keyframes gentle-bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-8px);
-  }
-  60% {
-    transform: translateY(-4px);
-  }
-}
-
+/* Простая анимация для LiveDrops */
 .animate-gentle-bounce {
-  animation: gentle-bounce 1.5s infinite;
+  animation: gentle-bounce 1s ease-in-out;
 }
 
-/* Анимация падения для результата рулетки */
-@keyframes drop-bounce {
-  0% {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.3);
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ДОПОЛНИТЕЛЬНЫЕ КЛАССЫ ДЛЯ УПРАВЛЕНИЯ ПРОИЗВОДИТЕЛЬНОСТЬЮ */
+
+/* Адаптивные классы для анимаций */
+.performance-animation {
+  animation-duration: var(--animation-duration);
+  transition-duration: var(--animation-duration);
+}
+
+.performance-backdrop {
+  backdrop-filter: var(--enable-backdrop-filter);
+  -webkit-backdrop-filter: var(--enable-backdrop-filter);
+}
+
+/* Оптимизированные классы для часто используемых элементов */
+.optimized-transition {
+  transition: transform var(--animation-duration) ease, opacity var(--animation-duration) ease;
+  will-change: auto;
+}
+
+.performance-low .optimized-transition {
+  transition: none !important;
+}
+
+/* Контейнер для GPU оптимизированных элементов */
+.gpu-optimized {
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.performance-low .gpu-optimized {
+  transform: none !important;
+  will-change: auto !important;
+  contain: none !important;
+}
+
+/* Специальные классы для компонентов */
+.live-drops-optimized {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.performance-low .live-drops-optimized {
+  contain: none !important;
+  transform: none !important;
+}
+
+/* Оптимизация для уведомлений */
+.notification-optimized {
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+.performance-low .notification-optimized {
+  will-change: auto !important;
+  contain: none !important;
+}
+
+.notification-optimized .gaming-notification-item:hover {
+  transform: translateX(2px);
+}
+
+.performance-low .notification-optimized .gaming-notification-item:hover {
+  transform: none !important;
+}
+
+/* Принудительное отключение анимаций на очень слабых устройствах */
+@media (max-width: 480px), (max-height: 480px) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1s !important;
   }
-  30% {
-    opacity: 0.8;
-    transform: translateY(10px) scale(1.1);
+
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  .animate-spin {
+    animation: none !important;
   }
-  50% {
-    opacity: 1;
-    transform: translateY(-5px) scale(0.95);
-  }
-  70% {
-    transform: translateY(3px) scale(1.02);
-  }
-  90% {
-    transform: translateY(-1px) scale(0.99);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
-.animate-drop-bounce {
-  animation: drop-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-/* Alternative Gaming Background Options */
-/* Carbon Fiber Style */
-.gaming-bg-carbon {
-  background-image:
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px),
-    repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(99, 102, 241, 0.02) 2px, rgba(99, 102, 241, 0.02) 4px);
-}
-
-/* Circuit Board Style */
-.gaming-bg-circuit {
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.05) 1px, transparent 0);
-  background-size: 20px 20px;
-}
-
-/* Subtle Grid Style */
-.gaming-bg-grid {
-  background-image:
-    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
-}
-
-/* Glitch Effect for Special Events */
-.gaming-bg-glitch {
-  background: linear-gradient(135deg, #151225 0%, #1a1630 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.gaming-bg-glitch::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 98px,
-    rgba(99, 102, 241, 0.02) 100px
-  );
-  animation: glitchMove 3s infinite linear;
-}
-
-@keyframes glitchMove {
-  0% { transform: translateX(-100px); }
-  100% { transform: translateX(100px); }
-}
-
-/* Enhanced particle effect */
-.gaming-particles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.gaming-particles::before {
-  content: '';
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: rgba(99, 102, 241, 0.4);
-  border-radius: 50%;
-  box-shadow:
-    200px 300px 0 rgba(99, 102, 241, 0.3),
-    400px 100px 0 rgba(139, 92, 246, 0.3),
-    600px 400px 0 rgba(99, 102, 241, 0.2),
-    800px 200px 0 rgba(139, 92, 246, 0.3),
-    1000px 350px 0 rgba(99, 102, 241, 0.2),
-    1200px 150px 0 rgba(139, 92, 246, 0.3),
-    1400px 450px 0 rgba(99, 102, 241, 0.2);
-  animation: particleFloat 25s infinite linear;
-}
-
-@keyframes particleFloat {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-    opacity: 0.5;
+  .backdrop-filter,
+  .backdrop-blur {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
-/* Float Animation for HomePage Background */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) translateX(0px);
-  }
-  25% {
-    transform: translateY(-8px) translateX(3px);
-  }
-  50% {
-    transform: translateY(-4px) translateX(-2px);
-  }
-  75% {
-    transform: translateY(-12px) translateX(5px);
-  }
-}
-
-/* Анимация свечения для новых уведомлений */
-@keyframes newNotificationGlow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
-    border-left-color: #6366f1;
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
-    border-left-color: #8b5cf6;
-  }
-}
-
-/* Анимация мерцания для новых уведомлений */
-@keyframes notificationShimmer {
-  0% {
-    opacity: 0;
-    transform: translateX(-100%) skewX(-15deg);
-  }
-  25% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateX(0%) skewX(-15deg);
-  }
-  75% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(100%) skewX(-15deg);
-  }
-}
-
-/* Fix для отображения изображений в LiveDrop */
+/* КРИТИЧЕСКИ ВАЖНЫЕ ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ */
 .live-drop-container img,
 .live-drop-item {
   filter: none !important;
@@ -1427,39 +855,29 @@
   forced-color-adjust: none !important;
 }
 
-/* Дополнительные фиксы для изображений */
 .live-drop-container img {
   -webkit-filter: none !important;
   -moz-filter: none !important;
   -ms-filter: none !important;
   -o-filter: none !important;
-
-  /* Принудительно сбрасываем любые возможные изменения цвета */
   -webkit-transform: none !important;
   -moz-transform: none !important;
   -ms-transform: none !important;
   -o-transform: none !important;
   transform: none !important;
-
-  /* Предотвращаем любое наложение цветов */
   background-blend-mode: normal !important;
   isolation: auto !important;
 }
 
-/* Убеждаемся что Tailwind reset не влияет на наши изображения */
 .live-drop-container img,
 .live-drop-item img {
   all: unset !important;
-  /* Восстанавливаем только нужные свойства */
   display: block !important;
   max-width: 100% !important;
   height: auto !important;
   object-fit: contain !important;
 }
 
-/* КРИТИЧЕСКИ ВАЖНЫЕ ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ ОРУЖИЯ */
-
-/* Принудительно отключаем темную тему для изображений */
 @media (prefers-color-scheme: dark) {
   .live-drop-container img,
   .live-drop-item {
@@ -1470,7 +888,6 @@
   }
 }
 
-/* Специфичные стили для изображений оружия */
 .live-drop-container img[src*=".png"],
 .live-drop-container img[src*=".jpg"],
 .live-drop-container img[src*=".jpeg"],
@@ -1486,7 +903,6 @@
   print-color-adjust: exact !important;
 }
 
-/* Убираем влияние родительских элементов */
 .live-drop-container {
   color-scheme: light !important;
   filter: none !important;
@@ -1494,7 +910,6 @@
   isolation: auto !important;
 }
 
-/* Специальный контейнер для изображений */
 .live-drop-image-container {
   filter: none !important;
   mix-blend-mode: normal !important;
@@ -1510,7 +925,6 @@
   color-scheme: light !important;
 }
 
-/* Дополнительные стили для борьбы с темной темой браузера */
 .live-drop-container,
 .live-drop-container *,
 .live-drop-image-container,
@@ -1521,70 +935,47 @@
   print-color-adjust: exact !important;
 }
 
-/* МАКСИМАЛЬНО АГРЕССИВНЫЕ СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ */
 .live-drop-container img,
 .live-drop-image-container img,
 img.live-drop-item {
-  /* Отключаем абсолютно все фильтры */
   filter: none !important;
   -webkit-filter: none !important;
   -moz-filter: none !important;
   -ms-filter: none !important;
   -o-filter: none !important;
-
-  /* Отключаем все blend modes */
   mix-blend-mode: normal !important;
   background-blend-mode: normal !important;
-
-  /* Принудительная прозрачность и фон */
   opacity: 1 !important;
   background: none !important;
   background-color: transparent !important;
   background-image: none !important;
-
-  /* Цветовая схема */
   color-scheme: light !important;
   forced-color-adjust: none !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
-
-  /* Убираем любые трансформации */
   transform: none !important;
   -webkit-transform: none !important;
   -moz-transform: none !important;
   -ms-transform: none !important;
   -o-transform: none !important;
-
-  /* Изоляция и z-index */
   isolation: auto !important;
   z-index: auto !important;
   contain: none !important;
-
-  /* Размеры и отображение */
   display: block !important;
   visibility: visible !important;
   object-fit: contain !important;
   object-position: center !important;
-
-  /* Отключаем любые анимации которые могут влиять */
   animation: none !important;
   transition: none !important;
-
-  /* Отключаем любые outline или box-shadow которые могут влиять */
   outline: none !important;
   box-shadow: none !important;
-
-  /* Убеждаемся что изображение не инвертируется */
   -webkit-appearance: none !important;
   appearance: none !important;
-
-  /* Дополнительные свойства для предотвращения инверсии */
   image-rendering: auto !important;
   image-rendering: -webkit-optimize-contrast !important;
   -ms-interpolation-mode: bicubic !important;
 }
 
-/* Дополнительные правила для псевдоэлементов */
 .live-drop-container img::before,
 .live-drop-container img::after,
 .live-drop-image-container img::before,
@@ -1595,7 +986,6 @@ img.live-drop-item {
   visibility: hidden !important;
 }
 
-/* Правила для различных состояний изображения */
 .live-drop-container img:hover,
 .live-drop-container img:focus,
 .live-drop-container img:active {
@@ -1605,7 +995,6 @@ img.live-drop-item {
   transform: none !important;
 }
 
-/* Медиа-запрос для принудительного отключения темной темы */
 @media (prefers-color-scheme: dark) {
   .live-drop-container img,
   .live-drop-image-container img {
@@ -1617,7 +1006,6 @@ img.live-drop-item {
   }
 }
 
-/* Правила для high contrast mode */
 @media (prefers-contrast: high) {
   .live-drop-container img,
   .live-drop-image-container img {
@@ -1626,7 +1014,6 @@ img.live-drop-item {
   }
 }
 
-/* Правила для reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .live-drop-container img,
   .live-drop-image-container img {
