@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePlaySlotMutation, useGetSlotItemsQuery } from '../features/user/userApi';
+import { usePlaySlotMutation, useGetSlotItemsQuery, useGetSlotStatusQuery } from '../features/user/userApi';
 import { useAuth } from '../store/hooks';
 import toast from 'react-hot-toast';
 import Monetary from '../components/Monetary';
@@ -202,6 +202,9 @@ const SlotPage: React.FC = () => {
 
   // Получаем предметы для слота из API
   const { data: slotItemsData, isLoading: isLoadingItems, error: itemsError } = useGetSlotItemsQuery();
+  const { data: slotStatusData, isLoading: isLoadingStatus } = useGetSlotStatusQuery(undefined, {
+    skip: !auth.user
+  });
   const [playSlot, { isLoading }] = usePlaySlotMutation();
 
   // Когда получаем предметы из API, обновляем displayItems
@@ -212,7 +215,7 @@ const SlotPage: React.FC = () => {
     }
   }, [slotItemsData]);
 
-  const canPlay = !isSpinning && !isLoading && auth.user && Number(auth.user.balance || 0) >= 10 && displayItems.length > 0;
+  const canPlay = !isSpinning && !isLoading && auth.user && Number(auth.user.balance || 0) >= 10 && displayItems.length > 0 && slotStatusData?.data?.canPlay;
 
   const handleSpin = async () => {
     if (!canPlay) {
@@ -356,6 +359,62 @@ const SlotPage: React.FC = () => {
               </div>
             )}
 
+            {/* Информация о подписке и лимитах */}
+            {auth.user && slotStatusData?.data && (
+              <div className="mb-6 p-6 rounded-lg bg-gray-700/30 border border-gray-600/50">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-white mb-4">📋 Информация о подписке</h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
+                      <div className="text-gray-400 text-sm font-medium mb-2">Ваша подписка</div>
+                      <div className={`text-lg font-semibold ${
+                        slotStatusData.data.hasSubscription ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {slotStatusData.data.subscriptionName}
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
+                      <div className="text-gray-400 text-sm font-medium mb-2">Спины сегодня</div>
+                      <div className="text-lg font-semibold text-white">
+                        {slotStatusData.data.used} / {slotStatusData.data.limit}
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Осталось: {slotStatusData.data.remaining}
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
+                      <div className="text-gray-400 text-sm font-medium mb-2">Сброс лимита</div>
+                      <div className="text-sm text-white font-medium">
+                        {slotStatusData.data.nextResetTimeFormatted}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">16:00 МСК ежедневно</div>
+                    </div>
+                  </div>
+
+                  {!slotStatusData.data.hasSubscription && (
+                    <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300">
+                      <div className="font-medium">💎 Нужна подписка для игры в слот!</div>
+                      <div className="text-sm mt-1">
+                        Статус (1 спин) • Статус+ (2 спина) • Статус++ (3 спина)
+                      </div>
+                    </div>
+                  )}
+
+                  {slotStatusData.data.hasSubscription && slotStatusData.data.remaining === 0 && (
+                    <div className="mt-4 p-3 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300">
+                      <div className="font-medium">🚫 Дневной лимит исчерпан</div>
+                      <div className="text-sm mt-1">
+                        Следующая возможность: {slotStatusData.data.nextResetTimeFormatted}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Информация о игре */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/50">
@@ -403,10 +462,28 @@ const SlotPage: React.FC = () => {
               </button>
 
               {/* Сообщения */}
-              {!canPlay && auth.user && Number(auth.user.balance || 0) < 10 && (
-                <div className="mt-4 p-4 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300 max-w-sm mx-auto">
-                  <div className="font-medium">{t('slots.insufficient_funds')}</div>
-                </div>
+              {!canPlay && auth.user && (
+                <>
+                  {Number(auth.user.balance || 0) < 10 && (
+                    <div className="mt-4 p-4 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300 max-w-sm mx-auto">
+                      <div className="font-medium">{t('slots.insufficient_funds')}</div>
+                    </div>
+                  )}
+
+                  {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
+                    <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
+                      <div className="font-medium">💎 Требуется подписка</div>
+                      <div className="text-sm mt-1">Оформите подписку для игры в слот</div>
+                    </div>
+                  )}
+
+                  {slotStatusData?.data && slotStatusData.data.hasSubscription && slotStatusData.data.remaining === 0 && (
+                    <div className="mt-4 p-4 bg-orange-900/20 border border-orange-400/50 rounded-lg text-orange-300 max-w-sm mx-auto">
+                      <div className="font-medium">🕐 Лимит исчерпан</div>
+                      <div className="text-sm mt-1">Ждите сброса в 16:00 МСК</div>
+                    </div>
+                  )}
+                </>
               )}
 
               {!auth.user && (

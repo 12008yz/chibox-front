@@ -17,6 +17,7 @@ import type {
   TicTacToeCreateGameResponse,
   TicTacToeMakeMoveResponse,
   PlaySlotResponse,
+  SlotStatusResponse,
   TopUpBalanceRequest,
   TopUpBalanceResponse
 } from '../../types/api';
@@ -312,6 +313,21 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          // Обновляем статус слота после успешной игры
+          dispatch(userApi.util.invalidateTags(['Balance', 'User']));
+        } catch {
+          // Игнорируем ошибки
+        }
+      },
+    }),
+
+    // Получение статуса слота для пользователя
+    getSlotStatus: builder.query<SlotStatusResponse, void>({
+      query: () => 'v1/games/slot-status',
+      providesTags: ['Balance', 'User'],
     }),
 
     // Получение предметов для слота
@@ -747,6 +763,7 @@ export const {
   usePlayRouletteMutation,
   usePlaySlotMutation,
   useGetSlotItemsQuery,
+  useGetSlotStatusQuery,
   useResetBonusCooldownMutation,
 
   useExchangeItemForSubscriptionMutation,

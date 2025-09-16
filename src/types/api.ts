@@ -379,6 +379,27 @@ export interface PlaySlotResponse {
   message?: string;
 }
 
+export interface SlotStatusData {
+  subscriptionTier: number;
+  subscriptionName: string;
+  limit: number;
+  used: number;
+  remaining: number;
+  canPlay: boolean;
+  cost: number;
+  balance: number;
+  nextResetTime: string;
+  nextResetTimeFormatted: string;
+  hasSubscription: boolean;
+  needsReset: boolean;
+}
+
+export interface SlotStatusResponse {
+  success: boolean;
+  data: SlotStatusData;
+  message?: string;
+}
+
 export interface UpgradeItem {
   id: string;
   name: string;

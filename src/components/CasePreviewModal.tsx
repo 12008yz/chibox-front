@@ -1,26 +1,21 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
-import { useGetUserSubscriptionQuery } from '../features/user/userApi';
 import { CaseTemplate } from '../types/api';
 import Monetary from './Monetary';
 import { useUserData } from '../hooks/useUserData';
 
-// CSS стили для анимации перечеркивания и эффектов
+// CSS стили для анимации перечеркивания и эффектов - ОПТИМИЗИРОВАННЫЕ
 const strikeAnimationStyles = `
   @keyframes item-glow-pulse {
-    0% {
-      box-shadow: 0 0 20px rgba(34, 197, 94, 0.8), inset 0 0 15px rgba(34, 197, 94, 0.3);
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
       border-color: rgb(34, 197, 94);
     }
     50% {
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), inset 0 0 20px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
       border-color: rgb(239, 68, 68);
-    }
-    100% {
-      box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), inset 0 0 15px rgba(34, 197, 94, 0.3);
-      border-color: rgb(34, 197, 94);
     }
   }
 
@@ -36,17 +31,11 @@ const strikeAnimationStyles = `
   }
 
   @keyframes victory-glow {
-    0% {
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-      border-color: rgb(255, 215, 0);
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
     }
     50% {
-      box-shadow: 0 0 60px rgba(255, 215, 0, 1), 0 0 100px rgba(255, 215, 0, 0.6);
-      border-color: rgb(255, 255, 0);
-    }
-    100% {
       box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-      border-color: rgb(255, 215, 0);
     }
   }
 
@@ -55,17 +44,11 @@ const strikeAnimationStyles = `
       width: 0;
       height: 0;
       opacity: 0;
-      transform: scale(0) rotate(45deg);
-    }
-    30% {
-      opacity: 1;
-      transform: scale(1) rotate(45deg);
     }
     100% {
       width: 70%;
       height: 4px;
       opacity: 1;
-      transform: scale(1) rotate(45deg);
     }
   }
 
@@ -74,84 +57,83 @@ const strikeAnimationStyles = `
       width: 0;
       height: 0;
       opacity: 0;
-      transform: scale(0) rotate(-45deg);
-    }
-    30% {
-      opacity: 1;
-      transform: scale(1) rotate(-45deg);
     }
     100% {
       width: 70%;
       height: 4px;
       opacity: 1;
-      transform: scale(1) rotate(-45deg);
     }
   }
 
   @keyframes overlay-fade-in {
     0% {
       opacity: 0;
-      background-color: rgba(0, 0, 0, 0);
     }
     100% {
       opacity: 1;
-      background-color: rgba(0, 0, 0, 0.6);
     }
   }
 
   @keyframes checkmark-bounce {
     0% {
       opacity: 0;
-      transform: scale(0) rotate(-10deg);
-    }
-    60% {
-      opacity: 1;
-      transform: scale(1.3) rotate(5deg);
-    }
-    80% {
-      transform: scale(0.9) rotate(-2deg);
+      transform: scale(0);
     }
     100% {
       opacity: 1;
-      transform: scale(1) rotate(0deg);
+      transform: scale(1);
     }
   }
 
   .animate-item-glow {
-    animation: item-glow-pulse 2s ease-in-out infinite;
+    animation: item-glow-pulse 3s ease-in-out infinite;
+    will-change: box-shadow, border-color;
   }
 
   .animate-cross-line-1 {
-    animation: cross-line-draw 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: cross-line-draw 0.6s ease-out forwards;
+    will-change: width, height, opacity;
   }
 
   .animate-cross-line-2 {
-    animation: cross-line-draw-reverse 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    animation-delay: 0.4s;
+    animation: cross-line-draw-reverse 0.6s ease-out forwards;
+    animation-delay: 0.3s;
+    will-change: width, height, opacity;
   }
 
   .animate-overlay-fade {
-    animation: overlay-fade-in 0.6s ease-out forwards;
+    animation: overlay-fade-in 0.4s ease-out forwards;
+    will-change: opacity;
   }
 
   .animate-checkmark-bounce {
-    animation: checkmark-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-    animation-delay: 1.4s;
+    animation: checkmark-bounce 0.5s ease-out forwards;
+    animation-delay: 1s;
+    will-change: opacity, transform;
   }
 
   .golden-spark {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%);
     border-radius: 50%;
     pointer-events: none;
-    animation: golden-spark 1.5s ease-out forwards;
-    box-shadow: 0 0 6px #FFD700, 0 0 12px #FFD700;
+    animation: golden-spark 1s ease-out forwards;
+    will-change: transform, opacity;
   }
 
   .victory-glow {
     animation: victory-glow 2s ease-in-out;
+    will-change: box-shadow;
+  }
+
+  /* Оптимизация для GPU */
+  .gpu-optimized {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 `;
 
@@ -191,20 +173,31 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // State должен быть объявлен до использования в функциях
   const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
 
+  // Получаем данные кейса и статус
+  const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
+    caseData.id,
+    { skip: !isOpen }
+  );
+
+  const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(
+    caseData.id,
+    { skip: !isOpen }
+  );
+
   // Функция для получения цены кейса
-  const getCasePrice = (caseData: CaseTemplate): number => {
+  const getCasePrice = useCallback((caseData: CaseTemplate): number => {
     if (statusData?.data?.price) {
       return statusData.data.price;
     }
     // Fallback на статические цены
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
-  };
+  }, [statusData]);
 
   // Проверяем, достаточно ли средств на балансе
-  const checkBalanceSufficient = (price: number): boolean => {
+  const checkBalanceSufficient = useCallback((price: number): boolean => {
     if (paymentMethod === 'bank_card') return true; // Для карты всегда true
     return (userData?.balance || 0) >= price;
-  };
+  }, [paymentMethod, userData]);
 
   // Автоматически переключаем на карту, если недостаточно баланса
   useEffect(() => {
@@ -241,29 +234,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Ref для контейнера со скроллом
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(
-    caseData.id,
-    { skip: !isOpen }
-  );
-
-  const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(
-    caseData.id,
-    { skip: !isOpen }
-  );
-
-  // Получаем информацию о подписке пользователя (удалена для упрощения)
-  // const { data: subscriptionData } = useGetUserSubscriptionQuery(undefined, { skip: !isOpen });
-
-  // Получаем инвентарь для определения уже выигранных предметов
-  // const { data: inventoryData } = useGetUserInventoryQuery(
-  //   { page: 1, limit: 1000, status: 'inventory' },
-  //   { skip: !isOpen }
-  // );
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
 
+  // Оптимизированный useEffect для открытия/закрытия модала
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -278,14 +254,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       // Блокируем скролл основной страницы
       document.body.style.overflow = 'hidden';
       // Небольшая задержка для запуска анимации после рендера
-      setTimeout(() => setIsAnimating(true), 10);
+      const timer = setTimeout(() => setIsAnimating(true), 16); // Один кадр
+      return () => clearTimeout(timer);
     } else {
       setIsAnimating(false);
       setIsProcessing(false);
       // Возвращаем скролл основной страницы
       document.body.style.overflow = 'unset';
       // Скрываем модалку после завершения анимации закрытия
-      setTimeout(() => setIsVisible(false), 300);
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -294,51 +272,50 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     return () => {
       // Восстанавливаем скролл при размонтировании
       document.body.style.overflow = 'unset';
+      // Очищаем таймеры
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
     };
   }, []);
 
-  // Автоматический скроллинг за выделенным предметом
-  useEffect(() => {
-    if (!showOpeningAnimation || !scrollContainerRef.current) {
-      return;
+  // Оптимизированный автоматический скроллинг
+  const scrollToItem = useCallback((itemIndex: number) => {
+    if (!scrollContainerRef.current || !showOpeningAnimation) return;
+
+    const container = scrollContainerRef.current;
+    const items = container.querySelectorAll('[data-item-index]');
+    const currentItem = items[itemIndex] as HTMLElement;
+
+    if (currentItem) {
+      const containerRect = container.getBoundingClientRect();
+      const itemRect = currentItem.getBoundingClientRect();
+
+      // Вычисляем позицию элемента относительно контейнера
+      const itemTop = itemRect.top - containerRect.top + container.scrollTop;
+      const containerHeight = container.clientHeight;
+
+      // Определяем целевую позицию скролла (центрируем элемент)
+      const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
+
+      // Скроллим
+      container.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
     }
+  }, [showOpeningAnimation]);
 
-    // Небольшая задержка для более плавной анимации
-    const scrollTimeout = setTimeout(() => {
-      const container = scrollContainerRef.current;
-      if (!container) return;
+  // Debounced scroll effect
+  useEffect(() => {
+    if (!showOpeningAnimation) return;
 
-      const items = container.querySelectorAll('[data-item-index]');
-      const currentItem = items[sliderPosition] as HTMLElement;
+    const timeoutId = setTimeout(() => {
+      scrollToItem(sliderPosition);
+    }, animationPhase === 'spinning' ? 100 : 200);
 
-      if (currentItem) {
-        const containerRect = container.getBoundingClientRect();
-        const itemRect = currentItem.getBoundingClientRect();
-
-        // Вычисляем позицию элемента относительно контейнера
-        const itemTop = itemRect.top - containerRect.top + container.scrollTop;
-        const containerHeight = container.clientHeight;
-
-        // Определяем целевую позицию скролла (центрируем элемент с небольшим смещением вверх)
-        const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2) - 50;
-
-        // Проверяем, виден ли элемент
-        const itemTopRelative = itemRect.top - containerRect.top;
-        const itemBottomRelative = itemRect.bottom - containerRect.top;
-        const isVisible = itemTopRelative >= 0 && itemBottomRelative <= containerHeight;
-
-        // Скроллим только если элемент не виден или находится слишком близко к краям
-        if (!isVisible || itemTopRelative < 100 || itemBottomRelative > containerHeight - 100) {
-          container.scrollTo({
-            top: Math.max(0, targetScrollTop),
-            behavior: 'smooth'
-          });
-        }
-      }
-    }, animationPhase === 'spinning' ? 50 : 100); // Быстрее во время быстрой фазы
-
-    return () => clearTimeout(scrollTimeout);
-  }, [sliderPosition, showOpeningAnimation, animationPhase]);
+    return () => clearTimeout(timeoutId);
+  }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem]);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -553,8 +530,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   };
 
-
-
   const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
     // Защита от множественных кликов
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
@@ -613,7 +588,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   };
 
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = useCallback(() => {
     setShowOpeningAnimation(false);
     setOpeningResult(null);
     setAnimationPhase('idle');
@@ -621,28 +596,33 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
     setIsProcessing(false);
-    // Не закрываем модалку сразу, пусть пользователь сам закроет
-  };
 
-  // Функция для создания золотых искр
-  const generateGoldenSparks = () => {
+    // Очищаем таймеры
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Оптимизированная функция для создания золотых искр
+  const generateGoldenSparks = useCallback(() => {
     const sparks = [];
-    const sparkCount = 12; // Количество искр
+    const sparkCount = 8; // Уменьшено количество искр для производительности
 
     for (let i = 0; i < sparkCount; i++) {
-      const angle = (i * 360) / sparkCount; // Распределяем искры равномерно по кругу
-      const distance = 80 + Math.random() * 40; // Случайное расстояние от 80 до 120px
+      const angle = (i * 360) / sparkCount;
+      const distance = 60 + Math.random() * 20; // Уменьшено расстояние
       const dx = Math.cos(angle * Math.PI / 180) * distance;
       const dy = Math.sin(angle * Math.PI / 180) * distance;
 
       sparks.push(
         <div
           key={i}
-          className="golden-spark"
+          className="golden-spark gpu-optimized"
           style={{
             '--dx': `${dx}px`,
             '--dy': `${dy}px`,
-            animationDelay: `${i * 0.1}s`, // Небольшая задержка между искрами
+            animationDelay: `${i * 0.08}s`, // Уменьшена задержка
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)'
@@ -652,7 +632,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     return sparks;
-  };
+  }, []);
 
   // Дефолтные изображения кейсов CS2
   const defaultCaseImages = [
@@ -813,52 +793,38 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           ) : items.length > 0 ? (
             <div className="relative">
 
-              {/* Сетка предметов без масштабирования */}
+              {/* Оптимизированная сетка предметов */}
               <div
-                className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4"
+                className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4 gpu-optimized"
               >
                 {itemsWithAdjustedChances.map((item: any, index: number) => {
-                  // ИСПРАВЛЕНИЕ: Показываем все предметы для информативности,
-                  // но анимация теперь корректно работает только с неисключенными
-
                   // Используем прямой индекс для отображения
                   const animationIndex = index;
 
                   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
                   const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
                   const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+                  const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
+
+                  // Предвычисляем классы для оптимизации
+                  const baseClasses = `bg-gray-800 rounded-lg p-2 border-2 relative gpu-optimized ${getRarityColor(item.rarity)}`;
+                  const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
+                  const highlightClasses = isCurrentSliderPosition ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+                  const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
+                  const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
+                  const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
 
                   return (
                     <div
                       key={item.id || index}
                       data-item-index={animationIndex}
-                      className={`bg-gray-800 rounded-lg p-2 border-2 relative transition-all duration-300 ${getRarityColor(item.rarity)} ${
-                        !showOpeningAnimation ? 'hover:scale-105 animate-fade-in-up' : 'animate-fade-in-up'
-                      } ${
-                        isCurrentSliderPosition
-                          ? 'ring-4 ring-yellow-400 ring-opacity-100 shadow-2xl shadow-yellow-400/75 z-10 border-yellow-400'
-                          : ''
-                      } ${
-                        isWinningItemStopped
-                          ? `ring-6 ring-green-400 ring-opacity-100 shadow-2xl shadow-green-400/90 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}`
-                          : ''
-                      } ${
-                        isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')
-                          ? 'animate-item-glow'
-                          : ''
-                      } ${
-                        (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444')) ? 'opacity-50 grayscale' : ''
-                      }`}
+                      className={`${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses}`}
                       style={{
-                        animationDelay: !showOpeningAnimation ? `${index * 50}ms` : '0ms',
-                        boxShadow: isCurrentSliderPosition
-                          ? '0 0 30px rgba(255, 193, 7, 0.8), inset 0 0 20px rgba(255, 193, 7, 0.3)'
-                          : isWinningItemStopped
-                            ? '0 0 40px rgba(34, 197, 94, 0.9), inset 0 0 25px rgba(34, 197, 94, 0.4)'
-                            : 'none'
+                        willChange: isCurrentSliderPosition || isWinningItemStopped ? 'transform, box-shadow' : 'auto',
+                        transform: 'translateZ(0)', // Принудительное использование GPU
                       }}
                     >
-                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative gpu-optimized">
                         {item.image_url ? (
                           <img
                             src={item.image_url}
@@ -866,8 +832,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                             className={`max-w-full max-h-full object-contain relative z-0 ${item.isExcluded ? 'opacity-70' : ''}`}
                             style={{
                               backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                              mixBlendMode: 'normal'
+                              mixBlendMode: 'normal',
+                              transform: 'translateZ(0)', // GPU acceleration
                             }}
+                            loading="lazy" // Ленивая загрузка изображений
                             onLoad={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.backgroundColor = 'transparent';
@@ -876,9 +844,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                               const parent = target.parentElement;
-                              if (parent) {
+                              if (parent && !parent.querySelector('.error-placeholder')) {
                                 const errorDiv = document.createElement('div');
-                                errorDiv.className = 'text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
+                                errorDiv.className = 'error-placeholder text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
                                 errorDiv.textContent = t('case_preview_modal.no_image');
                                 parent.appendChild(errorDiv);
                               }
@@ -890,41 +858,39 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           </div>
                         )}
 
-                        {/* Перечеркивание для уже полученных предметов */}
-                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444'))) && (
-                          <>
+                        {/* Оптимизированное перечеркивание для уже полученных предметов */}
+                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
+                          <div className="absolute inset-0 z-20 gpu-optimized">
                             {/* Полупрозрачный оверлей */}
-                            <div className={`absolute inset-0 z-20 ${
+                            <div className={`absolute inset-0 bg-black bg-opacity-40 ${
                               isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
                             }`}></div>
 
-                            {/* Крест по центру */}
-                            <div className="absolute inset-0 flex items-center justify-center z-30">
-                              {/* Первая линия креста */}
-                              <div className={`absolute bg-red-500 shadow-lg rounded-full ${
+                            {/* Оптимизированный крест */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className={`absolute bg-red-500 rounded-full ${
                                 isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
-                              }`}></div>
+                              }`} style={{ transform: 'rotate(45deg)' }}></div>
 
-                              {/* Вторая линия креста */}
-                              <div className={`absolute bg-red-500 shadow-lg rounded-full ${
+                              <div className={`absolute bg-red-500 rounded-full ${
                                 isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
-                              }`}></div>
+                              }`} style={{ transform: 'rotate(-45deg)' }}></div>
                             </div>
 
-                            {/* Галочка */}
-                            <div className={`absolute top-1 right-1 z-40 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-checkmark-bounce' : ''
-                            }`}>
-                              <div className="bg-gradient-to-r from-red-500 to-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg font-bold opacity-0">
-                                ✓
+                            {/* Упрощенная галочка */}
+                            {isWinningItemStopped && showStrikeThrough && (
+                              <div className="absolute top-1 right-1 animate-checkmark-bounce">
+                                <div className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-bold">
+                                  ✓
+                                </div>
                               </div>
-                            </div>
-                          </>
+                            )}
+                          </div>
                         )}
 
-                        {/* Эффект золотых искр для выигранного предмета */}
+                        {/* Оптимизированный эффект золотых искр */}
                         {showGoldenSparks && isWinningItemStopped && (
-                          <div className="absolute inset-0 pointer-events-none z-50">
+                          <div className="absolute inset-0 pointer-events-none z-50 gpu-optimized">
                             {generateGoldenSparks()}
                           </div>
                         )}
@@ -952,32 +918,29 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           <Monetary value={parseFloat(item.price || '0')} />
                         </p>
 
+                        {/* Оптимизированная информация о предмете */}
                         {!showOpeningAnimation && (
-                          <div className="text-xs mt-1 z-99999">
+                          <div className="text-xs mt-1">
                             {item.isExcluded ? (
-                              <div>
-                                <p className="text-red-400 font-bold">
-                                  {t('case_preview_modal.already_received')}
-                                </p>
-                              </div>
+                              <p className="text-red-400 font-bold">
+                                {t('case_preview_modal.already_received')}
+                              </p>
                             ) : (
-                              <div>
-                                <p className="text-gray-400">
-                                  {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(3)}%` : '0%'}
-                                  {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
-                                    <span className="text-yellow-400 ml-1">
-                                      (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
-                                    </span>
-                                  )}
-                                </p>
-                              </div>
+                              <p className="text-gray-400">
+                                {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
+                                {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                                  <span className="text-yellow-400 ml-1">
+                                    (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
+                                  </span>
+                                )}
+                              </p>
                             )}
                           </div>
                         )}
 
-                        {/* Показываем статус во время анимации для выигранного предмета */}
-                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && (caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444') && (
-                          <div className="text-xs mt-1 z-99999 animate-fade-in-delayed">
+                        {/* Статус во время анимации */}
+                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && isDailyCase && (
+                          <div className="text-xs mt-1">
                             <p className="text-red-400 font-bold">
                               {t('case_preview_modal.received')}
                             </p>

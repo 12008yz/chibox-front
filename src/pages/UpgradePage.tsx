@@ -71,27 +71,27 @@ const UpgradeAnimation: React.FC<{
         targetAngle = failZoneStart + (failZoneSize / 2);
       }
 
-      // Добавляем полные обороты для эффекта
-      const fullRotations = 1080 + 360; // 4 полных оборота
+      // Добавляем полные обороты для эффекта (сокращено для лучшей производительности)
+      const fullRotations = 720 + 180; // 2.5 оборота вместо 4
       const finalAngle = fullRotations - targetAngle;
       setFinalRotation(finalAngle);
 
-      // Короткая фаза подготовки (500мс)
+      // Короткая фаза подготовки (сокращено)
       setTimeout(() => {
         setPhase('spinning');
 
-        // Анимация прогресса во время кручения
+        // Анимация прогресса во время кручения (оптимизировано)
         let currentProgress = 0;
         const progressInterval = setInterval(() => {
-          currentProgress += 3;
+          currentProgress += 5; // Увеличили шаг для более быстрого обновления
           setProgress(currentProgress);
 
           if (currentProgress >= 100) {
             clearInterval(progressInterval);
           }
-        }, 100); // Обновляем каждые 100мс
+        }, 80); // Уменьшили интервал
 
-        // Завершаем кручение
+        // Завершаем кручение (сокращено время)
         setTimeout(() => {
           setPhase('showing_result');
           clearInterval(progressInterval);
@@ -100,9 +100,9 @@ const UpgradeAnimation: React.FC<{
           // Закрываем анимацию
           setTimeout(() => {
             onComplete();
-          }, 2500);
-        }, 3200); // 3.2 секунды на кручение
-      }, 500); // Короткая подготовка
+          }, 2000); // Сокращено время показа результата
+        }, 2400); // Сокращено время кручения до 2.4 секунды
+      }, 300); // Сокращена подготовка
     } else if (!isActive) {
       animationStartedRef.current = false;
       setPhase('preparing');
@@ -139,26 +139,10 @@ const UpgradeAnimation: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center z-50 backdrop-blur-sm">
-      {/* Тонкие анимированные частицы */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-slate-400 rounded-full opacity-30 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-
       <div className="text-center max-w-4xl mx-auto px-6 relative z-10">
         {/* Элегантный заголовок */}
         <div className="mb-12">
-          <h2 className={`text-4xl font-light mb-4 transition-all duration-700 ${
+          <h2 className={`text-4xl font-light mb-4 transition-all duration-500 ${
             phase === 'showing_result'
               ? (result.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
               : 'text-slate-200'
@@ -170,22 +154,23 @@ const UpgradeAnimation: React.FC<{
           </p>
         </div>
 
-        {/* Главная анимация - современная рулетка */}
+        {/* Главная анимация - оптимизированная рулетка */}
         <div className="relative mb-12 flex justify-center">
           <div className="relative">
-            {/* Внешнее свечение */}
-            <div className={`absolute -inset-12 rounded-full transition-all duration-1000 ${
+            {/* Внешнее свечение - оптимизировано */}
+            <div className={`absolute -inset-8 rounded-full transition-all duration-700 ${
               phase === 'spinning'
-                ? 'bg-gradient-to-r from-slate-600/20 via-slate-500/30 to-slate-600/20 animate-pulse'
-                : 'bg-slate-800/20'
+                ? 'bg-gradient-to-r from-slate-600/15 via-slate-500/25 to-slate-600/15'
+                : 'bg-slate-800/10'
             }`}></div>
 
-            {/* Орбитальные кольца */}
+            {/* Орбитальные кольца - сокращено количество */}
             {phase === 'spinning' && (
-              <>
-                <div className="absolute -inset-8 border border-slate-500/30 rounded-full animate-spin" style={{ animationDuration: '4s' }}></div>
-                <div className="absolute -inset-6 border border-slate-400/20 rounded-full animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}></div>
-              </>
+              <div className="absolute -inset-6 border border-slate-500/20 rounded-full"
+                   style={{
+                     animation: 'spin 3s linear infinite',
+                     willChange: 'transform'
+                   }}></div>
             )}
 
             {/* Указатель */}
@@ -193,7 +178,7 @@ const UpgradeAnimation: React.FC<{
               <div className="w-0 h-0 border-l-6 border-r-6 border-b-8 border-l-transparent border-r-transparent border-b-slate-300 drop-shadow-lg"></div>
             </div>
 
-            {/* Основная рулетка */}
+            {/* Основная рулетка - оптимизированная */}
             <div
               ref={wheelRef}
               className="w-80 h-80 rounded-full border-4 border-slate-600/50 relative overflow-hidden shadow-2xl backdrop-blur-sm"
@@ -203,13 +188,14 @@ const UpgradeAnimation: React.FC<{
                   #64748b ${result.data.success_chance}% 100%
                 )`,
                 transform: phase === 'spinning' || phase === 'showing_result' ? `rotate(${finalRotation}deg)` : 'rotate(0deg)',
-                transition: phase === 'spinning' ? 'transform 3.2s cubic-bezier(0.05, 0.5, 0.3, 0.95)' : phase === 'preparing' ? 'transform 0.3s ease-out' : 'none',
-                boxShadow: phase === 'spinning' ? '0 0 40px rgba(100, 116, 139, 0.3)' : '0 0 20px rgba(0, 0, 0, 0.3)'
+                transition: phase === 'spinning' ? 'transform 2.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : phase === 'preparing' ? 'transform 0.2s ease-out' : 'none',
+                boxShadow: phase === 'spinning' ? '0 0 30px rgba(100, 116, 139, 0.2)' : '0 0 15px rgba(0, 0, 0, 0.2)',
+                willChange: 'transform'
               }}
             >
               {/* Центральный элемент */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24">
-                <div className={`w-full h-full rounded-full flex items-center justify-center backdrop-blur-sm border transition-all duration-1000 ${
+                <div className={`w-full h-full rounded-full flex items-center justify-center backdrop-blur-sm border transition-all duration-700 ${
                   phase === 'spinning'
                     ? 'bg-slate-800/80 border-slate-500 shadow-lg'
                     : 'bg-slate-900/90 border-slate-600'
@@ -221,17 +207,17 @@ const UpgradeAnimation: React.FC<{
                 </div>
               </div>
 
-              {/* Минималистичные метки */}
-              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
+              {/* Минималистичные метки - уменьшено */}
+              <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-slate-200 text-sm opacity-60">
                 ●
               </div>
-              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
+              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-slate-200 text-sm opacity-60">
                 ●
               </div>
-              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
+              <div className="absolute left-8 top-1/2 transform -translate-y-1/2 text-slate-200 text-sm opacity-60">
                 ●
               </div>
-              <div className="absolute right-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
+              <div className="absolute right-8 top-1/2 transform -translate-y-1/2 text-slate-200 text-sm opacity-60">
                 ●
               </div>
             </div>
@@ -239,7 +225,7 @@ const UpgradeAnimation: React.FC<{
             {/* Результат в центре */}
             {phase === 'showing_result' && (
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                <div className={`text-6xl font-light transition-all duration-1000 ${
+                <div className={`text-6xl font-light transition-all duration-700 ${
                   result.upgrade_success ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                   {result.upgrade_success ? '✓' : '✕'}
@@ -251,7 +237,7 @@ const UpgradeAnimation: React.FC<{
 
         {/* Элегантная информационная панель */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
+          <div className="bg-slate-800/30 rounded-2xl p-6 border border-slate-600/20 backdrop-blur-sm">
             <div className="text-slate-400 text-sm font-medium mb-2">Вероятность успеха</div>
             <div className="text-slate-200 text-2xl font-light">
               {result.data.success_chance.toFixed(1)}%
@@ -261,7 +247,7 @@ const UpgradeAnimation: React.FC<{
             </div>
           </div>
 
-          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
+          <div className="bg-slate-800/30 rounded-2xl p-6 border border-slate-600/20 backdrop-blur-sm">
             <div className="text-slate-400 text-sm font-medium mb-2">Стоимость улучшения</div>
             <div className="text-slate-200 text-2xl font-light">
               <Monetary value={result.data.total_source_price} />
@@ -272,11 +258,11 @@ const UpgradeAnimation: React.FC<{
           </div>
         </div>
 
-        {/* Прогресс-бар */}
+        {/* Прогресс-бар - упрощен */}
         <div className="mb-8">
-          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-slate-800/50 rounded-full h-2 overflow-hidden">
             <div
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-2 rounded-full transition-all duration-200 ${
                 phase === 'preparing'
                   ? 'bg-gradient-to-r from-slate-500 to-slate-600'
                   : phase === 'spinning'
@@ -286,12 +272,13 @@ const UpgradeAnimation: React.FC<{
                   : 'bg-gradient-to-r from-rose-500 to-rose-600'
               }`}
               style={{
-                width: `${progress}%`
+                width: `${progress}%`,
+                willChange: 'width'
               }}
             ></div>
           </div>
           <div className="text-slate-500 text-sm mt-2 font-light">
-            {phase === 'preparing' && `Подготовка... ${progress}%`}
+            {phase === 'preparing' && 'Подготовка...'}
             {phase === 'spinning' && 'Обработка запроса...'}
             {phase === 'showing_result' && (result.upgrade_success ? 'Успешно завершено' : 'Завершено')}
           </div>
