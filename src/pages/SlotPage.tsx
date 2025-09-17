@@ -215,7 +215,7 @@ const SlotPage: React.FC = () => {
     }
   }, [slotItemsData]);
 
-  const canPlay = !isSpinning && !isLoading && auth.user && Number(auth.user.balance || 0) >= 10 && displayItems.length > 0 && slotStatusData?.data?.canPlay;
+  const canPlay = !isSpinning && !isLoading && auth.user && displayItems.length > 0 && slotStatusData?.data?.canPlay;
 
   const handleSpin = async () => {
     if (!canPlay) {
@@ -422,7 +422,7 @@ const SlotPage: React.FC = () => {
                   <div className="text-2xl">🎰</div>
                   <div>
                     <div className="text-gray-400 text-sm font-medium">{t('slots.spin_cost')}</div>
-                    <div className="text-white text-xl font-semibold">10 ₽</div>
+                    <div className="text-white text-xl font-semibold">Бесплатно</div>
                   </div>
                 </div>
               </div>
@@ -464,11 +464,6 @@ const SlotPage: React.FC = () => {
               {/* Сообщения */}
               {!canPlay && auth.user && (
                 <>
-                  {Number(auth.user.balance || 0) < 10 && (
-                    <div className="mt-4 p-4 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300 max-w-sm mx-auto">
-                      <div className="font-medium">{t('slots.insufficient_funds')}</div>
-                    </div>
-                  )}
 
                   {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
                     <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
