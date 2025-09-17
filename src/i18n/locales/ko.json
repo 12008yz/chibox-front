@@ -569,7 +569,7 @@
     "description": "同じアイテム3つを揃えて勝利",
     "spin_cost": "スピン料金",
     "your_balance": "残高",
-    "play_button": "プレイ (10 ₽)",
+    "play_button": "プレイ",
     "spinning": "スピン中...",
     "loading_items": "アイテム読み込み中...",
     "preparing_game": "ゲーム準備中",

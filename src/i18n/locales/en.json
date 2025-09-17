@@ -738,7 +738,7 @@
     "description": "Get 3 matching items to win",
     "spin_cost": "Spin Cost",
     "your_balance": "Your Balance",
-    "play_button": "Play (10 ₽)",
+    "play_button": "Play",
     "spinning": "Spinning...",
     "loading_items": "Loading items...",
     "preparing_game": "Preparing game",

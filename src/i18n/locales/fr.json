@@ -534,7 +534,7 @@
     "description": "Obtenez 3 objets identiques pour gagner",
     "spin_cost": "Coût du Tour",
     "your_balance": "Votre Solde",
-    "play_button": "Jouer (10 ₽)",
+    "play_button": "Jouer",
     "spinning": "En cours...",
     "loading_items": "Chargement des objets...",
     "preparing_game": "Préparation du jeu",

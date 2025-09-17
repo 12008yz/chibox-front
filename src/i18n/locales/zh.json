@@ -535,7 +535,7 @@
     "description": "获得3个相同物品即可获胜",
     "spin_cost": "旋转费用",
     "your_balance": "您的余额",
-    "play_button": "游戏 (10 ₽)",
+    "play_button": "游戏",
     "spinning": "旋转中...",
     "loading_items": "加载物品中...",
     "preparing_game": "准备游戏中",
