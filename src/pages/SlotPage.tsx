@@ -7,6 +7,7 @@ import Monetary from '../components/Monetary';
 import type { SlotItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { t } from 'i18next';
+import CountdownTimer from '../components/CountdownTimer';
 
 // Функция для безопасного преобразования типов API в SlotItem
 const convertToSlotItem = (item: any): SlotItem => {
@@ -202,10 +203,17 @@ const SlotPage: React.FC = () => {
 
   // Получаем предметы для слота из API
   const { data: slotItemsData, isLoading: isLoadingItems, error: itemsError } = useGetSlotItemsQuery();
-  const { data: slotStatusData, isLoading: isLoadingStatus } = useGetSlotStatusQuery(undefined, {
+  const { data: slotStatusData, isLoading: isLoadingStatus, refetch: refetchSlotStatus } = useGetSlotStatusQuery(undefined, {
     skip: !auth.user
   });
   const [playSlot, { isLoading }] = usePlaySlotMutation();
+
+  // Функция для обновления статуса слота когда таймер завершится
+  const handleTimerComplete = () => {
+    if (refetchSlotStatus) {
+      refetchSlotStatus();
+    }
+  };
 
   // Когда получаем предметы из API, обновляем displayItems
   useEffect(() => {
@@ -386,9 +394,13 @@ const SlotPage: React.FC = () => {
                     </div>
 
                     <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
-                      <div className="text-gray-400 text-sm font-medium mb-2">Сброс лимита</div>
+                      <div className="text-gray-400 text-sm font-medium mb-2">Сброс лимита через</div>
                       <div className="text-sm text-white font-medium">
-                        {slotStatusData.data.nextResetTimeFormatted}
+                        <CountdownTimer
+                          targetTime={slotStatusData.data.nextResetTime}
+                          className="text-blue-400"
+                          onComplete={handleTimerComplete}
+                        />
                       </div>
                       <div className="text-xs text-gray-500 mt-1">16:00 МСК ежедневно</div>
                     </div>
@@ -399,15 +411,6 @@ const SlotPage: React.FC = () => {
                       <div className="font-medium">💎 Нужна подписка для игры в слот!</div>
                       <div className="text-sm mt-1">
                         Статус (1 спин) • Статус+ (2 спина) • Статус++ (3 спина)
-                      </div>
-                    </div>
-                  )}
-
-                  {slotStatusData.data.hasSubscription && slotStatusData.data.remaining === 0 && (
-                    <div className="mt-4 p-3 bg-red-900/20 border border-red-400/50 rounded-lg text-red-300">
-                      <div className="font-medium">🚫 Дневной лимит исчерпан</div>
-                      <div className="text-sm mt-1">
-                        Следующая возможность: {slotStatusData.data.nextResetTimeFormatted}
                       </div>
                     </div>
                   )}
@@ -475,7 +478,13 @@ const SlotPage: React.FC = () => {
                   {slotStatusData?.data && slotStatusData.data.hasSubscription && slotStatusData.data.remaining === 0 && (
                     <div className="mt-4 p-4 bg-orange-900/20 border border-orange-400/50 rounded-lg text-orange-300 max-w-sm mx-auto">
                       <div className="font-medium">🕐 Лимит исчерпан</div>
-                      <div className="text-sm mt-1">Ждите сброса в 16:00 МСК</div>
+                      <div className="text-sm mt-1">
+                        Сброс через: <CountdownTimer
+                          targetTime={slotStatusData.data.nextResetTime}
+                          className="text-orange-200 font-medium"
+                          onComplete={handleTimerComplete}
+                        />
+                      </div>
                     </div>
                   )}
                 </>
