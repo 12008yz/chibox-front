@@ -30,7 +30,7 @@ interface UpgradeResult {
     success_chance: number;
     rolled_value: number;
     total_source_price: number;
-    quantity_bonus: number;
+    cheap_target_bonus: number;
   };
 }
 
@@ -656,7 +656,7 @@ const UpgradePage: React.FC = () => {
           success_chance: result.data.success_chance,
           rolled_value: result.data.rolled_value,
           total_source_price: result.data.total_source_price,
-          quantity_bonus: result.data.quantity_bonus
+          cheap_target_bonus: result.data.cheap_target_bonus
         }
       };
       setUpgradeResult(adaptedResult);

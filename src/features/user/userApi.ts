@@ -670,7 +670,7 @@ export const userApi = baseApi.injectEndpoints({
           upgrade_chance: number;
           price_ratio: number;
           base_chance: number;
-          quantity_bonus: number;
+          cheap_target_bonus: number;
         }>;
       }>,
       string | string[]
@@ -713,7 +713,7 @@ export const userApi = baseApi.injectEndpoints({
         success_chance: number;
         rolled_value: number;
         total_source_price: number;
-        quantity_bonus: number;
+        cheap_target_bonus: number;
       }> & {
         upgrade_success: boolean;
       },
