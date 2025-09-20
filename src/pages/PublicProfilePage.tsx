@@ -100,9 +100,25 @@ const PublicProfilePage: React.FC = () => {
     return t(`public_profile.achievement_categories.${category}`, category);
   };
 
+  const getItemStatusInfo = (status: string) => {
+    switch (status) {
+      case 'sold':
+        return { color: 'bg-green-400', text: t('profile.status.sold', 'Продан') };
+      case 'withdrawn':
+        return { color: 'bg-blue-400', text: t('profile.status.withdrawn', 'Выведен') };
+      case 'used':
+        return { color: 'bg-purple-400', text: t('profile.status.used', 'Использован') };
+      case 'inventory':
+        return { color: 'bg-gray-400', text: t('profile.status.active', 'Активен') };
+      default:
+        return { color: 'bg-gray-400', text: status };
+    }
+  };
+
   // Найти лучшее оружие (аналогично приватному профилю)
   const bestWeapon = user.bestWeapon;
   const inventory = user.inventory || [];
+  const caseItems = (user as any).caseItems || []; // Все предметы из кейсов
   const achievements = user.achievements || [];
   const dropBonuses = user.dropBonuses || { achievements: 0, subscription: 0, level: 0, total: 0 };
 
@@ -114,10 +130,8 @@ const PublicProfilePage: React.FC = () => {
   };
 
   const getOpenedCases = () => {
-    // Предметы, полученные из кейсов
-    return inventory.filter(item =>
-      item.source === 'case'
-    );
+    // Все предметы, полученные из кейсов (включая проданные/выведенные)
+    return caseItems;
   };
 
   // Получаем инвентарь в зависимости от активного таба
@@ -272,7 +286,7 @@ const PublicProfilePage: React.FC = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">{t('public_profile.items_in_inventory')}</p>
-                <p className="text-xl font-bold text-white">{inventory.length}</p>
+                <p className="text-xl font-bold text-white">{getActiveInventory().length}</p>
               </div>
             </div>
           </div>
@@ -416,7 +430,7 @@ const PublicProfilePage: React.FC = () => {
         </div>
 
         {/* Inventory Section */}
-        {inventory.length > 0 && (
+        {(inventory.length > 0 || caseItems.length > 0) && (
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2">
@@ -450,7 +464,7 @@ const PublicProfilePage: React.FC = () => {
                 <button
                   onClick={() => setActiveInventoryTab('opened')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    activeInventoryTab === 'opened'
+                    (activeInventoryTab as 'active' | 'opened') === 'opened'
                       ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
                       : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50'
                   }`}
@@ -465,8 +479,8 @@ const PublicProfilePage: React.FC = () => {
 
               {/* Описание активной вкладки */}
               <div className="mb-4 text-sm text-gray-400">
-                {activeInventoryTab === 'active' && t('public_profile.inventory_description_active')}
-                {activeInventoryTab === 'opened' && t('public_profile.inventory_description_opened')}
+                {(activeInventoryTab as 'active' | 'opened') === 'active' && t('public_profile.inventory_description_active')}
+                {(activeInventoryTab as 'active' | 'opened') === 'opened' && t('public_profile.inventory_description_opened')}
               </div>
 
               {/* Toggle Button для показа всех предметов */}
@@ -496,7 +510,7 @@ const PublicProfilePage: React.FC = () => {
 
             {filteredInventory.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {activeInventoryTab === 'opened' ? (
+                {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
                   (showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => {
                     const caseTemplate = inventoryItem.case_template_id
@@ -558,6 +572,15 @@ const PublicProfilePage: React.FC = () => {
                               inventoryItem.source
                             }</p>
                           )}
+                          {/* Статус предмета для открытых кейсов */}
+                          {(activeInventoryTab as 'active' | 'opened') === 'opened' && inventoryItem.status && (
+                            <div className="mt-1 flex items-center gap-1">
+                              <div className={`w-2 h-2 rounded-full ${getItemStatusInfo(inventoryItem.status).color}`}></div>
+                              <span className="capitalize text-xs">
+                                {getItemStatusInfo(inventoryItem.status).text}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -587,12 +610,12 @@ const PublicProfilePage: React.FC = () => {
                   </svg>
                 </div>
                 <h4 className="text-lg font-semibold text-gray-300 mb-2">
-                  {activeInventoryTab === 'active' && t('public_profile.no_active_items')}
-                  {activeInventoryTab === 'opened' && t('public_profile.no_opened_cases')}
+                  {(activeInventoryTab as 'active' | 'opened') === 'active' && t('public_profile.no_active_items')}
+                  {(activeInventoryTab as 'active' | 'opened') === 'opened' && t('public_profile.no_opened_cases')}
                 </h4>
                 <p className="text-gray-400 text-sm">
-                  {activeInventoryTab === 'active' && t('public_profile.no_active_items_description')}
-                  {activeInventoryTab === 'opened' && t('public_profile.no_opened_cases_description')}
+                  {(activeInventoryTab as 'active' | 'opened') === 'active' && t('public_profile.no_active_items_description')}
+                  {(activeInventoryTab as 'active' | 'opened') === 'opened' && t('public_profile.no_opened_cases_description')}
                 </p>
               </div>
             )}
