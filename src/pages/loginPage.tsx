@@ -5,6 +5,7 @@ import { useLoginMutation } from '../features/auth/authApi';
 import { useAuthHandlers } from '../hooks/useAuthHandlers';
 import SteamLoginButton from '../components/SteamLoginButton';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import SnakeGameBackground from '../components/SnakeGameBackground';
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -41,11 +42,14 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151225] gaming-font">
+    <div className="min-h-screen bg-[#151225] gaming-font relative overflow-hidden">
       <ScrollToTopOnMount />
 
-      {/* Простой статичный фон без анимаций */}
-      <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Фоновая игра в змейку */}
+      <SnakeGameBackground />
+
+      {/* Основное содержимое */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Простая карта без эффектов */}
           <div className="bg-[#19172D] border border-cyan-400/20 rounded-2xl p-8">
