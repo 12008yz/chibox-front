@@ -6,6 +6,7 @@ import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi'
 import { loginSuccess } from '../features/auth/authSlice';
 import SteamLoginButton from '../components/SteamLoginButton';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import SnakeGameBackground from '../components/SnakeGameBackground';
 import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 const RegisterPage: React.FC = () => {
@@ -83,14 +84,17 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151225] gaming-font">
+    <div className="min-h-screen bg-[#151225] gaming-font relative">
       <ScrollToTopOnMount />
 
-      {/* Простой статичный фон без анимаций */}
-      <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Игра в змейку в качестве фона */}
+      <SnakeGameBackground />
+
+      {/* Контент с формой регистрации */}
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
         <div className="w-full max-w-md">
-          {/* Простая карта без эффектов */}
-          <div className="bg-[#19172D] border border-cyan-400/20 rounded-2xl p-8">
+          {/* Карта регистрации с прозрачностью для лучшей интеграции с фоном */}
+          <div className="bg-[#19172D]/80 backdrop-blur-sm border border-cyan-400/30 rounded-2xl p-8 shadow-2xl">
             {/* Простой логотип без эффектов */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -117,7 +121,7 @@ const RegisterPage: React.FC = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#19172D]/70 backdrop-blur-sm border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 shadow-lg"
                   placeholder={t('auth.username_placeholder')}
                 />
               </div>
@@ -132,7 +136,7 @@ const RegisterPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#19172D]/70 backdrop-blur-sm border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 shadow-lg"
                   placeholder={t('auth.email_placeholder')}
                 />
               </div>
@@ -147,7 +151,7 @@ const RegisterPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#19172D]/70 backdrop-blur-sm border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 shadow-lg"
                   placeholder={t('auth.password_placeholder')}
                 />
                 <div className="text-xs text-cyan-400/70">{t('auth.password_min_chars')}</div>
@@ -163,14 +167,14 @@ const RegisterPage: React.FC = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full bg-[#19172D]/50 border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#19172D]/70 backdrop-blur-sm border border-cyan-400/30 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-cyan-400 shadow-lg"
                   placeholder={t('auth.password_placeholder')}
                 />
               </div>
 
               {/* Ошибка */}
               {error && (
-                <div className="p-4 bg-red-500/10 border border-red-400/30 rounded-xl">
+                <div className="p-4 bg-red-500/20 backdrop-blur-sm border border-red-400/40 rounded-xl shadow-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-5 h-5 bg-red-400 rounded-full flex items-center justify-center">
                       <span className="text-black text-xs font-bold">!</span>
