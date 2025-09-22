@@ -47,6 +47,14 @@ export interface User {
   // Дополнительные поля для данных профиля
   achievements?: UserAchievement[];
   inventory?: UserInventoryItem[];
+  bestWeapon?: {
+    id: string;
+    name: string;
+    image_url: string;
+    price: number;
+    rarity: string;
+    weapon_type?: string;
+  };
 }
 
 export interface CaseTemplate {

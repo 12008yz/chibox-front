@@ -632,9 +632,10 @@ const ProfilePage: React.FC = () => {
   // Завершенные достижения
   const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.completed).length;
 
-  // Находим самый дорогой предмет как "лучшее оружие"
-  const bestWeapon = inventory
-    .filter((item): item is UserInventoryItem => item.status === 'inventory' && isUserItem(item) && !!item.item.price)
+  // Используем лучшее оружие за всё время (аналогично PublicProfilePage)
+  // Если не установлено на сервере, ищем в текущем инвентаре как fallback
+  const bestWeapon = user.bestWeapon || inventory
+    .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 
   // Функции для фильтрации инвентаря по разным категориям
@@ -1137,7 +1138,7 @@ const ProfilePage: React.FC = () => {
                   <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57-1.116-.334-.804-.614-1.768-.84-2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
                 </svg>
               </div>
-{t('profile.best_weapon')}
+{t('public_profile.all_time_record')}
             </h3>
 
             {(inventoryLoading && !user.inventory?.length) ? (
@@ -1145,13 +1146,18 @@ const ProfilePage: React.FC = () => {
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-gray-400">{t('common.loading')}</p>
               </div>
-            ) : bestWeapon && isUserItem(bestWeapon) ? (
+            ) : bestWeapon ? (
               <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
                 <div className="flex items-center gap-6">
-                  <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.item.rarity)} p-1 flex items-center justify-center shadow-lg item-image-container`}>
+                  <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(
+                    'rarity' in bestWeapon ? bestWeapon.rarity : bestWeapon.item.rarity
+                  )} p-1 flex items-center justify-center shadow-lg item-image-container`}>
                     <img
-                      src={getItemImageUrl(bestWeapon.item.image_url, bestWeapon.item.name)}
-                      alt={bestWeapon.item.name}
+                      src={getItemImageUrl(
+                        'image_url' in bestWeapon ? bestWeapon.image_url : bestWeapon.item.image_url,
+                        'name' in bestWeapon ? bestWeapon.name : bestWeapon.item.name
+                      )}
+                      alt={'name' in bestWeapon ? bestWeapon.name : bestWeapon.item.name}
                       className="w-full h-full object-contain rounded-lg item-image"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
@@ -1166,15 +1172,27 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-2">{bestWeapon.item.name}</h4>
+                    <h4 className="text-lg font-bold text-white mb-2">
+                      {'name' in bestWeapon ? bestWeapon.name : bestWeapon.item.name}
+                    </h4>
                     <div className="flex items-center gap-4 mb-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.item.rarity)} text-white`}>
-                        {getRarityName(bestWeapon.item.rarity)}
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(
+                        'rarity' in bestWeapon ? bestWeapon.rarity : bestWeapon.item.rarity
+                      )} text-white`}>
+                        {getRarityName('rarity' in bestWeapon ? bestWeapon.rarity : bestWeapon.item.rarity)}
                       </span>
-                      <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.item.price).toFixed(2)} КР</span>
+                      <span className="text-green-400 font-bold text-lg">
+                        {Number('price' in bestWeapon ? bestWeapon.price : bestWeapon.item.price).toFixed(2)} КР
+                      </span>
                     </div>
                     <p className="text-gray-400 text-sm">
-                      {t('profile.acquired_date')} {new Date((bestWeapon as any).acquisition_date).toLocaleDateString()}
+                      {'weapon_type' in bestWeapon ? (
+                        `${t('profile.weapon_type')} ${bestWeapon.weapon_type || t('profile.weapon_type_default')}`
+                      ) : 'acquisition_date' in bestWeapon ? (
+                        `${t('profile.acquired_date')} ${new Date(bestWeapon.acquisition_date).toLocaleDateString()}`
+                      ) : (
+                        `${t('profile.weapon_type')} ${t('profile.weapon_type_default')}`
+                      )}
                     </p>
                   </div>
                 </div>
