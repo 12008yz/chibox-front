@@ -40,25 +40,6 @@ export const useAchievements = () => {
   // Функция для переключения состояния секции достижений
   const toggleAchievements = () => {
     console.log('toggleAchievements clicked, current state:', isAchievementsExpanded);
-    // Если секция разворачивается, автоматически скроллим к ней
-    if (!isAchievementsExpanded) {
-      setTimeout(() => {
-        const achievementsElement = document.querySelector('[data-achievements-section]');
-        if (achievementsElement) {
-          achievementsElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest'
-          });
-        }
-      }, 100);
-    } else {
-      // При сворачивании через кнопку скроллим вверх к началу страницы
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
     setIsAchievementsExpanded(!isAchievementsExpanded);
   };
 

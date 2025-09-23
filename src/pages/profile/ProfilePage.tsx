@@ -148,7 +148,7 @@ const ProfilePage: React.FC = () => {
       [
         ...(inventoryData.data.items || []),
         ...(inventoryData.data.cases || [])
-      ] : (user.inventory || []);
+      ] : (user?.inventory || []);
 
     // Находим кейс в инвентаре для получения информации о шаблоне
     const caseItem = rawInventory.find((item: any) =>
