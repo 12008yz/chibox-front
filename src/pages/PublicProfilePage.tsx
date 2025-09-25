@@ -117,6 +117,20 @@ const PublicProfilePage: React.FC = () => {
 
   // Найти лучшее оружие (аналогично приватному профилю)
   const bestWeapon = user.bestWeapon;
+
+  // DEBUG: Логи для отладки цены лучшего предмета
+  console.log('=== PUBLIC PROFILE DEBUG ===');
+  console.log('user.bestWeapon:', bestWeapon);
+  console.log('user.bestItemValue:', user.bestItemValue);
+  console.log('user.totalItemsValue:', user.totalItemsValue);
+  if (bestWeapon) {
+    console.log('bestWeapon.price:', bestWeapon.price);
+    console.log('bestWeapon.name:', bestWeapon.name);
+    console.log('bestWeapon.rarity:', bestWeapon.rarity);
+    console.log('bestWeapon.isRecord:', (bestWeapon as any).isRecord);
+    console.log('Number(bestWeapon.price):', Number(bestWeapon.price));
+  }
+  console.log('=== END DEBUG ===');
   const inventory = user.inventory || [];
   const caseItems = (user as any).caseItems || []; // Все предметы из кейсов
   const achievements = user.achievements || [];
@@ -392,24 +406,24 @@ const PublicProfilePage: React.FC = () => {
           {bestWeapon ? (
             <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
               <div className="flex items-center gap-6">
-                <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.rarity)} p-1 flex items-center justify-center shadow-lg`}>
+                <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.rarity || '')} p-1 flex items-center justify-center shadow-lg`}>
                   <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center">
                     <img
-                      src={getItemImageUrl(bestWeapon.image_url, bestWeapon.name)}
-                      alt={bestWeapon.name}
+                      src={getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
+                      alt={bestWeapon.name || ''}
                       className="w-full h-full object-contain rounded-lg"
                     />
                   </div>
                 </div>
                 <div className="flex-1">
                   <h4 className="text-lg font-bold text-white mb-2">
-                    {bestWeapon.name}
+                    {bestWeapon.name || ''}
                   </h4>
                   <div className="flex items-center gap-4 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity)} text-white`}>
-                      {getRarityName(bestWeapon.rarity)}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white`}>
+                      {getRarityName(bestWeapon.rarity || '')}
                     </span>
-                    <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price).toFixed(2)}{t('common.currency_suffix')}</span>
+                    <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price || 0).toFixed(2)}{t('common.currency_suffix')}</span>
                   </div>
                   <p className="text-gray-400 text-sm">
                     {t('public_profile.weapon_type')} {bestWeapon.weapon_type || t('public_profile.weapon_type_default')}
@@ -556,7 +570,7 @@ const PublicProfilePage: React.FC = () => {
                       <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                         {inventoryItem.item.name}
                       </h5>
-                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)}{t('common.currency_suffix')}</p>
+                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item?.price || inventoryItem.price || 0).toFixed(2)}{t('common.currency_suffix')}</p>
                       <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                         {getRarityName(inventoryItem.item.rarity)}
                       </p>

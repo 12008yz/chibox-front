@@ -20,6 +20,18 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item?.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 
+  // DEBUG: Логи для отладки цены лучшего предмета в обычном профиле
+  console.log('=== PRIVATE PROFILE DEBUG ===');
+  console.log('user.bestWeapon:', user.bestWeapon);
+  console.log('inventory bestWeapon found:', bestWeapon);
+  if (bestWeapon) {
+    console.log('bestWeapon.price:', (bestWeapon as any).price);
+    console.log('bestWeapon.item?.price:', (bestWeapon as any).item?.price);
+    console.log('bestWeapon.name:', (bestWeapon as any).name || (bestWeapon as any).item?.name);
+    console.log('Final price used:', Number((bestWeapon as any).price || (bestWeapon as any).item?.price || 0));
+  }
+  console.log('=== END DEBUG ===');
+
   const renderEmptyState = () => (
     <div className="text-center py-8">
       <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
