@@ -417,7 +417,7 @@ const PublicProfilePage: React.FC = () => {
                   </h4>
                   <div className="flex items-center gap-4 mb-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white`}>
-                      {getRarityName(bestWeapon.rarity || '', t)}
+                      {getRarityName(bestWeapon.rarity || '')}
                     </span>
                     <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price || 0).toFixed(2)}{t('common.currency_suffix')}</span>
                     {(bestWeapon as any).isRecord && (
