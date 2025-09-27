@@ -20,20 +20,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item?.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 
-  // DEBUG: Логи для отладки цены лучшего предмета в обычном профиле
-  console.log('=== PRIVATE PROFILE DEBUG ===');
-  console.log('user.bestWeapon:', user.bestWeapon);
-  console.log('user.bestItemValue:', user.bestItemValue);
-  console.log('inventory bestWeapon found:', bestWeapon);
-  if (bestWeapon) {
-    console.log('bestWeapon type check - direct weapon:', !!bestWeapon.price);
-    console.log('bestWeapon type check - inventory item:', !!bestWeapon.item);
-    console.log('bestWeapon.price:', bestWeapon.price);
-    console.log('bestWeapon.item?.price:', bestWeapon.item?.price);
-    console.log('bestWeapon.name:', bestWeapon.name || bestWeapon.item?.name);
-    console.log('Final price used:', Number(bestWeapon.price || bestWeapon.item?.price || 0));
-  }
-  console.log('=== END DEBUG ===');
+
 
   const renderEmptyState = () => (
     <div className="text-center py-8">
@@ -98,7 +85,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
                 {getRarityName(weaponData?.rarity || '', t)}
               </span>
               <span className="text-green-400 font-bold text-lg">
-                {Number(weaponPrice).toFixed(3)} КР
+                {Number(weaponPrice).toFixed(2)}{t('common.currency_suffix')}
               </span>
               {bestWeapon.isRecord && (
                 <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">
