@@ -14,7 +14,7 @@ interface BestWeaponProps {
 const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoading }) => {
   const { t } = useTranslation();
 
-  // Используем лучшее оружие за всё время
+  // Используем лучшее оружие за всё время с сервера
   // Если bestWeapon не установлено на сервере, ищем среди всех предметов в инвентаре
   const bestWeapon = user.bestWeapon || inventory
     .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item?.price)
@@ -23,12 +23,15 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
   // DEBUG: Логи для отладки цены лучшего предмета в обычном профиле
   console.log('=== PRIVATE PROFILE DEBUG ===');
   console.log('user.bestWeapon:', user.bestWeapon);
+  console.log('user.bestItemValue:', user.bestItemValue);
   console.log('inventory bestWeapon found:', bestWeapon);
   if (bestWeapon) {
-    console.log('bestWeapon.price:', (bestWeapon as any).price);
-    console.log('bestWeapon.item?.price:', (bestWeapon as any).item?.price);
-    console.log('bestWeapon.name:', (bestWeapon as any).name || (bestWeapon as any).item?.name);
-    console.log('Final price used:', Number((bestWeapon as any).price || (bestWeapon as any).item?.price || 0));
+    console.log('bestWeapon type check - direct weapon:', !!bestWeapon.price);
+    console.log('bestWeapon type check - inventory item:', !!bestWeapon.item);
+    console.log('bestWeapon.price:', bestWeapon.price);
+    console.log('bestWeapon.item?.price:', bestWeapon.item?.price);
+    console.log('bestWeapon.name:', bestWeapon.name || bestWeapon.item?.name);
+    console.log('Final price used:', Number(bestWeapon.price || bestWeapon.item?.price || 0));
   }
   console.log('=== END DEBUG ===');
 
@@ -52,65 +55,78 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     </div>
   );
 
-  const renderBestWeapon = () => (
-    <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
-      <div className="flex items-center gap-6">
-        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(
-          (bestWeapon as any).rarity || (bestWeapon as any).item?.rarity || ''
-        )} p-1 flex items-center justify-center shadow-lg item-image-container`}>
-          <img
-            src={getItemImageUrl(
-              (bestWeapon as any).image_url || (bestWeapon as any).item?.image_url || '',
-              (bestWeapon as any).name || (bestWeapon as any).item?.name || ''
-            )}
-            alt={(bestWeapon as any).name || (bestWeapon as any).item?.name || ''}
-            className="w-full h-full object-contain rounded-lg item-image"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-              if (nextElement) nextElement.style.display = 'flex';
-            }}
-          />
-          <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
-            <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-            </svg>
+  const renderBestWeapon = () => {
+    // Определяем, является ли bestWeapon объектом из сервера (с прямыми полями)
+    // или элементом инвентаря (с вложенным объектом item)
+    const isDirectWeapon = !!bestWeapon.price && !bestWeapon.item;
+    const weaponData = isDirectWeapon ? bestWeapon : bestWeapon.item;
+    const weaponPrice = isDirectWeapon ? bestWeapon.price : (bestWeapon.item?.price || 0);
+
+    return (
+      <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
+        <div className="flex items-center gap-6">
+          <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(
+            weaponData?.rarity || ''
+          )} p-1 flex items-center justify-center shadow-lg item-image-container`}>
+            <img
+              src={getItemImageUrl(
+                weaponData?.image_url || '',
+                weaponData?.name || ''
+              )}
+              alt={weaponData?.name || ''}
+              className="w-full h-full object-contain rounded-lg item-image"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                if (nextElement) nextElement.style.display = 'flex';
+              }}
+            />
+            <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
+              <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+              </svg>
+            </div>
           </div>
-        </div>
-        <div className="flex-1">
-          <h4 className="text-lg font-bold text-white mb-2">
-            {(bestWeapon as any).name || (bestWeapon as any).item?.name || ''}
-          </h4>
-          <div className="flex items-center gap-4 mb-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(
-              (bestWeapon as any).rarity || (bestWeapon as any).item?.rarity || ''
-            )} text-white`}>
-              {getRarityName((bestWeapon as any).rarity || (bestWeapon as any).item?.rarity || '', t)}
-            </span>
-            <span className="text-green-400 font-bold text-lg">
-              {Number((bestWeapon as any).price || (bestWeapon as any).item?.price || 0).toFixed(2)} КР
-            </span>
+          <div className="flex-1">
+            <h4 className="text-lg font-bold text-white mb-2">
+              {weaponData?.name || ''}
+            </h4>
+            <div className="flex items-center gap-4 mb-2">
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(
+                weaponData?.rarity || ''
+              )} text-white`}>
+                {getRarityName(weaponData?.rarity || '', t)}
+              </span>
+              <span className="text-green-400 font-bold text-lg">
+                {Number(weaponPrice).toFixed(3)} КР
+              </span>
+              {bestWeapon.isRecord && (
+                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">
+                  {t('profile.all_time_record')}
+                </span>
+              )}
+            </div>
+            <p className="text-gray-400 text-sm">
+              {weaponData?.weapon_type ? (
+                `${t('profile.weapon_type')} ${weaponData.weapon_type || t('profile.weapon_type_default')}`
+              ) : bestWeapon.acquisition_date ? (
+                `${t('profile.acquired_date')} ${new Date(bestWeapon.acquisition_date as string).toLocaleDateString()}`
+              ) : (
+                `${t('profile.weapon_type')} ${t('profile.weapon_type_default')}`
+              )}
+            </p>
           </div>
-          <p className="text-gray-400 text-sm">
-            {(bestWeapon as any).weapon_type ? (
-              `${t('profile.weapon_type')} ${(bestWeapon as any).weapon_type || t('profile.weapon_type_default')}`
-            ) : (bestWeapon as any).acquisition_date ? (
-              `${t('profile.acquired_date')} ${new Date((bestWeapon as any).acquisition_date as string).toLocaleDateString()}`
-            ) : (
-              `${t('profile.weapon_type')} ${t('profile.weapon_type_default')}`
-            )}
-          </p>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="lg:col-span-2 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
       <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
         <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
           <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57-1.116-.334-.804-.614-1.768-.84-2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 01-.613 3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
           </svg>
         </div>
         {t('public_profile.all_time_record')}
