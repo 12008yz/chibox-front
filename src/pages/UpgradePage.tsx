@@ -139,21 +139,7 @@ const UpgradeAnimation: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center z-50 backdrop-blur-sm">
-      {/* Тонкие анимированные частицы */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-slate-400 rounded-full opacity-30 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
+
 
       <div className="text-center max-w-4xl mx-auto px-6 relative z-10">
         {/* Элегантный заголовок */}

@@ -1,17 +1,152 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Wheel } from 'react-custom-roulette';
 import { usePlayRouletteMutation } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 
-// Мы будем динамически создавать wheelData с переводами внутри компонента
-
-// Фразы теперь будут получаться из переводов
+// Конфигурация 9 секций рулетки
+const ROULETTE_SEGMENTS = [
+  { id: 0, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 1, type: 'sub_1_day', value: 1, color: '#059669', textColor: '#FFFFFF' },
+  { id: 2, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 3, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 4, type: 'sub_2_days', value: 2, color: '#DC2626', textColor: '#FFFFFF' },
+  { id: 5, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 6, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 7, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' },
+  { id: 8, type: 'empty', value: 0, color: '#6B7280', textColor: '#FFFFFF' }
+];
 
 // Функция для получения случайной фразы
 const getRandomMessage = (messages: string[]): string => {
   return messages[Math.floor(Math.random() * messages.length)];
+};
+
+// Компонент колеса рулетки
+const RouletteWheel: React.FC<{
+  isSpinning: boolean;
+  rotationAngle: number;
+  t: any;
+}> = ({ isSpinning, rotationAngle, t }) => {
+  const segmentAngle = 360 / 9; // 40 градусов на секцию
+  const radius = 120;
+  const centerX = 150;
+  const centerY = 150;
+
+  // Создаем путь для каждой секции
+  const createSegmentPath = (index: number) => {
+    const startAngle = (index * segmentAngle - segmentAngle / 2) * (Math.PI / 180);
+    const endAngle = ((index + 1) * segmentAngle - segmentAngle / 2) * (Math.PI / 180);
+
+    const x1 = centerX + radius * Math.cos(startAngle);
+    const y1 = centerY + radius * Math.sin(startAngle);
+    const x2 = centerX + radius * Math.cos(endAngle);
+    const y2 = centerY + radius * Math.sin(endAngle);
+
+    const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+
+    return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+  };
+
+  // Позиция текста для каждой секции
+  const getTextPosition = (index: number) => {
+    const angle = (index * segmentAngle) * (Math.PI / 180);
+    const textRadius = radius * 0.75;
+    const x = centerX + textRadius * Math.cos(angle);
+    const y = centerY + textRadius * Math.sin(angle) + 5; // +5 для центрирования по вертикали
+    return { x, y, angle: angle * (180 / Math.PI) };
+  };
+
+  // Получаем текст для секции
+  const getSegmentText = (segment: typeof ROULETTE_SEGMENTS[0]) => {
+    if (segment.type === 'sub_1_day') return `1 ${t('time.day')}`;
+    if (segment.type === 'sub_2_days') return `2 ${t('time.days')}`;
+    return t('roulette.empty');
+  };
+
+  return (
+    <div className="relative">
+      <svg
+        width="300"
+        height="300"
+        className="drop-shadow-lg"
+      >
+        {/* Внешний круг/рамка */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={radius + 5}
+          fill="none"
+          stroke="#374151"
+          strokeWidth="10"
+        />
+
+        {/* Колесо с анимацией */}
+        <g
+          style={{
+            transformOrigin: `${centerX}px ${centerY}px`,
+            transform: `rotate(${rotationAngle}deg)`,
+            transition: isSpinning ? 'transform 3s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
+          }}
+        >
+          {ROULETTE_SEGMENTS.map((segment, index) => {
+            const textPos = getTextPosition(index);
+            return (
+              <g key={segment.id}>
+                {/* Секция */}
+                <path
+                  d={createSegmentPath(index)}
+                  fill={segment.color}
+                  stroke="#1F2937"
+                  strokeWidth="2"
+                />
+
+                {/* Текст секции */}
+                <text
+                  x={textPos.x}
+                  y={textPos.y}
+                  fill={segment.textColor}
+                  fontSize="12"
+                  fontWeight="600"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={`rotate(${textPos.angle + 90}, ${textPos.x}, ${textPos.y})`}
+                >
+                  {getSegmentText(segment)}
+                </text>
+              </g>
+            );
+          })}
+        </g>
+
+        {/* Центральный круг */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r="15"
+          fill="#1F2937"
+          stroke="#374151"
+          strokeWidth="2"
+        />
+      </svg>
+
+      {/* Указатель/стрелка */}
+      <div
+        className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10"
+        style={{ marginLeft: '-1px' }}
+      >
+        <div
+          className="w-0 h-0"
+          style={{
+            borderLeft: '12px solid transparent',
+            borderRight: '12px solid transparent',
+            borderTop: '20px solid #EF4444',
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+          }}
+        />
+      </div>
+    </div>
+  );
 };
 
 interface RouletteGameProps {
@@ -22,33 +157,20 @@ interface RouletteGameProps {
 
 const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className = '' }) => {
   const { t } = useTranslation();
-  const [mustSpin, setMustSpin] = useState(false);
-  const [prizeNumber, setPrizeNumber] = useState(0);
-  const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [startingPosition, setStartingPosition] = useState(0);
+  const [rotationAngle, setRotationAngle] = useState(0);
+  const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<any>(null);
+  const spinTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
-
-  // Конфигурация 9 секций рулетки для библиотеки
-  const wheelData = [
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 0
-    { option: '1 ' + t('time.day'), style: { backgroundColor: '#059669', textColor: '#FFFFFF' } },      // 1
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 2
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 3
-    { option: '2 ' + t('time.days'), style: { backgroundColor: '#DC2626', textColor: '#FFFFFF' } },     // 4
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 5
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 6
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } },       // 7
-    { option: t('roulette.empty'), style: { backgroundColor: '#6B7280', textColor: '#FFFFFF' } }        // 8
-  ];
 
   // Получаем локализованные сообщения
   const loseMessages = t('roulette.lose_messages', { returnObjects: true }) as string[];
   const winMessages = t('roulette.win_messages', { returnObjects: true }) as string[];
 
   // Проверяем, можно ли играть
-  const canPlay = !mustSpin && !isLoading && !nextPlayTime && !isSpinning;
+  const canPlay = !isSpinning && !isLoading && !nextPlayTime;
 
   useEffect(() => {
     // Проверяем, есть ли сохраненное время следующей игры
@@ -62,11 +184,17 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       }
     }
 
-    // Загружаем сохраненную позицию колеса
-    const savedPosition = localStorage.getItem('roulette_last_position');
-    if (savedPosition) {
-      setStartingPosition(parseInt(savedPosition, 10));
+    // Загружаем сохраненный угол поворота
+    const savedRotation = localStorage.getItem('roulette_last_rotation');
+    if (savedRotation) {
+      setRotationAngle(parseInt(savedRotation, 10));
     }
+
+    return () => {
+      if (spinTimeoutRef.current) {
+        clearTimeout(spinTimeoutRef.current);
+      }
+    };
   }, []);
 
   const spin = async () => {
@@ -77,13 +205,34 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       const response = await playRoulette().unwrap();
 
       if (response.success) {
-        // Устанавливаем результат и запускаем анимацию
-        setPrizeNumber(response.winner_index);
-        setMustSpin(true);
+        console.log('🎲 Рулетка - ответ сервера:', response);
+
+        // Получаем угол поворота от сервера
+        const targetRotation = rotationAngle + response.rotation_angle;
+
+        console.log('🎲 Рулетка - углы:', {
+          currentRotation: rotationAngle,
+          serverRotation: response.rotation_angle,
+          targetRotation: targetRotation,
+          winnerIndex: response.winner_index,
+          prizeType: response.prize_type
+        });
+
+        setRotationAngle(targetRotation);
+        setLastResult(response);
 
         // Сохраняем время следующей игры
         setNextPlayTime(response.next_time);
         localStorage.setItem('roulette_next_play_time', response.next_time);
+
+        // Сохраняем финальный угол поворота
+        localStorage.setItem('roulette_last_rotation', targetRotation.toString());
+
+        // Устанавливаем таймер для завершения анимации
+        spinTimeoutRef.current = setTimeout(() => {
+          handleSpinComplete(response);
+        }, 3000); // 3 секунды - время анимации
+
       } else {
         setIsSpinning(false);
         toast.error(response.message || t('roulette.something_went_wrong'));
@@ -100,19 +249,14 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   };
 
   // Обработка завершения вращения
-  const handleSpinComplete = () => {
-    setMustSpin(false);
+  const handleSpinComplete = (result: any) => {
     setIsSpinning(false);
 
-    // Сохраняем финальную позицию колеса для следующей игры
-    setStartingPosition(prizeNumber);
-    localStorage.setItem('roulette_last_position', prizeNumber.toString());
+    // Определяем сообщение на основе результата
+    const winnerSegment = ROULETTE_SEGMENTS[result.winner_index];
 
-    // Определяем сообщение на основе выигрышного сегмента
-    const wonSegment = wheelData[prizeNumber];
-
-    // Показываем результат сразу
-    if (wonSegment.option === t('roulette.empty')) {
+    // Показываем результат
+    if (winnerSegment.type === 'empty') {
       const randomLoseMessage = getRandomMessage(loseMessages);
       toast(randomLoseMessage, {
         icon: '😔',
@@ -206,38 +350,13 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
             <p className="text-xs text-gray-400">{t('roulette.games_per_day')}</p>
           </div>
 
-          {/* Колесо рулетки - ОПТИМИЗИРОВАНО */}
+          {/* Колесо рулетки - собственная реализация */}
           <div className="relative flex justify-center">
-            {isOpen && (
-              <Wheel
-                mustStartSpinning={mustSpin}
-                prizeNumber={prizeNumber}
-                data={wheelData}
-                onStopSpinning={handleSpinComplete}
-                backgroundColors={['#3f3f46', '#71717a']}
-                textColors={['#ffffff']}
-                outerBorderColor="#374151"
-                outerBorderWidth={4}
-                innerRadius={20}
-                innerBorderColor="#1f2937"
-                innerBorderWidth={2}
-                radiusLineColor="#374151"
-                radiusLineWidth={1}
-                fontSize={12}
-                textDistance={60}
-                spinDuration={2.0}
-                startingOptionIndex={startingPosition}
-                disableInitialAnimation={true}
-                perpendicularText={false}
-                pointerProps={{
-                  src: undefined,
-                  style: {
-                    transform: 'rotate(0deg)',
-                    willChange: 'auto'
-                  }
-                }}
-              />
-            )}
+            <RouletteWheel
+              isSpinning={isSpinning}
+              rotationAngle={rotationAngle}
+              t={t}
+            />
           </div>
 
           {/* Кнопка для вращения */}
@@ -259,7 +378,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
                     : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {isSpinning || mustSpin ? t('roulette.spinning') : isLoading ? t('common.loading') : t('roulette.spin_wheel')}
+                {isSpinning ? t('roulette.spinning') : isLoading ? t('common.loading') : t('roulette.spin_wheel')}
               </button>
             )}
           </div>
