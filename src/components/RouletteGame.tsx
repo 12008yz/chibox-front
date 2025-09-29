@@ -38,6 +38,17 @@ const RouletteWheel: React.FC<{
     const startAngle = (index * segmentAngle - segmentAngle / 2) * (Math.PI / 180);
     const endAngle = ((index + 1) * segmentAngle - segmentAngle / 2) * (Math.PI / 180);
 
+    // Логируем углы секций для отладки
+    if (index === 0) {
+      console.log('🎯 Углы секций:', ROULETTE_SEGMENTS.map((seg, idx) => ({
+        id: seg.id,
+        type: seg.type,
+        startDegrees: idx * segmentAngle - segmentAngle / 2,
+        endDegrees: (idx + 1) * segmentAngle - segmentAngle / 2,
+        centerDegrees: idx * segmentAngle
+      })));
+    }
+
     const x1 = centerX + radius * Math.cos(startAngle);
     const y1 = centerY + radius * Math.sin(startAngle);
     const x2 = centerX + radius * Math.cos(endAngle);
@@ -113,6 +124,20 @@ const RouletteWheel: React.FC<{
                   transform={`rotate(${textPos.angle + 90}, ${textPos.x}, ${textPos.y})`}
                 >
                   {getSegmentText(segment)}
+                </text>
+
+                {/* Номер секции для отладки */}
+                <text
+                  x={textPos.x}
+                  y={textPos.y - 15}
+                  fill="#FFFF00"
+                  fontSize="10"
+                  fontWeight="800"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={`rotate(${textPos.angle + 90}, ${textPos.x}, ${textPos.y - 15})`}
+                >
+                  #{index}
                 </text>
               </g>
             );
@@ -248,12 +273,71 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
     }
   };
 
+  // Функция для определения выигрышной секции по углу поворота
+  const getWinnerSegmentByAngle = (finalAngle: number): number => {
+    // Нормализуем угол к диапазону 0-360
+    const normalizedAngle = ((finalAngle % 360) + 360) % 360;
+
+    // Указатель находится сверху (0 градусов), нужно определить на какую секцию он указывает
+    // Каждая секция занимает 40 градусов (360 / 9)
+    const segmentAngle = 360 / 9;
+
+    // Указатель находится сверху (0 градусов)
+    // После поворота колеса на normalizedAngle градусов,
+    // позиция указателя относительно колеса
+    const pointerPosition = (360 - normalizedAngle) % 360;
+
+    // Определяем индекс секции
+    const segmentIndex = Math.floor(pointerPosition / segmentAngle) % 9;
+
+    // Детальное логирование для отладки
+    console.log('🎯 Подробное определение выигрышной секции:', {
+      finalAngle,
+      normalizedAngle,
+      pointerPosition,
+      segmentAngle,
+      segmentIndex,
+      segmentInfo: ROULETTE_SEGMENTS[segmentIndex],
+      allSegments: ROULETTE_SEGMENTS.map((seg, idx) => ({
+        index: idx,
+        type: seg.type,
+        startAngle: idx * segmentAngle - segmentAngle / 2,
+        endAngle: (idx + 1) * segmentAngle - segmentAngle / 2,
+        centerAngle: idx * segmentAngle,
+        isWinner: idx === segmentIndex
+      }))
+    });
+
+    return segmentIndex;
+  };
+
   // Обработка завершения вращения
   const handleSpinComplete = (result: any) => {
     setIsSpinning(false);
 
-    // Определяем сообщение на основе результата
-    const winnerSegment = ROULETTE_SEGMENTS[result.winner_index];
+    // Определяем реальную выигрышную секцию по финальному углу
+    const realWinnerIndex = getWinnerSegmentByAngle(rotationAngle);
+    const realWinnerSegment = ROULETTE_SEGMENTS[realWinnerIndex];
+
+    // Сравниваем с тем, что прислал сервер
+    const serverWinnerSegment = ROULETTE_SEGMENTS[result.winner_index];
+
+    console.log('🔍 Сравнение результатов:', {
+      server: {
+        index: result.winner_index,
+        type: serverWinnerSegment.type,
+        value: serverWinnerSegment.value
+      },
+      real: {
+        index: realWinnerIndex,
+        type: realWinnerSegment.type,
+        value: realWinnerSegment.value
+      },
+      match: realWinnerIndex === result.winner_index
+    });
+
+    // Используем реальную выигрышную секцию для отображения
+    const winnerSegment = realWinnerSegment;
 
     // Показываем результат
     if (winnerSegment.type === 'empty') {
@@ -277,6 +361,15 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
           border: '1px solid #10b981',
           zIndex: 999999999,
         },
+      });
+    }
+
+    // Если есть несоответствие, логируем ошибку
+    if (realWinnerIndex !== result.winner_index) {
+      console.error('❌ ОШИБКА: Несоответствие между сервером и фронтендом!', {
+        serverIndex: result.winner_index,
+        realIndex: realWinnerIndex,
+        finalAngle: rotationAngle
       });
     }
   };
@@ -357,6 +450,23 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
               rotationAngle={rotationAngle}
               t={t}
             />
+          </div>
+
+          {/* Кнопка тестирования (временная) */}
+          <div className="text-center mb-4">
+            <button
+              onClick={() => {
+                console.log('🧪 ТЕСТ: Проверка соответствия углов и секций');
+                for (let i = 0; i < 9; i++) {
+                  const testAngle = i * 40 + 20; // центр каждой секции
+                  const detectedIndex = getWinnerSegmentByAngle(testAngle);
+                  console.log(`Секция ${i} (центр ${testAngle}°) → детектируется как секция ${detectedIndex}`);
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
+            >
+              🧪 Тест углов
+            </button>
           </div>
 
           {/* Кнопка для вращения */}
