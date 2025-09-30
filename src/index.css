@@ -1021,3 +1021,273 @@ img.live-drop-item {
     transition: none !important;
   }
 }
+
+/* ========================================
+   КРАСИВЫЙ КАСТОМНЫЙ СКРОЛЛБАР ДЛЯ ВСЕГО САЙТА
+   ======================================== */
+
+/* Основные стили скроллбара для WebKit браузеров */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, rgba(21, 18, 37, 0.4) 0%, rgba(25, 23, 45, 0.6) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.8) 0%,
+    rgba(139, 92, 246, 0.9) 50%,
+    rgba(168, 85, 247, 0.8) 100%
+  );
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 1) 0%,
+    rgba(139, 92, 246, 1) 50%,
+    rgba(168, 85, 247, 1) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg,
+    rgba(79, 70, 229, 1) 0%,
+    rgba(124, 58, 237, 1) 50%,
+    rgba(147, 51, 234, 1) 100%
+  );
+  transform: scale(0.95);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(21, 18, 37, 0.8);
+  border-radius: 6px;
+}
+
+/* Стили для Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.8) rgba(21, 18, 37, 0.4);
+}
+
+/* Стили для основного контента */
+body::-webkit-scrollbar,
+html::-webkit-scrollbar,
+#root::-webkit-scrollbar {
+  width: 14px;
+}
+
+body::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+#root::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.9) 0%,
+    rgba(139, 92, 246, 1) 50%,
+    rgba(168, 85, 247, 0.9) 100%
+  );
+  border-radius: 7px;
+  border: 2px solid rgba(21, 18, 37, 0.3);
+}
+
+/* Стили для модальных окон и попапов */
+.modal::-webkit-scrollbar,
+.popup::-webkit-scrollbar,
+.dropdown::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.modal::-webkit-scrollbar-thumb,
+.popup::-webkit-scrollbar-thumb,
+.dropdown::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.7) 0%,
+    rgba(139, 92, 246, 0.8) 100%
+  );
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для инвентаря и списков */
+.inventory::-webkit-scrollbar,
+.list-container::-webkit-scrollbar,
+.chat::-webkit-scrollbar {
+  width: 10px;
+}
+
+.inventory::-webkit-scrollbar-thumb,
+.list-container::-webkit-scrollbar-thumb,
+.chat::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.7) 0%,
+    rgba(16, 185, 129, 0.8) 100%
+  );
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory::-webkit-scrollbar-thumb:hover,
+.list-container::-webkit-scrollbar-thumb:hover,
+.chat::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.9) 0%,
+    rgba(16, 185, 129, 1) 100%
+  );
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+/* Горизонтальный скролл */
+::-webkit-scrollbar:horizontal {
+  height: 12px;
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  background: linear-gradient(90deg,
+    rgba(99, 102, 241, 0.8) 0%,
+    rgba(139, 92, 246, 0.9) 50%,
+    rgba(168, 85, 247, 0.8) 100%
+  );
+}
+
+/* Обновляем стили для уведомлений */
+.gaming-notifications-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.gaming-notifications-list::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, rgba(21, 18, 37, 0.6) 0%, rgba(25, 23, 45, 0.8) 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gaming-notifications-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.8) 0%,
+    rgba(139, 92, 246, 0.9) 100%
+  );
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gaming-notifications-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 1) 0%,
+    rgba(139, 92, 246, 1) 100%
+  );
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  body::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  #root::-webkit-scrollbar {
+    width: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: none;
+    border-radius: 3px;
+  }
+
+  body::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  #root::-webkit-scrollbar {
+    width: 8px;
+  }
+}
+
+/* Анимации для скроллбара */
+@keyframes scrollbar-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+  }
+}
+
+::-webkit-scrollbar-thumb:hover {
+  animation: scrollbar-glow 2s ease-in-out infinite;
+}
+
+/* Специальные цвета для разных секций */
+.profile-section::-webkit-scrollbar-thumb,
+.user-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(139, 92, 246, 0.8) 0%,
+    rgba(168, 85, 247, 0.9) 100%
+  );
+}
+
+.cases-section::-webkit-scrollbar-thumb,
+.game-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(249, 115, 22, 0.8) 0%,
+    rgba(234, 88, 12, 0.9) 100%
+  );
+}
+
+.leaderboard::-webkit-scrollbar-thumb,
+.stats-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.8) 0%,
+    rgba(16, 185, 129, 0.9) 100%
+  );
+}
+
+/* Универсальный класс для красивого скролла */
+.beautiful-scroll::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.beautiful-scroll::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, rgba(21, 18, 37, 0.4) 0%, rgba(25, 23, 45, 0.6) 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.beautiful-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 0.8) 0%,
+    rgba(139, 92, 246, 0.9) 50%,
+    rgba(168, 85, 247, 0.8) 100%
+  );
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.beautiful-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(99, 102, 241, 1) 0%,
+    rgba(139, 92, 246, 1) 50%,
+    rgba(168, 85, 247, 1) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
