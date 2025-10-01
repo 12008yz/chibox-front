@@ -119,17 +119,6 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                   const target = achievement.target || 1;
                   const progressPercentage = Math.min(100, Math.round((progress / target) * 100));
 
-                  // Отладочная информация
-                  if (process.env.NODE_ENV === 'development') {
-                    console.log('Achievement data:', {
-                      id: achievement.id,
-                      name: achievement.name,
-                      description: achievement.description,
-                      translatedName: achievement.name ? translateAchievement(achievement.name, 'name') : 'N/A',
-                      translatedDesc: achievement.description ? translateAchievement(achievement.description, 'description') : 'N/A'
-                    });
-                  }
-
                   return (
                     <div
                       key={achievement.id}
