@@ -295,7 +295,6 @@ export const userApi = baseApi.injectEndpoints({
         winner_index: number;
         prize_type: 'sub_1_day' | 'sub_2_days' | 'empty';
         prize_value: number;
-        rotation_angle: number;
       },
       void
     >({
