@@ -114,7 +114,7 @@ const SelectedItemsDisplay: React.FC<{
                       <div className="flex-1">
                         <div className="text-white font-medium text-sm truncate">{item.name}</div>
                         <div className="text-cyan-300 text-xs">
-                          <Monetary value={parseFloat(item.price)} />
+                          <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
                         </div>
                       </div>
                     </div>
@@ -186,7 +186,7 @@ const SelectedItemsDisplay: React.FC<{
                         <div className="flex justify-between">
                           <span className="text-purple-300">Стоимость:</span>
                           <span className="text-purple-300 font-semibold">
-                            <Monetary value={parseFloat(targetItem.price)} />
+                            <Monetary value={typeof targetItem.price === 'string' ? parseFloat(targetItem.price) : targetItem.price} />
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -247,19 +247,22 @@ const UpgradeAnimationComponent: React.FC<{
       let targetAngle: number;
 
       if (isActualSuccess) {
-        // УСПЕХ - попадаем в зону успеха
+        // УСПЕХ - попадаем в зону успеха (зелёная зона от 0 до successChance%)
         const successZoneSize = (successChance / 100) * 360;
-        targetAngle = successZoneSize / 2;
+        // Случайное место внутри зоны успеха
+        targetAngle = Math.random() * successZoneSize;
       } else {
-        // НЕУДАЧА - попадаем в зону неудачи
+        // НЕУДАЧА - попадаем в зону неудачи (серая зона от successChance% до 100%)
         const failZoneStart = (successChance / 100) * 360;
         const failZoneSize = 360 - failZoneStart;
-        targetAngle = failZoneStart + (failZoneSize / 2);
+        // Случайное место внутри зоны неудачи
+        targetAngle = failZoneStart + (Math.random() * failZoneSize);
       }
 
-      // Добавляем полные обороты
+      // Добавляем полные обороты и инвертируем угол (так как рулетка крутится против часовой стрелки)
       const fullRotations = 1080; // 3 полных оборота
-      setFinalRotation(fullRotations + targetAngle);
+      // Инвертируем угол, чтобы указатель корректно указывал на нужную зону
+      setFinalRotation(fullRotations - targetAngle);
 
       // Показываем результат после вращения
       const timer2 = setTimeout(() => {
@@ -465,7 +468,7 @@ const SourceItemCard: React.FC<{
           <div className="flex justify-between items-center text-xs">
             <span className="text-cyan-300">{t('upgrade.item_value')}</span>
             <span className="text-cyan-300 font-semibold">
-              <Monetary value={parseFloat(item.price)} />
+              <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
             </span>
           </div>
         </div>
@@ -560,7 +563,7 @@ const TargetItemCard: React.FC<{
             <div className="flex justify-between items-center text-xs">
               <span className="text-cyan-300">{t('upgrade.target_value')}</span>
               <span className="text-cyan-300 font-semibold">
-                <Monetary value={parseFloat(item.price)} />
+                <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
               </span>
             </div>
 
@@ -708,7 +711,9 @@ const UpgradePage: React.FC = () => {
       itemGroup.instances.forEach((inst: any) => {
         if (selectedInventoryIds.includes(inst.id)) {
           // Преобразуем цену в число и проверяем что это корректное число
-          const price = parseFloat(itemGroup.item.price);
+          const price = typeof itemGroup.item.price === 'string'
+            ? parseFloat(itemGroup.item.price)
+            : itemGroup.item.price;
           if (!isNaN(price) && isFinite(price)) {
             total += price;
           }
