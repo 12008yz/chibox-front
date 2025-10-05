@@ -916,39 +916,6 @@ const UpgradePage: React.FC = () => {
 
         {/* Панель управления */}
         <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Информация о выбранных предметах */}
-            <div className="bg-black/30 rounded-lg p-4 border border-cyan-500/50">
-              <div className="text-cyan-400 text-sm font-medium mb-2">Выбрано предметов</div>
-              <div className="text-white text-xl font-bold">
-                {selectedInventoryIds.length}
-              </div>
-              <div className="text-gray-300 text-sm">
-                Общая стоимость: <Monetary value={totalSelectedPrice} />
-              </div>
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-4 border border-purple-500/50">
-              <div className="text-purple-400 text-sm font-medium mb-2">{t('upgrade.selected_target')}</div>
-              {selectedTargetItem ? (
-                <div className="text-white">
-                  {upgradeOptions?.data?.upgrade_options.find(item => item.id === selectedTargetItem)?.name || t('upgrade.not_selected')}
-                </div>
-              ) : (
-                <div className="text-gray-400">{t('upgrade.not_selected')}</div>
-              )}
-            </div>
-
-            <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
-              <div className="text-green-400 text-sm font-medium mb-2">Шанс успеха</div>
-              <div className="text-white text-xl font-bold">
-                {upgradeChance}%
-              </div>
-              <div className="text-gray-300 text-sm">
-                Вероятность улучшения
-              </div>
-            </div>
-          </div>
 
           {/* Поиск и кнопки */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

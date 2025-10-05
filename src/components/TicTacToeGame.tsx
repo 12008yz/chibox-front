@@ -68,11 +68,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         setShowResult(true);
         setIsProcessingResult(false);
 
-        // Если победа, вызываем callback
-        if (game.result === 'win' && onRewardReceived) {
-          setTimeout(() => {
-            onRewardReceived();
-          }, 3000);
+        // Если победа, логируем но НЕ вызываем автоматический callback
+        if (game.result === 'win') {
+          console.log('TicTacToeGame: Победа! Автоматический callback отключен для предотвращения закрытия окна.');
         }
       }, 1500); // Задержка 1.5 секунды для всех результатов при загрузке
     }
@@ -126,17 +124,11 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             setShowResult(true);
             setIsProcessingResult(false);
 
-            // Если победа, вызываем callback через дополнительное время
-            if (result.game?.result === 'win' && onRewardReceived) {
-              console.log('TicTacToeGame: Победа! Вызываем onRewardReceived через 3 секунды...');
-              setTimeout(() => {
-                console.log('TicTacToeGame: Вызываем onRewardReceived сейчас!');
-                onRewardReceived();
-              }, 3000); // Показываем результат 3 секунды
-            } else if (result.game?.result === 'win') {
-              console.log('TicTacToeGame: Победа, но onRewardReceived не передан');
+            // Если победа, логируем но НЕ вызываем автоматический callback
+            if (result.game?.result === 'win') {
+              console.log('TicTacToeGame: Победа! Автоматический callback отключен для предотвращения закрытия окна.');
             } else {
-              console.log('TicTacToeGame: Результат не является победой:', result.game?.result);
+              console.log('TicTacToeGame: Результат игры:', result.game?.result);
             }
           }, 1500); // Задержка 1.5 секунды для всех результатов
         }
@@ -307,7 +299,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
               )}
 
               <button
-                onClick={onClose}
+                onClick={() => {
+                  // Вызываем callback для награды только при нажатии кнопки
+                  if (onRewardReceived) {
+                    onRewardReceived();
+                  }
+                  onClose();
+                }}
                 className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-500 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 font-semibold"
               >
 {t('tic_tac_toe_game.claim_prize')}
