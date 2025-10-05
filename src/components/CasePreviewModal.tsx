@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
@@ -87,29 +87,24 @@ const strikeAnimationStyles = `
 
   .animate-item-glow {
     animation: item-glow-pulse 3s ease-in-out infinite;
-    will-change: box-shadow, border-color;
   }
 
   .animate-cross-line-1 {
     animation: cross-line-draw 0.6s ease-out forwards;
-    will-change: width, height, opacity;
   }
 
   .animate-cross-line-2 {
     animation: cross-line-draw-reverse 0.6s ease-out forwards;
     animation-delay: 0.3s;
-    will-change: width, height, opacity;
   }
 
   .animate-overlay-fade {
     animation: overlay-fade-in 0.4s ease-out forwards;
-    will-change: opacity;
   }
 
   .animate-checkmark-bounce {
     animation: checkmark-bounce 0.5s ease-out forwards;
     animation-delay: 1s;
-    will-change: opacity, transform;
   }
 
   .golden-spark {
@@ -120,32 +115,370 @@ const strikeAnimationStyles = `
     border-radius: 50%;
     pointer-events: none;
     animation: golden-spark 1s ease-out forwards;
-    will-change: transform, opacity;
   }
 
   .victory-glow {
     animation: victory-glow 2s ease-in-out;
-    will-change: box-shadow;
   }
 
-  /* Оптимизация для GPU */
-  .gpu-optimized {
+  /* Оптимизация производительности */
+  .gpu-layer {
     will-change: transform;
     transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
+  }
+
+  .no-gpu-layer {
+    will-change: auto;
+    transform: none;
   }
 `;
 
-// Добавляем стили в head
-if (typeof document !== 'undefined') {
+// Добавляем стили в head только один раз
+if (typeof document !== 'undefined' && !document.head.querySelector('style[data-case-modal-styles]')) {
   const styleElement = document.createElement('style');
   styleElement.textContent = strikeAnimationStyles;
-  if (!document.head.querySelector('style[data-strike-animation]')) {
-    styleElement.setAttribute('data-strike-animation', 'true');
-    document.head.appendChild(styleElement);
-  }
+  styleElement.setAttribute('data-case-modal-styles', 'true');
+  document.head.appendChild(styleElement);
 }
+
+// Мемоизированный компонент предмета для лучшей производительности
+const CaseItem = memo(({
+  item,
+  index,
+  animationIndex,
+  showOpeningAnimation,
+  sliderPosition,
+  openingResult,
+  animationPhase,
+  caseData,
+  showStrikeThrough,
+  showGoldenSparks,
+  getRarityColor,
+  generateGoldenSparks,
+  t,
+  isVisible = true
+}: {
+  item: any;
+  index: number;
+  animationIndex: number;
+  showOpeningAnimation: boolean;
+  sliderPosition: number;
+  openingResult: any;
+  animationPhase: string;
+  caseData: any;
+  showStrikeThrough: boolean;
+  showGoldenSparks: boolean;
+  getRarityColor: (rarity: string) => string;
+  generateGoldenSparks: () => React.ReactNode[];
+  t: (key: string) => string;
+  isVisible?: boolean;
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Рассчитываем состояния предмета
+  const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
+  const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
+  const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+  const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
+
+  // Предвычисляем все классы CSS
+  const itemClasses = useMemo(() => {
+    const baseClasses = `bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)}`;
+    const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
+    const highlightClasses = isCurrentSliderPosition ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+    const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
+    const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
+    const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
+    const performanceClass = (isCurrentSliderPosition || isWinningItemStopped) ? 'gpu-layer' : 'no-gpu-layer';
+
+    return `${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass}`;
+  }, [
+    item.rarity, item.isExcluded, isCurrentSliderPosition, isWinningItem, isWinningItemStopped,
+    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor
+  ]);
+
+  if (!isVisible) {
+    return <div className="bg-gray-800 rounded-lg p-2 border-2 border-gray-400 opacity-0" style={{ height: '200px' }} />;
+  }
+
+  return (
+    <div
+      key={item.id || index}
+      data-item-index={animationIndex}
+      className={itemClasses}
+    >
+      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+        {item.image_url && !imageError ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            } ${item.isExcluded ? 'opacity-70' : ''}`}
+            loading={index < 30 ? 'eager' : 'lazy'} // Первые 30 изображений загружаем сразу
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            style={{
+              backgroundColor: imageLoaded ? 'transparent' : 'rgba(17, 24, 39, 0.8)',
+            }}
+          />
+        ) : (
+          <div className="text-gray-500 text-xs text-center">
+            {t('case_preview_modal.no_image')}
+          </div>
+        )}
+
+        {/* Оптимизированное перечеркивание */}
+        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
+          <div className="absolute inset-0 z-20">
+            <div className={`absolute inset-0 bg-black bg-opacity-40 ${
+              isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
+            }`} />
+
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className={`absolute bg-red-500 rounded-full ${
+                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
+              }`} style={{ transform: 'rotate(45deg)' }} />
+
+              <div className={`absolute bg-red-500 rounded-full ${
+                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
+              }`} style={{ transform: 'rotate(-45deg)' }} />
+            </div>
+
+            {isWinningItemStopped && showStrikeThrough && (
+              <div className="absolute top-1 right-1 animate-checkmark-bounce">
+                <div className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-bold">
+                  ✓
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Эффект золотых искр только для выигранного предмета */}
+        {showGoldenSparks && isWinningItemStopped && (
+          <div className="absolute inset-0 pointer-events-none z-50">
+            {generateGoldenSparks()}
+          </div>
+        )}
+      </div>
+
+      <div className="text-center">
+        <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: '1.2em',
+              maxHeight: '2.4em'
+            }}>
+          {item.name}
+        </h3>
+
+        {item.rarity && (
+          <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
+            {item.rarity}
+          </p>
+        )}
+
+        <p className="text-green-400 font-bold text-sm">
+          <Monetary value={parseFloat(item.price || '0')} />
+        </p>
+
+        {!showOpeningAnimation && (
+          <div className="text-xs mt-1">
+            {item.isExcluded ? (
+              <p className="text-red-400 font-bold">
+                {t('case_preview_modal.already_received')}
+              </p>
+            ) : (
+              <p className="text-gray-400">
+                {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
+                {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                  <span className="text-yellow-400 ml-1">
+                    (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        )}
+
+        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && isDailyCase && (
+          <div className="text-xs mt-1">
+            <p className="text-red-400 font-bold">
+              {t('case_preview_modal.received')}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+CaseItem.displayName = 'CaseItem';
+
+// Упрощенный компонент предмета для виртуализированного просмотра
+const StaticCaseItem = memo(({
+  item,
+  getRarityColor,
+  t
+}: {
+  item: any;
+  getRarityColor: (rarity: string) => string;
+  t: (key: string) => string;
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <div className={`bg-gray-800 rounded-lg p-2 border-2 relative hover:scale-105 transition-transform duration-200 ${getRarityColor(item.rarity)} ${item.isExcluded ? 'opacity-50 grayscale' : ''}`}>
+      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+        {item.image_url && !imageError ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            } ${item.isExcluded ? 'opacity-70' : ''}`}
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            style={{
+              backgroundColor: imageLoaded ? 'transparent' : 'rgba(17, 24, 39, 0.8)',
+            }}
+          />
+        ) : (
+          <div className="text-gray-500 text-xs text-center">
+            {t('case_preview_modal.no_image')}
+          </div>
+        )}
+
+        {/* Простое перечеркивание для исключенных предметов */}
+        {item.isExcluded && (
+          <div className="absolute inset-0 z-20">
+            <div className="absolute inset-0 bg-black bg-opacity-40" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute bg-red-500 rounded-full w-[70%] h-1" style={{ transform: 'rotate(45deg)' }} />
+              <div className="absolute bg-red-500 rounded-full w-[70%] h-1" style={{ transform: 'rotate(-45deg)' }} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="text-center">
+        <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: '1.2em',
+              maxHeight: '2.4em'
+            }}>
+          {item.name}
+        </h3>
+
+        {item.rarity && (
+          <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
+            {item.rarity}
+          </p>
+        )}
+
+        <p className="text-green-400 font-bold text-sm">
+          <Monetary value={parseFloat(item.price || '0')} />
+        </p>
+
+        <div className="text-xs mt-1">
+          {item.isExcluded ? (
+            <p className="text-red-400 font-bold">
+              {t('case_preview_modal.already_received')}
+            </p>
+          ) : (
+            <p className="text-gray-400">
+              {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
+              {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                <span className="text-yellow-400 ml-1">
+                  (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
+                </span>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+StaticCaseItem.displayName = 'StaticCaseItem';
+
+// Виртуализированная сетка для лучшей производительности (только для просмотра)
+const VirtualizedGrid = memo(({
+  items,
+  itemHeight = 200,
+  containerHeight = 600,
+  getRarityColor,
+  t
+}: {
+  items: any[];
+  itemHeight?: number;
+  containerHeight?: number;
+  getRarityColor: (rarity: string) => string;
+  t: (key: string) => string;
+}) => {
+  const [scrollTop, setScrollTop] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Вычисляем параметры виртуализации
+  const itemsPerRow = 6; // По умолчанию 6 колонок
+  const rowHeight = itemHeight + 16; // высота элемента + gap
+  const totalRows = Math.ceil(items.length / itemsPerRow);
+  const totalHeight = totalRows * rowHeight;
+
+  // Вычисляем видимые элементы
+  const visibleRowStart = Math.floor(scrollTop / rowHeight);
+  const visibleRowEnd = Math.min(totalRows, visibleRowStart + Math.ceil(containerHeight / rowHeight) + 2);
+  const startIndex = visibleRowStart * itemsPerRow;
+  const endIndex = Math.min(items.length, visibleRowEnd * itemsPerRow);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="overflow-auto"
+      style={{ height: containerHeight }}
+      onScroll={handleScroll}
+    >
+      <div style={{ height: totalHeight, position: 'relative' }}>
+        <div
+          className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4"
+          style={{
+            transform: `translateY(${visibleRowStart * rowHeight}px)`,
+            position: 'absolute',
+            width: '100%'
+          }}
+        >
+          {items.slice(startIndex, endIndex).map((item, index) => {
+            const actualIndex = startIndex + index;
+            return (
+              <StaticCaseItem
+                key={item.id || actualIndex}
+                item={item}
+                getRarityColor={getRarityColor}
+                t={t}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+VirtualizedGrid.displayName = 'VirtualizedGrid';
 
 interface CasePreviewModalProps {
   isOpen: boolean;
@@ -208,7 +541,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         console.log('Недостаточно баланса, но оставляем выбор пользователю');
       }
     }
-  }, [userData, caseData, paymentMethod]);
+  }, [userData, caseData, paymentMethod, getCasePrice]);
 
   // Проверяем авторизацию пользователя
   useEffect(() => {
@@ -325,15 +658,53 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }, 300);
   };
 
+  // Определяем, исключать ли предметы в зависимости от ID кейса
+  const itemsWithAdjustedChances = useMemo(() => {
+    const items = itemsData?.data?.items || [];
+    if (!items || items.length === 0) return [];
+
+    // Проверяем, является ли это ежедневным кейсом
+    const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444";
+
+    // Теперь используем данные от сервера, но применяем исключение только для ежедневного кейса
+    const processedItems = items.map(item => ({
+      ...item,
+      // Исключаем предметы только для ежедневного кейса с ID 444444...
+      isExcluded: isDailyCase ? (item.is_excluded || false) : false,
+      isAlreadyWon: item.is_already_dropped || false,
+      // Остальные поля уже рассчитаны сервером
+      drop_chance_percent: item.drop_chance_percent || 0,
+      modifiedWeight: item.modified_weight || item.drop_weight || 0,
+      weightMultiplier: item.weight_multiplier || 1,
+      bonusApplied: item.bonus_applied || 0
+    }));
+
+    // Отладочная информация
+    const excludedItems = processedItems.filter(item => item.isExcluded);
+    if (excludedItems.length > 0) {
+      console.log('🚫 Исключенные предметы (уже получены) для кейса', caseData.id, ':', excludedItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        isExcluded: item.isExcluded,
+        isAlreadyDropped: item.isAlreadyWon
+      })));
+    }
+
+    if (!isDailyCase) {
+      console.log('ℹ️ Для кейса', caseData.id, 'предметы НЕ исключаются - могут выпадать повторно');
+    }
+
+    return processedItems;
+  }, [itemsData?.data?.items, caseData.id]);
+
   // Перемещаем объявления функций выше их использования
-  const startAnimation = (wonItem: any) => {
+  const startAnimation = useCallback((wonItem: any) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
-    setShowStrikeThrough(false); // Сбрасываем перечеркивание при начале анимации
-    setShowGoldenSparks(false); // Сбрасываем эффект искр
+    setShowStrikeThrough(false);
+    setShowGoldenSparks(false);
 
     // ИСПРАВЛЕНИЕ: Используем ТОЛЬКО доступные (неисключенные) предметы для анимации
-    // Бэкенд выбирает предмет только из неисключенных, поэтому анимация должна показывать то же самое
     const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
 
     console.log('АНИМАЦИЯ: Всего предметов в кейсе:', itemsWithAdjustedChances.length);
@@ -387,7 +758,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(wonItemInFullList);
         setAnimationPhase('stopped');
 
-        // Показываем перечеркивание через 2 секунды после остановки (только для ежедневного кейса)
         // Запускаем эффект золотых искр через 1 секунду после остановки
         setTimeout(() => {
           setShowGoldenSparks(true);
@@ -402,7 +772,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         setTimeout(() => {
           handleAnimationComplete();
-        }, caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 3500); // Увеличиваем время для показа эффекта искр
+        }, caseData.id === '44444444-4444-4444-4444-444444444444' || caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 3500);
         return;
       }
 
@@ -444,7 +814,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setTimeout(() => {
       animateSlider();
     }, 500);
-  };
+  }, [itemsWithAdjustedChances, caseData.id]);
 
   const handleBuyCase = async () => {
     // Защита от множественных кликов
@@ -607,22 +977,22 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Оптимизированная функция для создания золотых искр
   const generateGoldenSparks = useCallback(() => {
     const sparks = [];
-    const sparkCount = 8; // Уменьшено количество искр для производительности
+    const sparkCount = 6; // Уменьшено количество искр для производительности
 
     for (let i = 0; i < sparkCount; i++) {
       const angle = (i * 360) / sparkCount;
-      const distance = 60 + Math.random() * 20; // Уменьшено расстояние
+      const distance = 40 + Math.random() * 15; // Уменьшено расстояние
       const dx = Math.cos(angle * Math.PI / 180) * distance;
       const dy = Math.sin(angle * Math.PI / 180) * distance;
 
       sparks.push(
         <div
           key={i}
-          className="golden-spark gpu-optimized"
+          className="golden-spark"
           style={{
             '--dx': `${dx}px`,
             '--dy': `${dy}px`,
-            animationDelay: `${i * 0.08}s`, // Уменьшена задержка
+            animationDelay: `${i * 0.1}s`,
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)'
@@ -651,59 +1021,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return a & a;
     }, 0);
     return defaultCaseImages[Math.abs(hash) % defaultCaseImages.length];
-  }, [caseData.name]);
-
-  const items = itemsData?.data?.items || [];
-
-  // Удалены неиспользуемые переменные и функции для упрощения кода
-
-  // Определяем, исключать ли предметы в зависимости от ID кейса
-  const itemsWithAdjustedChances = useMemo(() => {
-    if (!items || items.length === 0) return [];
-
-    // Проверяем, является ли это ежедневным кейсом
-    const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444";
-
-    // Теперь используем данные от сервера, но применяем исключение только для ежедневного кейса
-    const processedItems = items.map(item => ({
-      ...item,
-      // Исключаем предметы только для ежедневного кейса с ID 444444...
-      isExcluded: isDailyCase ? (item.is_excluded || false) : false,
-      isAlreadyWon: item.is_already_dropped || false,
-      // Остальные поля уже рассчитаны сервером
-      drop_chance_percent: item.drop_chance_percent || 0,
-      modifiedWeight: item.modified_weight || item.drop_weight || 0,
-      weightMultiplier: item.weight_multiplier || 1,
-      bonusApplied: item.bonus_applied || 0
-    }));
-
-    // Отладочная информация
-    const excludedItems = processedItems.filter(item => item.isExcluded);
-    if (excludedItems.length > 0) {
-      console.log('🚫 Исключенные предметы (уже получены) для кейса', caseData.id, ':', excludedItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        isExcluded: item.isExcluded,
-        isAlreadyDropped: item.isAlreadyWon
-      })));
-    }
-
-    if (!isDailyCase) {
-      console.log('ℹ️ Для кейса', caseData.id, 'предметы НЕ исключаются - могут выпадать повторно');
-    }
-
-    return processedItems;
-  }, [items, caseData.id]);
-
-  if (!isVisible) return null;
-
-  // Определяем изображение кейса
-  const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
-    ? caseData.image_url
-    : defaultCaseImage;
+  }, [caseData.name, defaultCaseImages]);
 
   // Функция для определения цвета редкости
-  const getRarityColor = (rarity: string) => {
+  const getRarityColor = useCallback((rarity: string) => {
     switch (rarity?.toLowerCase()) {
       case 'mil-spec':
       case 'consumer':
@@ -720,7 +1041,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       default:
         return 'text-gray-400 border-gray-400';
     }
-  };
+  }, []);
+
+  if (!isVisible) return null;
+
+  // Определяем изображение кейса
+  const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
+    ? caseData.image_url
+    : defaultCaseImage;
 
   return (
     <div
@@ -790,167 +1118,162 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <div className="text-center py-12">
               <p className="text-red-400">{t('case_preview_modal.loading_error')}</p>
             </div>
-          ) : items.length > 0 ? (
+          ) : itemsWithAdjustedChances.length > 0 ? (
             <div className="relative">
+              {/* Если анимация идет - показываем все элементы, иначе виртуализируем */}
+              {showOpeningAnimation ? (
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+                  {itemsWithAdjustedChances.map((item: any, index: number) => {
+                    const animationIndex = index;
+                    const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
+                    const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
+                    const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+                    const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
 
-              {/* Оптимизированная сетка предметов */}
-              <div
-                className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4 gpu-optimized"
-              >
-                {itemsWithAdjustedChances.map((item: any, index: number) => {
-                  // Используем прямой индекс для отображения
-                  const animationIndex = index;
+                    // Предвычисляем классы для оптимизации
+                    const baseClasses = `bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)}`;
+                    const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
+                    const highlightClasses = isCurrentSliderPosition ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+                    const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
+                    const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
+                    const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
+                    const performanceClass = (isCurrentSliderPosition || isWinningItemStopped) ? 'gpu-layer' : 'no-gpu-layer';
 
-                  const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
-                  const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
-                  const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
-                  const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
-
-                  // Предвычисляем классы для оптимизации
-                  const baseClasses = `bg-gray-800 rounded-lg p-2 border-2 relative gpu-optimized ${getRarityColor(item.rarity)}`;
-                  const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
-                  const highlightClasses = isCurrentSliderPosition ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
-                  const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
-                  const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
-                  const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
-
-                  return (
-                    <div
-                      key={item.id || index}
-                      data-item-index={animationIndex}
-                      className={`${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses}`}
-                      style={{
-                        willChange: isCurrentSliderPosition || isWinningItemStopped ? 'transform, box-shadow' : 'auto',
-                        transform: 'translateZ(0)', // Принудительное использование GPU
-                      }}
-                    >
-                      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative gpu-optimized">
-                        {item.image_url ? (
-                          <img
-                            src={item.image_url}
-                            alt={item.name}
-                            className={`max-w-full max-h-full object-contain relative z-0 ${item.isExcluded ? 'opacity-70' : ''}`}
-                            style={{
-                              backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                              mixBlendMode: 'normal',
-                              transform: 'translateZ(0)', // GPU acceleration
-                            }}
-                            loading="lazy" // Ленивая загрузка изображений
-                            onLoad={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.backgroundColor = 'transparent';
-                            }}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent && !parent.querySelector('.error-placeholder')) {
-                                const errorDiv = document.createElement('div');
-                                errorDiv.className = 'error-placeholder text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
-                                errorDiv.textContent = t('case_preview_modal.no_image');
-                                parent.appendChild(errorDiv);
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0">
-                            {t('case_preview_modal.no_image')}
-                          </div>
-                        )}
-
-                        {/* Оптимизированное перечеркивание для уже полученных предметов */}
-                        {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
-                          <div className="absolute inset-0 z-20 gpu-optimized">
-                            {/* Полупрозрачный оверлей */}
-                            <div className={`absolute inset-0 bg-black bg-opacity-40 ${
-                              isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
-                            }`}></div>
-
-                            {/* Оптимизированный крест */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className={`absolute bg-red-500 rounded-full ${
-                                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
-                              }`} style={{ transform: 'rotate(45deg)' }}></div>
-
-                              <div className={`absolute bg-red-500 rounded-full ${
-                                isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
-                              }`} style={{ transform: 'rotate(-45deg)' }}></div>
+                    return (
+                      <div
+                        key={item.id || index}
+                        data-item-index={animationIndex}
+                        className={`${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass}`}
+                      >
+                        <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+                          {item.image_url ? (
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className={`max-w-full max-h-full object-contain relative z-0 ${item.isExcluded ? 'opacity-70' : ''}`}
+                              style={{
+                                backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                                mixBlendMode: 'normal',
+                              }}
+                              loading="lazy"
+                              onLoad={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.backgroundColor = 'transparent';
+                              }}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent && !parent.querySelector('.error-placeholder')) {
+                                  const errorDiv = document.createElement('div');
+                                  errorDiv.className = 'error-placeholder text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0';
+                                  errorDiv.textContent = t('case_preview_modal.no_image');
+                                  parent.appendChild(errorDiv);
+                                }
+                              }}
+                            />
+                          ) : (
+                            <div className="text-gray-500 text-xs text-center absolute inset-0 flex items-center justify-center z-0">
+                              {t('case_preview_modal.no_image')}
                             </div>
+                          )}
 
-                            {/* Упрощенная галочка */}
-                            {isWinningItemStopped && showStrikeThrough && (
-                              <div className="absolute top-1 right-1 animate-checkmark-bounce">
-                                <div className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-bold">
-                                  ✓
-                                </div>
+                          {/* Оригинальное перечеркивание */}
+                          {((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
+                            <div className="absolute inset-0 z-20">
+                              <div className={`absolute inset-0 bg-black bg-opacity-40 ${
+                                isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
+                              }`}></div>
+
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className={`absolute bg-red-500 rounded-full ${
+                                  isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
+                                }`} style={{ transform: 'rotate(45deg)' }}></div>
+
+                                <div className={`absolute bg-red-500 rounded-full ${
+                                  isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
+                                }`} style={{ transform: 'rotate(-45deg)' }}></div>
                               </div>
-                            )}
-                          </div>
-                        )}
 
-                        {/* Оптимизированный эффект золотых искр */}
-                        {showGoldenSparks && isWinningItemStopped && (
-                          <div className="absolute inset-0 pointer-events-none z-50 gpu-optimized">
-                            {generateGoldenSparks()}
-                          </div>
-                        )}
-                      </div>
+                              {isWinningItemStopped && showStrikeThrough && (
+                                <div className="absolute top-1 right-1 animate-checkmark-bounce">
+                                  <div className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-bold">
+                                    ✓
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
 
-                      <div className="text-center">
-                        <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
-                            style={{
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              lineHeight: '1.2em',
-                              maxHeight: '2.4em'
-                            }}>
-                          {item.name}
-                        </h3>
+                          {/* Эффект золотых искр */}
+                          {showGoldenSparks && isWinningItemStopped && (
+                            <div className="absolute inset-0 pointer-events-none z-50">
+                              {generateGoldenSparks()}
+                            </div>
+                          )}
+                        </div>
 
-                        {item.rarity && (
-                          <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
-                            {item.rarity}
-                          </p>
-                        )}
+                        <div className="text-center">
+                          <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
+                              style={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                lineHeight: '1.2em',
+                                maxHeight: '2.4em'
+                              }}>
+                            {item.name}
+                          </h3>
 
-                        <p className="text-green-400 font-bold text-sm">
-                          <Monetary value={parseFloat(item.price || '0')} />
-                        </p>
-
-                        {/* Оптимизированная информация о предмете */}
-                        {!showOpeningAnimation && (
-                          <div className="text-xs mt-1">
-                            {item.isExcluded ? (
-                              <p className="text-red-400 font-bold">
-                                {t('case_preview_modal.already_received')}
-                              </p>
-                            ) : (
-                              <p className="text-gray-400">
-                                {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
-                                {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
-                                  <span className="text-yellow-400 ml-1">
-                                    (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
-                                  </span>
-                                )}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Статус во время анимации */}
-                        {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && isDailyCase && (
-                          <div className="text-xs mt-1">
-                            <p className="text-red-400 font-bold">
-                              {t('case_preview_modal.received')}
+                          {item.rarity && (
+                            <p className={`text-xs mb-2 ${getRarityColor(item.rarity).split(' ')[0]}`}>
+                              {item.rarity}
                             </p>
-                          </div>
-                        )}
+                          )}
+
+                          <p className="text-green-400 font-bold text-sm">
+                            <Monetary value={parseFloat(item.price || '0')} />
+                          </p>
+
+                          {!showOpeningAnimation && (
+                            <div className="text-xs mt-1">
+                              {item.isExcluded ? (
+                                <p className="text-red-400 font-bold">
+                                  {t('case_preview_modal.already_received')}
+                                </p>
+                              ) : (
+                                <p className="text-gray-400">
+                                  {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
+                                  {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
+                                    <span className="text-yellow-400 ml-1">
+                                      (+{(item.bonusApplied * 100).toFixed(1)}% {t('case_preview_modal.bonus')})
+                                    </span>
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {showOpeningAnimation && isWinningItemStopped && showStrikeThrough && isDailyCase && (
+                            <div className="text-xs mt-1">
+                              <p className="text-red-400 font-bold">
+                                {t('case_preview_modal.received')}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <VirtualizedGrid
+                  items={itemsWithAdjustedChances}
+                  containerHeight={600}
+                  getRarityColor={getRarityColor}
+                  t={t}
+                />
+              )}
             </div>
           ) : (
             <div className="text-center py-12">
