@@ -31,6 +31,7 @@ const SelectedItemsDisplay: React.FC<{
   canUpgrade: boolean;
   showAnimation: boolean;
   upgradeResult: UpgradeResult | null;
+  onAnimationComplete: () => void;
 }> = ({
   selectedItems,
   targetItem,
@@ -40,7 +41,8 @@ const SelectedItemsDisplay: React.FC<{
   isUpgrading,
   canUpgrade,
   showAnimation,
-  upgradeResult
+  upgradeResult,
+  onAnimationComplete
 }) => {
   const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
 
@@ -82,7 +84,10 @@ const SelectedItemsDisplay: React.FC<{
   return (
     <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
       {showAnimation && upgradeResult ? (
-        <UpgradeAnimationComponent upgradeResult={upgradeResult} />
+        <UpgradeAnimationComponent
+          upgradeResult={upgradeResult}
+          onAnimationComplete={onAnimationComplete}
+        />
       ) : (
         // Обычное отображение выбранных предметов
         <div>
@@ -231,7 +236,8 @@ interface UpgradeResult {
 // Компонент анимации улучшения
 const UpgradeAnimationComponent: React.FC<{
   upgradeResult: UpgradeResult;
-}> = ({ upgradeResult }) => {
+  onAnimationComplete: () => void;
+}> = ({ upgradeResult, onAnimationComplete }) => {
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -371,11 +377,25 @@ const UpgradeAnimationComponent: React.FC<{
                 Получен: <span className="font-medium text-emerald-400">{upgradeResult.data.result_item.name}</span>
               </div>
             )}
-            <div className="text-slate-400 font-light">
+            <div className="text-slate-400 font-light mb-4">
               {upgradeResult.upgrade_success
                 ? 'Ваши предметы были успешно трансформированы'
                 : 'Предметы были утрачены в процессе улучшения'
               }
+            </div>
+
+            {/* Кнопка для закрытия анимации */}
+            <div className="text-center">
+              <button
+                onClick={() => onAnimationComplete()}
+                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                  upgradeResult.upgrade_success
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-rose-600 hover:bg-rose-700 text-white'
+                }`}
+              >
+                Продолжить
+              </button>
             </div>
           </div>
         </div>
@@ -614,6 +634,54 @@ const UpgradePage: React.FC = () => {
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
 
+  // Автоматическая очистка недоступных предметов из выбора
+  React.useEffect(() => {
+    // Не выполняем очистку во время анимации или процесса апгрейда
+    if (showAnimation || isUpgrading) {
+      return;
+    }
+
+    if (upgradeableItems?.data?.items && selectedInventoryIds.length > 0) {
+      // Получаем список всех доступных ID предметов в инвентаре
+      const availableInventoryIds = new Set<string>();
+      upgradeableItems.data.items.forEach(itemGroup => {
+        itemGroup.instances.forEach((inst: any) => {
+          if (inst && inst.id) {
+            availableInventoryIds.add(inst.id);
+          }
+        });
+      });
+
+      // Фильтруем выбранные предметы, оставляя только доступные
+      const validSelectedInventoryIds = selectedInventoryIds.filter(id =>
+        availableInventoryIds.has(id)
+      );
+
+      // Если есть недоступные предметы, обновляем состояние
+      if (validSelectedInventoryIds.length !== selectedInventoryIds.length) {
+        setSelectedInventoryIds(validSelectedInventoryIds);
+
+        // Также обновляем selectedItemIds
+        const validItemIds = new Set<string>();
+        upgradeableItems.data.items.forEach(itemGroup => {
+          const hasSelectedInstance = itemGroup.instances.some((inst: any) =>
+            inst && inst.id && validSelectedInventoryIds.includes(inst.id)
+          );
+          if (hasSelectedInstance) {
+            validItemIds.add(itemGroup.item.id);
+          }
+        });
+
+        setSelectedItemIds(Array.from(validItemIds));
+
+        // Сбрасываем целевой предмет
+        setSelectedTargetItem('');
+
+        console.log('Очищены недоступные предметы из выбора');
+      }
+    }
+  }, [upgradeableItems, selectedInventoryIds, selectedItemIds, showAnimation, isUpgrading]);
+
   // Фильтрация предметов (убираем ограничение по минимальной цене)
   const filteredItems = React.useMemo(() => {
     if (!upgradeableItems?.data?.items) return [];
@@ -654,11 +722,20 @@ const UpgradePage: React.FC = () => {
   // Обработчик выбора исходных предметов
   const handleSelectSourceItem = useCallback((itemId: string) => {
     const itemGroup = filteredItems.find(group => group.item.id === itemId);
-    if (!itemGroup) return;
+    if (!itemGroup) {
+      console.warn('Предмет не найден:', itemId);
+      return;
+    }
+
+    // Проверяем, что экземпляры предмета существуют
+    if (!itemGroup.instances || itemGroup.instances.length === 0) {
+      console.warn('У предмета нет доступных экземпляров:', itemId);
+      return;
+    }
 
     // Находим доступные экземпляры этого предмета, которые еще не выбраны
     const availableInstances = itemGroup.instances.filter((inst: any) =>
-      !selectedInventoryIds.includes(inst.id)
+      inst && inst.id && !selectedInventoryIds.includes(inst.id)
     );
 
     if (availableInstances.length > 0) {
@@ -673,13 +750,13 @@ const UpgradePage: React.FC = () => {
     } else {
       // Если экземпляров больше нет, убираем предмет из выбранных
       const remainingInventoryIds = selectedInventoryIds.filter(id =>
-        !itemGroup.instances.some((inst: any) => inst.id === id)
+        !itemGroup.instances.some((inst: any) => inst && inst.id === id)
       );
       setSelectedInventoryIds(remainingInventoryIds);
 
       // Проверяем, есть ли еще экземпляры этого предмета в выборе
       const hasOtherInstances = remainingInventoryIds.some(id =>
-        itemGroup.instances.some((inst: any) => inst.id === id)
+        itemGroup.instances.some((inst: any) => inst && inst.id === id)
       );
 
       if (!hasOtherInstances) {
@@ -687,6 +764,7 @@ const UpgradePage: React.FC = () => {
       }
     }
 
+    // Сбрасываем выбранный целевой предмет при изменении исходных предметов
     setSelectedTargetItem('');
   }, [filteredItems, selectedInventoryIds, selectedItemIds]);
 
@@ -752,6 +830,11 @@ const UpgradePage: React.FC = () => {
       setUpgradeResult(adaptedResult);
       setShowAnimation(true);
 
+
+
+
+
+
       // Автоматически скрываем анимацию через 4 секунды
       setTimeout(() => {
         handleAnimationComplete();
@@ -785,7 +868,7 @@ const UpgradePage: React.FC = () => {
         );
       }
 
-      // Сбрасываем выбор и обновляем данные
+      // Сбрасываем выбор и обновляем данные после завершения анимации
       setSelectedItemIds([]);
       setSelectedInventoryIds([]);
       setSelectedTargetItem('');
@@ -828,6 +911,7 @@ const UpgradePage: React.FC = () => {
           canUpgrade={selectedInventoryIds.length > 0 && selectedTargetItem !== ''}
           showAnimation={showAnimation}
           upgradeResult={upgradeResult}
+          onAnimationComplete={handleAnimationComplete}
         />
 
         {/* Панель управления */}
