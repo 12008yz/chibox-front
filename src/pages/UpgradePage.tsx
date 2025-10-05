@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../store/hooks';
 // import { Wheel } from 'react-custom-roulette'; // УБИРАЕМ ЕБАННУЮ БИБЛИОТЕКУ
 import {
   useGetUserUpgradeableItemsQuery,
@@ -16,10 +15,205 @@ import { getItemImageUrl } from '../utils/steamImageUtils';
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
   <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex items-center justify-center`}>
     <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
     </svg>
   </div>
 );
+
+// Компонент для отображения выбранных предметов вверху
+const SelectedItemsDisplay: React.FC<{
+  selectedItems: any[];
+  targetItem: any;
+  upgradeChance: number;
+  totalValue: number;
+  onUpgrade: () => void;
+  isUpgrading: boolean;
+  canUpgrade: boolean;
+  showAnimation: boolean;
+  upgradeResult: UpgradeResult | null;
+}> = ({
+  selectedItems,
+  targetItem,
+  upgradeChance,
+  totalValue,
+  onUpgrade,
+  isUpgrading,
+  canUpgrade,
+  showAnimation,
+  upgradeResult
+}) => {
+  const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'covert':
+      case 'contraband': return 'from-yellow-500 to-orange-500';
+      case 'classified': return 'from-purple-500 to-pink-500';
+      case 'restricted': return 'from-blue-500 to-cyan-500';
+      case 'milspec': return 'from-green-500 to-emerald-500';
+      case 'industrial':
+      case 'consumer': return 'from-gray-500 to-slate-500';
+      default: return 'from-gray-500 to-slate-500';
+    }
+  };
+
+  const getChanceColor = (chance: number) => {
+    if (chance >= 40) return 'text-green-400';
+    if (chance >= 20) return 'text-yellow-400';
+    return 'text-red-400';
+  };
+
+  if (selectedItems.length === 0 && !targetItem) {
+    return (
+      <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-8 mb-8">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+            <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <p className="text-gray-400 text-lg mb-2">Выберите предметы для улучшения</p>
+          <p className="text-gray-500 text-sm">Сначала выберите предметы снизу, затем целевой предмет</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
+      {showAnimation && upgradeResult ? (
+        <UpgradeAnimationComponent upgradeResult={upgradeResult} />
+      ) : (
+        // Обычное отображение выбранных предметов
+        <div>
+          <h2 className="text-xl font-bold text-white mb-6 text-center">Выбранные предметы для улучшения</h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Исходные предметы */}
+            <div className="lg:col-span-1">
+              <h3 className="text-lg font-semibold text-cyan-400 mb-4">
+                Ваши предметы ({selectedItems.length})
+              </h3>
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {selectedItems.map((item, index) => (
+                  <div key={`${item.id}-${index}`} className="bg-black/30 rounded-lg p-3 border border-cyan-500/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="relative w-16 h-16 bg-black/20 rounded-lg overflow-hidden">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20`}></div>
+                        {!imageError[item.id] ? (
+                          <img
+                            src={getItemImageUrl(item.image_url, item.name)}
+                            alt={item.name}
+                            className="absolute inset-0 w-full h-full object-contain z-10"
+                            onError={() => setImageError(prev => ({...prev, [item.id]: true}))}
+                          />
+                        ) : (
+                          <PlaceholderImage className="w-full h-full" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium text-sm truncate">{item.name}</div>
+                        <div className="text-cyan-300 text-xs">
+                          <Monetary value={parseFloat(item.price)} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                <div className="text-cyan-300 text-sm">
+                  Общая стоимость: <span className="font-bold"><Monetary value={totalValue} /></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Кнопка улучшения */}
+            <div className="lg:col-span-1 flex flex-col items-center justify-center">
+              <div className="text-center mb-6">
+                <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd"/>
+                  </svg>
+                </div>
+                {upgradeChance > 0 && (
+                  <div className="mb-4">
+                    <div className={`text-2xl font-bold ${getChanceColor(upgradeChance)}`}>
+                      {upgradeChance}%
+                    </div>
+                    <div className="text-gray-400 text-sm">Шанс успеха</div>
+                  </div>
+                )}
+                <button
+                  onClick={onUpgrade}
+                  disabled={!canUpgrade || isUpgrading}
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-8 rounded-lg font-semibold text-lg transition-all duration-200 disabled:cursor-not-allowed"
+                >
+                  {isUpgrading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Улучшение...
+                    </div>
+                  ) : (
+                    'УЛУЧШИТЬ'
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Целевой предмет */}
+            <div className="lg:col-span-1">
+              <h3 className="text-lg font-semibold text-purple-400 mb-4">Целевой предмет</h3>
+              {targetItem ? (
+                <div className="bg-black/30 rounded-lg p-4 border border-purple-500/30">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative w-20 h-20 bg-black/20 rounded-lg overflow-hidden">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(targetItem.rarity)} opacity-20`}></div>
+                      {!imageError[targetItem.id] ? (
+                        <img
+                          src={getItemImageUrl(targetItem.image_url, targetItem.name)}
+                          alt={targetItem.name}
+                          className="absolute inset-0 w-full h-full object-contain z-10"
+                          onError={() => setImageError(prev => ({...prev, [targetItem.id]: true}))}
+                        />
+                      ) : (
+                        <PlaceholderImage className="w-full h-full" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-semibold mb-2">{targetItem.name}</div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-purple-300">Стоимость:</span>
+                          <span className="text-purple-300 font-semibold">
+                            <Monetary value={parseFloat(targetItem.price)} />
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-purple-300">Шанс:</span>
+                          <span className={`font-semibold ${getChanceColor(targetItem.upgrade_chance)}`}>
+                            {targetItem.upgrade_chance}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-black/30 rounded-lg p-4 border border-gray-600/30 h-32 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-gray-400 text-sm">Не выбран</div>
+                    <div className="text-gray-500 text-xs">Выберите целевой предмет</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface UpgradeResult {
   upgrade_success: boolean;
@@ -34,30 +228,22 @@ interface UpgradeResult {
   };
 }
 
-// Компонент анимации апгрейда с элегантным дизайном
-const UpgradeAnimation: React.FC<{
-  isActive: boolean;
-  result: UpgradeResult | null;
-  onComplete: () => void;
-}> = ({ isActive, result, onComplete }) => {
-  const { t } = useTranslation();
+// Компонент анимации улучшения
+const UpgradeAnimationComponent: React.FC<{
+  upgradeResult: UpgradeResult;
+}> = ({ upgradeResult }) => {
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const wheelRef = React.useRef<HTMLDivElement>(null);
-  const animationStartedRef = React.useRef(false);
+  const [showResult, setShowResult] = useState(false);
 
   React.useEffect(() => {
-    if (isActive && result && !animationStartedRef.current) {
-      animationStartedRef.current = true;
+    // Начинаем анимацию
+    const timer1 = setTimeout(() => {
+      setPhase('spinning');
 
-      // Сбрасываем состояние
-      setPhase('preparing');
-      setProgress(0);
-
-      // Вычисляем финальный поворот на основе результата
-      const successChance = result.data.success_chance;
-      const isActualSuccess = result.upgrade_success;
+      // Вычисляем финальный угол
+      const successChance = upgradeResult.data.success_chance;
+      const isActualSuccess = upgradeResult.upgrade_success;
       let targetAngle: number;
 
       if (isActualSuccess) {
@@ -71,247 +257,131 @@ const UpgradeAnimation: React.FC<{
         targetAngle = failZoneStart + (failZoneSize / 2);
       }
 
-      // Добавляем полные обороты для эффекта
-      const fullRotations = 1080 + 360; // 4 полных оборота
-      const finalAngle = fullRotations - targetAngle;
-      setFinalRotation(finalAngle);
+      // Добавляем полные обороты
+      const fullRotations = 1080; // 3 полных оборота
+      setFinalRotation(fullRotations + targetAngle);
 
-      // Короткая фаза подготовки (500мс)
-      setTimeout(() => {
-        setPhase('spinning');
+      // Показываем результат после вращения
+      const timer2 = setTimeout(() => {
+        setPhase('showing_result');
+        setShowResult(true);
+      }, 3000); // 3 секунды вращения
 
-        // Анимация прогресса во время кручения
-        let currentProgress = 0;
-        const progressInterval = setInterval(() => {
-          currentProgress += 3;
-          setProgress(currentProgress);
+      return () => clearTimeout(timer2);
+    }, 500); // 0.5 секунды подготовки
 
-          if (currentProgress >= 100) {
-            clearInterval(progressInterval);
-          }
-        }, 100); // Обновляем каждые 100мс
+    return () => clearTimeout(timer1);
+  }, [upgradeResult]);
 
-        // Завершаем кручение
-        setTimeout(() => {
-          setPhase('showing_result');
-          clearInterval(progressInterval);
-          setProgress(100);
-
-          // Закрываем анимацию
-          setTimeout(() => {
-            onComplete();
-          }, 2500);
-        }, 3200); // 3.2 секунды на кручение
-      }, 500); // Короткая подготовка
-    } else if (!isActive) {
-      animationStartedRef.current = false;
-      setPhase('preparing');
-      setFinalRotation(0);
-      setProgress(0);
-    }
-  }, [isActive, result]);
-
-  if (!isActive || !result) return null;
-
-  const getPhaseTitles = () => {
+  const getPhaseTitle = () => {
     switch (phase) {
       case 'preparing':
-        return {
-          title: 'Подготовка',
-          subtitle: 'Инициализация процесса улучшения'
-        };
+        return 'Подготовка улучшения...';
       case 'spinning':
-        return {
-          title: 'Обработка',
-          subtitle: 'Определяем исход вашей попытки'
-        };
+        return 'Определяем результат...';
       case 'showing_result':
-        return {
-          title: result.upgrade_success ? 'Успех' : 'Неудача',
-          subtitle: result.upgrade_success
-            ? 'Ваш предмет успешно улучшен'
-            : 'Попытка улучшения не удалась'
-        };
+        return upgradeResult.upgrade_success ? 'Успех!' : 'Неудача';
     }
   };
 
-  const titles = getPhaseTitles();
-
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 flex items-center justify-center z-50 backdrop-blur-sm">
-
-
-      <div className="text-center max-w-4xl mx-auto px-6 relative z-10">
-        {/* Элегантный заголовок */}
-        <div className="mb-12">
-          <h2 className={`text-4xl font-light mb-4 transition-all duration-700 ${
-            phase === 'showing_result'
-              ? (result.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
-              : 'text-slate-200'
-          }`}>
-            {titles.title}
-          </h2>
-          <p className="text-slate-400 text-xl font-light">
-            {titles.subtitle}
-          </p>
-        </div>
-
-        {/* Главная анимация - современная рулетка */}
-        <div className="relative mb-12 flex justify-center">
-          <div className="relative">
-            {/* Внешнее свечение */}
-            <div className={`absolute -inset-12 rounded-full transition-all duration-1000 ${
-              phase === 'spinning'
-                ? 'bg-gradient-to-r from-slate-600/20 via-slate-500/30 to-slate-600/20 animate-pulse'
-                : 'bg-slate-800/20'
-            }`}></div>
-
-            {/* Орбитальные кольца */}
-            {phase === 'spinning' && (
-              <>
-                <div className="absolute -inset-8 border border-slate-500/30 rounded-full animate-spin" style={{ animationDuration: '4s' }}></div>
-                <div className="absolute -inset-6 border border-slate-400/20 rounded-full animate-spin" style={{ animationDuration: '6s', animationDirection: 'reverse' }}></div>
-              </>
-            )}
-
-            {/* Указатель */}
-            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
-              <div className="w-0 h-0 border-l-6 border-r-6 border-b-8 border-l-transparent border-r-transparent border-b-slate-300 drop-shadow-lg"></div>
-            </div>
-
-            {/* Основная рулетка */}
-            <div
-              ref={wheelRef}
-              className="w-80 h-80 rounded-full border-4 border-slate-600/50 relative overflow-hidden shadow-2xl backdrop-blur-sm"
-              style={{
-                background: `conic-gradient(
-                  #059669 0% ${result.data.success_chance}%,
-                  #64748b ${result.data.success_chance}% 100%
-                )`,
-                transform: phase === 'spinning' || phase === 'showing_result' ? `rotate(${finalRotation}deg)` : 'rotate(0deg)',
-                transition: phase === 'spinning' ? 'transform 3.2s cubic-bezier(0.05, 0.5, 0.3, 0.95)' : phase === 'preparing' ? 'transform 0.3s ease-out' : 'none',
-                boxShadow: phase === 'spinning' ? '0 0 40px rgba(100, 116, 139, 0.3)' : '0 0 20px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              {/* Центральный элемент */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24">
-                <div className={`w-full h-full rounded-full flex items-center justify-center backdrop-blur-sm border transition-all duration-1000 ${
-                  phase === 'spinning'
-                    ? 'bg-slate-800/80 border-slate-500 shadow-lg'
-                    : 'bg-slate-900/90 border-slate-600'
-                }`}>
-                  <div className="text-slate-200 font-medium text-center">
-                    <div className="text-lg">{result.data.success_chance}%</div>
-                    <div className="text-xs text-slate-400">шанс</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Минималистичные метки */}
-              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
-                ●
-              </div>
-              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-slate-200 text-lg">
-                ●
-              </div>
-              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
-                ●
-              </div>
-              <div className="absolute right-6 top-1/2 transform -translate-y-1/2 text-slate-200 text-lg">
-                ●
-              </div>
-            </div>
-
-            {/* Результат в центре */}
-            {phase === 'showing_result' && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                <div className={`text-6xl font-light transition-all duration-1000 ${
-                  result.upgrade_success ? 'text-emerald-400' : 'text-rose-400'
-                }`}>
-                  {result.upgrade_success ? '✓' : '✕'}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Элегантная информационная панель */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
-            <div className="text-slate-400 text-sm font-medium mb-2">Вероятность успеха</div>
-            <div className="text-slate-200 text-2xl font-light">
-              {result.data.success_chance.toFixed(1)}%
-            </div>
-            <div className="text-slate-500 text-sm mt-1">
-              {result.data.success_chance >= 50 ? 'Высокая вероятность' : result.data.success_chance >= 25 ? 'Средняя вероятность' : 'Низкая вероятность'}
-            </div>
-          </div>
-
-          <div className="bg-slate-800/40 rounded-2xl p-6 border border-slate-600/30 backdrop-blur-sm">
-            <div className="text-slate-400 text-sm font-medium mb-2">Стоимость улучшения</div>
-            <div className="text-slate-200 text-2xl font-light">
-              <Monetary value={result.data.total_source_price} />
-            </div>
-            <div className="text-slate-500 text-sm mt-1">
-              Предметов: {result.data.source_items.length}
-            </div>
-          </div>
-        </div>
-
-        {/* Прогресс-бар */}
-        <div className="mb-8">
-          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                phase === 'preparing'
-                  ? 'bg-gradient-to-r from-slate-500 to-slate-600'
-                  : phase === 'spinning'
-                  ? 'bg-gradient-to-r from-slate-400 to-slate-500'
-                  : result.upgrade_success
-                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
-                  : 'bg-gradient-to-r from-rose-500 to-rose-600'
-              }`}
-              style={{
-                width: `${progress}%`
-              }}
-            ></div>
-          </div>
-          <div className="text-slate-500 text-sm mt-2 font-light">
-            {phase === 'preparing' && `Подготовка... ${progress}%`}
-            {phase === 'spinning' && 'Обработка запроса...'}
-            {phase === 'showing_result' && (result.upgrade_success ? 'Успешно завершено' : 'Завершено')}
-          </div>
-        </div>
-
-        {/* Результат */}
-        {phase === 'showing_result' && (
-          <div className={`rounded-2xl p-8 border backdrop-blur-sm transition-all duration-1000 ${
-            result.upgrade_success
-              ? 'bg-emerald-900/20 border-emerald-500/30'
-              : 'bg-rose-900/20 border-rose-500/30'
-          }`}>
-            <div className="text-slate-200">
-              <div className="text-2xl font-light mb-4">
-                {result.upgrade_success ? 'Улучшение успешно' : 'Улучшение не удалось'}
-              </div>
-              {result.upgrade_success && result.data.result_item && (
-                <div className="text-lg mb-3 text-slate-300">
-                  Получен: <span className="font-medium text-emerald-400">{result.data.result_item.name}</span>
-                </div>
-              )}
-              <div className="text-slate-400 font-light">
-                {result.upgrade_success
-                  ? 'Ваши предметы были успешно трансформированы'
-                  : 'Предметы были утрачены в процессе улучшения'
-                }
-              </div>
-            </div>
-          </div>
-        )}
+    <div className="text-center py-8">
+      <div className="mb-6">
+        <h2 className={`text-3xl font-light mb-3 transition-all duration-700 ${
+          phase === 'showing_result'
+            ? (upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
+            : 'text-slate-200'
+        }`}>
+          {getPhaseTitle()}
+        </h2>
+        <p className="text-slate-400 text-lg font-light">
+          {phase === 'showing_result'
+            ? (upgradeResult.upgrade_success
+                ? 'Ваш предмет успешно улучшен'
+                : 'Попытка улучшения не удалась')
+            : 'Пожалуйста, подождите...'
+          }
+        </p>
       </div>
+
+      {/* Главная анимация */}
+      <div className="relative mb-8 flex justify-center">
+        <div className="relative">
+          {/* Указатель */}
+          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+            <div className="w-0 h-0 border-l-6 border-r-6 border-b-8 border-l-transparent border-r-transparent border-b-slate-300 drop-shadow-lg"></div>
+          </div>
+
+          {/* Основная рулетка */}
+          <div
+            className="w-60 h-60 rounded-full border-4 border-slate-600/50 relative overflow-hidden shadow-2xl backdrop-blur-sm"
+            style={{
+              background: `conic-gradient(
+                #059669 0% ${upgradeResult.data.success_chance}%,
+                #64748b ${upgradeResult.data.success_chance}% 100%
+              )`,
+              transform: phase === 'spinning' || phase === 'showing_result'
+                ? `rotate(${finalRotation}deg)`
+                : 'rotate(0deg)',
+              transition: phase === 'spinning'
+                ? 'transform 3s cubic-bezier(0.05, 0.5, 0.3, 0.95)'
+                : 'transform 0.3s ease-out'
+            }}
+          >
+            {/* Центральный элемент */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+              <div className="w-full h-full rounded-full flex items-center justify-center bg-slate-800/90 border border-slate-500">
+                <div className="text-slate-200 font-medium text-center">
+                  <div className="text-lg">{upgradeResult.data.success_chance}%</div>
+                  <div className="text-xs text-slate-400">шанс</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Результат - показываем только после завершения анимации */}
+          {showResult && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+              <div className={`text-4xl font-light animate-bounce ${
+                upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400'
+              }`}>
+                {upgradeResult.upgrade_success ? '✓' : '✕'}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Результат - показываем только после завершения анимации */}
+      {showResult && (
+        <div className={`rounded-xl p-6 border backdrop-blur-sm transition-all duration-1000 ${
+          upgradeResult.upgrade_success
+            ? 'bg-emerald-900/20 border-emerald-500/30'
+            : 'bg-rose-900/20 border-rose-500/30'
+        }`}>
+          <div className="text-slate-200">
+            <div className="text-xl font-light mb-3">
+              {upgradeResult.upgrade_success ? 'Улучшение успешно' : 'Улучшение не удалось'}
+            </div>
+            {upgradeResult.upgrade_success && upgradeResult.data.result_item && (
+              <div className="text-lg mb-2 text-slate-300">
+                Получен: <span className="font-medium text-emerald-400">{upgradeResult.data.result_item.name}</span>
+              </div>
+            )}
+            <div className="text-slate-400 font-light">
+              {upgradeResult.upgrade_success
+                ? 'Ваши предметы были успешно трансформированы'
+                : 'Предметы были утрачены в процессе улучшения'
+              }
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+
 
 // Компонент карточки предмета для выбора
 const SourceItemCard: React.FC<{
@@ -541,8 +611,6 @@ const UpgradePage: React.FC = () => {
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
 
-
-
   // Фильтрация предметов (убираем ограничение по минимальной цене)
   const filteredItems = React.useMemo(() => {
     if (!upgradeableItems?.data?.items) return [];
@@ -552,6 +620,33 @@ const UpgradePage: React.FC = () => {
       // Убрали: && itemGroup.item.price >= 10 - теперь можно улучшать любые предметы
     );
   }, [upgradeableItems, searchTerm]);
+
+  // Получаем выбранные предметы для отображения
+  const selectedItemsDetails = React.useMemo(() => {
+    if (!upgradeableItems?.data?.items || selectedInventoryIds.length === 0) return [];
+
+    const details: any[] = [];
+    upgradeableItems.data.items.forEach(itemGroup => {
+      itemGroup.instances.forEach((inst: any) => {
+        if (selectedInventoryIds.includes(inst.id)) {
+          details.push(itemGroup.item);
+        }
+      });
+    });
+
+    return details;
+  }, [upgradeableItems, selectedInventoryIds]);
+
+  // Получаем выбранный целевой предмет
+  const selectedTargetItemDetails = React.useMemo(() => {
+    if (!selectedTargetItem || !upgradeOptions?.data?.upgrade_options) return null;
+    return upgradeOptions.data.upgrade_options.find(item => item.id === selectedTargetItem) || null;
+  }, [selectedTargetItem, upgradeOptions]);
+
+  // Получаем шанс улучшения из выбранного целевого предмета
+  const upgradeChance = React.useMemo(() => {
+    return selectedTargetItemDetails?.upgrade_chance || 0;
+  }, [selectedTargetItemDetails]);
 
   // Обработчик выбора исходных предметов
   const handleSelectSourceItem = useCallback((itemId: string) => {
@@ -612,7 +707,11 @@ const UpgradePage: React.FC = () => {
     upgradeableItems.data.items.forEach(itemGroup => {
       itemGroup.instances.forEach((inst: any) => {
         if (selectedInventoryIds.includes(inst.id)) {
-          total += itemGroup.item.price;
+          // Преобразуем цену в число и проверяем что это корректное число
+          const price = parseFloat(itemGroup.item.price);
+          if (!isNaN(price) && isFinite(price)) {
+            total += price;
+          }
         }
       });
     });
@@ -647,6 +746,11 @@ const UpgradePage: React.FC = () => {
       };
       setUpgradeResult(adaptedResult);
       setShowAnimation(true);
+
+      // Автоматически скрываем анимацию через 4 секунды
+      setTimeout(() => {
+        handleAnimationComplete();
+      }, 4000);
 
     } catch (error: any) {
       console.error('Ошибка при апгрейде:', error);
@@ -689,13 +793,6 @@ const UpgradePage: React.FC = () => {
     <div className="min-h-screen bg-[#151225] text-white">
       <ScrollToTopOnMount />
 
-      {/* Анимация апгрейда */}
-      <UpgradeAnimation
-        isActive={showAnimation}
-        result={upgradeResult}
-        onComplete={handleAnimationComplete}
-      />
-
       <div className="container mx-auto px-4 py-8">
         {/* Заголовок */}
         <div className="text-center mb-8">
@@ -715,22 +812,18 @@ const UpgradePage: React.FC = () => {
           <p className="text-gray-400 text-lg">{t('upgrade.subtitle')}</p>
         </div>
 
-        {/* Информационная панель */}
-        <div className="bg-gradient-to-r from-amber-600/10 to-red-600/10 rounded-xl p-6 mb-8 border border-amber-500/30">
-          <div className="flex items-start space-x-4">
-            <div className="text-amber-400 text-2xl">⚠️</div>
-            <div>
-              <h3 className="text-amber-300 font-semibold text-lg mb-2">{t('upgrade.warning_title')}</h3>
-              <ul className="text-gray-300 text-sm space-y-1">
-                <li>• При неудачном апгрейде все выбранные предметы будут потеряны</li>
-                <li>• Шанс успеха зависит только от соотношения цен ваших предметов к целевому</li>
-                <li>• Целевой предмет должен быть дороже общей стоимости ваших предметов</li>
-                <li>• Теперь можно улучшать предметы любой стоимости, даже копейки!</li>
-                <li>• Максимум 10 предметов можно выбрать для одного улучшения</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        {/* Компонент отображения выбранных предметов */}
+        <SelectedItemsDisplay
+          selectedItems={selectedItemsDetails}
+          targetItem={selectedTargetItemDetails}
+          upgradeChance={upgradeChance}
+          totalValue={totalSelectedPrice}
+          onUpgrade={handlePerformUpgrade}
+          isUpgrading={isUpgrading}
+          canUpgrade={selectedInventoryIds.length > 0 && selectedTargetItem !== ''}
+          showAnimation={showAnimation}
+          upgradeResult={upgradeResult}
+        />
 
         {/* Панель управления */}
         <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
@@ -758,18 +851,18 @@ const UpgradePage: React.FC = () => {
             </div>
 
             <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
-              <div className="text-green-400 text-sm font-medium mb-2">Количество предметов</div>
+              <div className="text-green-400 text-sm font-medium mb-2">Шанс успеха</div>
               <div className="text-white text-xl font-bold">
-                {selectedInventoryIds.length}
+                {upgradeChance}%
               </div>
               <div className="text-gray-300 text-sm">
-                Выбрано для апгрейда
+                Вероятность улучшения
               </div>
             </div>
           </div>
 
           {/* Поиск и кнопки */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               value={searchTerm}
@@ -784,24 +877,6 @@ const UpgradePage: React.FC = () => {
               className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
             >
               Сбросить выбор ({selectedInventoryIds.length})
-            </button>
-          </div>
-
-          {/* Кнопка апгрейда */}
-          <div className="text-center">
-            <button
-              onClick={handlePerformUpgrade}
-              disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-8 rounded-lg font-semibold text-lg transition-all duration-200 disabled:cursor-not-allowed"
-            >
-              {isUpgrading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  {t('upgrade.processing')}
-                </div>
-              ) : (
-                `Улучшить ${selectedInventoryIds.length} предметов`
-              )}
             </button>
           </div>
         </div>
