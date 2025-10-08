@@ -32,6 +32,8 @@ const SelectedItemsDisplay: React.FC<{
   showAnimation: boolean;
   upgradeResult: UpgradeResult | null;
   onAnimationComplete: () => void;
+  onRemoveSourceItem?: (itemId: string) => void;
+  onRemoveTargetItem?: () => void;
 }> = ({
   selectedItems,
   targetItem,
@@ -42,7 +44,9 @@ const SelectedItemsDisplay: React.FC<{
   canUpgrade,
   showAnimation,
   upgradeResult,
-  onAnimationComplete
+  onAnimationComplete,
+  onRemoveSourceItem,
+  onRemoveTargetItem
 }) => {
   const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
 
@@ -75,7 +79,7 @@ const SelectedItemsDisplay: React.FC<{
             </svg>
           </div>
           <p className="text-gray-400 text-lg mb-2">Выберите предметы для улучшения</p>
-          <p className="text-gray-500 text-sm">Сначала выберите предметы снизу, затем целевой предмет</p>
+          <p className="text-gray-500 text-sm">Сначала выберите до 10 предметов снизу, затем целевой предмет</p>
         </div>
       </div>
     );
@@ -97,11 +101,16 @@ const SelectedItemsDisplay: React.FC<{
             {/* Исходные предметы */}
             <div className="lg:col-span-1">
               <h3 className="text-lg font-semibold text-cyan-400 mb-4">
-                Ваши предметы ({selectedItems.length})
+                Ваши предметы ({selectedItems.length}/10)
               </h3>
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {selectedItems.map((item, index) => (
-                  <div key={`${item.id}-${index}`} className="bg-black/30 rounded-lg p-3 border border-cyan-500/30">
+                  <div
+                    key={`${item.id}-${index}`}
+                    className="bg-black/30 rounded-lg p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                    onClick={() => onRemoveSourceItem && onRemoveSourceItem(item.id)}
+                    title="Кликните для удаления"
+                  >
                     <div className="flex items-center space-x-3">
                       <div className="relative w-16 h-16 bg-black/20 rounded-lg overflow-hidden">
                         <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20`}></div>
@@ -115,6 +124,12 @@ const SelectedItemsDisplay: React.FC<{
                         ) : (
                           <PlaceholderImage className="w-full h-full" />
                         )}
+                        {/* Иконка удаления */}
+                        <div className="absolute top-1 right-1 w-5 h-5 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
                       <div className="flex-1">
                         <div className="text-white font-medium text-sm truncate">{item.name}</div>
@@ -170,7 +185,11 @@ const SelectedItemsDisplay: React.FC<{
             <div className="lg:col-span-1">
               <h3 className="text-lg font-semibold text-purple-400 mb-4">Целевой предмет</h3>
               {targetItem ? (
-                <div className="bg-black/30 rounded-lg p-4 border border-purple-500/30">
+                <div
+                  className="bg-black/30 rounded-lg p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                  onClick={() => onRemoveTargetItem && onRemoveTargetItem()}
+                  title="Кликните для отмены выбора"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="relative w-20 h-20 bg-black/20 rounded-lg overflow-hidden">
                       <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(targetItem.rarity)} opacity-20`}></div>
@@ -184,6 +203,12 @@ const SelectedItemsDisplay: React.FC<{
                       ) : (
                         <PlaceholderImage className="w-full h-full" />
                       )}
+                      {/* Иконка удаления */}
+                      <div className="absolute top-1 right-1 w-6 h-6 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                     </div>
                     <div className="flex-1">
                       <div className="text-white font-semibold mb-2">{targetItem.name}</div>
@@ -412,7 +437,8 @@ const SourceItemCard: React.FC<{
   onSelect: (itemId: string) => void;
   selectedItemIds: string[];
   selectedInventoryIds: string[];
-}> = ({ itemGroup, onSelect, selectedItemIds, selectedInventoryIds }) => {
+  isLimitReached: boolean;
+}> = ({ itemGroup, onSelect, selectedItemIds, selectedInventoryIds, isLimitReached }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const { item, count, instances } = itemGroup;
@@ -421,6 +447,9 @@ const SourceItemCard: React.FC<{
   const selectedCount = selectedInventoryIds.filter(id =>
     instances.some((inst: any) => inst.id === id)
   ).length;
+
+  // Проверяем, можно ли взаимодействовать с предметом (добавить или убрать)
+  const canInteract = selectedCount > 0 || (selectedCount < count && !isLimitReached);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
@@ -437,12 +466,18 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 ${
+        canInteract
+          ? 'cursor-pointer hover:brightness-110 hover:shadow-xl'
+          : 'cursor-not-allowed opacity-50'
+      } ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
-          : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
+          : canInteract
+            ? 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
+            : 'border-gray-600/30'
       }`}
-      onClick={() => onSelect(item.id)}
+      onClick={() => canInteract && onSelect(item.id)}
     >
       <div className="relative">
         {/* Изображение предмета */}
@@ -460,9 +495,31 @@ const SourceItemCard: React.FC<{
           )}
 
           {/* Количество предметов */}
-          <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-white text-xs font-bold z-20">
+          <div className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-xs font-bold z-20 ${
+            !canInteract && selectedCount === 0
+              ? 'bg-red-800/80 text-red-200'
+              : 'bg-black/80 text-white'
+          }`}>
             {selectedCount > 0 ? `${selectedCount}/${count}` : `x${count}`}
           </div>
+
+          {/* Индикатор блокировки (только если нельзя взаимодействовать и ничего не выбрано) */}
+          {!canInteract && selectedCount === 0 && (
+            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-red-800/80 text-red-200 text-xs font-bold z-20">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
+
+          {/* Индикатор возможности удаления */}
+          {selectedCount > 0 && (
+            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-cyan-800/80 text-cyan-200 text-xs font-bold z-20" title="Кликните для удаления">
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
 
           {/* Индикатор выбора */}
           {selectedCount > 0 && (
@@ -556,12 +613,12 @@ const TargetItemCard: React.FC<{
 
           {/* Убираем отображение бонуса за количество */}
 
-          {/* Индикатор выбора */}
+          {/* Индикатор выбора с возможностью отмены */}
           {isSelected && (
             <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
-              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center" title="Кликните для отмены выбора">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>
@@ -733,12 +790,35 @@ const UpgradePage: React.FC = () => {
       return;
     }
 
+    // Находим выбранные экземпляры этого предмета
+    const selectedInstances = itemGroup.instances.filter((inst: any) =>
+      inst && inst.id && selectedInventoryIds.includes(inst.id)
+    );
+
     // Находим доступные экземпляры этого предмета, которые еще не выбраны
     const availableInstances = itemGroup.instances.filter((inst: any) =>
       inst && inst.id && !selectedInventoryIds.includes(inst.id)
     );
 
-    if (availableInstances.length > 0) {
+    if (selectedInstances.length > 0) {
+      // Если есть выбранные экземпляры - убираем один
+      const instanceToRemove = selectedInstances[0].id;
+      setSelectedInventoryIds(prev => prev.filter(id => id !== instanceToRemove));
+
+      // Проверяем, остались ли еще выбранные экземпляры этого предмета
+      const remainingSelectedInstances = selectedInstances.slice(1);
+      if (remainingSelectedInstances.length === 0) {
+        setSelectedItemIds(prev => prev.filter(id => id !== itemId));
+      }
+    } else if (availableInstances.length > 0) {
+      // Если нет выбранных экземпляров, но есть доступные - добавляем один
+
+      // Проверяем ограничение на 10 предметов
+      if (selectedInventoryIds.length >= 10) {
+        toast.error('Можно выбрать максимум 10 предметов за одну попытку улучшения');
+        return;
+      }
+
       // Добавляем один экземпляр
       const newInventoryId = availableInstances[0].id;
       setSelectedInventoryIds(prev => [...prev, newInventoryId]);
@@ -746,21 +826,6 @@ const UpgradePage: React.FC = () => {
       // Добавляем ID предмета, если его еще нет
       if (!selectedItemIds.includes(itemId)) {
         setSelectedItemIds(prev => [...prev, itemId]);
-      }
-    } else {
-      // Если экземпляров больше нет, убираем предмет из выбранных
-      const remainingInventoryIds = selectedInventoryIds.filter(id =>
-        !itemGroup.instances.some((inst: any) => inst && inst.id === id)
-      );
-      setSelectedInventoryIds(remainingInventoryIds);
-
-      // Проверяем, есть ли еще экземпляры этого предмета в выборе
-      const hasOtherInstances = remainingInventoryIds.some(id =>
-        itemGroup.instances.some((inst: any) => inst && inst.id === id)
-      );
-
-      if (!hasOtherInstances) {
-        setSelectedItemIds(prev => prev.filter(id => id !== itemId));
       }
     }
 
@@ -777,8 +842,13 @@ const UpgradePage: React.FC = () => {
 
   // Обработчик выбора целевого предмета
   const handleSelectTargetItem = useCallback((itemId: string) => {
-    setSelectedTargetItem(itemId);
-  }, []);
+    // Если предмет уже выбран, убираем выбор
+    if (selectedTargetItem === itemId) {
+      setSelectedTargetItem('');
+    } else {
+      setSelectedTargetItem(itemId);
+    }
+  }, [selectedTargetItem]);
 
   // Подсчет общей стоимости выбранных предметов
   const totalSelectedPrice = React.useMemo(() => {
@@ -807,6 +877,11 @@ const UpgradePage: React.FC = () => {
     try {
       if (selectedInventoryIds.length === 0 || !selectedTargetItem) {
         toast.error('Выберите предметы для улучшения и целевой предмет');
+        return;
+      }
+
+      if (selectedInventoryIds.length > 10) {
+        toast.error('Максимальное количество предметов для улучшения - 10');
         return;
       }
 
@@ -912,6 +987,8 @@ const UpgradePage: React.FC = () => {
           showAnimation={showAnimation}
           upgradeResult={upgradeResult}
           onAnimationComplete={handleAnimationComplete}
+          onRemoveSourceItem={handleSelectSourceItem}
+          onRemoveTargetItem={() => setSelectedTargetItem('')}
         />
 
         {/* Панель управления */}
@@ -940,9 +1017,19 @@ const UpgradePage: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Выбор исходных предметов */}
           <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
-            <h2 className="text-xl font-bold text-white mb-6">
-              {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
-            </h2>
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-white mb-2">
+                {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
+              </h2>
+              {selectedInventoryIds.length >= 10 && (
+                <div className="text-yellow-400 text-sm flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Достигнут лимит предметов (10/10)
+                </div>
+              )}
+            </div>
 
             {isLoadingItems ? (
               <div className="flex items-center justify-center py-12">
@@ -978,6 +1065,7 @@ const UpgradePage: React.FC = () => {
                     onSelect={handleSelectSourceItem}
                     selectedItemIds={selectedItemIds}
                     selectedInventoryIds={selectedInventoryIds}
+                    isLimitReached={selectedInventoryIds.length >= 10}
                   />
                 ))}
               </div>
