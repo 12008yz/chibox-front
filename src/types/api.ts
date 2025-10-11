@@ -472,6 +472,7 @@ export interface UpgradeResponse {
 // Типы для пополнения баланса
 export interface TopUpBalanceRequest {
   amount: number;
+  currency?: string;
 }
 
 export interface TopUpBalanceResponse {

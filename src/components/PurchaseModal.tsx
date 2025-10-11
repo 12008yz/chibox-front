@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { FaTimes, FaCrown, FaCheck, FaCoins, FaWallet } from 'react-icons/fa';
+import { FaTimes, FaCrown, FaCheck, FaCoins, FaWallet, FaExchangeAlt, FaInfoCircle } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
-import { useTopUpBalanceMutation } from '../features/user/userApi';
+import { useTopUpBalanceMutation, useGetCurrencyQuery } from '../features/user/userApi';
 import type { SubscriptionTier } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
+import {
+  Currency,
+  CURRENCY_SYMBOLS,
+  CURRENCY_NAMES,
+  getSavedCurrency,
+  saveCurrency,
+  detectCurrencyFromLocale,
+  convertToChiCoins,
+  convertFromChiCoins,
+  formatCurrency
+} from '../utils/currencyUtils';
 
 interface PurchaseModalProps {
   isOpen: boolean;
@@ -24,6 +35,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedSubscription, setSelectedSubscription] = useState<number | null>(null);
   const [topUpAmount, setTopUpAmount] = useState<string>('');
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(
+    getSavedCurrency() || detectCurrencyFromLocale()
+  );
 
   // API mutations
   const [buySubscription, { isLoading: isSubscriptionLoading }] = useBuySubscriptionMutation();
@@ -33,8 +47,16 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const { data: subscriptionTiersData } = useGetSubscriptionTiersQuery();
   const subscriptionTiers = subscriptionTiersData?.data || [];
 
-  // Предустановленные суммы для пополнения
-  const presetAmounts = [500, 1000, 2500, 5000, 10000, 25000];
+  const { data: currencyData } = useGetCurrencyQuery({ currency: selectedCurrency });
+  const exchangeRates = currencyData?.data?.exchangeRates || { RUB: 1, USD: 0.0105, EUR: 0.0095, GBP: 0.0082, CNY: 0.0750 };
+  const topUpPackages = currencyData?.data?.topUpPackages || [];
+
+  // Сохраняем выбранную валюту
+  useEffect(() => {
+    if (selectedCurrency) {
+      saveCurrency(selectedCurrency);
+    }
+  }, [selectedCurrency]);
 
   const handleSubscriptionPurchase = async (tierId: number) => {
     try {
@@ -60,7 +82,10 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   const handleTopUp = async (amount: number) => {
     try {
-      const result = await topUpBalance({ amount }).unwrap();
+      const result = await topUpBalance({
+        amount,
+        currency: selectedCurrency
+      }).unwrap();
 
       if (result.success && result.data?.paymentUrl) {
         window.open(result.data.paymentUrl, '_blank');
@@ -78,16 +103,16 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   };
 
   const handleCustomTopUp = () => {
-    const amount = parseInt(topUpAmount);
-    if (amount < 100) {
-      toast.error(t('modals.minimum_amount_error'));
+    const chicoins = parseInt(topUpAmount);
+    if (chicoins < 100) {
+      toast.error('Минимум 100 ChiCoins');
       return;
     }
-    if (amount > 100000) {
-      toast.error(t('modals.maximum_amount_error'));
+    if (chicoins > 100000) {
+      toast.error('Максимум 100,000 ChiCoins');
       return;
     }
-    handleTopUp(amount);
+    handleTopUp(chicoins);
   };
 
   if (!isOpen) return null;
@@ -157,29 +182,94 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             /* Balance Top-up Content */
             <div className="bg-black/20 rounded-xl p-6">
               <h3 className="text-lg font-semibold text-white mb-4">{t('modals.select_amount')}</h3>
-              <p className="text-gray-400 text-sm mb-6">
-                {t('modals.balance_description')}
-              </p>
 
-              {/* Preset amounts */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
-                {presetAmounts.map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => handleQuickTopUp(amount)}
-                    disabled={isTopUpLoading}
-                    className="p-4 rounded-lg border-2 border-gray-600 bg-gray-800/30 hover:border-green-500/50 hover:bg-green-500/10 text-white font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Monetary value={amount} />
-                  </button>
-                ))}
+              {/* Currency Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Валюта отображения
+                </label>
+                <select
+                  value={selectedCurrency}
+                  onChange={(e) => setSelectedCurrency(e.target.value as Currency)}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  {Object.entries(CURRENCY_NAMES).map(([code, name]) => (
+                    <option key={code} value={code}>
+                      {CURRENCY_SYMBOLS[code as Currency]} {name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {/* Conversion Info */}
+              <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <FaInfoCircle className="text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm">
+                    <p className="text-blue-300 font-medium mb-1">
+                      О пополнении баланса
+                    </p>
+                    <p className="text-blue-200/80">
+                      Базовая валюта: <strong>1₽ = 1 ChiCoin ⚡</strong>
+                    </p>
+                    <p className="text-blue-200/80 mt-1">
+                      Оплата производится в рублях (RUB) через YooKassa
+                    </p>
+                    {selectedCurrency !== 'RUB' && (
+                      <p className="text-yellow-300/90 mt-2 flex items-center space-x-1">
+                        <FaExchangeAlt className="text-xs" />
+                        <span>Курс: 1 {CURRENCY_SYMBOLS[selectedCurrency]} = {(1 / exchangeRates[selectedCurrency]).toFixed(2)} ChiCoins</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Top-up Packages */}
+              {topUpPackages.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-gray-400 text-sm mb-3">Популярные пакеты:</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {topUpPackages.map((pkg) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => handleQuickTopUp(pkg.chicoins)}
+                        disabled={isTopUpLoading}
+                        className={`p-4 rounded-lg border-2 bg-gray-800/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          pkg.popular ? 'border-green-500/50 bg-green-500/10' : 'border-gray-600'
+                        }`}
+                      >
+                        <div className="text-left">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-yellow-400 font-bold text-lg">
+                              {pkg.totalChicoins} ⚡
+                            </span>
+                            {pkg.bonus > 0 && (
+                              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                                +{Math.round((pkg.bonus / pkg.chicoins) * 100)}%
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-white font-semibold">
+                            {formatCurrency(pkg.price, selectedCurrency, true)}
+                          </div>
+                          {selectedCurrency !== 'RUB' && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              ≈ {formatCurrency(convertFromChiCoins(pkg.chicoins, 'RUB', exchangeRates), 'RUB', true)} к оплате
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Custom amount */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {t('modals.custom_amount')}
+                    {t('modals.custom_amount')} (ChiCoins)
                   </label>
                   <input
                     type="number"
@@ -187,11 +277,33 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                     max="100000"
                     value={topUpAmount}
                     onChange={(e) => setTopUpAmount(e.target.value)}
-                    placeholder={t('modals.enter_amount')}
+                    placeholder="Введите количество ChiCoins"
                     className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                   />
-                  <p className="text-xs text-gray-400 mt-1">
-                    {t('modals.amount_range')}
+                  {topUpAmount && parseInt(topUpAmount) >= 100 && (
+                    <div className="mt-2 p-3 bg-gray-800/50 rounded border border-gray-700">
+                      <div className="text-sm text-gray-300">
+                        <div className="flex justify-between">
+                          <span>Получите:</span>
+                          <span className="text-yellow-400 font-bold">{parseInt(topUpAmount)} ⚡</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span>К оплате:</span>
+                          <span className="text-white font-semibold">
+                            {formatCurrency(convertFromChiCoins(parseInt(topUpAmount), selectedCurrency, exchangeRates), selectedCurrency, true)}
+                          </span>
+                        </div>
+                        {selectedCurrency !== 'RUB' && (
+                          <div className="flex justify-between mt-1 text-xs text-gray-400">
+                            <span>В рублях:</span>
+                            <span>{formatCurrency(parseInt(topUpAmount), 'RUB', true)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    Минимум: 100 ChiCoins • Максимум: 100,000 ChiCoins
                   </p>
                 </div>
 
