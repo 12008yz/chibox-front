@@ -21,6 +21,7 @@ import type {
   TopUpBalanceRequest,
   TopUpBalanceResponse
 } from '../../types/api';
+import type { ExchangeRates } from '../../utils/currencyUtils';
 
 // Расширяем базовый API для работы с пользователем
 export const userApi = baseApi.injectEndpoints({
@@ -742,7 +743,7 @@ export const userApi = baseApi.injectEndpoints({
         currentCurrency: string;
         currencySymbol: string;
         chicoinsSymbol: string;
-        exchangeRates: Record<string, number>;
+        exchangeRates: ExchangeRates;
         lastUpdated: string | null;
         supportedCurrencies: string[];
         topUpPackages: Array<{

@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { FaTimes, FaCrown, FaCheck, FaCoins, FaWallet, FaExchangeAlt, FaInfoCircle } from 'react-icons/fa';
+import { FaTimes, FaCrown, FaCoins, FaWallet, FaInfoCircle } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import toast from 'react-hot-toast';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import { useTopUpBalanceMutation, useGetCurrencyQuery } from '../features/user/userApi';
-import type { SubscriptionTier } from '../features/subscriptions/subscriptionsApi';
+
 import Monetary from './Monetary';
 import {
   Currency,
   CURRENCY_SYMBOLS,
-  CURRENCY_NAMES,
+  CURRENCY_FLAGS,
   getSavedCurrency,
   saveCurrency,
   detectCurrencyFromLocale,
-  convertToChiCoins,
   convertFromChiCoins,
-  formatCurrency
+  formatCurrency,
+  type ExchangeRates
 } from '../utils/currencyUtils';
 
 interface PurchaseModalProps {
@@ -48,7 +48,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const subscriptionTiers = subscriptionTiersData?.data || [];
 
   const { data: currencyData } = useGetCurrencyQuery({ currency: selectedCurrency });
-  const exchangeRates = currencyData?.data?.exchangeRates || { RUB: 1, USD: 0.0105, EUR: 0.0095, GBP: 0.0082, CNY: 0.0750 };
+  const exchangeRates: ExchangeRates = currencyData?.data?.exchangeRates ?? { RUB: 1, USD: 0.0105, EUR: 0.0095, GBP: 0.0082, CNY: 0.0750 };
   const topUpPackages = currencyData?.data?.topUpPackages || [];
 
   // Сохраняем выбранную валюту
@@ -126,9 +126,9 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+      <div className="relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-2xl p-5 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
             {activeTab === 'balance' ? (
               <>
@@ -151,7 +151,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-black/20 rounded-lg p-1">
+        <div className="flex space-x-1 mb-4 bg-black/20 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('balance')}
             className={`flex-1 py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 ${
@@ -177,85 +177,79 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {activeTab === 'balance' ? (
             /* Balance Top-up Content */
-            <div className="bg-black/20 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">{t('modals.select_amount')}</h3>
+            <div className="bg-black/20 rounded-xl p-4">
 
               {/* Currency Selector */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Валюта отображения
-                </label>
-                <select
-                  value={selectedCurrency}
-                  onChange={(e) => setSelectedCurrency(e.target.value as Currency)}
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  {Object.entries(CURRENCY_NAMES).map(([code, name]) => (
-                    <option key={code} value={code}>
-                      {CURRENCY_SYMBOLS[code as Currency]} {name}
-                    </option>
+              <div className="mb-4">
+                <div className="flex items-center justify-center gap-2">
+                  {(Object.keys(CURRENCY_FLAGS) as Currency[]).map((code) => (
+                    <button
+                      key={code}
+                      onClick={() => setSelectedCurrency(code)}
+                      className={`relative px-3 py-2 rounded-lg transition-all duration-200 ${
+                        selectedCurrency === code
+                          ? 'bg-green-500/20 border-2 border-green-500 scale-110'
+                          : 'bg-gray-800/50 border-2 border-gray-700 hover:border-gray-600 hover:scale-105'
+                      }`}
+                      title={`${CURRENCY_FLAGS[code]} ${CURRENCY_SYMBOLS[code]}`}
+                    >
+                      <span className="text-2xl">{CURRENCY_FLAGS[code]}</span>
+                      {selectedCurrency === code && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1530]" />
+                      )}
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
 
               {/* Conversion Info */}
-              <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <div className="flex items-start space-x-2">
-                  <FaInfoCircle className="text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm">
-                    <p className="text-blue-300 font-medium mb-1">
-                      О пополнении баланса
-                    </p>
-                    <p className="text-blue-200/80">
-                      Базовая валюта: <strong>1₽ = 1 ChiCoin ⚡</strong>
-                    </p>
-                    <p className="text-blue-200/80 mt-1">
-                      Оплата производится в рублях (RUB) через YooKassa
-                    </p>
-                    {selectedCurrency !== 'RUB' && (
-                      <p className="text-yellow-300/90 mt-2 flex items-center space-x-1">
-                        <FaExchangeAlt className="text-xs" />
-                        <span>Курс: 1 {CURRENCY_SYMBOLS[selectedCurrency]} = {(1 / exchangeRates[selectedCurrency]).toFixed(2)} ChiCoins</span>
-                      </p>
-                    )}
+              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-2 text-blue-200/80">
+                    <FaInfoCircle className="text-blue-400" />
+                    <span><strong>1₽ = 1⚡</strong> · Оплата через YooKassa</span>
                   </div>
+                  {selectedCurrency !== 'RUB' && (
+                    <div className="text-xs text-yellow-300/90">
+                      <span>Курс: 1{CURRENCY_SYMBOLS[selectedCurrency]} = {(1 / exchangeRates[selectedCurrency]).toFixed(2)}⚡</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Top-up Packages */}
               {topUpPackages.length > 0 && (
-                <div className="mb-6">
-                  <p className="text-gray-400 text-sm mb-3">Популярные пакеты:</p>
+                <div className="mb-4">
                   <div className="grid grid-cols-2 gap-3">
                     {topUpPackages.map((pkg) => (
                       <button
                         key={pkg.id}
                         onClick={() => handleQuickTopUp(pkg.chicoins)}
                         disabled={isTopUpLoading}
-                        className={`p-4 rounded-lg border-2 bg-gray-800/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        className={`p-3 rounded-lg border-2 bg-gray-800/30 hover:border-green-500/50 hover:bg-green-500/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                           pkg.popular ? 'border-green-500/50 bg-green-500/10' : 'border-gray-600'
                         }`}
                       >
                         <div className="text-left">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-yellow-400 font-bold text-lg">
-                              {pkg.totalChicoins} ⚡
+                            <span className="text-yellow-400 font-bold text-base">
+                              {pkg.totalChicoins}⚡
                             </span>
                             {pkg.bonus > 0 && (
-                              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                              <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">
                                 +{Math.round((pkg.bonus / pkg.chicoins) * 100)}%
                               </span>
                             )}
                           </div>
-                          <div className="text-white font-semibold">
+                          <div className="text-white font-semibold text-sm">
                             {formatCurrency(pkg.price, selectedCurrency, true)}
                           </div>
                           {selectedCurrency !== 'RUB' && (
-                            <div className="text-xs text-gray-400 mt-1">
-                              ≈ {formatCurrency(convertFromChiCoins(pkg.chicoins, 'RUB', exchangeRates), 'RUB', true)} к оплате
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              ≈ {formatCurrency(convertFromChiCoins(pkg.chicoins, 'RUB', exchangeRates), 'RUB', true)}
                             </div>
                           )}
                         </div>
@@ -266,18 +260,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               )}
 
               {/* Custom amount */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {t('modals.custom_amount')} (ChiCoins)
-                  </label>
                   <input
                     type="number"
                     min="100"
                     max="100000"
                     value={topUpAmount}
                     onChange={(e) => setTopUpAmount(e.target.value)}
-                    placeholder="Введите количество ChiCoins"
+                    placeholder="Произвольная сумма (мин. 100⚡)"
                     className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                   />
                   {topUpAmount && parseInt(topUpAmount) >= 100 && (
@@ -302,15 +293,12 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                       </div>
                     </div>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">
-                    Минимум: 100 ChiCoins • Максимум: 100,000 ChiCoins
-                  </p>
                 </div>
 
                 <button
                   onClick={handleCustomTopUp}
                   disabled={isTopUpLoading || !topUpAmount || parseInt(topUpAmount) < 100}
-                  className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   <FaWallet className="text-lg" />
                   <span>
@@ -321,17 +309,13 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             </div>
           ) : (
             /* Subscription Content */
-            <div className="bg-black/20 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">{t('modals.select_subscription')}</h3>
-              <p className="text-gray-400 text-sm mb-6">
-                {t('modals.subscription_description')}
-              </p>
+            <div className="bg-black/20 rounded-xl p-4">
 
               <div className="space-y-3">
                 {subscriptionTiers.map((tier) => (
                   <div
                     key={tier.id}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                    className={`p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                       selectedSubscription === tier.id
                         ? 'border-purple-500 bg-purple-500/20'
                         : 'border-gray-600 bg-gray-800/30 hover:border-purple-500/50 hover:bg-purple-500/10'
@@ -371,7 +355,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               <button
                 onClick={() => selectedSubscription && handleSubscriptionPurchase(selectedSubscription)}
                 disabled={isSubscriptionLoading || !selectedSubscription}
-                className="w-full mt-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 <FaCrown className="text-lg" />
                 <span>

@@ -43,6 +43,14 @@ export const CURRENCY_SYMBOLS: Record<Currency | 'ChiCoins', string> = {
   ChiCoins: '⚡'
 };
 
+export const CURRENCY_FLAGS: Record<Currency, string> = {
+  RUB: '🇷🇺',
+  USD: '🇺🇸',
+  EUR: '🇪🇺',
+  GBP: '🇬🇧',
+  CNY: '🇨🇳'
+};
+
 export const CURRENCY_NAMES: Record<Currency, string> = {
   RUB: 'Российский рубль',
   USD: 'Доллар США',
@@ -104,14 +112,21 @@ export function formatCurrency(
 }
 
 /**
+ * Проверить, является ли строка валидной валютой
+ */
+function isValidCurrency(value: string): value is Currency {
+  return ['RUB', 'USD', 'EUR', 'GBP', 'CNY'].includes(value);
+}
+
+/**
  * Получить сохраненную валюту пользователя из localStorage
  */
-export function getSavedCurrency(): Currency {
+export function getSavedCurrency(): Currency | null {
   const saved = localStorage.getItem('userCurrency');
   if (saved && isValidCurrency(saved)) {
     return saved as Currency;
   }
-  return 'RUB'; // По умолчанию
+  return null;
 }
 
 /**
@@ -119,13 +134,6 @@ export function getSavedCurrency(): Currency {
  */
 export function saveCurrency(currency: Currency): void {
   localStorage.setItem('userCurrency', currency);
-}
-
-/**
- * Проверить, является ли строка валидной валютой
- */
-function isValidCurrency(value: string): value is Currency {
-  return ['RUB', 'USD', 'EUR', 'GBP', 'CNY'].includes(value);
 }
 
 /**
