@@ -735,6 +735,39 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+
+    // Получение информации о валютах и курсах
+    getCurrency: builder.query<
+      ApiResponse<{
+        currentCurrency: string;
+        currencySymbol: string;
+        chicoinsSymbol: string;
+        exchangeRates: Record<string, number>;
+        lastUpdated: string | null;
+        supportedCurrencies: string[];
+        topUpPackages: Array<{
+          id: string;
+          chicoins: number;
+          bonus: number;
+          totalChicoins: number;
+          price: number;
+          currency: string;
+          currencySymbol: string;
+          popular?: boolean;
+        }>;
+        conversionInfo: {
+          base: string;
+          formula: string;
+          note: string;
+        };
+      }>,
+      { currency?: string } | void
+    >({
+      query: (params) => {
+        const currency = params && 'currency' in params ? params.currency : undefined;
+        return currency ? `v1/currency?currency=${currency}` : 'v1/currency';
+      },
+    }),
   }),
 });
 
@@ -788,4 +821,7 @@ export const {
 
   // Пополнение баланса хук
   useTopUpBalanceMutation,
+
+  // Валюты хук
+  useGetCurrencyQuery,
 } = userApi;
