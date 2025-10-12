@@ -13,6 +13,7 @@ import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../
 import Notifications from './Notifications';
 import RouletteGame from '../../RouletteGame';
 import PurchaseModal from '../../PurchaseModal';
+import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 
 interface RightContentProps {
@@ -33,6 +34,7 @@ const RightContent: React.FC<RightContentProps> = ({
   const [showBonusGame, setShowBonusGame] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [purchaseModalTab, setPurchaseModalTab] = useState<'balance' | 'subscription'>('balance');
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
   const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
@@ -127,8 +129,7 @@ const RightContent: React.FC<RightContentProps> = ({
           </div>
           <button
             onClick={() => {
-              setPurchaseModalTab('balance');
-              setIsPurchaseModalOpen(true);
+              setIsDepositModalOpen(true);
             }}
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
@@ -212,6 +213,12 @@ const RightContent: React.FC<RightContentProps> = ({
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
         initialTab={purchaseModalTab}
+      />
+
+      {/* Deposit Modal */}
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
       />
     </div>
   );
