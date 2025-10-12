@@ -473,6 +473,7 @@ export interface UpgradeResponse {
 export interface TopUpBalanceRequest {
   amount: number;
   currency?: string;
+  payment_method?: string;
 }
 
 export interface TopUpBalanceResponse {
