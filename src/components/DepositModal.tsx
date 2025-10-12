@@ -26,7 +26,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.auth.user);
 
   const [selectedCountry, setSelectedCountry] = useState('RU');
-  const [selectedMethod, setSelectedMethod] = useState<string>('sbp');
+  const [selectedMethod, setSelectedMethod] = useState<string>('robokassa');
   const [amount, setAmount] = useState<string>('100');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -35,6 +35,20 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
   const [applyPromo] = useApplyPromoCodeMutation();
 
   const paymentMethods: PaymentMethod[] = [
+    {
+      id: 'robokassa',
+      name: 'Robokassa',
+      icon: (
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+            ROBOKASSA
+          </div>
+        </div>
+      ),
+      badge: 'Все способы',
+      enabled: true,
+      type: 'card'
+    },
     {
       id: 'sbp',
       name: 'СБП',
@@ -247,9 +261,17 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
+      // Определяем payment_method на основе выбранного способа оплаты
+      let paymentMethod = 'yookassa'; // По умолчанию YooKassa
+
+      if (selectedMethod === 'robokassa') {
+        paymentMethod = 'robokassa';
+      }
+
       const result = await topUpBalance({
         amount: amountNum,
-        currency: 'RUB'
+        currency: 'RUB',
+        payment_method: paymentMethod
       }).unwrap();
 
       if (result.success && result.data?.paymentUrl) {
