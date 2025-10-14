@@ -21,6 +21,25 @@ type PaymentMethod = {
   type: 'sbp' | 'card' | 'crypto' | 'other';
 };
 
+const SbpIcon: React.FC = () => {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <div className="flex items-center justify-center w-full h-full">
+      {imageError ? (
+        <div className="text-2xl font-bold text-green-400">СБП</div>
+      ) : (
+        <img
+          src="https://payment.kassa.ai/build/assets/favicon-0dca7b36.png"
+          alt="СБП"
+          className="w-12 h-12 object-contain"
+          onError={() => setImageError(true)}
+        />
+      )}
+    </div>
+  );
+};
+
 const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.auth.user);
@@ -52,20 +71,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose }) => {
     {
       id: 'sbp',
       name: 'СБП',
-      icon: (
-        <div className="flex items-center justify-center w-full h-full">
-          <img
-            src="https://payment.kassa.ai/build/assets/favicon-0dca7b36.png"
-            alt="СБП"
-            className="w-12 h-12 object-contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = '<div class="text-2xl font-bold text-green-400">СБП</div>';
-            }}
-          />
-        </div>
-      ),
+      icon: <SbpIcon />,
       enabled: true,
       type: 'sbp'
     },
