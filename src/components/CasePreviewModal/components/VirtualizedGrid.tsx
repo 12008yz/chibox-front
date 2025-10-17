@@ -13,8 +13,8 @@ export const VirtualizedGrid = memo(({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Вычисляем параметры виртуализации
-  const itemsPerRow = 4;
-  const rowHeight = itemHeight + 16;
+  const itemsPerRow = 6; // соответствует grid-cols-6 на средних экранах
+  const rowHeight = itemHeight + 16; // высота элемента + gap
   const totalRows = Math.ceil(items.length / itemsPerRow);
   const totalHeight = totalRows * rowHeight;
 
@@ -25,23 +25,27 @@ export const VirtualizedGrid = memo(({
   const endIndex = Math.min(items.length, visibleRowEnd * itemsPerRow);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
+    const scrollTop = e.currentTarget.scrollTop;
+    requestAnimationFrame(() => {
+      setScrollTop(scrollTop);
+    });
   }, []);
 
   return (
     <div
       ref={containerRef}
-      className="overflow-auto"
+      className="overflow-y-auto overflow-x-hidden"
       style={{ height: containerHeight }}
       onScroll={handleScroll}
     >
-      <div style={{ height: totalHeight, position: 'relative' }}>
+      <div style={{ height: totalHeight, position: 'relative', width: '100%' }}>
         <div
-          className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+          className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
           style={{
             transform: `translateY(${visibleRowStart * rowHeight}px)`,
             position: 'absolute',
-            width: '100%'
+            width: '100%',
+            willChange: 'transform'
           }}
         >
           {items.slice(startIndex, endIndex).map((item, index) => {
