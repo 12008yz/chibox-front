@@ -20,13 +20,21 @@ export const getRarityColor = (rarity: string): string => {
   }
 };
 
-export const generateGoldenSparks = (): React.ReactNode[] => {
+// Оптимизированная генерация золотых искр с мемоизацией
+const sparkCache = new Map<number, React.ReactNode[]>();
+
+export const generateGoldenSparks = (seed: number = 0): React.ReactNode[] => {
+  // Используем кеш для одинаковых наборов искр
+  if (sparkCache.has(seed)) {
+    return sparkCache.get(seed)!;
+  }
+
   const sparks: React.ReactNode[] = [];
   const sparkCount = 6;
 
   for (let i = 0; i < sparkCount; i++) {
     const angle = (i * 360) / sparkCount;
-    const distance = 40 + Math.random() * 15;
+    const distance = 40 + (seed % 15); // Детерминированное расстояние
     const dx = Math.cos(angle * Math.PI / 180) * distance;
     const dy = Math.sin(angle * Math.PI / 180) * distance;
 
@@ -40,11 +48,21 @@ export const generateGoldenSparks = (): React.ReactNode[] => {
           animationDelay: `${i * 0.1}s`,
           left: '50%',
           top: '50%',
-          transform: 'translate(-50%, -50%)'
+          transform: 'translate3d(-50%, -50%, 0)',
+          willChange: 'transform, opacity'
         } as React.CSSProperties}
       />
     );
   }
+
+  // Сохраняем в кеш, но ограничиваем размер кеша
+  if (sparkCache.size > 10) {
+    const firstKey = sparkCache.keys().next().value;
+    if (firstKey !== undefined) {
+      sparkCache.delete(firstKey);
+    }
+  }
+  sparkCache.set(seed, sparks);
 
   return sparks;
 };

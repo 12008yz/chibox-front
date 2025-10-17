@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { throttle } from 'lodash-es';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../../features/cases/casesApi';
 import { CaseTemplate } from '../../types/api';
 import { useUserData } from '../../hooks/useUserData';
@@ -39,6 +40,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
   const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
@@ -97,30 +99,49 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, []);
 
+  // Оптимизированный автоскролл с throttling
+  const scrollToItem = useCallback(
+    throttle((index: number) => {
+      if (!scrollContainerRef.current || !showOpeningAnimation || animationPhase === 'idle') return;
+
+      const container = scrollContainerRef.current;
+      const items = container.querySelectorAll('[data-item-index]');
+      const currentItem = items[index] as HTMLElement;
+
+      if (currentItem) {
+        // Используем requestAnimationFrame для плавности
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+
+        animationFrameRef.current = requestAnimationFrame(() => {
+          const containerRect = container.getBoundingClientRect();
+          const itemRect = currentItem.getBoundingClientRect();
+          const itemTop = itemRect.top - containerRect.top + container.scrollTop;
+          const containerHeight = container.clientHeight;
+          const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
+
+          container.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
+          });
+        });
+      }
+    }, 16), // Throttle до 60 FPS
+    [showOpeningAnimation, animationPhase]
+  );
+
   // Автоскролл к выбранному элементу во время анимации
   useEffect(() => {
-    if (!scrollContainerRef.current || !showOpeningAnimation || animationPhase === 'idle') return;
-
-    const container = scrollContainerRef.current;
-    const items = container.querySelectorAll('[data-item-index]');
-    const currentItem = items[sliderPosition] as HTMLElement;
-
-    if (currentItem) {
-      const containerRect = container.getBoundingClientRect();
-      const itemRect = currentItem.getBoundingClientRect();
-      const itemTop = itemRect.top - containerRect.top + container.scrollTop;
-      const containerHeight = container.clientHeight;
-      const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
-
-      container.scrollTo({
-        top: Math.max(0, targetScrollTop),
-        behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
-      });
-    }
-  }, [sliderPosition, showOpeningAnimation, animationPhase]);
+    if (!showOpeningAnimation || animationPhase === 'idle') return;
+    scrollToItem(sliderPosition);
+  }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem]);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -163,7 +184,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   }, []);
 
-  // Анимация открытия
+  // Анимация открытия (оригинальная логика с оптимизациями)
   const startAnimation = useCallback((wonItem: any) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
@@ -340,9 +361,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   return (
     <div
       className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
-        isAnimating ? 'bg-black bg-opacity-75 backdrop-blur-sm' : 'bg-black bg-opacity-0'
+        isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
       }`}
       onClick={handleClose}
+      style={{
+        backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
+      }}
     >
       <div
         className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
@@ -358,10 +382,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           t={t}
         />
 
-        {/* Содержимое кейса */}
+        {/* Содержимое кейса - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 p-6 overflow-y-auto relative"
+          className="flex-1 p-6 overflow-y-auto relative virtualized-container smooth-scroll"
           style={{ maxHeight: 'calc(90vh - 200px)' }}
         >
           {isLoading ? (
