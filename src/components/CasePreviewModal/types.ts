@@ -22,14 +22,14 @@ export interface CaseItemProps {
   showGoldenSparks: boolean;
   getRarityColor: (rarity: string) => string;
   generateGoldenSparks: () => React.ReactNode[];
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
   isVisible?: boolean;
 }
 
 export interface StaticCaseItemProps {
   item: any;
   getRarityColor: (rarity: string) => string;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
 }
 
 export interface VirtualizedGridProps {
@@ -37,7 +37,7 @@ export interface VirtualizedGridProps {
   itemHeight?: number;
   containerHeight?: number;
   getRarityColor: (rarity: string) => string;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
 }
 
 export interface ModalHeaderProps {
@@ -45,7 +45,7 @@ export interface ModalHeaderProps {
   caseImageUrl: string;
   fixedPrices: boolean;
   onClose: () => void;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
 }
 
 export interface ModalFooterProps {
@@ -65,7 +65,7 @@ export interface ModalFooterProps {
   handleOpenCase: () => void;
   getCasePrice: (caseData: CaseTemplate) => number;
   checkBalanceSufficient: (price: number) => boolean;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
 }
 
 export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'stopped';

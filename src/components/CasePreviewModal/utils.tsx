@@ -1,5 +1,4 @@
 import React from 'react';
-import { CaseTemplate } from '../../types/api';
 import { DEFAULT_CASE_IMAGES } from './constants';
 
 export const getRarityColor = (rarity: string): string => {
@@ -22,7 +21,7 @@ export const getRarityColor = (rarity: string): string => {
 };
 
 export const generateGoldenSparks = (): React.ReactNode[] => {
-  const sparks = [];
+  const sparks: React.ReactNode[] = [];
   const sparkCount = 6;
 
   for (let i = 0; i < sparkCount; i++) {
@@ -36,8 +35,8 @@ export const generateGoldenSparks = (): React.ReactNode[] => {
         key={i}
         className="golden-spark"
         style={{
-          '--dx': `${dx}px`,
-          '--dy': `${dy}px`,
+          ['--dx' as any]: `${dx}px`,
+          ['--dy' as any]: `${dy}px`,
           animationDelay: `${i * 0.1}s`,
           left: '50%',
           top: '50%',
