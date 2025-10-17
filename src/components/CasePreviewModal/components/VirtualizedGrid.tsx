@@ -13,7 +13,7 @@ export const VirtualizedGrid = memo(({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Вычисляем параметры виртуализации
-  const itemsPerRow = 6;
+  const itemsPerRow = 4;
   const rowHeight = itemHeight + 16;
   const totalRows = Math.ceil(items.length / itemsPerRow);
   const totalHeight = totalRows * rowHeight;
@@ -37,7 +37,7 @@ export const VirtualizedGrid = memo(({
     >
       <div style={{ height: totalHeight, position: 'relative' }}>
         <div
-          className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4"
+          className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
           style={{
             transform: `translateY(${visibleRowStart * rowHeight}px)`,
             position: 'absolute',
