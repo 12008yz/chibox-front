@@ -218,7 +218,6 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[1].username,
                       level: leaderboardData.leaderboard[1].level,
                       steam_avatar: leaderboardData.leaderboard[1].steam_avatar,
-                      steam_avatar_url: leaderboardData.leaderboard[1].steam_avatar_url,
                       score: getScoreValue(leaderboardData.leaderboard[1])
                     }}
                     rank={2}
@@ -232,7 +231,6 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[0].username,
                       level: leaderboardData.leaderboard[0].level,
                       steam_avatar: leaderboardData.leaderboard[0].steam_avatar,
-                      steam_avatar_url: leaderboardData.leaderboard[0].steam_avatar_url,
                       score: getScoreValue(leaderboardData.leaderboard[0])
                     }}
                     rank={1}
@@ -246,7 +244,6 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[2].username,
                       level: leaderboardData.leaderboard[2].level,
                       steam_avatar: leaderboardData.leaderboard[2].steam_avatar,
-                      steam_avatar_url: leaderboardData.leaderboard[2].steam_avatar_url,
                       score: getScoreValue(leaderboardData.leaderboard[2])
                     }}
                     rank={3}

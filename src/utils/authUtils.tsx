@@ -1,6 +1,7 @@
 // Утилиты для работы с авторизацией
 import { AppDispatch } from '../store';
 import { logout } from '../features/auth/authSlice';
+import { baseApi } from '../store/api/baseApi';
 
 /**
  * Полная очистка состояния приложения при выходе
@@ -8,6 +9,9 @@ import { logout } from '../features/auth/authSlice';
  */
 export const performFullLogout = (dispatch: AppDispatch) => {
   try {
+    // Сбрасываем весь кэш RTK Query ПЕРЕД очисткой Redux
+    dispatch(baseApi.util.resetApiState());
+
     // Очищаем Redux состояние и localStorage
     dispatch(logout());
 
@@ -27,10 +31,6 @@ export const performFullLogout = (dispatch: AppDispatch) => {
 
     // Очищаем sessionStorage полностью
     sessionStorage.clear();
-
-    // Сброс кэша API (если нужно более агрессивная очистка)
-    // Это можно раскомментировать если нужно очистить весь кэш RTK Query
-    // dispatch(baseApi.util.resetApiState());
 
     console.log('Full logout completed - all user data cleared');
 

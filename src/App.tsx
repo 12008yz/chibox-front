@@ -33,9 +33,13 @@ const App: React.FC = () => {
     username: auth.user?.username
   });
 
+  // Проверяем, находимся ли мы на странице Steam авторизации
+  const isSteamAuthPage = window.location.pathname === '/steam-auth';
+
   // Автоматически получаем данные пользователя если есть токен
   // И либо нет полных данных пользователя, либо нет Steam данных
-  const shouldFetchUser = auth.token && (
+  // НО НЕ загружаем если мы на странице Steam авторизации (там будет новый токен)
+  const shouldFetchUser = !isSteamAuthPage && auth.token && (
     !auth.user ||
     !auth.user.id ||
     (auth.user.auth_provider === 'steam' && !auth.user.steam_avatar_url && !auth.user.steam_avatar)

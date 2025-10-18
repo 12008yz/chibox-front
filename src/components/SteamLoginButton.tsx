@@ -1,5 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from '../store/hooks';
+import { logout } from '../features/auth/authSlice';
+import { baseApi } from '../store/api/baseApi';
 
 interface SteamLoginButtonProps {
   isLoading?: boolean;
@@ -11,15 +14,37 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
   disabled = false
 }) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
   const handleSteamLogin = () => {
     if (disabled || isLoading) return;
 
-    // Перенаправляем на серверный endpoint для Steam авторизации
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-    console.log('Final serverUrl:', serverUrl);
-    console.log('Redirecting to:', `${serverUrl}/v1/auth/steam`);
-    window.location.href = `${serverUrl}/v1/auth/steam`;
+    // Очищаем старое состояние ПЕРЕД редиректом на Steam
+    console.log('Clearing state before Steam login...');
+
+    // Сначала очищаем localStorage вручную
+    const keysToKeep = ['theme', 'language', 'cookieConsent'];
+    const allKeys = Object.keys(localStorage);
+    allKeys.forEach(key => {
+      if (!keysToKeep.includes(key)) {
+        localStorage.removeItem(key);
+      }
+    });
+    sessionStorage.clear();
+
+    // Потом очищаем Redux
+    dispatch(baseApi.util.resetApiState());
+    dispatch(logout());
+
+    // Небольшая задержка чтобы убедиться что все очистилось
+    setTimeout(() => {
+      // Перенаправляем на серверный endpoint для Steam авторизации
+      const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+      console.log('Final serverUrl:', serverUrl);
+      console.log('Redirecting to:', `${serverUrl}/v1/auth/steam`);
+      window.location.href = `${serverUrl}/v1/auth/steam`;
+    }, 100);
   };
 
   return (
