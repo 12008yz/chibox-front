@@ -65,7 +65,7 @@ const SteamProfile: React.FC<SteamProfileProps> = ({ user, onSteamLink }) => {
         {/* Steam аватар */}
         <div className="flex-shrink-0">
           <Avatar
-            steamAvatar={user.steam_avatar}
+            steamAvatar={user.steam_avatar_url || user.steam_avatar}
             id={user.steam_id}
             size="large"
             level={user.level}

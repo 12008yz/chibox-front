@@ -313,7 +313,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
-      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
         try {
           await queryFulfilled;
           // Обновляем статус слота после успешной игры
@@ -532,6 +532,7 @@ export const userApi = baseApi.injectEndpoints({
             total: number;
           };
           steam_avatar?: string;
+          steam_avatar_url?: string;
           steam_profile?: {
             personaname?: string;
             profileurl?: string;

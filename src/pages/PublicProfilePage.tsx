@@ -169,7 +169,7 @@ const PublicProfilePage: React.FC = () => {
               <div className="relative">
                 <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-1 flex items-center justify-center">
                   <Avatar
-                    steamAvatar={user.steam_avatar}
+                    steamAvatar={user.steam_avatar_url || user.steam_avatar}
                     id={user.id}
                     size="large"
                     level={user.level}

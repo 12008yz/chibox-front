@@ -38,7 +38,7 @@ const App: React.FC = () => {
   const shouldFetchUser = auth.token && (
     !auth.user ||
     !auth.user.id ||
-    (auth.user.auth_provider === 'steam' && !auth.user.steam_avatar)
+    (auth.user.auth_provider === 'steam' && !auth.user.steam_avatar_url && !auth.user.steam_avatar)
   );
 
   const {

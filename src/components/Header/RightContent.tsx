@@ -137,7 +137,7 @@ const RightContent: React.FC<RightContentProps> = ({
         <div className="profile-content">
           <Avatar
             image={user.profilePicture}
-            steamAvatar={user.steam_avatar}
+            steamAvatar={user.steam_avatar_url || user.steam_avatar}
             id={user.id || user.username}
             size="small"
           />
