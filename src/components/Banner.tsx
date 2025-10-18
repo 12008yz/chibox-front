@@ -16,11 +16,18 @@ const Banner: React.FC<BannerProps> = ({ left, right }) => {
   const { t } = useTranslation();
 
   return (
-    <div
-      className="w-screen max-w-[1920px] h-[460px] bg-no-repeat hidden md:flex bg-cover"
-      style={{ backgroundImage: `url(${left.image})` }}
-    >
-      <div className="flex items-center justify-center w-full">
+    <div className="relative w-screen max-w-[1920px] h-[460px] hidden md:flex overflow-hidden">
+      {/* Фоновое изображение */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${left.image})` }}
+      />
+
+      {/* Затемнение по бокам (градиент) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+
+      {/* Контент */}
+      <div className="relative flex items-center justify-center w-full z-10">
         <div className="flex max-w-7xl w-full items-center justify-between">
           {left.title !== 'hide' ? (
             <div className="w-72 h-56 notched bg-[#CF3464] flex items-center justify-center">
