@@ -360,22 +360,12 @@ const HomePage: React.FC = () => {
                   const subscriptionDaysLeft = Number(userData?.subscription_days_left || 0);
                   const nextCaseAvailableTime = userData?.next_case_available_time;
 
-                  // Логирование для отладки
-                  console.log('HomePage: userData и nextCaseAvailableTime:', {
-                    userData: userData,
-                    nextCaseAvailableTime: nextCaseAvailableTime,
-                    casesData: data
-                  });
-
                   // Функция для принудительного обновления данных
                   const handleDataUpdate = () => {
                     console.log('Принудительное обновление данных...');
                     refetchUser();
                     refetchCases();
                   };
-
-
-
 
 
                   // Функция для фильтрации кейсов по подписке
