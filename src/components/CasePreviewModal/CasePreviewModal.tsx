@@ -260,11 +260,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]);
 
   const handleBuyCase = async () => {
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) return;
+    console.log('=== handleBuyCase START ===');
+    console.log('States:', { isProcessing, buyLoading, openLoading, showOpeningAnimation });
+
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+      console.log('BLOCKED: один из флагов true, выход');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       if (onBuyAndOpenCase) {
+        console.log('Используем onBuyAndOpenCase callback');
         const result = await onBuyAndOpenCase(caseData);
         if (result && result.item) {
           setOpeningResult(result);
@@ -280,61 +288,93 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         quantity: 1
       };
 
+      console.log('Отправка запроса на покупку кейса:', buyParams);
       const result = await buyCase(buyParams).unwrap();
+      console.log('Результат покупки:', result);
 
       if (result.success) {
         if (paymentMethod === 'bank_card') {
+          console.log('Метод оплаты: банковская карта');
           if (result.data?.paymentUrl) {
             window.location.href = result.data.paymentUrl;
           } else {
             alert('Ошибка: не получена ссылка для оплаты');
           }
         } else {
+          console.log('Метод оплаты: баланс');
+          console.log('inventory_cases:', result.data?.inventory_cases);
+
           if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
             const inventoryCase = result.data.inventory_cases[0];
+            console.log('Найден купленный кейс в инвентаре:', inventoryCase);
+            console.log('Вызываем handleOpenCase с inventoryItemId:', inventoryCase.id);
+
+            // Сбрасываем isProcessing перед вызовом handleOpenCase
+            setIsProcessing(false);
             await handleOpenCase(undefined, inventoryCase.id);
+            console.log('handleOpenCase завершен');
+            return; // Возвращаемся, чтобы не сбрасывать isProcessing в finally
           } else {
+            console.log('inventory_cases пустой или отсутствует');
             alert('Кейс успешно куплен!');
             handleClose();
           }
         }
       } else {
+        console.error('Покупка не успешна:', result.message);
         alert('Ошибка покупки: ' + (result.message || 'Неизвестная ошибка'));
       }
     } catch (error: any) {
       console.error('Ошибка покупки кейса:', error);
       if (error?.status === 400 && error?.data?.message?.includes('Недостаточно средств')) {
-        const requiredAmount = error?.data?.required || 0;
-        const availableAmount = error?.data?.available || 0;
+        const requiredAmount = error?.data?.data?.required || 0;
+        const availableAmount = error?.data?.data?.available || 0;
         const shortfall = requiredAmount - availableAmount;
         alert(`Недостаточно средств на балансе!\nТребуется: ${requiredAmount}₽\nДоступно: ${availableAmount}₽\nНе хватает: ${shortfall}₽`);
       } else {
         alert('Ошибка покупки кейса: ' + (error?.data?.message || error?.message || 'Неизвестная ошибка'));
       }
     } finally {
+      console.log('=== handleBuyCase FINALLY ===');
       setIsProcessing(false);
     }
   };
 
   const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) return;
+    console.log('=== handleOpenCase START ===');
+    console.log('Параметры:', { caseId, inventoryItemId });
+    console.log('States:', { isProcessing, buyLoading, openLoading, showOpeningAnimation });
+
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+      console.log('BLOCKED: один из флагов true, выход');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       const openCaseParams: any = {};
       if (inventoryItemId) {
         openCaseParams.inventoryItemId = inventoryItemId;
+        console.log('Используем inventoryItemId:', inventoryItemId);
       } else if (caseId) {
         openCaseParams.case_id = caseId;
+        console.log('Используем caseId:', caseId);
       } else {
         openCaseParams.template_id = caseData.id;
+        console.log('Используем template_id:', caseData.id);
       }
 
+      console.log('Отправка запроса на открытие кейса:', openCaseParams);
       const result = await openCase(openCaseParams).unwrap();
+      console.log('Результат открытия кейса:', result);
 
       if (result.success && result.data?.item) {
+        console.log('Кейс успешно открыт, запуск анимации. Предмет:', result.data.item);
         setOpeningResult(result.data);
         startAnimation(result.data.item);
+      } else {
+        console.warn('Открытие не успешно или нет предмета в результате');
       }
     } catch (error: any) {
       console.error('Ошибка открытия кейса:', error);
@@ -348,6 +388,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         alert(error?.data?.message || 'Произошла ошибка при открытии кейса');
       }
     } finally {
+      console.log('=== handleOpenCase FINALLY ===');
       setIsProcessing(false);
     }
   };

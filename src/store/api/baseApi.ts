@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 // Базовый query с таймаутом
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
-  timeout: 30000, // 30 секунд таймаут
+  timeout: 60000, // 60 секунд таймаут (увеличен для медленных операций)
   credentials: 'include', // Включаем отправку cookies для session-based аутентификации
   prepareHeaders: (headers, { getState }) => {
     // Добавляем токен авторизации из состояния

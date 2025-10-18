@@ -245,8 +245,11 @@ const HomePage: React.FC = () => {
       }, 100);
 
       // Проверяем наличие inventory_cases в ответе
-      const inventoryCases = (buyResult as any).inventory_cases;
+      const inventoryCases = buyResult.data?.inventory_cases;
+      console.log('inventory_cases из результата покупки:', inventoryCases);
+
       if (!inventoryCases || inventoryCases.length === 0) {
+        console.error('Полный результат покупки:', buyResult);
         throw new Error('Кейс не был добавлен в инвентарь');
       }
 
