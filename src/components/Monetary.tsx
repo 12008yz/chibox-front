@@ -31,14 +31,23 @@ const Monetary: React.FC<MonetaryProps> = ({
     return (
       <span className="inline-flex items-center gap-1">
         <span className="font-semibold">{formattedValue}</span>
-        <span className="text-yellow-400">{symbol}</span>
+        <img
+          src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+          alt="chicoins"
+          className="w-5 h-5 inline-block object-contain"
+        />
       </span>
     );
   }
 
   return (
-    <span>
-      {symbol}{formattedValue}
+    <span className="inline-flex items-center gap-1">
+      <span className="font-semibold">{formattedValue}</span>
+      <img
+        src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+        alt={currency}
+        className="w-5 h-5 inline-block object-contain"
+      />
     </span>
   );
 };

@@ -24,6 +24,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
   };
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // // Логирование для отладки
   // console.log(`Case "${title}":`, {
@@ -53,24 +54,43 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
   const usingDefaultImage = !image || image.trim() === '' || imageError;
 
   return (
-    <div className="flex flex-col w-64 items-center rounded transition-all hover:scale-105 cursor-pointer">
+    <div
+      className="flex flex-col w-64 items-center rounded transition-all hover:scale-105 cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {!loaded && (
         <div className="flex w-full h-64 items-center justify-center">
           <div className="spinner" />
         </div>
       )}
 
-      <img
-        src={usingDefaultImage ? defaultImage : image}
-        alt={title}
-        className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 ${loaded ? '' : 'hidden'}`}
-        onLoad={() => setLoaded(true)}
-        onError={() => {
-          if (!usingDefaultImage && !imageError) {
-            setImageError(true);
-          }
-        }}
-      />
+      <div className="relative w-full flex items-center justify-center">
+        {/* Радиальное свечение - только при наведении */}
+        {isHovered && (
+          <div
+            className="absolute inset-0 -ml-4"
+            style={{
+              background: 'radial-gradient(circle at center, rgba(120, 180, 255, 0.7) 0%, rgba(80, 140, 255, 0.45) 25%, rgba(60, 120, 255, 0.25) 45%, transparent 70%)',
+              filter: 'blur(25px)',
+              pointerEvents: 'none',
+              transform: 'scale(1.2)'
+            }}
+          />
+        )}
+
+        <img
+          src={usingDefaultImage ? defaultImage : image}
+          alt={title}
+          className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 relative z-10 ${loaded ? '' : 'hidden'}`}
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            if (!usingDefaultImage && !imageError) {
+              setImageError(true);
+            }
+          }}
+        />
+      </div>
 
       <div className="flex flex-col gap-2 p-4 items-center">
         <div className="font-bold text-lg text-white text-center">{translateCaseName(title)}</div>
