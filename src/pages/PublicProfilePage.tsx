@@ -304,8 +304,13 @@ const PublicProfilePage: React.FC = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">{t('public_profile.total_value')}</p>
-                <p className="text-xl font-bold text-white">
-                  {(Number(user.totalItemsValue) || 0).toFixed(2)}{t('common.currency_suffix')}
+                <p className="text-xl font-bold text-white inline-flex items-center gap-1">
+                  {(Number(user.totalItemsValue) || 0).toFixed(2)}
+                  <img
+                    src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+                    alt="currency"
+                    className="w-5 h-5 inline-block object-contain"
+                  />
                 </p>
               </div>
             </div>
@@ -419,7 +424,14 @@ const PublicProfilePage: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white`}>
                       {getRarityName(bestWeapon.rarity || '')}
                     </span>
-                    <span className="text-green-400 font-bold text-lg">{Number(bestWeapon.price || 0).toFixed(2)}{t('common.currency_suffix')}</span>
+                    <span className="text-green-400 font-bold text-lg inline-flex items-center gap-1">
+                      {Number(bestWeapon.price || 0).toFixed(2)}
+                      <img
+                        src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+                        alt="currency"
+                        className="w-5 h-5 inline-block object-contain"
+                      />
+                    </span>
                     {(bestWeapon as any).isRecord && (
                       <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">
                         {t('profile.all_time_record')}
