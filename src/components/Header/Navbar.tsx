@@ -83,7 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <Link to="/" className="gaming-logo group mr-8">
               <div className="logo-container">
                 <img
-                  src="/vite.svg"
+                  src="https://tempfile.aiquickdraw.com/s/24849f07c0c84339a1f5c50d9e99bb8a_0_1760810764_9109.png"
                   alt="ChiBox Logo"
                   className="w-12 h-12 object-contain transition-transform group-hover:scale-110"
                   onError={(e) => {

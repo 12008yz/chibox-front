@@ -26,12 +26,6 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { onlineUsers, isConnected } = useSocket();
 
-  console.log('App render - auth state:', {
-    isAuthenticated: auth.isAuthenticated,
-    hasUser: !!auth.user,
-    hasToken: !!auth.token,
-    username: auth.user?.username
-  });
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/steam-auth';
