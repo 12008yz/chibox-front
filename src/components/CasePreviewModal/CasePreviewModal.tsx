@@ -343,6 +343,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
     console.log('=== handleOpenCase START ===');
     console.log('Параметры:', { caseId, inventoryItemId });
+    console.log('caseData:', { id: caseData.id, name: caseData.name, type: caseData.type, min_subscription_tier: caseData.min_subscription_tier });
+    console.log('statusData:', statusData?.data);
     console.log('States:', { isProcessing, buyLoading, openLoading, showOpeningAnimation });
 
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
@@ -362,10 +364,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         console.log('Используем caseId:', caseId);
       } else {
         openCaseParams.template_id = caseData.id;
-        console.log('Используем template_id:', caseData.id);
+        console.log('Используем template_id (caseData.id):', caseData.id);
       }
 
       console.log('Отправка запроса на открытие кейса:', openCaseParams);
+      console.log('userData:', { subscription_tier: userData?.subscription_tier, subscription_days_left: userData?.subscription_days_left });
       const result = await openCase(openCaseParams).unwrap();
       console.log('Результат открытия кейса:', result);
 

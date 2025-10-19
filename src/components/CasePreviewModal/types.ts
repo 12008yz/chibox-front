@@ -62,7 +62,7 @@ export interface ModalFooterProps {
   showOpeningAnimation: boolean;
   handleClose: () => void;
   handleBuyCase: () => void;
-  handleOpenCase: () => void;
+  handleOpenCase: (caseId?: string, inventoryItemId?: string) => void;
   getCasePrice: (caseData: CaseTemplate) => number;
   checkBalanceSufficient: (price: number) => boolean;
   t: (key: string, options?: any) => string;
