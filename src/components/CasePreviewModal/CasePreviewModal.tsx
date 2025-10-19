@@ -439,7 +439,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               <p className="text-red-400">{t('case_preview_modal.loading_error')}</p>
             </div>
           ) : itemsWithAdjustedChances.length > 0 ? (
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
               {itemsWithAdjustedChances.map((item: any, index: number) => (
                 <CaseItem
                   key={item.id || index}
