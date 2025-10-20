@@ -64,12 +64,15 @@ interface ReelProps {
   finalItem?: SlotItem;
   delay: number;
   onSpinComplete: () => void;
+  isLastReel?: boolean;
+  isWinning?: boolean;
 }
 
-const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpinComplete }) => {
+const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpinComplete, isLastReel = false, isWinning = false }) => {
   const [currentOffset, setCurrentOffset] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [useTransition, setUseTransition] = useState(false);
+  const [isSlowingDown, setIsSlowingDown] = useState(false);
   const reelRef = useRef<HTMLDivElement>(null);
 
   const handleImageError = (itemId: string) => {
@@ -80,6 +83,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
     if (isSpinning && finalItem) {
       setUseTransition(false);
       setCurrentOffset(0);
+      setIsSlowingDown(false);
 
       const delayTimeout = setTimeout(() => {
         setTimeout(() => {
@@ -91,24 +95,40 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
           setCurrentOffset(-totalOffset);
 
+          // Для последнего барабана - включаем эффект замедления раньше
+          if (isLastReel) {
+            setTimeout(() => {
+              setIsSlowingDown(true);
+            }, 1200);
+          }
+
           setTimeout(() => {
+            setIsSlowingDown(false);
             onSpinComplete();
-          }, 1500);
+          }, isLastReel ? 2500 : 1500);
         }, 50);
       }, delay);
 
       return () => clearTimeout(delayTimeout);
     }
-  }, [isSpinning, finalItem, delay, items, onSpinComplete]);
+  }, [isSpinning, finalItem, delay, items, onSpinComplete, isLastReel]);
 
   return (
-    <div className="relative w-80 h-96 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-600/50 shadow-lg">
+    <div className={`relative w-80 h-96 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border border-gray-600/50 shadow-lg transition-all duration-500 ${
+      isLastReel && isSlowingDown && isWinning ? 'ring-4 ring-green-500/50 shadow-green-500/30' : ''
+    } ${isLastReel && isSlowingDown ? 'scale-105' : 'scale-100'}`}>
       {/* Простая внутренняя рамка */}
       <div className="absolute inset-2 rounded border border-gray-600/30"></div>
 
       <div
         ref={reelRef}
-        className={`${useTransition ? 'transition-transform' : ''} ${isSpinning && useTransition ? 'duration-[1500ms] ease-out' : 'duration-0'}`}
+        className={`${useTransition ? 'transition-transform' : ''} ${
+          isSpinning && useTransition
+            ? isLastReel
+              ? 'duration-[2500ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]'
+              : 'duration-[1500ms] ease-out'
+            : 'duration-0'
+        }`}
         style={{
           transform: `translateY(${currentOffset}px)`,
           willChange: isSpinning ? 'transform' : 'auto'
@@ -181,6 +201,7 @@ const SlotPage: React.FC = () => {
   const [result, setResult] = useState<SlotItem[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [displayItems, setDisplayItems] = useState<SlotItem[]>([]);
+  const [isWinning, setIsWinning] = useState(false);
   const auth = useAuth();
 
   // Получаем предметы для слота из API
@@ -215,11 +236,13 @@ const SlotPage: React.FC = () => {
     try {
       setIsSpinning(true);
       setShowResult(false);
+      setIsWinning(false);
 
       const response = await playSlot().unwrap();
 
       if (response.success && response.result) {
         setResult(response.result.items);
+        setIsWinning(response.result.isWin);
 
         setTimeout(() => {
           setIsSpinning(false);
@@ -232,7 +255,7 @@ const SlotPage: React.FC = () => {
           } else {
             toast(t('slots.game_result_no_luck'), { icon: '🎰' });
           }
-        }, 3500);
+        }, 4500); // Увеличили время для последнего барабана
       } else {
         setIsSpinning(false);
         toast.error(response.message || t('slots.unknown_error'));
@@ -305,6 +328,8 @@ const SlotPage: React.FC = () => {
                     finalItem={result[reelIndex]}
                     delay={reelIndex * 200}
                     onSpinComplete={handleReelComplete}
+                    isLastReel={reelIndex === 2}
+                    isWinning={isWinning}
                   />
                 ))}
               </div>
