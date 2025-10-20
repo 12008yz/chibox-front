@@ -31,7 +31,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 3.0,
       max_daily_cases: 1,
-      icon: '👑',
+      icon: 'https://tempfile.aiquickdraw.com/s/dea2b80d489c496abc9d784eaf7cc3de_0_1760992330_2259.png',
       color: 'from-gray-400 to-gray-600',
       badge: 'Базовый',
       features: [
@@ -50,7 +50,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 5.0,
       max_daily_cases: 1,
-      icon: '💎',
+      icon: 'https://tempfile.aiquickdraw.com/s/4264270fdf0d4af48ab8286fe891b48f_0_1760992710_3054.png',
       color: 'from-blue-400 to-purple-600',
       badge: 'Популярный',
       features: [
@@ -70,7 +70,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 8.0,
       max_daily_cases: 1,
-      icon: '🔥',
+      icon: 'https://tempfile.aiquickdraw.com/s/caa7ebeaac1b463494b16610ba10ce35_0_1760992446_4828.png',
       color: 'from-yellow-400 to-red-500',
       badge: 'Премиум',
       features: [
@@ -104,14 +104,6 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                 : 'border-gray-700/50 hover:border-gray-600/70'
             }`}
           >
-            {/* Популярный статус */}
-            {tier.popular && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
-                  ⭐ ПОПУЛЯРНЫЙ
-                </div>
-              </div>
-            )}
 
             {/* Градиентный фон при наведении */}
             <div className={`absolute inset-0 bg-gradient-to-br ${tier.color} opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300`}></div>
@@ -124,8 +116,8 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
             <div className="relative z-10">
               {/* Иконка и название */}
               <div className="text-center mb-6">
-                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">
-                  {tier.icon}
+                <div className="mb-3 group-hover:scale-110 transition-transform duration-300 flex justify-center">
+                  <img src={tier.icon} alt={tier.name} className="w-20 h-20 object-contain" />
                 </div>
                 <h3 className="text-white font-bold text-2xl mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
                   {tier.name}
