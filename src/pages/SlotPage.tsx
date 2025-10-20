@@ -11,7 +11,7 @@ import CountdownTimer from '../components/CountdownTimer';
 
 // Функция для безопасного преобразования типов API в SlotItem
 const convertToSlotItem = (item: any): SlotItem => {
-  const validRarities = ['consumer', 'industrial', 'milspec', 'restricted', 'classified', 'covert', 'contraband', 'exotic', 'empty'];
+  const validRarities = ['consumer', 'industrial', 'milspec', 'restricted', 'classified', 'covert', 'contraband', 'exotic'];
   const rarity = validRarities.includes(item.rarity?.toLowerCase())
     ? item.rarity.toLowerCase() as SlotItem['rarity']
     : 'consumer' as SlotItem['rarity'];
@@ -30,18 +30,6 @@ const PlaceholderImage: React.FC<{
   className?: string;
   item: SlotItem;
 }> = ({ className = "w-full h-full", item }) => {
-  // Специальная обработка для пустых слотов
-  if (item.id === 'empty' || item.rarity === 'empty') {
-    return (
-      <div className={`${className} bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex flex-col items-center justify-center border border-gray-700/50`}>
-        <div className="text-4xl mb-3 text-gray-600">❌</div>
-        <div className="text-sm text-gray-500 font-medium px-3 text-center">
-          {t('slots.empty')}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex flex-col items-center justify-center border border-gray-600`}>
       <div className="text-3xl mb-3 text-gray-400">📦</div>
@@ -58,7 +46,6 @@ const PlaceholderImage: React.FC<{
 // Спокойные цвета редкости
 const getRarityColor = (rarity: string) => {
   switch (rarity?.toLowerCase()) {
-    case 'empty': return 'border-gray-600/60 bg-gradient-to-br from-gray-800/40 to-gray-900/40';
     case 'covert':
     case 'contraband': return 'border-red-400/60 bg-gradient-to-br from-red-900/20 to-red-800/20';
     case 'classified': return 'border-purple-400/60 bg-gradient-to-br from-purple-900/20 to-purple-800/20';
@@ -137,7 +124,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               }}
             >
               {/* Изображение или заглушка */}
-              {!imageErrors.has(item.id) && item.id !== 'empty' && item.rarity !== 'empty' ? (
+              {!imageErrors.has(item.id) ? (
                 <img
                   src={getItemImageUrl(item.image_url, item.name)}
                   alt={item.name}
@@ -151,25 +138,20 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
                   }}
                 />
               ) : (
-                <>
-                  <PlaceholderImage className="w-full h-full" item={item} />
-                </>
+                <PlaceholderImage className="w-full h-full" item={item} />
               )}
 
               {/* Название внизу */}
               <div className="absolute bottom-2 left-2 right-2 text-center">
                 <div className="text-sm text-white font-medium bg-black/70 rounded px-2 py-1 truncate border border-gray-500/50">
-                  {item.id === 'empty' || item.rarity === 'empty'
-                    ? t('slots.empty')
-                    : (item.name.length > 16 ? `${item.name.substring(0, 16)}...` : item.name)}
+                  {item.name.length > 16 ? `${item.name.substring(0, 16)}...` : item.name}
                 </div>
               </div>
 
               {/* Индикатор редкости */}
               <div className="absolute top-2 right-2">
                 <div className={`w-2 h-2 rounded-full ${
-                  item.rarity === 'empty' ? 'bg-gray-600'
-                  : item.rarity === 'covert' || item.rarity === 'contraband' ? 'bg-red-400'
+                  item.rarity === 'covert' || item.rarity === 'contraband' ? 'bg-red-400'
                   : item.rarity === 'classified' ? 'bg-purple-400'
                   : item.rarity === 'restricted' ? 'bg-blue-400'
                   : item.rarity === 'milspec' ? 'bg-green-400'
@@ -327,45 +309,6 @@ const SlotPage: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Результат */}
-            {showResult && result.length === 3 && (
-              <div className="mb-6 p-6 rounded-lg bg-gray-700/30 border border-gray-600/50">
-                <div className="text-center">
-                  {/* Проверка на пустые слоты */}
-                  {result[0]?.id !== 'empty' && result[1]?.id !== 'empty' && result[2]?.id !== 'empty' &&
-                  result[0]?.id === result[1]?.id && result[1]?.id === result[2]?.id ? (
-                    <div className="text-center">
-                      <div className="text-4xl mb-4">🎉</div>
-                      <div className="text-2xl mb-4 font-bold text-green-400">
-                        {t('slots.congratulations_jackpot')}
-                      </div>
-                      <div className="bg-green-900/20 rounded-lg p-6 border border-green-400/50">
-                        <div className="text-gray-300 mb-3 font-medium">{t('slots.winning_item')}</div>
-                        <div className="text-xl font-bold text-white mb-3">{result[0]?.name}</div>
-                        <div className="text-lg text-green-400 font-semibold">
-                          {t('slots.item_value')} <Monetary value={Number(result[0]?.price || 0)} />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="text-xl mb-3 font-semibold text-gray-300">{t('slots.no_luck')}</div>
-                      <div className="text-gray-400 mb-4">{t('slots.try_again')}</div>
-                      <div className="bg-gray-700/30 rounded p-4 border border-gray-600/50">
-                        <div className="text-gray-300 font-medium">
-                          {t('slots.result')} {result.map(item =>
-                            item?.id === 'empty' || item?.rarity === 'empty'
-                              ? t('slots.empty')
-                              : (item?.name?.split(' ')[0] || '?')
-                          ).join(' • ')}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Информация о подписке и лимитах */}
             {auth.user && slotStatusData?.data && (

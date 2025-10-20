@@ -370,7 +370,7 @@ export interface SlotItem {
   id: string;
   name: string;
   image_url: string;
-  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic' | 'empty';
+  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic';
   price: number;
 }
 
