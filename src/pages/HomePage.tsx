@@ -111,7 +111,7 @@ const HomePage: React.FC = () => {
   const bannerContent = [
     {
       left: {
-        image: 'https://app.air.fail/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Fair-messages%2Fgptimage_2669bb2b-4e88-4ae9-b716-1b4dc00fd3de_1760720771.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DYCAJEgjjLbF-FmmsWfD5_6v5k%252F20251017%252Fus-east-1%252Fs3%252Faws4_request%26X-Amz-Date%3D20251017T214402Z%26X-Amz-Expires%3D604800%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3D4800d62c55de11299b568e984468bd2e8bdb425e4976de8c742c485ceb63abcf&w=640&q=75',
+        image: 'https://radika1.link/2025/10/19/c56a0eff-892f-45b7-9741-7f601b66197956bebac5b3cc34fc.jpg',
         title: t('homepage.chibox_title'),
         description: t('homepage.chibox_description'),
         link: "/cases",
@@ -124,7 +124,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://app.air.fail/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Fair-messages%2Fgptimage_2669bb2b-4e88-4ae9-b716-1b4dc00fd3de_1760713751.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DYCAJEgjjLbF-FmmsWfD5_6v5k%252F20251017%252Fus-east-1%252Fs3%252Faws4_request%26X-Amz-Date%3D20251017T214432Z%26X-Amz-Expires%3D604800%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3D1a468b00dd654ade4b7e204ae63e5b081d8f7fc3e8124384b157e95b77594bdb&w=640&q=75',
+        image: 'https://tempfile.aiquickdraw.com/s/051079e49c354c2c9e9ba2714f14654c_0_1760886894_4282.png',
         title: t('homepage.your_luck_title'),
         description: t('homepage.your_luck_description'),
         link: "/cases",
@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://app.air.fail/_next/image?url=https%3A%2F%2Fstorage.yandexcloud.net%2Fair-messages%2Fgptimage_2669bb2b-4e88-4ae9-b716-1b4dc00fd3de_1760712614.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Credential%3DYCAJEgjjLbF-FmmsWfD5_6v5k%252F20251017%252Fus-east-1%252Fs3%252Faws4_request%26X-Amz-Date%3D20251017T214432Z%26X-Amz-Expires%3D604800%26X-Amz-SignedHeaders%3Dhost%26X-Amz-Signature%3D1bd3f15a21a189410eed3d23b3d32cedb61bf1a807bcbceca1ffaa759fe65356&w=640&q=75',
+        image: 'https://tempfile.aiquickdraw.com/s/051079e49c354c2c9e9ba2714f14654c_0_1760886894_4282.png',
         title: t('homepage.community_title'),
         description: t('homepage.community_description'),
         link: "/leaderboard",

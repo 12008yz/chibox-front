@@ -309,59 +309,156 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             </div>
           ) : (
             /* Subscription Content */
-            <div className="bg-black/20 rounded-xl p-4">
-
-              <div className="space-y-3">
-                {subscriptionTiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    className={`p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
-                      selectedSubscription === tier.id
-                        ? 'border-purple-500 bg-purple-500/20'
-                        : 'border-gray-600 bg-gray-800/30 hover:border-purple-500/50 hover:bg-purple-500/10'
-                    }`}
-                    onClick={() => setSelectedSubscription(tier.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${
-                          tier.id === 1 ? 'bg-blue-500/20 text-blue-400' :
-                          tier.id === 2 ? 'bg-purple-500/20 text-purple-400' :
-                          'bg-yellow-500/20 text-yellow-400'
-                        }`}>
-                          <RiVipCrownFill className="text-lg" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-white">{tier.name}</div>
-                          <div className="text-sm text-gray-400">
-                            {tier.name.includes('Статус++') || tier.name.includes('++') ?
-                              `+8% ${t('modals.drop_bonus')} • 1 ${t('modals.case_per_day')} • ${t('modals.no_duplicates')}` :
-                              `+${tier.bonus_percentage}% ${t('modals.drop_bonus')} • ${tier.max_daily_cases} ${t('modals.case_per_day')}`
-                            }
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-white">
-                          <Monetary value={tier.price} />
-                        </div>
-                        <div className="text-xs text-gray-400">{t('modals.day_30')}</div>
-                      </div>
-                    </div>
+            <div className="space-y-4">
+              {/* Info Banner */}
+              <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-xl p-3">
+                <div className="flex items-start space-x-2">
+                  <FaInfoCircle className="text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-purple-200/80">
+                    <strong className="text-purple-300">Статус дает:</strong> бонус к шансу выпадения редких предметов, ежедневные кейсы и уникальные привилегии
                   </div>
-                ))}
+                </div>
               </div>
 
-              <button
-                onClick={() => selectedSubscription && handleSubscriptionPurchase(selectedSubscription)}
-                disabled={isSubscriptionLoading || !selectedSubscription}
-                className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-lg transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                <FaCrown className="text-lg" />
-                <span>
-                  {isSubscriptionLoading ? t('modals.creating_payment') : t('modals.buy_subscription')}
-                </span>
-              </button>
+              {/* Subscription Tiers */}
+              <div className="grid grid-cols-1 gap-3">
+                {subscriptionTiers.map((tier) => {
+                  const isBasic = tier.id === 1;
+                  const isPro = tier.id === 2;
+                  const isPremium = tier.id === 3;
+                  const isSelected = selectedSubscription === tier.id;
+
+                  return (
+                    <div
+                      key={tier.id}
+                      className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer group ${
+                        isSelected
+                          ? 'border-purple-500 shadow-lg shadow-purple-500/30 scale-[1.02]'
+                          : 'border-gray-600/50 hover:border-purple-400/50 hover:scale-[1.01]'
+                      }`}
+                      onClick={() => setSelectedSubscription(tier.id)}
+                    >
+                      {/* Background Gradient */}
+                      <div className={`absolute inset-0 ${
+                        isPremium ? 'bg-gradient-to-br from-yellow-500/10 via-purple-500/10 to-pink-500/10' :
+                        isPro ? 'bg-gradient-to-br from-purple-500/10 to-indigo-500/10' :
+                        'bg-gradient-to-br from-blue-500/10 to-cyan-500/10'
+                      }`} />
+
+                      {/* Most Popular Badge */}
+                      {isPro && (
+                        <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                          ПОПУЛЯРНЫЙ
+                        </div>
+                      )}
+
+                      {/* Content */}
+                      <div className="relative p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          {/* Icon & Title */}
+                          <div className="flex items-center space-x-3">
+                            <div className={`p-3 rounded-xl shadow-lg ${
+                              isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
+                              isPro ? 'bg-gradient-to-br from-purple-500 to-indigo-500' :
+                              'bg-gradient-to-br from-blue-500 to-cyan-500'
+                            }`}>
+                              <RiVipCrownFill className="text-2xl text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-white mb-0.5">{tier.name}</h3>
+                              <p className="text-sm text-gray-400">30 дней подписки</p>
+                            </div>
+                          </div>
+
+                          {/* Price */}
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-white">
+                              <Monetary value={tier.price} />
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              ~<Monetary value={Math.round(tier.price / 30)} />{t('modals.day')}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Features */}
+                        <div className="space-y-2 mb-3">
+                          <div className="flex items-center space-x-2 text-sm">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
+                            }`} />
+                            <span className="text-gray-200">
+                              <strong className={`${
+                                isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'
+                              }`}>+{tier.bonus_percentage}%</strong> к шансу редких дропов
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
+                            }`} />
+                            <span className="text-gray-200">
+                              <strong className="text-white">{tier.max_daily_cases}</strong> бесплатный кейс каждый день
+                            </span>
+                          </div>
+                          {isPremium && (
+                            <div className="flex items-center space-x-2 text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                              <span className="text-gray-200">
+                                <strong className="text-yellow-400">Без дубликатов</strong> в ежедневных кейсах
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex items-center space-x-2 text-sm">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
+                            }`} />
+                            <span className="text-gray-200">
+                              Особый статус в <strong className="text-white">чате</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Buy Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSubscriptionPurchase(tier.id);
+                          }}
+                          disabled={isSubscriptionLoading}
+                          className={`w-full py-2.5 rounded-lg font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                            isPremium
+                              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-lg shadow-yellow-500/30'
+                              : isPro
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 shadow-lg shadow-purple-500/30'
+                              : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg shadow-blue-500/30'
+                          } ${isSelected ? 'animate-pulse' : ''}`}
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            <FaCrown />
+                            <span>
+                              {isSubscriptionLoading && isSelected
+                                ? t('modals.creating_payment')
+                                : `Купить ${tier.name}`}
+                            </span>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Selection Indicator */}
+                      {isSelected && (
+                        <div className="absolute inset-0 border-2 border-purple-500 rounded-xl pointer-events-none">
+                          <div className="absolute top-3 left-3 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
