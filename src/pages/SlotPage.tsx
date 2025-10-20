@@ -343,7 +343,7 @@ const SlotPage: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
-                      <div className="text-gray-400 text-sm font-medium mb-2">Ваша подписка</div>
+                      <div className="text-gray-400 text-sm font-medium mb-2">Ваш уровень</div>
                       <div className={`text-lg font-semibold ${
                         slotStatusData.data.hasSubscription ? 'text-green-400' : 'text-red-400'
                       }`}>
@@ -386,31 +386,6 @@ const SlotPage: React.FC = () => {
               </div>
             )}
 
-            {/* Информация о игре */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/50">
-                <div className="flex items-center space-x-3">
-                  <div className="text-2xl">🎰</div>
-                  <div>
-                    <div className="text-gray-400 text-sm font-medium">{t('slots.spin_cost')}</div>
-                    <div className="text-white text-xl font-semibold">Бесплатно</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/50">
-                <div className="flex items-center space-x-3">
-                  <div className="text-2xl">💰</div>
-                  <div>
-                    <div className="text-gray-400 text-sm font-medium">{t('slots.your_balance')}</div>
-                    <div className="text-white text-xl font-semibold">
-                      <Monetary value={Number(auth.user?.balance || 0)} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Кнопка спина */}
             <div className="text-center">
               <button
@@ -440,19 +415,6 @@ const SlotPage: React.FC = () => {
                     <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
                       <div className="font-medium">💎 Требуется подписка</div>
                       <div className="text-sm mt-1">Оформите подписку для игры в слот</div>
-                    </div>
-                  )}
-
-                  {slotStatusData?.data && slotStatusData.data.hasSubscription && slotStatusData.data.remaining === 0 && (
-                    <div className="mt-4 p-4 bg-orange-900/20 border border-orange-400/50 rounded-lg text-orange-300 max-w-sm mx-auto">
-                      <div className="font-medium">🕐 Лимит исчерпан</div>
-                      <div className="text-sm mt-1">
-                        Сброс через: <CountdownTimer
-                          targetTime={slotStatusData.data.nextResetTime}
-                          className="text-orange-200 font-medium"
-                          onComplete={handleTimerComplete}
-                        />
-                      </div>
                     </div>
                   )}
                 </>

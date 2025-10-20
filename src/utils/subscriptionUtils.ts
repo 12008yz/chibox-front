@@ -125,7 +125,7 @@ export function getSubscriptionWarning(user: User | null): {
       showWarning: true,
       type: 'expiring',
       title: 'Подписка истекает',
-      message: `Ваша подписка истекает через ${daysLeft} дней. Продлите подписку, чтобы продолжить выводить предметы`,
+      message: `Ваш статус истекает через ${daysLeft} дней. Продлите подписку, чтобы продолжить выводить предметы`,
       actionText: 'Продлить подписку'
     };
   }
