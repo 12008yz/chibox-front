@@ -20,6 +20,7 @@ export interface CaseItemProps {
   caseData: any;
   showStrikeThrough: boolean;
   showGoldenSparks: boolean;
+  showWinEffects: boolean;
   getRarityColor: (rarity: string) => string;
   generateGoldenSparks: () => React.ReactNode[];
   t: (key: string, options?: any) => string;
@@ -68,4 +69,4 @@ export interface ModalFooterProps {
   t: (key: string, options?: any) => string;
 }
 
-export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'stopped';
+export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'stopped';

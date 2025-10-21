@@ -16,6 +16,7 @@ export const CaseItem = memo(({
   caseData,
   showStrikeThrough,
   showGoldenSparks,
+  showWinEffects,
   getRarityColor,
   generateGoldenSparks,
   t,
@@ -54,12 +55,46 @@ export const CaseItem = memo(({
     const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
     const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
     const performanceClass = shouldUseGPU ? 'gpu-layer' : 'no-gpu-layer';
+    const winEffectClass = isWinningItemStopped && showWinEffects ? 'item-pop-animation' : '';
 
-    return `${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass}`;
+    return `${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass} ${winEffectClass}`;
   }, [
     item.rarity, item.isExcluded, isCurrentSliderPosition, isWinningItem, isWinningItemStopped,
-    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU
+    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU, showWinEffects
   ]);
+
+  // Динамические стили для визуальных эффектов в зависимости от фазы анимации
+  const dynamicStyles = useMemo(() => {
+    if (!showOpeningAnimation) return {};
+
+    const styles: React.CSSProperties = {};
+
+    switch (animationPhase) {
+      case 'spinning':
+      case 'speeding-up':
+        // Легкий blur эффект при быстром вращении
+        if (!isCurrentSliderPosition && !isWinningItemStopped) {
+          styles.filter = 'blur(1px)';
+          styles.transition = 'filter 0.15s ease-out';
+        }
+        break;
+      case 'fake-slowing':
+        // Пульсация во время fake slowdown
+        if (!isWinningItemStopped) {
+          styles.animation = 'fake-slow-pulse 0.6s ease-in-out';
+        }
+        break;
+      case 'slowing':
+        // Плавное убирание blur при замедлении
+        styles.filter = 'blur(0px)';
+        styles.transition = 'filter 0.3s ease-out';
+        break;
+      default:
+        break;
+    }
+
+    return styles;
+  }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isWinningItemStopped]);
 
   // Рендерим заглушку для невидимых элементов
   if (!isVisible) {
@@ -75,6 +110,7 @@ export const CaseItem = memo(({
       key={item.id || index}
       data-item-index={animationIndex}
       className={itemClasses}
+      style={dynamicStyles}
     >
       {shouldRenderSimplified ? (
         // Упрощенная версия для элементов вне области видимости
@@ -134,6 +170,47 @@ export const CaseItem = memo(({
             <div className="absolute inset-0 pointer-events-none z-50">
               {generateGoldenSparks()}
             </div>
+          )}
+
+          {/* КРУТЫЕ ЭФФЕКТЫ ПОБЕДЫ */}
+          {!shouldRenderSimplified && showWinEffects && isWinningItemStopped && (
+            <>
+              {/* Расходящиеся кольца */}
+              <div className="expanding-ring" />
+              <div className="expanding-ring" />
+              <div className="expanding-ring" />
+
+              {/* Световые лучи */}
+              <div className="light-ray" style={{ animationDelay: '0s' }} />
+              <div className="light-ray" style={{ animationDelay: '0.3s', transform: 'rotate(45deg)' }} />
+              <div className="light-ray" style={{ animationDelay: '0.6s', transform: 'rotate(90deg)' }} />
+
+              {/* Particle burst эффект */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30) * Math.PI / 180;
+                const distance = 60 + Math.random() * 40;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#A78BFA', '#F472B6'];
+                const color = colors[i % colors.length];
+
+                return (
+                  <div
+                    key={i}
+                    className="particle-burst"
+                    style={{
+                      '--tx': `${tx}px`,
+                      '--ty': `${ty}px`,
+                      background: color,
+                      animationDelay: `${i * 0.05}s`,
+                      left: '50%',
+                      top: '50%',
+                      boxShadow: `0 0 10px ${color}`,
+                    } as React.CSSProperties}
+                  />
+                );
+              })}
+            </>
           )}
         </div>
       )}

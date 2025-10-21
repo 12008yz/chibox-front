@@ -34,9 +34,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
-  const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'stopped'>('idle');
+  const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
   const [showGoldenSparks, setShowGoldenSparks] = useState(false);
+  const [shouldFakeSlowdown, setShouldFakeSlowdown] = useState(false);
+  const [showWinEffects, setShowWinEffects] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -80,6 +82,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setOpeningResult(null);
       setShowStrikeThrough(false);
       setShowGoldenSparks(false);
+      setShowWinEffects(false);
       document.body.style.overflow = 'hidden';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
@@ -176,6 +179,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setSliderPosition(0);
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
+    setShowWinEffects(false);
     setIsProcessing(false);
 
     if (animationTimeoutRef.current) {
@@ -184,12 +188,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   }, []);
 
-  // Анимация открытия (оригинальная логика с оптимизациями)
+  // Улучшенная анимация открытия с fake slowdown
   const startAnimation = useCallback((wonItem: any) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
+    setShowWinEffects(false);
+
+    // 25% шанс на fake slowdown
+    const useFakeSlowdown = Math.random() < 0.25;
+    setShouldFakeSlowdown(useFakeSlowdown);
 
     const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
     const wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
@@ -207,10 +216,21 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     let currentAvailablePosition = 0;
-    let initialSpeed = 150;
+    const initialSpeed = 80; // Быстрее начальная скорость
     let currentSpeed = initialSpeed;
     const distance = wonItemIndex;
-    const slowDownStart = Math.max(0, distance - 7);
+
+    // Точки анимации
+    const fakeSlowdownPoint = useFakeSlowdown ? Math.floor(distance * 0.4) : -1; // 40% пути
+    const fakeSlowdownEnd = useFakeSlowdown ? Math.floor(distance * 0.5) : -1; // 50% пути
+    const finalSlowdownStart = Math.max(0, distance - 8);
+
+    let hasFakeSlowedDown = false;
+    let hasSpedUpAgain = false;
+
+    const easeOutQuart = (t: number): number => 1 - Math.pow(1 - t, 4);
+    const easeInQuart = (t: number): number => Math.pow(t, 4);
+    const easeInOutCubic = (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     const animateSlider = () => {
       if (currentAvailablePosition >= wonItemIndex) {
@@ -218,13 +238,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(wonItemInFullList);
         setAnimationPhase('stopped');
 
-        setTimeout(() => setShowGoldenSparks(true), 1000);
+        // Крутая последовательность эффектов выигрыша
+        setTimeout(() => setShowWinEffects(true), 300); // Вспышка и круги
+        setTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
         setTimeout(() => {
           if (caseData.id === "44444444-4444-4444-4444-444444444444") {
             setShowStrikeThrough(true);
           }
-        }, 2000);
-        setTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 3500);
+        }, 1500);
+        setTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
         return;
       }
 
@@ -243,14 +265,38 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       setSliderPosition(fullListPosition);
 
-      if (currentAvailablePosition <= slowDownStart) {
+      // Логика fake slowdown
+      if (useFakeSlowdown && currentAvailablePosition >= fakeSlowdownPoint && currentAvailablePosition < fakeSlowdownEnd && !hasFakeSlowedDown) {
+        setAnimationPhase('fake-slowing');
+        const progress = (currentAvailablePosition - fakeSlowdownPoint) / (fakeSlowdownEnd - fakeSlowdownPoint);
+        currentSpeed = initialSpeed + (400 * easeInQuart(progress)); // Резкое замедление
+
+        if (currentAvailablePosition >= fakeSlowdownEnd - 1) {
+          hasFakeSlowedDown = true;
+        }
+      }
+      // Резкое ускорение после fake slowdown
+      else if (useFakeSlowdown && hasFakeSlowedDown && !hasSpedUpAgain && currentAvailablePosition < finalSlowdownStart) {
+        setAnimationPhase('speeding-up');
+        const speedUpDuration = 5;
+        const speedUpProgress = Math.min(1, (currentAvailablePosition - fakeSlowdownEnd) / speedUpDuration);
+        currentSpeed = Math.max(initialSpeed * 0.5, 400 - (350 * easeOutQuart(speedUpProgress))); // Резкое ускорение
+
+        if (speedUpProgress >= 1) {
+          hasSpedUpAgain = true;
+        }
+      }
+      // Обычное вращение
+      else if (currentAvailablePosition < finalSlowdownStart) {
         setAnimationPhase('spinning');
         currentSpeed = initialSpeed;
-      } else {
+      }
+      // Финальное замедление
+      else {
         setAnimationPhase('slowing');
         const stepsLeft = wonItemIndex - currentAvailablePosition;
-        const slowdownFactor = Math.max(0.1, stepsLeft / 7);
-        currentSpeed = initialSpeed + (300 * (1 - slowdownFactor));
+        const progress = 1 - (stepsLeft / 8);
+        currentSpeed = initialSpeed + (450 * easeInOutCubic(progress));
       }
 
       setTimeout(animateSlider, currentSpeed);
@@ -403,21 +449,25 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     : getDefaultCaseImage(caseData.name);
 
   return (
-    <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
-        isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
-      }`}
-      onClick={handleClose}
-      style={{
-        backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
-      }}
-    >
+    <>
+      {/* Вспышка на весь экран при победе */}
+      {showWinEffects && <div className="win-flash-overlay" />}
+
       <div
-        className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
-          isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
+        className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
+          isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
         }`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleClose}
+        style={{
+          backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
+        }}
       >
+        <div
+          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
+            isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
+          } ${showWinEffects ? 'win-shake' : ''}`}
+          onClick={(e) => e.stopPropagation()}
+        >
         <ModalHeader
           caseData={caseData}
           caseImageUrl={caseImageUrl}
@@ -429,7 +479,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         {/* Содержимое кейса - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 p-6 overflow-y-auto relative virtualized-container smooth-scroll"
+          className={`flex-1 p-6 overflow-y-auto relative virtualized-container smooth-scroll ${
+            animationPhase === 'speeding-up' ? 'spinning-container' : ''
+          }`}
           style={{ maxHeight: 'calc(90vh - 200px)' }}
         >
           {isLoading ? (
@@ -456,6 +508,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   caseData={caseData}
                   showStrikeThrough={showStrikeThrough}
                   showGoldenSparks={showGoldenSparks}
+                  showWinEffects={showWinEffects}
                   getRarityColor={getRarityColor}
                   generateGoldenSparks={generateGoldenSparks}
                   t={t}
@@ -490,6 +543,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         />
       </div>
     </div>
+    </>
   );
 };
 
