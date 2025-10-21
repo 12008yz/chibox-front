@@ -233,7 +233,14 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                     <h5 className="text-white text-xs font-medium mb-1 truncate" title={caseName}>
                       {caseName}
                     </h5>
-                    <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
+                      {((inventoryItem as any).quantity || 1) > 1 && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-blue-600 text-white font-bold">
+                          x{(inventoryItem as any).quantity}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
                         {t('profile.case_label')}
