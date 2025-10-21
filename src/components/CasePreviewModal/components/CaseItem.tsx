@@ -169,7 +169,7 @@ export const CaseItem = memo(({
                 </p>
               ) : (
                 <p className="text-gray-400">
-                  {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent.toFixed(2)}%` : '0%'}
+                  {t('case_preview_modal.chance')} {item.drop_chance_percent ? `${item.drop_chance_percent < 0.01 ? item.drop_chance_percent.toFixed(6) : item.drop_chance_percent.toFixed(2)}%` : '0%'}
                   {item.bonusApplied > 0 && parseFloat(item.price || '0') >= 100 && (
                     <span className="text-yellow-400 ml-1">
                       (+{(item.bonusApplied * 100).toFixed(2)}% {t('case_preview_modal.bonus')})
