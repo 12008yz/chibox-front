@@ -34,10 +34,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
-  const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'stopped'>('idle');
+  const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
   const [showGoldenSparks, setShowGoldenSparks] = useState(false);
   const [shouldFakeSlowdown, setShouldFakeSlowdown] = useState(false);
+  const [shouldStopBetween, setShouldStopBetween] = useState(false);
+  const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -77,12 +79,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setIsVisible(true);
       setIsProcessing(false);
       setSliderPosition(0);
+      setSliderOffset(0);
       setAnimationPhase('idle');
       setShowOpeningAnimation(false);
       setOpeningResult(null);
       setShowStrikeThrough(false);
       setShowGoldenSparks(false);
       setShowWinEffects(false);
+      setShouldStopBetween(false);
       document.body.style.overflow = 'hidden';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
@@ -177,9 +181,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setOpeningResult(null);
     setAnimationPhase('idle');
     setSliderPosition(0);
+    setSliderOffset(0);
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
     setShowWinEffects(false);
+    setShouldStopBetween(false);
     setIsProcessing(false);
 
     if (animationTimeoutRef.current) {
@@ -199,6 +205,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     // 25% шанс на fake slowdown
     const useFakeSlowdown = Math.random() < 0.25;
     setShouldFakeSlowdown(useFakeSlowdown);
+
+    // 50% шанс на остановку между предметами (для теста, потом будет 5%)
+    const useStopBetween = Math.random() < 0.5;
+    setShouldStopBetween(useStopBetween);
 
     const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
     const wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
@@ -233,6 +243,85 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const easeInOutCubic = (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     const animateSlider = () => {
+      // Проверка на остановку между предметами (за 1 позицию до выигрыша)
+      if (useStopBetween && currentAvailablePosition === wonItemIndex - 1) {
+        const currentItemInFullList = itemsWithAdjustedChances.findIndex((item, idx) => {
+          let availableCount = 0;
+          for (let i = 0; i <= idx; i++) {
+            if (!itemsWithAdjustedChances[i].isExcluded) {
+              if (availableCount === currentAvailablePosition) {
+                return i === idx;
+              }
+              availableCount++;
+            }
+          }
+          return false;
+        });
+
+        setSliderPosition(currentItemInFullList);
+
+        // Небольшая задержка перед началом wobbling для плавности
+        setTimeout(() => {
+          setAnimationPhase('wobbling');
+
+          // Плавное перекатывание на следующий предмет (30%) и обратно
+          let rollProgress = 0;
+          const rollSteps = 60; // Увеличили количество шагов для более медленной анимации
+          const rollInterval = setInterval(() => {
+            rollProgress++;
+
+            // Создаем плавную кривую: 0 -> 0.3 -> 0
+            const normalizedProgress = rollProgress / rollSteps;
+            let offset = 0;
+
+            if (normalizedProgress < 0.5) {
+              // Первая половина: плавно двигаемся вперед до 30%
+              const forwardProgress = normalizedProgress * 2; // 0 -> 1
+              // Используем ease-in-out для плавного старта и замедления в конце
+              const eased = forwardProgress < 0.5
+                ? 4 * forwardProgress * forwardProgress * forwardProgress
+                : 1 - Math.pow(-2 * forwardProgress + 2, 3) / 2;
+              offset = 0.3 * eased;
+            } else {
+              // Вторая половина: плавно возвращаемся назад
+              const backwardProgress = (normalizedProgress - 0.5) * 2; // 0 -> 1
+              // Используем ease-in-out для плавного возврата
+              const eased = backwardProgress < 0.5
+                ? 4 * backwardProgress * backwardProgress * backwardProgress
+                : 1 - Math.pow(-2 * backwardProgress + 2, 3) / 2;
+              offset = 0.3 * (1 - eased);
+            }
+
+            setSliderOffset(offset);
+
+            if (rollProgress >= rollSteps) {
+              clearInterval(rollInterval);
+              setSliderOffset(0);
+              setAnimationPhase('falling');
+
+              // Быстрое падение на выигрышный предмет
+              setTimeout(() => {
+                const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+                setSliderPosition(wonItemInFullList);
+                setAnimationPhase('stopped');
+
+                // Крутая последовательность эффектов выигрыша
+                setTimeout(() => setShowWinEffects(true), 300);
+                setTimeout(() => setShowGoldenSparks(true), 800);
+                setTimeout(() => {
+                  if (caseData.id === "44444444-4444-4444-4444-444444444444") {
+                    setShowStrikeThrough(true);
+                  }
+                }, 1500);
+                setTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+              }, 200);
+            }
+          }, 25); // 25ms между шагами (60 шагов * 25ms = 1.5 секунды)
+        }, 200); // Задержка 200ms перед началом анимации
+
+        return;
+      }
+
       if (currentAvailablePosition >= wonItemIndex) {
         const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
         setSliderPosition(wonItemInFullList);
@@ -503,6 +592,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   animationIndex={index}
                   showOpeningAnimation={showOpeningAnimation}
                   sliderPosition={sliderPosition}
+                  sliderOffset={sliderOffset}
                   openingResult={openingResult}
                   animationPhase={animationPhase}
                   caseData={caseData}

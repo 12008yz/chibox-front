@@ -30,6 +30,20 @@ export const strikeAnimationStyles = `
     }
   }
 
+  @keyframes wobble-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(251, 146, 60, 0.8), 0 0 40px rgba(251, 146, 60, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 35px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.6);
+    }
+  }
+
+  .animate-wobble {
+    animation: wobble-glow 0.5s ease-in-out infinite;
+    will-change: box-shadow;
+  }
+
   @keyframes speed-up-flash {
     0% {
       filter: brightness(1);

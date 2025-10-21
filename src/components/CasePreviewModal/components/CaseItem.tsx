@@ -11,6 +11,7 @@ export const CaseItem = memo(({
   animationIndex,
   showOpeningAnimation,
   sliderPosition,
+  sliderOffset = 0,
   openingResult,
   animationPhase,
   caseData,
@@ -34,6 +35,9 @@ export const CaseItem = memo(({
 
   // Рассчитываем состояния предмета
   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
+  const isNextSliderPosition = showOpeningAnimation && sliderPosition + 1 === animationIndex;
+  const isBetweenItems = (animationPhase === 'wobbling' || animationPhase === 'falling') &&
+                         (isCurrentSliderPosition || isNextSliderPosition);
   const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
   const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
   const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
@@ -50,17 +54,18 @@ export const CaseItem = memo(({
   const itemClasses = useMemo(() => {
     const baseClasses = `item-container bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)}`;
     const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
-    const highlightClasses = isCurrentSliderPosition ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+    const highlightClasses = isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+    const betweenClasses = isBetweenItems ? 'ring-4 ring-orange-500 z-10 border-orange-500 shadow-2xl shadow-orange-500/50' : '';
     const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
     const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
     const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
     const performanceClass = shouldUseGPU ? 'gpu-layer' : 'no-gpu-layer';
     const winEffectClass = isWinningItemStopped && showWinEffects ? 'item-pop-animation' : '';
 
-    return `${baseClasses} ${animationClasses} ${highlightClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass} ${winEffectClass}`;
+    return `${baseClasses} ${animationClasses} ${highlightClasses} ${betweenClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass} ${winEffectClass}`;
   }, [
-    item.rarity, item.isExcluded, isCurrentSliderPosition, isWinningItem, isWinningItemStopped,
-    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU, showWinEffects
+    item.rarity, item.isExcluded, isCurrentSliderPosition, isBetweenItems, isWinningItem, isWinningItemStopped,
+    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU, showWinEffects, animationPhase
   ]);
 
   // Динамические стили для визуальных эффектов в зависимости от фазы анимации
@@ -89,12 +94,48 @@ export const CaseItem = memo(({
         styles.filter = 'blur(0px)';
         styles.transition = 'filter 0.3s ease-out';
         break;
+      case 'wobbling':
+        // Эффект перекатывания между предметами
+        if (isCurrentSliderPosition) {
+          // Текущий предмет: уменьшаем яркость и масштаб, как будто уходим от него
+          const progress = sliderOffset / 0.3; // 0 -> 1
+          // Начинаем с нормальных значений (1.0) и плавно переходим
+          const brightness = 1 + (0.3 * (1 - progress)) - (0.5 * progress); // 1.3 -> 0.8
+          const scale = 1 + (0.15 * (1 - progress)) - (0.1 * progress); // 1.15 -> 0.9
+          const opacity = 1 - (0.3 * progress); // 1 -> 0.7
+          const rotation = -3 * progress; // 0 -> -3
+          styles.filter = `brightness(${brightness})`;
+          styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+          styles.opacity = opacity;
+          styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
+        } else if (isNextSliderPosition) {
+          // Следующий предмет: увеличиваем яркость и масштаб, как будто приближаемся к нему
+          const progress = sliderOffset / 0.3; // 0 -> 1
+          // Начинаем с нормальных значений и плавно увеличиваем
+          const brightness = 1 - (0.2 * (1 - progress)) + (0.3 * progress); // 0.8 -> 1.3
+          const scale = 1 - (0.1 * (1 - progress)) + (0.15 * progress); // 0.9 -> 1.15
+          const opacity = 1 - (0.3 * (1 - progress)); // 0.7 -> 1
+          const rotation = 3 * progress; // 0 -> 3
+          styles.filter = `brightness(${brightness})`;
+          styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+          styles.opacity = opacity;
+          styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
+        }
+        break;
+      case 'falling':
+        // Во время падения
+        if (isCurrentSliderPosition) {
+          styles.filter = 'brightness(1.1)';
+          styles.transform = 'scale(1.05)';
+          styles.transition = 'filter 0.2s ease-out, transform 0.2s ease-out';
+        }
+        break;
       default:
         break;
     }
 
     return styles;
-  }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isWinningItemStopped]);
+  }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isNextSliderPosition, isWinningItemStopped, sliderOffset]);
 
   // Рендерим заглушку для невидимых элементов
   if (!isVisible) {

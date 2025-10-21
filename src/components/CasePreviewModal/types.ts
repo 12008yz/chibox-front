@@ -15,6 +15,7 @@ export interface CaseItemProps {
   animationIndex: number;
   showOpeningAnimation: boolean;
   sliderPosition: number;
+  sliderOffset?: number;
   openingResult: any;
   animationPhase: string;
   caseData: any;
@@ -69,4 +70,4 @@ export interface ModalFooterProps {
   t: (key: string, options?: any) => string;
 }
 
-export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'stopped';
+export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped';
