@@ -6,7 +6,6 @@ import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
-import Banner from '../components/Banner';
 import CaseListing from '../components/CaseListing';
 import AppFeatures from '../components/AppFeatures';
 import StatusDashboard from '../components/StatusDashboard';
@@ -36,7 +35,6 @@ const HomePage: React.FC = () => {
     email: string;
     previewUrl?: string;
   } | null>(null);
-  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
   // Состояние игры крестики-нолики
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
@@ -107,62 +105,7 @@ const HomePage: React.FC = () => {
     skip: !userData?.id, // Пропускаем запрос если пользователь не авторизован
   });
 
-  // Баннеры контент
-  const bannerContent = [
-    {
-      left: {
-        video: 'https://www.dropbox.com/scl/fi/yfzzmzjm44mhnz9yhbciw/9f69cac8-7668-4cdd-b7f4-31dedca1fba7_watermarked.mp4?rlkey=hez7bixroupq9uy4zqgmi8x1s&st=p4bj859l&raw=1',
-        poster: 'https://iimg.su/s/22/u1hYbkxxbj4VoXi9sAtjPbV1KAzC1UOgKe3NiCpy.jpg',
-        title: t('homepage.chibox_title'),
-        description: t('homepage.chibox_description'),
-        link: "/cases",
-      },
-      right: (
-        <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">🎬</div>
-        </div>
-      ),
-    },
-    {
-      left: {
-        image: 'https://iimg.su/s/22/u1hYbkxxbj4VoXi9sAtjPbV1KAzC1UOgKe3NiCpy.jpg',
-        title: t('homepage.chibox_title'),
-        description: t('homepage.chibox_description'),
-        link: "/cases",
-      },
-      right: (
-        <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">💎</div>
-        </div>
-      ),
-    },
-    {
-      left: {
-        image: 'https://iimg.su/s/22/uWLgBfhxXHiIvlKkg1qp8DkNQrIl5BlXOfaOwEa7.jpg',
-        title: t('homepage.your_luck_title'),
-        description: t('homepage.your_luck_description'),
-        link: "/cases",
-      },
-      right: (
-        <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">🍀</div>
-        </div>
-      ),
-    },
-    {
-      left: {
-        image: 'https://iimg.su/s/22/u8kRwJ5xtNezoCAXgOauppq8AEgMpBvDURrSfvPp.jpg',
-        title: t('homepage.community_title'),
-        description: t('homepage.community_description'),
-        link: "/leaderboard",
-      },
-      right: (
-        <div className="hidden 2xl:flex 2xl:mr-36">
-          <div className="text-6xl opacity-30">🏆</div>
-        </div>
-      ),
-    },
-  ];
+
 
   // Проверяем, нужно ли показать модальное окно регистрации
   useEffect(() => {
@@ -176,16 +119,7 @@ const HomePage: React.FC = () => {
     }
   }, [location.state, navigate]);
 
-  // Автоматическая смена баннеров
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBannerIndex((prev) =>
-        prev === bannerContent.length - 1 ? 0 : prev + 1
-      );
-    }, 8000);
 
-    return () => clearInterval(interval);
-  }, [bannerContent.length]);
 
   const handleCloseRegistrationModal = () => {
     setShowRegistrationModal(false);
@@ -324,38 +258,24 @@ const HomePage: React.FC = () => {
   }, [refetchCases]);
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div
+      className="min-h-screen text-white relative"
+      style={{
+        backgroundImage: 'url(https://s.iimg.su/s/22/uJDay5Ux8rop1XNmC5q3906RrnzKbXeGscO48PZ6.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Затемняющий оверлей */}
+      <div className="fixed inset-0 bg-black/70 z-0"></div>
+
       <div className="relative z-10">
         <ScrollToTopOnMount />
 
       <div className="flex justify-center">
         <div className="flex-col w-full max-w-[1920px]">
-
-          {/* Баннер секция */}
-          <div className="relative w-full">
-            <Banner
-              key={currentBannerIndex}
-              left={bannerContent[currentBannerIndex].left}
-              right={bannerContent[currentBannerIndex].right}
-            />
-
-            {/* Индикаторы баннеров */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 space-x-2 md:flex hidden z-20">
-              {bannerContent.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-all cursor-pointer ${
-                    index === currentBannerIndex
-                      ? 'bg-white scale-110'
-                      : 'bg-white/50 hover:bg-white/75'
-                  }`}
-                  onClick={() => setCurrentBannerIndex(index)}
-                  aria-label={`Баннер ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
 
           {/* Кейсы секция */}
           <div className="container mx-auto px-4 py-8">

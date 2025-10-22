@@ -717,11 +717,15 @@
   animation: slideInLeft var(--animation-duration) ease-out;
 }
 
-/* Кастомный скроллбар для LiveDrops */
-.live-drops-scroll::-webkit-scrollbar { height: 8px; }
-.live-drops-scroll::-webkit-scrollbar-track { background: rgba(31, 41, 55, 0.3); border-radius: 4px; }
-.live-drops-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; border: 1px solid rgba(75, 85, 99, 0.3); }
-.live-drops-scroll::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+/* Скрываем скроллбар для LiveDrops */
+.live-drops-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.live-drops-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* Упрощенные анимации для рулетки */
 .roulette-result-enter {
