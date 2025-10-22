@@ -270,11 +270,17 @@ const UpgradeAnimationComponent: React.FC<{
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [scale, setScale] = useState(1);
 
   React.useEffect(() => {
+    // Плавный скролл вверх при начале анимации
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // Начинаем анимацию
     const timer1 = setTimeout(() => {
       setPhase('spinning');
+      // Увеличиваем рулетку во время вращения
+      setScale(1.5);
 
       // Вычисляем финальный угол
       const successChance = upgradeResult.data.success_chance;
@@ -303,6 +309,8 @@ const UpgradeAnimationComponent: React.FC<{
       const timer2 = setTimeout(() => {
         setPhase('showing_result');
         setShowResult(true);
+        // Возвращаем рулетку к нормальному размеру
+        setScale(1);
       }, 3000); // 3 секунды вращения
 
       return () => clearTimeout(timer2);
@@ -324,26 +332,8 @@ const UpgradeAnimationComponent: React.FC<{
 
   return (
     <div className="text-center py-8">
-      <div className="mb-6">
-        <h2 className={`text-3xl font-light mb-3 transition-all duration-700 ${
-          phase === 'showing_result'
-            ? (upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
-            : 'text-slate-200'
-        }`}>
-          {getPhaseTitle()}
-        </h2>
-        <p className="text-slate-400 text-lg font-light">
-          {phase === 'showing_result'
-            ? (upgradeResult.upgrade_success
-                ? 'Ваш предмет успешно улучшен'
-                : 'Попытка улучшения не удалась')
-            : 'Пожалуйста, подождите...'
-          }
-        </p>
-      </div>
-
       {/* Главная анимация */}
-      <div className="relative mb-8 flex justify-center">
+      <div className="relative mt-16 mb-16 flex justify-center">
         <div className="relative">
           {/* Указатель */}
           <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
@@ -359,11 +349,11 @@ const UpgradeAnimationComponent: React.FC<{
                 #64748b ${upgradeResult.data.success_chance}% 100%
               )`,
               transform: phase === 'spinning' || phase === 'showing_result'
-                ? `rotate(${finalRotation}deg)`
-                : 'rotate(0deg)',
+                ? `rotate(${finalRotation}deg) scale(${scale})`
+                : `rotate(0deg) scale(${scale})`,
               transition: phase === 'spinning'
                 ? 'transform 3s cubic-bezier(0.05, 0.5, 0.3, 0.95)'
-                : 'transform 0.3s ease-out'
+                : 'transform 0.5s ease-out'
             }}
           >
             {/* Центральный элемент */}
@@ -388,6 +378,25 @@ const UpgradeAnimationComponent: React.FC<{
             </div>
           )}
         </div>
+      </div>
+
+      {/* Текст состояния */}
+      <div className="mb-6">
+        <h2 className={`text-3xl font-light mb-3 transition-all duration-700 ${
+          phase === 'showing_result'
+            ? (upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
+            : 'text-slate-200'
+        }`}>
+          {getPhaseTitle()}
+        </h2>
+        <p className="text-slate-400 text-lg font-light">
+          {phase === 'showing_result'
+            ? (upgradeResult.upgrade_success
+                ? 'Ваш предмет успешно улучшен'
+                : 'Попытка улучшения не удалась')
+            : 'Пожалуйста, подождите...'
+          }
+        </p>
       </div>
 
       {/* Результат - показываем только после завершения анимации */}
@@ -933,11 +942,11 @@ const UpgradePage: React.FC = () => {
         clearTimeout(animationTimeoutRef.current);
       }
 
-      // Автоматически скрываем анимацию через 8 секунд
-      // (500ms подготовка + 3000ms вращение + 4500ms показ результата)
+      // Автоматически скрываем анимацию через 7.5 секунд
+      // (500ms подготовка + 3000ms вращение + 4000ms показ результата)
       animationTimeoutRef.current = setTimeout(() => {
         handleAnimationComplete();
-      }, 8000);
+      }, 7500);
 
     } catch (error: any) {
       console.error('Ошибка при апгрейде:', error);
