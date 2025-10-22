@@ -677,6 +677,8 @@ const UpgradePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAnimation, setShowAnimation] = useState(false);
   const [upgradeResult, setUpgradeResult] = useState<UpgradeResult | null>(null);
+  const [isProcessingUpgrade, setIsProcessingUpgrade] = useState(false);
+  const animationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // API queries
   const {
@@ -695,10 +697,19 @@ const UpgradePage: React.FC = () => {
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
 
+  // Очистка таймера при unmount
+  React.useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Автоматическая очистка недоступных предметов из выбора
   React.useEffect(() => {
     // Не выполняем очистку во время анимации или процесса апгрейда
-    if (showAnimation || isUpgrading) {
+    if (showAnimation || isUpgrading || isProcessingUpgrade) {
       return;
     }
 
@@ -741,7 +752,7 @@ const UpgradePage: React.FC = () => {
         console.log('Очищены недоступные предметы из выбора');
       }
     }
-  }, [upgradeableItems, selectedInventoryIds, selectedItemIds, showAnimation, isUpgrading]);
+  }, [upgradeableItems, selectedInventoryIds, selectedItemIds, showAnimation, isUpgrading, isProcessingUpgrade]);
 
   // Фильтрация предметов (убираем ограничение по минимальной цене)
   const filteredItems = React.useMemo(() => {
@@ -889,6 +900,9 @@ const UpgradePage: React.FC = () => {
         return;
       }
 
+      // Устанавливаем флаг обработки перед началом запроса
+      setIsProcessingUpgrade(true);
+
       const result = await performUpgrade({
         sourceInventoryIds: selectedInventoryIds,
         targetItemId: selectedTargetItem
@@ -914,21 +928,36 @@ const UpgradePage: React.FC = () => {
 
 
 
-      // Автоматически скрываем анимацию через 4 секунды
-      setTimeout(() => {
+      // Очищаем предыдущий таймер, если есть
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+
+      // Автоматически скрываем анимацию через 8 секунд
+      // (500ms подготовка + 3000ms вращение + 4500ms показ результата)
+      animationTimeoutRef.current = setTimeout(() => {
         handleAnimationComplete();
-      }, 4000);
+      }, 8000);
 
     } catch (error: any) {
       console.error('Ошибка при апгрейде:', error);
       const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
+      // Сбрасываем флаг обработки в случае ошибки
+      setIsProcessingUpgrade(false);
     }
   };
 
   // Обработчик завершения анимации
   const handleAnimationComplete = () => {
+    // Очищаем таймер, если анимация закрыта вручную
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
+
     setShowAnimation(false);
+    setIsProcessingUpgrade(false);
 
     if (upgradeResult) {
       if (upgradeResult.upgrade_success) {
