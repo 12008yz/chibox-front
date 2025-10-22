@@ -111,7 +111,7 @@ const HomePage: React.FC = () => {
   const bannerContent = [
     {
       left: {
-        image: 'https://radika1.link/2025/10/19/c56a0eff-892f-45b7-9741-7f601b66197956bebac5b3cc34fc.jpg',
+        image: 'https://iimg.su/s/22/u1hYbkxxbj4VoXi9sAtjPbV1KAzC1UOgKe3NiCpy.jpg',
         title: t('homepage.chibox_title'),
         description: t('homepage.chibox_description'),
         link: "/cases",
@@ -124,7 +124,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://tempfile.aiquickdraw.com/s/051079e49c354c2c9e9ba2714f14654c_0_1760886894_4282.png',
+        image: 'https://iimg.su/s/22/uWLgBfhxXHiIvlKkg1qp8DkNQrIl5BlXOfaOwEa7.jpg',
         title: t('homepage.your_luck_title'),
         description: t('homepage.your_luck_description'),
         link: "/cases",
@@ -137,7 +137,7 @@ const HomePage: React.FC = () => {
     },
     {
       left: {
-        image: 'https://tempfile.aiquickdraw.com/s/051079e49c354c2c9e9ba2714f14654c_0_1760886894_4282.png',
+        image: 'https://iimg.su/s/22/u8kRwJ5xtNezoCAXgOauppq8AEgMpBvDURrSfvPp.jpg',
         title: t('homepage.community_title'),
         description: t('homepage.community_description'),
         link: "/leaderboard",
