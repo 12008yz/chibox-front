@@ -112,6 +112,7 @@ const HomePage: React.FC = () => {
     {
       left: {
         video: 'https://www.dropbox.com/scl/fi/yfzzmzjm44mhnz9yhbciw/9f69cac8-7668-4cdd-b7f4-31dedca1fba7_watermarked.mp4?rlkey=hez7bixroupq9uy4zqgmi8x1s&st=p4bj859l&raw=1',
+        poster: 'https://iimg.su/s/22/u1hYbkxxbj4VoXi9sAtjPbV1KAzC1UOgKe3NiCpy.jpg',
         title: t('homepage.chibox_title'),
         description: t('homepage.chibox_description'),
         link: "/cases",
@@ -181,7 +182,7 @@ const HomePage: React.FC = () => {
       setCurrentBannerIndex((prev) =>
         prev === bannerContent.length - 1 ? 0 : prev + 1
       );
-    }, 7000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [bannerContent.length]);
@@ -333,21 +334,23 @@ const HomePage: React.FC = () => {
           {/* Баннер секция */}
           <div className="relative w-full">
             <Banner
+              key={currentBannerIndex}
               left={bannerContent[currentBannerIndex].left}
               right={bannerContent[currentBannerIndex].right}
             />
 
             {/* Индикаторы баннеров */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 space-x-2 md:flex hidden">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 space-x-2 md:flex hidden z-20">
               {bannerContent.map((_, index) => (
                 <button
                   key={index}
-                  className={`w-3 h-3 rounded-full transition-all ${
+                  className={`w-3 h-3 rounded-full transition-all cursor-pointer ${
                     index === currentBannerIndex
                       ? 'bg-white scale-110'
                       : 'bg-white/50 hover:bg-white/75'
                   }`}
                   onClick={() => setCurrentBannerIndex(index)}
+                  aria-label={`Баннер ${index + 1}`}
                 />
               ))}
             </div>

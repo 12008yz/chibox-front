@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface BannerLeftContent {
   image?: string;
   video?: string;
+  poster?: string;
   title: string;
   description: string;
   link: string;
@@ -17,20 +18,55 @@ interface BannerProps {
 
 const Banner: React.FC<BannerProps> = ({ left, right }) => {
   const { t } = useTranslation();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    if (videoRef.current && left.video) {
+      const video = videoRef.current;
+      setIsVideoLoaded(false);
+
+      const handleLoadedData = () => {
+        setIsVideoLoaded(true);
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      };
+
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.load();
+
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+      };
+    }
+  }, [left.video]);
 
   return (
     <div className="relative w-screen max-w-[1920px] h-[460px] hidden md:flex overflow-hidden">
       {/* Фоновое изображение или видео */}
       {left.video ? (
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src={left.video} type="video/mp4" />
-        </video>
+        <>
+          {/* Фоновая картинка под видео (всегда видна) */}
+          <div
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-300 ${
+              isVideoLoaded ? 'opacity-0' : 'opacity-100'
+            }`}
+            style={{ backgroundImage: `url(${left.poster || left.image || ''})` }}
+          />
+          <video
+            ref={videoRef}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              isVideoLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+          >
+            <source src={left.video} type="video/mp4" />
+          </video>
+        </>
       ) : (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
