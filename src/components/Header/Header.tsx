@@ -109,17 +109,17 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className={`modern-header relative z-[99] w-full transition-transform duration-300 ${
-      isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-    }`}>
-      {/* Animated Background Glow */}
-      <div className="header-glow absolute inset-0 opacity-30 pointer-events-none"></div>
-
+    <div
+      className={`modern-header relative z-[99] w-full transition-transform duration-300 ${
+        isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+      style={{ background: 'transparent' }}
+    >
       {/* Header Content */}
-      <div className="relative flex flex-col w-full">
+      <div className="relative flex flex-col w-full" style={{ background: 'transparent' }}>
         {/* Online Users Status Bar */}
-        <div className="flex items-center justify-start px-4 py-1">
-          <div className="status-indicator flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md bg-black/20 border border-cyan-500/30">
+        <div className="flex items-center justify-start px-4 py-1" style={{ background: 'transparent' }}>
+          <div className="status-indicator flex items-center gap-1.5 px-3 py-1.5 rounded-full">
             {items.map((item, index) => (
               <div
                 key={index}
@@ -137,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Main Navigation */}
-        <div className="w-full px-4 pb-4 overflow-visible">
+        <div className="w-full px-4 pb-4 overflow-visible" style={{ background: 'transparent' }}>
           <Navbar
             openNotifications={openNotifications}
             setOpenNotifications={setOpenNotifications}

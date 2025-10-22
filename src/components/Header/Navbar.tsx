@@ -60,12 +60,9 @@ const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <div className="w-full relative z-[9999]">
-      <nav className="modern-navbar group w-full">
-        {/* Animated Border */}
-        <div className="navbar-border"></div>
-
-        <div className="relative flex items-center justify-between w-full min-h-[64px] px-8 py-4">
+    <div className="w-full relative z-[9999]" style={{ background: 'transparent' }}>
+      <nav className="modern-navbar group w-full" style={{ background: 'transparent' }}>
+        <div className="relative flex items-center justify-between w-full min-h-[64px] px-8 py-4" style={{ background: 'transparent' }}>
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button

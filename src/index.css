@@ -214,8 +214,8 @@
 
 /* Упрощенный header без backdrop-filter на слабых устройствах */
 .modern-header {
-  background: rgba(21, 18, 37, 0.95);
-  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  background: transparent !important;
+  border-bottom: none !important;
   position: relative;
   overflow: visible;
   width: 100%;
@@ -224,7 +224,7 @@
 /* Убираем тяжелые анимации header */
 @media (min-width: 769px) and (min-height: 601px) {
   .modern-header {
-    backdrop-filter: blur(10px); /* Уменьшено с 20px */
+    backdrop-filter: none !important;
   }
 }
 
@@ -232,21 +232,21 @@
 .modern-navbar {
   position: relative;
   width: 100%;
-  background: rgba(25, 23, 45, 0.8);
+  background: transparent !important;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none !important;
   overflow: hidden;
   transition: border-color var(--animation-duration) ease;
 }
 
 @media (min-width: 769px) {
   .modern-navbar {
-    backdrop-filter: blur(8px); /* Уменьшено */
+    backdrop-filter: none !important;
   }
 }
 
 .modern-navbar:hover {
-  border-color: rgba(0, 255, 255, 0.3);
+  border-color: transparent;
 }
 
 /* Logo Styles - упрощено */
