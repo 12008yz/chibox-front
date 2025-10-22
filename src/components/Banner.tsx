@@ -2,13 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+interface BannerLeftContent {
+  image?: string;
+  video?: string;
+  title: string;
+  description: string;
+  link: string;
+}
+
 interface BannerProps {
-  left: {
-    image: string;
-    title: string;
-    description: string;
-    link: string;
-  };
+  left: BannerLeftContent;
   right: React.ReactNode;
 }
 
@@ -17,11 +20,23 @@ const Banner: React.FC<BannerProps> = ({ left, right }) => {
 
   return (
     <div className="relative w-screen max-w-[1920px] h-[460px] hidden md:flex overflow-hidden">
-      {/* Фоновое изображение */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${left.image})` }}
-      />
+      {/* Фоновое изображение или видео */}
+      {left.video ? (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src={left.video} type="video/mp4" />
+        </video>
+      ) : (
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${left.image})` }}
+        />
+      )}
 
       {/* Затемнение по бокам (градиент) */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />

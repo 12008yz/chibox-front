@@ -111,6 +111,19 @@ const HomePage: React.FC = () => {
   const bannerContent = [
     {
       left: {
+        video: 'https://www.dropbox.com/scl/fi/yfzzmzjm44mhnz9yhbciw/9f69cac8-7668-4cdd-b7f4-31dedca1fba7_watermarked.mp4?rlkey=hez7bixroupq9uy4zqgmi8x1s&st=p4bj859l&raw=1',
+        title: t('homepage.chibox_title'),
+        description: t('homepage.chibox_description'),
+        link: "/cases",
+      },
+      right: (
+        <div className="hidden 2xl:flex 2xl:mr-36">
+          <div className="text-6xl opacity-30">🎬</div>
+        </div>
+      ),
+    },
+    {
+      left: {
         image: 'https://iimg.su/s/22/u1hYbkxxbj4VoXi9sAtjPbV1KAzC1UOgKe3NiCpy.jpg',
         title: t('homepage.chibox_title'),
         description: t('homepage.chibox_description'),
