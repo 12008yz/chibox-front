@@ -4,6 +4,7 @@ import { getRarityColor, getRarityName } from '../../utils/profileUtils';
 import { getItemImageUrl } from '../../../../utils/steamImageUtils';
 import type { UserInventoryItem } from '../../../../types/api';
 import { isUserItem } from '../../hooks/useInventory';
+import Monetary from '../../../../components/Monetary';
 
 interface BestWeaponProps {
   user: any;
@@ -85,7 +86,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
                 {getRarityName(weaponData?.rarity || '', t)}
               </span>
               <span className="text-green-400 font-bold text-lg">
-                {Number(weaponPrice).toFixed(2)}{t('common.currency_suffix')}
+                <Monetary value={Number(weaponPrice)} showFraction={true} />
               </span>
               {bestWeapon.isRecord && (
                 <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">

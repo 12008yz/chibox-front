@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Avatar from '../../../../components/Avatar';
 import Tooltip from '../../../../components/Tooltip';
 import { calculateLevelProgress } from '../../utils/profileUtils';
+import Monetary from '../../../../components/Monetary';
 
 interface ProfileHeaderProps {
   user: any;
@@ -82,7 +83,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-400 text-sm">{t('common.balance')}</span>
               <span className="text-2xl font-bold text-green-400">
-                {Number(user.balance).toFixed(2)} КР
+                <Monetary value={Number(user.balance)} showFraction={true} />
               </span>
             </div>
           </div>

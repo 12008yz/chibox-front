@@ -264,6 +264,21 @@
   background: rgba(0, 255, 255, 0.1);
 }
 
+/* Logo star rotation animation */
+@keyframes rotate-star {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo-star {
+  animation: rotate-star 3s linear infinite;
+  display: inline-block;
+}
+
 /* Navigation Items - упрощено */
 .gaming-nav-item {
   position: relative;

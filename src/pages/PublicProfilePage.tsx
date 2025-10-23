@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar';
 import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import Monetary from '../components/Monetary';
 
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -605,7 +606,9 @@ const PublicProfilePage: React.FC = () => {
                       <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                         {inventoryItem.item.name}
                       </h5>
-                      <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item?.price || inventoryItem.price || 0).toFixed(2)}{t('common.currency_suffix')}</p>
+                      <p className="text-green-400 text-sm font-bold">
+                        <Monetary value={Number(inventoryItem.item?.price || inventoryItem.price || 0)} showFraction={true} />
+                      </p>
                       <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
                         {getRarityName(inventoryItem.item.rarity)}
                       </p>

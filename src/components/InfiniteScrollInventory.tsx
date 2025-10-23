@@ -4,6 +4,7 @@ import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import CaseWithDrop from './CaseWithDrop';
 import ItemWithdrawBanner from './ItemWithdrawBanner';
 import toast from 'react-hot-toast';
+import Monetary from './Monetary';
 
 interface InfiniteScrollInventoryProps {
   items: any[];
@@ -128,7 +129,9 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
                   <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                     {inventoryItem.item.name}
                   </h5>
-                  <p className="text-green-400 text-sm font-bold">{Number(inventoryItem.item.price).toFixed(2)} КР</p>
+                  <p className="text-green-400 text-sm font-bold">
+                    <Monetary value={Number(inventoryItem.item.price)} showFraction={true} />
+                  </p>
                   <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor?.(inventoryItem.item.rarity) || 'from-gray-500 to-gray-600'} text-white text-center mt-2`}>
                     {getRarityName?.(inventoryItem.item.rarity, t) || inventoryItem.item.rarity}
                   </p>
@@ -201,7 +204,9 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
                         {caseName}
                       </h5>
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-yellow-400 text-sm font-bold">{Number(casePrice).toFixed(2)} КР</p>
+                        <p className="text-yellow-400 text-sm font-bold">
+                          <Monetary value={Number(casePrice)} showFraction={true} />
+                        </p>
                         {(inventoryItem.quantity || 1) > 1 && (
                           <span className="text-xs px-2 py-1 rounded-full bg-blue-600 text-white font-bold">
                             x{inventoryItem.quantity}

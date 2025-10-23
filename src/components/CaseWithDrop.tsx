@@ -2,6 +2,7 @@ import React from 'react';
 import type { UserInventoryItem, CaseTemplate } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { useTranslation } from 'react-i18next';
+import Monetary from './Monetary';
 
 interface CaseWithDropProps {
   droppedItem: UserInventoryItem;
@@ -137,7 +138,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
             {getRarityName(droppedItem.item.rarity)}
           </span>
           <span className="text-green-400 font-bold text-xs text-center">
-            {Number(droppedItem.item.price).toFixed(2)} КР
+            <Monetary value={Number(droppedItem.item.price)} showFraction={true} />
           </span>
         </div>
       </div>
