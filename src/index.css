@@ -290,6 +290,21 @@
   color: white;
 }
 
+.nav-item-border {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4, transparent);
+  transition: width 0.3s ease;
+}
+
+.gaming-nav-item:hover .nav-item-border {
+  width: 80%;
+}
+
 /* Gaming Buttons - упрощено */
 .gaming-button {
   padding: 1rem 1rem;
