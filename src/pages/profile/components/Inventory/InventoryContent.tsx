@@ -262,22 +262,25 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                       {caseName}
                     </h5>
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-yellow-400 text-sm font-bold">
-                        <Monetary value={Number(casePrice)} showFraction={true} />
-                      </p>
+                      {Number(casePrice) > 0 ? (
+                        <p className="text-yellow-400 text-sm font-bold">
+                          <Monetary value={Number(casePrice)} showFraction={true} />
+                        </p>
+                      ) : (
+                        <p className="text-green-400 text-sm font-bold">
+                          {t('profile.free_case', { defaultValue: 'Бесплатно' })}
+                        </p>
+                      )}
                       {((inventoryItem as any).quantity || 1) > 1 && (
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-600 text-white font-bold">
                           x{(inventoryItem as any).quantity}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white truncate">
-                        {caseName}
-                      </p>
-                      {activeTab === 'active' && inventoryItem.status === 'inventory' && (
+                    {activeTab === 'active' && inventoryItem.status === 'inventory' && (
+                      <div className="mt-2">
                         <button
-                          className={`text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
+                          className={`w-full text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
                             openingCaseId === inventoryItem.id
                               ? 'bg-gray-500 cursor-not-allowed'
                               : 'bg-green-600 hover:bg-green-500'
@@ -292,8 +295,8 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                         >
                           {openingCaseId === inventoryItem.id ? t('profile.opening') : t('profile.open_button')}
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                     {/* Acquisition info */}
                     <div className="mt-2 text-xs text-gray-400">
                       <p>{t('profile.acquired_date')} {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
