@@ -11,7 +11,16 @@ import { getItemImageUrl } from '../utils/steamImageUtils';
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data: profileData, isLoading, error } = useGetPublicProfileQuery(id || '');
+
+  // State для пагинации
+  const [page, setPage] = useState(1);
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
+  const [caseItemsList, setCaseItemsList] = useState<any[]>([]);
+
+  const { data: profileData, isLoading, error } = useGetPublicProfileQuery(
+    { userId: id || '', page, limit: 24 },
+    { skip: !id }
+  );
 
   // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
@@ -21,6 +30,19 @@ const PublicProfilePage: React.FC = () => {
 
   // State для переключения между категориями инвентаря
   const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
+
+  // Обновляем списки при получении новых данных
+  React.useEffect(() => {
+    if (profileData?.user) {
+      if (page === 1) {
+        setInventoryItems(profileData.user.inventory || []);
+        setCaseItemsList(profileData.user.caseItems || []);
+      } else {
+        setInventoryItems(prev => [...prev, ...(profileData.user.inventory || [])]);
+        setCaseItemsList(prev => [...prev, ...(profileData.user.caseItems || [])]);
+      }
+    }
+  }, [profileData, page]);
 
   if (isLoading) {
     return (

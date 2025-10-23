@@ -507,6 +507,35 @@ export const userApi = baseApi.injectEndpoints({
             status?: string;
             acquisition_date?: string;
           }>;
+          inventoryPagination?: {
+            total: number;
+            page: number;
+            limit: number;
+            totalPages: number;
+            hasMore: boolean;
+          };
+          caseItems?: Array<{
+            id: string;
+            item: {
+              id: string;
+              name: string;
+              rarity: string;
+              price: string;
+              weapon_type?: string;
+              skin_name?: string;
+              image_url?: string;
+            };
+            source?: string;
+            status?: string;
+            acquisition_date?: string;
+          }>;
+          caseItemsPagination?: {
+            total: number;
+            page: number;
+            limit: number;
+            totalPages: number;
+            hasMore: boolean;
+          };
           bestWeapon?: {
             id: string;
             name: string;
@@ -542,9 +571,15 @@ export const userApi = baseApi.injectEndpoints({
           };
         };
       },
-      string
+      { userId: string; page?: number; limit?: number }
     >({
-      query: (userId) => `v1/users/${userId}`,
+      query: ({ userId, page = 1, limit = 24 }) => {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
+        });
+        return `v1/users/${userId}?${params.toString()}`;
+      },
     }),
 
     // Получение статуса вывода предмета
