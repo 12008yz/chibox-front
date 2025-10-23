@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
+import IntroVideo from '../components/IntroVideo';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
@@ -31,6 +32,7 @@ const HomePage: React.FC = () => {
   });
 
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showIntroVideo, setShowIntroVideo] = useState(false);
   const [registrationData, setRegistrationData] = useState<{
     email: string;
     previewUrl?: string;
@@ -107,15 +109,29 @@ const HomePage: React.FC = () => {
 
 
 
-  // Проверяем, нужно ли показать модальное окно регистрации
+  // Проверяем, нужно ли показать видео или модальное окно регистрации
   useEffect(() => {
+    console.log('HomePage location.state:', location.state);
+
     if (location.state?.showRegistrationSuccess) {
+      console.log('Showing registration success - video mode:', location.state?.showIntroVideo);
+
       setRegistrationData({
         email: location.state.registrationEmail,
         previewUrl: location.state.previewUrl
       });
-      setShowRegistrationModal(true);
-      navigate('/', { replace: true });
+
+      // Если нужно показать видео
+      if (location.state?.showIntroVideo) {
+        console.log('Setting showIntroVideo to true');
+        setShowIntroVideo(true);
+      } else {
+        console.log('Setting showRegistrationModal to true');
+        setShowRegistrationModal(true);
+      }
+
+      // Очищаем state после обработки
+      navigate('/', { replace: true, state: {} });
     }
   }, [location.state, navigate]);
 
@@ -124,6 +140,11 @@ const HomePage: React.FC = () => {
   const handleCloseRegistrationModal = () => {
     setShowRegistrationModal(false);
     setRegistrationData(null);
+  };
+
+  const handleVideoEnd = () => {
+    setShowIntroVideo(false);
+    // После видео показываем главный экран без модального окна
   };
 
   // Функция для покупки и открытия кейса - ВОЗВРАЩАЕТ результат для анимации в модале
@@ -450,6 +471,13 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       </div>
+
+      {/* Вступительное видео после регистрации */}
+      <IntroVideo
+        isOpen={showIntroVideo}
+        onVideoEnd={handleVideoEnd}
+        videoUrl="/intro-video.mp4"
+      />
 
       {/* Модальное окно успешной регистрации */}
       {registrationData && (

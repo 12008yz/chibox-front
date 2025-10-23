@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../store/hooks';
 import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi';
 import { loginSuccess } from '../features/auth/authSlice';
 import SteamLoginButton from '../components/SteamLoginButton';
@@ -11,6 +12,7 @@ import { validateUsername, suggestAlternativeUsername } from '../utils/profanity
 
 const RegisterPage: React.FC = () => {
   const { t } = useTranslation();
+  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [email, setEmail] = useState('');
@@ -24,6 +26,21 @@ const RegisterPage: React.FC = () => {
   const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
   const isLoading = isRegistering || isLoggingIn;
+
+  // Предзагрузка видео
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Начинаем предзагрузку видео как только пользователь начинает вводить данные
+    if ((username || email || password) && videoRef.current) {
+      videoRef.current.load();
+    }
+  }, [username, email, password]);
+
+  // Если пользователь уже авторизован, перенаправляем на главную
+  if (auth.isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,29 +68,40 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
+      console.log('Starting registration...');
       const registerResult = await register({ username, email, password }).unwrap();
+      console.log('Registration result:', registerResult);
 
       if (registerResult.success && registerResult.data) {
         try {
+          console.log('Attempting auto-login...');
           const loginResult = await login({ email, password }).unwrap();
+          console.log('Auto-login result:', loginResult);
 
           if (loginResult.success && loginResult.data) {
             dispatch(loginSuccess({
               user: loginResult.data.user,
               token: loginResult.data.token
             }));
+            console.log('Login success dispatched');
           }
         } catch (loginErr: any) {
           console.error('Auto-login error:', loginErr);
         }
 
-        navigate('/', {
-          state: {
-            showRegistrationSuccess: true,
-            registrationEmail: registerResult.data.email,
-            previewUrl: registerResult.previewUrl
-          }
-        });
+        console.log('Navigating to homepage with video...');
+        // Небольшая задержка для завершения всех обновлений состояния
+        setTimeout(() => {
+          navigate('/', {
+            state: {
+              showRegistrationSuccess: true,
+              showIntroVideo: true,
+              registrationEmail: registerResult.data.email,
+              previewUrl: registerResult.previewUrl
+            },
+            replace: true
+          });
+        }, 100);
       } else {
         setError(t('auth.registration_error'));
       }
@@ -86,6 +114,11 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#151225] gaming-font relative">
       <ScrollToTopOnMount />
+
+      {/* Предзагрузка видео (скрыто) */}
+      <video ref={videoRef} className="hidden" preload="auto">
+        <source src="/intro-video.mp4" type="video/mp4" />
+      </video>
 
       {/* Игра в змейку в качестве фона */}
       <SnakeGameBackground />

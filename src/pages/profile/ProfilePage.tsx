@@ -7,7 +7,7 @@ import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../../features/ca
 import { useUserData } from '../../hooks/useUserData';
 import ScrollToTop from '../../components/ScrollToTop';
 import ScrollToTopOnMount from '../../components/ScrollToTopOnMount';
-import PurchaseModal from '../../components/PurchaseModal';
+import DepositModal from '../../components/DepositModal';
 
 // Импорты компонентов
 import ProfileHeader from './components/ProfileHeader/ProfileHeader';
@@ -39,7 +39,7 @@ const ProfilePage: React.FC = () => {
   // State для модальных окон
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
-  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // State для отслеживания ID открываемого кейса
   const [openingCaseId, setOpeningCaseId] = useState<string | null>(null);
@@ -276,7 +276,7 @@ const ProfilePage: React.FC = () => {
             {/* Purchase Button */}
             <button
               onClick={() => {
-                setIsPurchaseModalOpen(true);
+                setIsDepositModalOpen(true);
               }}
               className="w-full bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-purple-400/20 hover:border-purple-400/50"
             >
@@ -321,10 +321,10 @@ const ProfilePage: React.FC = () => {
         user={user}
       />
 
-      {/* Purchase Modal */}
-      <PurchaseModal
-        isOpen={isPurchaseModalOpen}
-        onClose={() => setIsPurchaseModalOpen(false)}
+      {/* Deposit Modal */}
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
       />
 
       {/* Scroll to Top Button */}
