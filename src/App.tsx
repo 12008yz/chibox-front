@@ -93,21 +93,7 @@ const App: React.FC = () => {
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
     console.log('Showing loading screen - fetching user data...');
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #151225 0%, #1a1630 100%)',
-      }}>
-        {/* Gaming Background Pattern for Loading */}
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 26L45 35.32V43.68L30 53L15 43.68V35.32L30 26z' stroke='%236366f1' stroke-opacity='0.8' stroke-width='1'/%3E%3Cpath d='M30 0L45 9.32V17.68L30 27L15 17.68V9.32L30 0z' stroke='%238b5cf6' stroke-opacity='0.6' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: '60px 52px',
-              animation: 'float 20s ease-in-out infinite',
-            }}
-          />
-        </div>
-
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#151225]">
         <FloatingWatermark />
         <div className="relative z-10 flex flex-col items-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
@@ -119,36 +105,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="min-h-screen relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #151225 0%, #1a1630 100%)',
-      }}>
-        {/* Gaming Background Pattern */}
-        <div className="fixed inset-0 pointer-events-none z-0">
-          {/* Hexagonal Pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 26L45 35.32V43.68L30 53L15 43.68V35.32L30 26z' stroke='%236366f1' stroke-opacity='0.8' stroke-width='1'/%3E%3Cpath d='M30 0L45 9.32V17.68L30 27L15 17.68V9.32L30 0z' stroke='%238b5cf6' stroke-opacity='0.6' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundSize: '60px 52px',
-              animation: 'float 20s ease-in-out infinite',
-            }}
-          />
-
-          {/* Circuit-like Grid */}
-          <div
-            className="absolute inset-0 opacity-[0.02]"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(99, 102, 241, 0.5) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)
-              `,
-              backgroundSize: '40px 40px',
-            }}
-          />
-
-          {/* Убраны анимированные частицы для оптимизации производительности */}
-        </div>
-
+      <div className="min-h-screen relative overflow-hidden">
         <FloatingWatermark />
         <div className="relative z-10">
           <Header

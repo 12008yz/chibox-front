@@ -258,18 +258,19 @@ const HomePage: React.FC = () => {
   }, [refetchCases]);
 
   return (
-    <div
-      className="min-h-screen text-white relative"
-      style={{
-        backgroundImage: 'url(https://s.iimg.su/s/22/uJDay5Ux8rop1XNmC5q3906RrnzKbXeGscO48PZ6.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
-    >
+    <div className="min-h-screen text-white relative">
+      {/* Фиксированный фон на весь экран */}
+      <div
+        className="fixed inset-0 -z-50"
+        style={{
+          backgroundImage: 'url(https://s.iimg.su/s/22/uJDay5Ux8rop1XNmC5q3906RrnzKbXeGscO48PZ6.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
       {/* Затемняющий оверлей */}
-      <div className="fixed inset-0 bg-black/70 z-0"></div>
+      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80 -z-40"></div>
 
       <div className="relative z-10">
         <ScrollToTopOnMount />

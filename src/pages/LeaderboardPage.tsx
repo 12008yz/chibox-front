@@ -131,33 +131,20 @@ const LeaderboardPage: React.FC = () => {
   const currentTab = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative overflow-hidden">
       <ScrollToTopOnMount />
 
-      {/* Тестовый водяной знак с CS2 иконками */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Фон */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0a0a0f]">
         <img
-          src="https://ext.same-assets.com/609624232/3169792146.png"
+          src="https://www.dropbox.com/scl/fi/91mxeni73uxqegs3bm8mc/edited_image_20251023063517.png?rlkey=aylw3lfetegm40w82vsi5bfzj&st=dhq3o2ln&raw=1"
           alt=""
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-12 select-none"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover"
           style={{
-            width: '120px',
-            height: '120px',
-            opacity: 0.05,
-            filter: 'grayscale(100%)',
+            opacity: 0.3,
           }}
         />
-        <img
-          src="https://ext.same-assets.com/609624232/355601599.png"
-          alt=""
-          className="absolute top-32 left-32 transform -rotate-12 select-none"
-          style={{
-            width: '80px',
-            height: '80px',
-            opacity: 0.04,
-            filter: 'grayscale(100%)',
-          }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
