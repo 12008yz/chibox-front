@@ -137,7 +137,7 @@ const LeaderboardPage: React.FC = () => {
       {/* Фон */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0a0a0f]">
         <img
-          src="https://www.dropbox.com/scl/fi/91mxeni73uxqegs3bm8mc/edited_image_20251023063517.png?rlkey=aylw3lfetegm40w82vsi5bfzj&st=dhq3o2ln&raw=1"
+          src="https://s.iimg.su/s/23/uw4EGEzxUNnKG5YI8urY6nXDol9MgLXDlSgczEqS.png"
           alt=""
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover"
           style={{

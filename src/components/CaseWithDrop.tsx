@@ -12,9 +12,18 @@ interface CaseWithDropProps {
 const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }) => {
   const { t } = useTranslation();
 
-  // Функция для перевода названий кейсов
+  // Функция для перевода и форматирования названий кейсов
   const translateCaseName = (caseName: string) => {
-    const translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+    let translatedName = t(`case_names.${caseName}`, { defaultValue: caseName });
+
+    // Убираем префикс "Ежедневный кейс - "
+    translatedName = translatedName.replace(/^Ежедневный кейс - /i, '');
+
+    // Заменяем "Стандартный кейс" и "Премиум кейс" на "Покупной кейс"
+    if (translatedName === 'Стандартный кейс' || translatedName === 'Премиум кейс') {
+      translatedName = 'Покупной кейс';
+    }
+
     return translatedName;
   };
 
@@ -119,8 +128,8 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
           />
         </p>
         <div className="flex items-center justify-between mt-2">
-          <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-            {t('profile.case_label')}
+          <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white truncate">
+            {caseName}
           </p>
           <div className="text-xs text-green-400 font-semibold">
             {t('profile.status_opened')}

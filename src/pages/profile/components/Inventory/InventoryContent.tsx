@@ -33,6 +33,14 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Debug: проверяем данные
+  if (activeTab === 'opened') {
+    console.log('InventoryContent - opened tab:', {
+      filteredInventory: filteredInventory,
+      filteredInventoryLength: filteredInventory.length
+    });
+  }
+
   // Функция для показа уведомлений
   const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
     switch (type) {
@@ -95,9 +103,19 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
         // Специальный рендеринг для открытых кейсов с анимацией
         filteredInventory.map((inventoryItem) => {
           if (isUserItem(inventoryItem)) {
+            // Debug: выводим данные в консоль
+            console.log('Opened case item:', {
+              id: inventoryItem.id,
+              name: inventoryItem.item.name,
+              case_template_id: inventoryItem.case_template_id,
+              full_item: inventoryItem
+            });
+
             const caseTemplate = inventoryItem.case_template_id
               ? getCaseTemplateById(inventoryItem.case_template_id)
               : null;
+
+            console.log('Case template found:', caseTemplate);
 
             return (
               <CaseWithDrop
@@ -197,7 +215,14 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
               (() => {
                 const caseTemplate = getCaseTemplateById(inventoryItem.case_template_id);
                 const rawCaseName = caseTemplate?.name || `Кейс #${inventoryItem.case_template_id.slice(0, 8)}`;
-                const caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
+                let caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
+
+                // Форматируем название кейса
+                caseName = caseName.replace(/^Ежедневный кейс - /i, '');
+                if (caseName === 'Стандартный кейс' || caseName === 'Премиум кейс') {
+                  caseName = 'Покупной кейс';
+                }
+
                 const casePrice = caseTemplate?.price || '0.00';
                 const caseImageUrl = caseTemplate?.image_url;
 
@@ -247,8 +272,8 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
-                        {t('profile.case_label')}
+                      <p className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 text-white truncate">
+                        {caseName}
                       </p>
                       {activeTab === 'active' && inventoryItem.status === 'inventory' && (
                         <button
