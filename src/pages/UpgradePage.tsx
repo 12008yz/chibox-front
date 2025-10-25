@@ -71,7 +71,7 @@ const SelectedItemsDisplay: React.FC<{
 
   if (selectedItems.length === 0 && !targetItem) {
     return (
-      <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-8 mb-8 h-[520px]">
+      <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-8 mb-8 h-[520px]">
         <div className="text-center h-full flex items-center justify-center">
           <div>
             <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
@@ -88,7 +88,7 @@ const SelectedItemsDisplay: React.FC<{
   }
 
   return (
-    <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8 h-[520px] overflow-hidden">
+    <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-6 mb-8 h-[520px] overflow-hidden">
       {showAnimation && upgradeResult ? (
         <UpgradeAnimationComponent
           upgradeResult={upgradeResult}
@@ -109,7 +109,7 @@ const SelectedItemsDisplay: React.FC<{
                 {selectedItems.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className="bg-black/30 rounded-lg p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                    className="bg-black/30 backdrop-blur-sm rounded-lg p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
                     onClick={() => onRemoveSourceItem && onRemoveSourceItem(item.id)}
                     title="Кликните для удаления"
                   >
@@ -143,7 +143,7 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30 flex-shrink-0">
+              <div className="mt-4 p-3 bg-cyan-500/10 backdrop-blur-sm rounded-lg border border-cyan-500/30 flex-shrink-0">
                 <div className="text-cyan-300 text-sm">
                   Общая стоимость: <span className="font-bold"><Monetary value={totalValue} /></span>
                 </div>
@@ -189,7 +189,7 @@ const SelectedItemsDisplay: React.FC<{
               <div className="overflow-y-auto flex-1 pr-2">
               {targetItem ? (
                 <div
-                  className="bg-black/30 rounded-lg p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                  className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
                   onClick={() => onRemoveTargetItem && onRemoveTargetItem()}
                   title="Кликните для отмены выбора"
                 >
@@ -233,7 +233,7 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 </div>
               ) : (
-                <div className="bg-black/30 rounded-lg p-4 border border-gray-600/30 h-32 flex items-center justify-center">
+                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-gray-600/30 h-32 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-gray-400 text-sm">Не выбран</div>
                     <div className="text-gray-500 text-xs">Выберите целевой предмет</div>
@@ -401,7 +401,7 @@ const UpgradeAnimationComponent: React.FC<{
 
       {/* Результат - показываем только после завершения анимации */}
       {showResult && (
-        <div className={`rounded-xl p-6 border backdrop-blur-sm transition-all duration-1000 ${
+        <div className={`rounded-xl p-6 border backdrop-blur-md transition-all duration-1000 ${
           upgradeResult.upgrade_success
             ? 'bg-emerald-900/20 border-emerald-500/30'
             : 'bg-rose-900/20 border-rose-500/30'
@@ -479,7 +479,7 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 ${
+      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-xl p-3 border transition-all duration-300 ${
         canInteract
           ? 'cursor-pointer hover:brightness-110 hover:shadow-xl'
           : 'cursor-not-allowed opacity-50'
@@ -597,7 +597,7 @@ const TargetItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -995,7 +995,10 @@ const UpgradePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151225] text-white">
+    <div
+      className="min-h-screen text-white bg-cover bg-center bg-no-repeat bg-fixed pt-32"
+      style={{ backgroundImage: 'url(https://s.iimg.su/s/25/uR0XDDXx5zfcmyKF9K872YIjR6O2hf8Zuwf7eiy1.png)' }}
+    >
       <ScrollToTopOnMount />
 
       <div className="container mx-auto px-4 py-8">
@@ -1034,7 +1037,7 @@ const UpgradePage: React.FC = () => {
         />
 
         {/* Панель управления */}
-        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
+        <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-6 mb-8">
 
           {/* Поиск и кнопки */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1043,7 +1046,7 @@ const UpgradePage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('upgrade.search_placeholder')}
-              className="bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="bg-black/50 backdrop-blur-sm border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
             />
 
             <button
@@ -1058,7 +1061,7 @@ const UpgradePage: React.FC = () => {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Выбор исходных предметов */}
-          <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
+          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-6 border border-purple-800/30">
             <div className="mb-6">
               <h2 className="text-xl font-bold text-white mb-2">
                 {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
@@ -1115,7 +1118,7 @@ const UpgradePage: React.FC = () => {
           </div>
 
           {/* Выбор целевого предмета */}
-          <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
+          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-6 border border-purple-800/30">
             <h2 className="text-xl font-bold text-white mb-6">
               {t('upgrade.step_2_title')}
             </h2>
