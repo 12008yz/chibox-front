@@ -68,7 +68,7 @@ const ItemCard: React.FC<{
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
+    <div className="backdrop-blur-md bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 rounded-xl p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
       <div className="relative">
         {/* Изображение предмета */}
         <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
@@ -89,7 +89,7 @@ const ItemCard: React.FC<{
           </div>
           {/* Количество предметов */}
           {count > 1 && (
-            <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/80 text-white text-xs font-bold z-20">
+            <div className="absolute top-2 left-2 px-2 py-1 rounded-md backdrop-blur-sm bg-black/80 text-white text-xs font-bold z-20">
               x{count}
             </div>
           )}
@@ -373,12 +373,21 @@ const ExchangePage: React.FC = () => {
   const rarities = ['all', 'consumer', 'industrial', 'milspec', 'restricted', 'classified', 'covert'];
 
   return (
-    <div className="min-h-screen bg-[#151225] text-white">
+    <div
+      className="min-h-screen text-white bg-cover bg-center bg-no-repeat bg-fixed relative"
+      style={{
+        backgroundImage: 'url(https://s.iimg.su/s/25/uID9oPZxlmOW7ju3ljwd5sBYfkM8sSpC1uZqkrvP.png)',
+        backgroundColor: '#151225'
+      }}
+    >
+      {/* Полупрозрачный оверлей для читаемости */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
+
       <ScrollToTopOnMount />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Простой игровой заголовок */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 backdrop-blur-sm bg-black/20 rounded-xl p-6">
           <div className="inline-flex items-center space-x-3 mb-4">
             <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -397,10 +406,10 @@ const ExchangePage: React.FC = () => {
         </div>
 
         {/* Игровая панель управления */}
-        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-6 mb-8">
+        <div className="backdrop-blur-md bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 rounded-xl border border-purple-500/30 p-6 mb-8">
           {/* Статистика игрока */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-black/30 rounded-lg p-4 border border-green-500/50">
+            <div className="backdrop-blur-sm bg-black/40 rounded-lg p-4 border border-green-500/50">
               <div className="flex items-center space-x-3">
                 <div className="text-green-400 text-2xl">💰</div>
                 <div>
@@ -412,7 +421,7 @@ const ExchangePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-black/30 rounded-lg p-4 border border-purple-500/50">
+            <div className="backdrop-blur-sm bg-black/40 rounded-lg p-4 border border-purple-500/50">
               <div className="flex items-center space-x-3">
                 <div className="text-purple-400 text-2xl">⭐</div>
                 <div>
@@ -442,7 +451,7 @@ const ExchangePage: React.FC = () => {
 
           {/* Переключатель режимов */}
           <div className="flex justify-center mb-6">
-            <div className="bg-black/50 rounded-lg p-2 border border-gray-700">
+            <div className="backdrop-blur-sm bg-black/60 rounded-lg p-2 border border-gray-700">
               <div className="flex space-x-2">
                 <button
                   onClick={() => setSelectedTab('sell')}
@@ -476,7 +485,7 @@ const ExchangePage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('exchange.search_placeholder')}
-                className="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+                className="w-full backdrop-blur-sm bg-black/60 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
               />
             </div>
             <div>
@@ -507,7 +516,7 @@ const ExchangePage: React.FC = () => {
 
         {/* Расширенная информация о тарифах (скрываемая) */}
         {showExchangeInfo && (
-          <div className="mb-6 bg-gradient-to-r from-amber-600/10 to-orange-600/10 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
+          <div className="mb-6 backdrop-blur-md bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h4 className="text-amber-300 font-semibold text-lg mb-2">{t('exchange.exchange_rates_title')}</h4>
@@ -524,12 +533,12 @@ const ExchangePage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-black/20 rounded-lg p-4">
+              <div className="backdrop-blur-sm bg-black/30 rounded-lg p-4">
                 <h5 className="text-blue-300 font-medium mb-2">{t('exchange.tier_1_title')}</h5>
                 <p className="text-white text-lg font-bold">{t('exchange.tier_1_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_1_description')}</p>
               </div>
-              <div className="bg-black/20 rounded-lg p-4">
+              <div className="backdrop-blur-sm bg-black/30 rounded-lg p-4">
                 <h5 className="text-purple-300 font-medium mb-2">{t('exchange.tier_2_title')}</h5>
                 <p className="text-white text-lg font-bold">{t('exchange.tier_2_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_2_description')}</p>
@@ -541,7 +550,7 @@ const ExchangePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-4 p-4 bg-purple-600/10 rounded-lg">
+            <div className="mt-4 p-4 backdrop-blur-sm bg-purple-600/20 rounded-lg">
               <h6 className="text-purple-300 font-medium mb-2">{t('exchange.important_conditions')}</h6>
               <ul className="text-sm text-gray-300 space-y-1">
                 <li>• {t('exchange.min_exchange_price', { price: minExchangePrice })}</li>
@@ -556,7 +565,7 @@ const ExchangePage: React.FC = () => {
 
 
         {/* Инвентарь */}
-        <div className="bg-[#1a1426] rounded-xl p-6 border border-purple-800/30">
+        <div className="backdrop-blur-md bg-[#1a1426]/80 rounded-xl p-6 border border-purple-800/30">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">
               {selectedTab === 'sell' ? t('exchange.items_for_sale') : t('exchange.items_for_exchange')}
@@ -583,7 +592,7 @@ const ExchangePage: React.FC = () => {
             </div>
           ) : groupedAndFilteredItems.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto mb-4 backdrop-blur-sm bg-purple-500/30 rounded-full flex items-center justify-center">
                 <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
