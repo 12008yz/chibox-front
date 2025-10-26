@@ -210,14 +210,14 @@ const ExchangePage: React.FC = () => {
 
   // Вычисляем значения на основе тарифа подписки
   const currentTier = subscriptionData?.data?.subscription_tier || 1;
-  const pricePerDay = currentTier === 3 ? 300 : 150;
+  const pricePerDay = currentTier === 3 ? 350 : 200;
   const minExchangePrice = Math.floor(pricePerDay * 0.93); // Синхронизировано с сервером
 
   // Функция расчета дней подписки
   const calculateSubscriptionDays = useCallback((itemPrice: number) => {
     // Используем ту же логику что и на бэкенде:
-    // Для тарифа 3: 280-300₽ = 1 день, 580-600₽ = 2 дня и т.д.
-    // Для тарифов 1,2: 140-150₽ = 1 день, 290-300₽ = 2 дня и т.д.
+    // Для тарифа 3: 325-350₽ = 1 день, 675-700₽ = 2 дня и т.д.
+    // Для тарифов 1,2: 186-200₽ = 1 день, 386-400₽ = 2 дня и т.д.
     return Math.floor((itemPrice + pricePerDay * 0.067) / pricePerDay);
   }, [pricePerDay]);
 
