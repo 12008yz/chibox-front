@@ -242,9 +242,12 @@ const ProfilePage: React.FC = () => {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] text-white">
+    <div className="min-h-screen text-white relative">
+      {/* Фиксированный фон на весь экран */}
+      <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] -z-50" />
+
       <ScrollToTopOnMount />
-      <div className="container mx-auto max-w-7xl p-4 space-y-6">
+      <div className="relative z-10 container mx-auto max-w-7xl p-4 space-y-6">
 
         {/* Header Section */}
         <ProfileHeader

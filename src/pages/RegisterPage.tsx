@@ -112,7 +112,10 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151225] gaming-font relative">
+    <div className="min-h-screen gaming-font relative">
+      {/* Фиксированный фон на весь экран */}
+      <div className="fixed inset-0 bg-[#151225] -z-50" />
+
       <ScrollToTopOnMount />
 
       {/* Предзагрузка видео (скрыто) */}
@@ -124,7 +127,7 @@ const RegisterPage: React.FC = () => {
       <SnakeGameBackground />
 
       {/* Контент с формой регистрации */}
-      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Карта регистрации с прозрачностью для лучшей интеграции с фоном */}
           <div className="bg-[#19172D]/80 backdrop-blur-sm border border-cyan-400/30 rounded-2xl p-8 shadow-2xl">

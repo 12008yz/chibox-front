@@ -300,8 +300,11 @@ const SlotPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen text-white relative">
+      {/* Фиксированный фон на весь экран */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 to-gray-800 -z-50" />
+
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Простой заголовок */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-4">

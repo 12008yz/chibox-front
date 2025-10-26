@@ -995,13 +995,23 @@ const UpgradePage: React.FC = () => {
   };
 
   return (
-    <div
-      className="min-h-screen text-white bg-cover bg-center bg-no-repeat bg-fixed pt-32"
-      style={{ backgroundImage: 'url(https://s.iimg.su/s/25/uR0XDDXx5zfcmyKF9K872YIjR6O2hf8Zuwf7eiy1.png)' }}
-    >
+    <div className="min-h-screen text-white relative">
       <ScrollToTopOnMount />
 
-      <div className="container mx-auto px-4 py-8">
+      {/* Фиксированный фон на весь экран */}
+      <div
+        className="fixed inset-0 -z-50"
+        style={{
+          backgroundImage: 'url(https://s.iimg.su/s/25/uR0XDDXx5zfcmyKF9K872YIjR6O2hf8Zuwf7eiy1.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+      {/* Затемняющий оверлей */}
+      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80 -z-40"></div>
+
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Заголовок */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center space-x-3 mb-4">

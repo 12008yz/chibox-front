@@ -373,19 +373,24 @@ const ExchangePage: React.FC = () => {
   const rarities = ['all', 'consumer', 'industrial', 'milspec', 'restricted', 'classified', 'covert'];
 
   return (
-    <div
-      className="min-h-screen text-white bg-cover bg-center bg-no-repeat bg-fixed relative"
-      style={{
-        backgroundImage: 'url(https://s.iimg.su/s/25/uID9oPZxlmOW7ju3ljwd5sBYfkM8sSpC1uZqkrvP.png)',
-        backgroundColor: '#151225'
-      }}
-    >
-      {/* Полупрозрачный оверлей для читаемости */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
+    <div className="min-h-screen text-white relative">
+      {/* Фиксированный фон на весь экран */}
+      <div
+        className="fixed inset-0 -z-50"
+        style={{
+          backgroundImage: 'url(https://s.iimg.su/s/25/uID9oPZxlmOW7ju3ljwd5sBYfkM8sSpC1uZqkrvP.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#151225'
+        }}
+      />
+      {/* Затемняющий оверлей */}
+      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 -z-40"></div>
 
       <ScrollToTopOnMount />
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Простой игровой заголовок */}
         <div className="text-center mb-8 backdrop-blur-sm bg-black/20 rounded-xl p-6">
           <div className="inline-flex items-center space-x-3 mb-4">
@@ -409,7 +414,7 @@ const ExchangePage: React.FC = () => {
         <div className="backdrop-blur-md bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 rounded-xl border border-purple-500/30 p-6 mb-8">
           {/* Статистика игрока */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="backdrop-blur-sm bg-black/40 rounded-lg p-4 border border-green-500/50">
+            <div className="rounded-lg p-4 border border-green-500/50">
               <div className="flex items-center space-x-3">
                 <div className="text-green-400 text-2xl">💰</div>
                 <div>
@@ -421,7 +426,7 @@ const ExchangePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="backdrop-blur-sm bg-black/40 rounded-lg p-4 border border-purple-500/50">
+            <div className="rounded-lg p-4 border border-purple-500/50">
               <div className="flex items-center space-x-3">
                 <div className="text-purple-400 text-2xl">⭐</div>
                 <div>
@@ -437,7 +442,7 @@ const ExchangePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-black/30 rounded-lg p-4 border border-orange-500/50">
+            <div className="rounded-lg p-4 border border-orange-500/50">
               <div className="flex items-center space-x-3">
                 <div className="text-orange-400 text-2xl">🔄</div>
                 <div>
@@ -516,7 +521,7 @@ const ExchangePage: React.FC = () => {
 
         {/* Расширенная информация о тарифах (скрываемая) */}
         {showExchangeInfo && (
-          <div className="mb-6 backdrop-blur-md bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
+          <div className="mb-6 rounded-xl p-6 border border-amber-500/30 animate-in slide-in-from-top duration-300">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h4 className="text-amber-300 font-semibold text-lg mb-2">{t('exchange.exchange_rates_title')}</h4>
@@ -533,24 +538,24 @@ const ExchangePage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="backdrop-blur-sm bg-black/30 rounded-lg p-4">
+              <div className="rounded-lg p-4 border border-blue-500/30">
                 <h5 className="text-blue-300 font-medium mb-2">{t('exchange.tier_1_title')}</h5>
                 <p className="text-white text-lg font-bold">{t('exchange.tier_1_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_1_description')}</p>
               </div>
-              <div className="backdrop-blur-sm bg-black/30 rounded-lg p-4">
+              <div className="rounded-lg p-4 border border-purple-500/30">
                 <h5 className="text-purple-300 font-medium mb-2">{t('exchange.tier_2_title')}</h5>
                 <p className="text-white text-lg font-bold">{t('exchange.tier_2_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_2_description')}</p>
               </div>
-              <div className="bg-black/20 rounded-lg p-4 border border-yellow-500/30">
+              <div className="rounded-lg p-4 border border-yellow-500/30">
                 <h5 className="text-yellow-300 font-medium mb-2">{t('exchange.tier_3_title')}</h5>
                 <p className="text-white text-lg font-bold">{t('exchange.tier_3_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_3_description')}</p>
               </div>
             </div>
 
-            <div className="mt-4 p-4 backdrop-blur-sm bg-purple-600/20 rounded-lg">
+            <div className="mt-4 p-4 rounded-lg border border-purple-500/30">
               <h6 className="text-purple-300 font-medium mb-2">{t('exchange.important_conditions')}</h6>
               <ul className="text-sm text-gray-300 space-y-1">
                 <li>• {t('exchange.min_exchange_price', { price: minExchangePrice })}</li>

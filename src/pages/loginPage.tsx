@@ -42,7 +42,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151225] gaming-font relative overflow-hidden">
+    <div className="min-h-screen gaming-font relative overflow-hidden">
+      {/* Фиксированный фон на весь экран */}
+      <div className="fixed inset-0 bg-[#151225] -z-50" />
+
       <ScrollToTopOnMount />
 
       {/* Фоновая игра в змейку */}
