@@ -10,6 +10,7 @@ import {
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import { BACKGROUNDS } from '../utils/config';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (

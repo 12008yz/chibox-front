@@ -7,6 +7,7 @@ import TopPlayer from '../components/TopPlayer';
 import Player from '../components/Player';
 import Monetary from '../components/Monetary';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
+import { BACKGROUNDS } from '../utils/config';
 
 interface User {
   user_id: string;
@@ -137,7 +138,7 @@ const LeaderboardPage: React.FC = () => {
       {/* Фон */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0a0a0f]">
         <img
-          src="https://s.iimg.su/s/23/uw4EGEzxUNnKG5YI8urY6nXDol9MgLXDlSgczEqS.png"
+          src={BACKGROUNDS.leaderboard}
           alt=""
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover"
           style={{

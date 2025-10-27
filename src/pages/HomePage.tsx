@@ -13,7 +13,7 @@ import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import RouletteGame from '../components/RouletteGame';
 import { formatDaysI18n } from '../utils/declension';
-
+import { BACKGROUNDS } from '../utils/config';
 
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
@@ -284,7 +284,7 @@ const HomePage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(https://s.iimg.su/s/22/uJDay5Ux8rop1XNmC5q3906RrnzKbXeGscO48PZ6.jpg)',
+          backgroundImage: `url(${BACKGROUNDS.home})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

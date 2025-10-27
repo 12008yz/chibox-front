@@ -13,6 +13,7 @@ import Monetary from '../components/Monetary';
 import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import { BACKGROUNDS } from '../utils/config';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -378,7 +379,7 @@ const ExchangePage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(https://s.iimg.su/s/25/uID9oPZxlmOW7ju3ljwd5sBYfkM8sSpC1uZqkrvP.png)',
+          backgroundImage: `url(${BACKGROUNDS.exchange})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
