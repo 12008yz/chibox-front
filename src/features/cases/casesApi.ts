@@ -27,6 +27,7 @@ export const casesApi = baseApi.injectEndpoints({
     }>, void>({
       query: () => 'v1/cases',
       providesTags: ['Cases', 'CaseTemplates'],
+      keepUnusedDataFor: 0, // Не кэшировать данные
     }),
 
     // Получение истории кейсов пользователя

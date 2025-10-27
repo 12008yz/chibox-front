@@ -103,6 +103,9 @@ export function getItemImageUrl(imageUrl: string | null | undefined, fallbackNam
   return getDefaultItemImage(fallbackName);
 }
 
+// Версия для кэша изображений (изменяйте это число при обновлении изображений)
+const CACHE_VERSION = '2';
+
 // Функция для получения изображения кейса (всегда с бэкенда)
 export function getCaseImageUrl(imageUrl: string | null | undefined): string {
   if (!imageUrl) {
@@ -117,7 +120,9 @@ export function getCaseImageUrl(imageUrl: string | null | undefined): string {
 
   // Если это относительный путь, получаем с бэкенда
   const backendUrl = getBackendImageUrl(imageUrl);
-  return backendUrl || imageUrl;
+  // Добавляем версию для избежания кэширования браузера при обновлении изображений
+  const finalUrl = backendUrl || imageUrl;
+  return finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'v=' + CACHE_VERSION;
 }
 
 // Функция для получения дефолтного изображения предмета
