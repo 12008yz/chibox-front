@@ -31,7 +31,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 3.0,
       max_daily_cases: 1,
-      icon: 'https://tempfile.aiquickdraw.com/s/dea2b80d489c496abc9d784eaf7cc3de_0_1760992330_2259.png',
+      icon: '/images/status.png',
       color: 'from-gray-400 to-gray-600',
       badge: 'Базовый',
       features: [
@@ -50,7 +50,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 5.0,
       max_daily_cases: 1,
-      icon: 'https://tempfile.aiquickdraw.com/s/4264270fdf0d4af48ab8286fe891b48f_0_1760992710_3054.png',
+      icon: '/images/status+.png',
       color: 'from-blue-400 to-purple-600',
       badge: 'Популярный',
       features: [
@@ -70,7 +70,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 8.0,
       max_daily_cases: 1,
-      icon: 'https://tempfile.aiquickdraw.com/s/caa7ebeaac1b463494b16610ba10ce35_0_1760992446_4828.png',
+      icon: '/images/status++.png',
       color: 'from-yellow-400 to-red-500',
       badge: 'Премиум',
       features: [

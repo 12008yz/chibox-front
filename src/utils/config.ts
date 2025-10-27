@@ -3,10 +3,10 @@ export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost
 
 // URL для фоновых изображений
 export const BACKGROUNDS = {
-  home: `${BACKEND_URL}/images/backgrounds/background.jpg`,
-  exchange: `${BACKEND_URL}/images/backgrounds/exchange-bg.png`,
-  upgrade: `${BACKEND_URL}/images/backgrounds/upgrade-bg.png`,
-  leaderboard: `${BACKEND_URL}/images/backgrounds/leaderboard-img.png`,
+  home: '/images/home.jpg',
+  exchange: '/images/exscange.png',
+  upgrade: '/images/upgrade.png',
+  leaderboard: '/images/liders.png',
 };
 
 // Для отладки
