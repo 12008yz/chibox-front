@@ -1,5 +1,22 @@
 // Утилита для работы с изображениями Steam Market
 
+// Базовый URL бэкенда для получения изображений
+const BACKEND_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+
+// Функция для получения полного URL изображения с бэкенда
+export function getBackendImageUrl(imagePath: string | null | undefined): string | null {
+  if (!imagePath) return null;
+
+  // Если это уже полный URL (начинается с http:// или https://)
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+
+  // Если это относительный путь, добавляем базовый URL
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  return `${BACKEND_URL}${cleanPath}`;
+}
+
 // Функция для извлечения market_hash_name из URL страницы Steam Market
 export function extractMarketHashName(marketUrl: string): string | null {
   try {
@@ -74,8 +91,33 @@ export function getItemImageUrl(imageUrl: string | null | undefined, fallbackNam
     return imageUrl;
   }
 
+  // Если это относительный путь (например /images/cases/free.png), получаем с бэкенда
+  if (imageUrl.startsWith('/')) {
+    const backendUrl = getBackendImageUrl(imageUrl);
+    if (backendUrl) {
+      return backendUrl;
+    }
+  }
+
   // Возвращаем дефолтное изображение
   return getDefaultItemImage(fallbackName);
+}
+
+// Функция для получения изображения кейса (всегда с бэкенда)
+export function getCaseImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) {
+    // Дефолтное изображение для кейса
+    return getBackendImageUrl('/images/cases/free.png') || '/images/cases/free.png';
+  }
+
+  // Если это полный URL, возвращаем как есть
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // Если это относительный путь, получаем с бэкенда
+  const backendUrl = getBackendImageUrl(imageUrl);
+  return backendUrl || imageUrl;
 }
 
 // Функция для получения дефолтного изображения предмета

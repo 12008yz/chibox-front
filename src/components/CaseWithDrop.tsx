@@ -1,6 +1,6 @@
 import React from 'react';
 import type { UserInventoryItem, CaseTemplate } from '../types/api';
-import { getItemImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, getCaseImageUrl } from '../utils/steamImageUtils';
 import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 
@@ -57,7 +57,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
 
   const rawCaseName = caseTemplate?.name || `${t('profile.case_label')} #${droppedItem.case_template_id?.slice(0, 8) || 'unknown'}`;
   const caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
-  const caseImageUrl = caseTemplate?.image_url;
+  const caseImageUrl = getCaseImageUrl(caseTemplate?.image_url);
 
   // Получаем корректный URL изображения предмета
   const itemImageUrl = getItemImageUrl(droppedItem.item.image_url, droppedItem.item.name);

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 import CaseTimer from './CaseTimer';
+import { getCaseImageUrl } from '../utils/steamImageUtils';
 
 interface CaseProps {
   title: string;
@@ -50,8 +51,13 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
     return defaultCaseImages[Math.abs(hash) % defaultCaseImages.length];
   }, [title]);
 
-  // Определяем, используется ли дефолтное изображение
-  const usingDefaultImage = !image || image.trim() === '' || imageError;
+  // Получаем правильный URL изображения кейса (с бэкенда или Steam)
+  const caseImageUrl = useMemo(() => {
+    if (!image || image.trim() === '' || imageError) {
+      return defaultImage;
+    }
+    return getCaseImageUrl(image);
+  }, [image, imageError, defaultImage]);
 
   return (
     <div
@@ -80,12 +86,12 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         )}
 
         <img
-          src={usingDefaultImage ? defaultImage : image}
+          src={caseImageUrl}
           alt={title}
           className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 relative z-10 ${loaded ? '' : 'hidden'}`}
           onLoad={() => setLoaded(true)}
           onError={() => {
-            if (!usingDefaultImage && !imageError) {
+            if (!imageError) {
               setImageError(true);
             }
           }}

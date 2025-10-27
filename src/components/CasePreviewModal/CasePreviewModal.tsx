@@ -11,6 +11,7 @@ import { ModalFooter } from './components/ModalFooter';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
+import { getCaseImageUrl } from '../../utils/steamImageUtils';
 
 // Добавляем стили в head только один раз
 injectStyles();
@@ -534,7 +535,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   if (!isVisible) return null;
 
   const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
-    ? caseData.image_url
+    ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
   return (
