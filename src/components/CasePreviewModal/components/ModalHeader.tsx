@@ -23,8 +23,8 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
             {fixedPrices ? (
               <span className="text-yellow-400 font-bold">
                 {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
-                  ? '499₽'
-                  : '99₽'
+                  ? <Monetary value={499} />
+                  : <Monetary value={99} />
                 }
               </span>
             ) : (

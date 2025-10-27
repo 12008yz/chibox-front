@@ -417,7 +417,9 @@ const ExchangePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="rounded-lg p-4 border border-green-500/50">
               <div className="flex items-center space-x-3">
-                <div className="text-green-400 text-2xl">💰</div>
+                <div className="text-green-400 text-2xl">
+                  <img src="/images/chiCoin.png" alt="chiCoin" className="w-8 h-8" />
+                </div>
                 <div>
                   <div className="text-green-400 text-sm font-medium">{t('exchange.balance')}</div>
                   <div className="text-white text-xl font-bold">

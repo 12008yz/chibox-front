@@ -32,7 +32,7 @@ const Monetary: React.FC<MonetaryProps> = ({
       <span className="inline-flex items-center gap-1">
         <span className="font-semibold">{formattedValue}</span>
         <img
-          src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+          src="/images/chiCoin.png"
           alt="chicoins"
           className="w-5 h-5 inline-block object-contain"
         />
@@ -44,7 +44,7 @@ const Monetary: React.FC<MonetaryProps> = ({
     <span className="inline-flex items-center gap-1">
       <span className="font-semibold">{formattedValue}</span>
       <img
-        src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+        src="/images/chiCoin.png"
         alt={currency}
         className="w-5 h-5 inline-block object-contain"
       />

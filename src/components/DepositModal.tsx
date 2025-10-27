@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { FaTimes, FaWallet, FaCreditCard, FaBitcoin, FaEthereum, FaCrown, FaCoins } from 'react-icons/fa';
+import { FaTimes, FaWallet, FaCreditCard, FaBitcoin, FaEthereum, FaCrown } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
 import { SiTether, SiBinance, SiDogecoin, SiLitecoin, SiTon, SiPolygon } from 'react-icons/si';
 import toast from 'react-hot-toast';
@@ -392,7 +392,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 : 'bg-gray-800/30 text-gray-400 hover:text-white hover:bg-gray-700/40 border-2 border-transparent'
             }`}
           >
-            <FaCoins className="text-xl" />
+            <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
             <span>Баланс</span>
           </button>
           <button
@@ -534,8 +534,9 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
             {/* Amount Input */}
             <div>
-              <label className="text-sm font-semibold text-gray-300 mb-2 block">
-                💰 Сумма пополнения (RUB)
+              <label className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-1">
+                <img src="/images/chiCoin.png" alt="chiCoin" className="w-4 h-4 inline-block" />
+                Сумма пополнения (RUB)
               </label>
               <div className="flex items-center bg-gray-900/70 border-2 border-gray-600 rounded-lg px-4 py-3 focus-within:border-yellow-500 focus-within:ring-2 focus-within:ring-yellow-500/20 transition-all">
                 <span className="text-3xl mr-3">💵</span>

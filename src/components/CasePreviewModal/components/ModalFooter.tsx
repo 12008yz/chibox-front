@@ -68,9 +68,12 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                 </div>
                 {paymentMethod === 'balance' && userData && (
                   <div className="flex items-center space-x-1 text-xs">
-                    <span className="text-gray-400">💰 Баланс:</span>
+                    <span className="text-gray-400 flex items-center gap-1">
+                      <img src="/images/chiCoin.png" alt="chiCoin" className="w-4 h-4 inline-block" />
+                      Баланс:
+                    </span>
                     <span className={`font-bold ${(userData.balance || 0) < getCasePrice(caseData) ? 'text-red-400' : 'text-green-400'}`}>
-                      {userData.balance || 0}₽
+                      <Monetary value={userData.balance || 0} />
                     </span>
                   </div>
                 )}
@@ -103,18 +106,18 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                     ) : !hasEnoughBalance && paymentMethod === 'balance' ? (
                       <>
                         <span className="text-red-100">💳 Недостаточно средств</span>
-                        <span className="text-yellow-400 font-bold">{price}₽</span>
+                        <span className="text-yellow-400 font-bold"><Monetary value={price} /></span>
                       </>
                     ) : (
                       <>
                         <span>{paymentMethod === 'bank_card' ? t('case_preview_modal.buy') : t('case_preview_modal.open')}</span>
-                        <span className="text-yellow-400 font-bold">{price}₽</span>
+                        <span className="text-yellow-400 font-bold"><Monetary value={price} /></span>
                       </>
                     )}
                   </button>
                   {!hasEnoughBalance && paymentMethod === 'balance' && (
-                    <div className="text-xs text-red-400 bg-red-900/20 px-3 py-1 rounded border border-red-500/30">
-                      ⚠️ Не хватает {price - (userData?.balance || 0)}₽
+                    <div className="text-xs text-red-400 bg-red-900/20 px-3 py-1 rounded border border-red-500/30 flex items-center gap-1">
+                      ⚠️ Не хватает <Monetary value={price - (userData?.balance || 0)} />
                     </div>
                   )}
                 </div>
@@ -161,8 +164,8 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                         )}
                       </button>
                       {!hasEnoughBalance && paymentMethod === 'balance' && (
-                        <div className="text-xs text-red-400 bg-red-900/20 px-3 py-1 rounded border border-red-500/30">
-                          ⚠️ Не хватает {price - (userData?.balance || 0)}₽
+                        <div className="text-xs text-red-400 bg-red-900/20 px-3 py-1 rounded border border-red-500/30 flex items-center gap-1">
+                          ⚠️ Не хватает <Monetary value={price - (userData?.balance || 0)} />
                         </div>
                       )}
                     </div>

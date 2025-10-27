@@ -1,4 +1,3 @@
-import { BsCoin } from "react-icons/bs";
 import { GiUpgrade } from "react-icons/gi";
 import { MdOutlineSell } from "react-icons/md";
 import { SlPlane } from "react-icons/sl";
@@ -58,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
         {
             name: t('header.coin_flip'),
             path: "/leaderboard",
-            icon: <BsCoin className="text-2xl" />,
+            icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />,
         },
         {
             name: t('header.crash'),

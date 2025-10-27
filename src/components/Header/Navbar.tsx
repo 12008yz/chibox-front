@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import React from "react";
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSell } from "react-icons/md";
-import { BsCoin } from "react-icons/bs";
 import { SlPlane } from "react-icons/sl";
 import { GiUpgrade } from 'react-icons/gi';
 import { TbCat } from "react-icons/tb";
@@ -53,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({
     },
     {
       to: "/leaderboard",
-      icon: <BsCoin className="text-xl" />,
+      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />,
       label: t('header.leaderboard_table'),
       color: "from-yellow-400 to-orange-500"
     }

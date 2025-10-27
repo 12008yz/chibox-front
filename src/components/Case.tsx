@@ -104,8 +104,8 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
               {title.toLowerCase().includes('premium') || title.toLowerCase().includes('премиум')
-                ? '499₽'
-                : '99₽'
+                ? <Monetary value={499} />
+                : <Monetary value={99} />
               }
             </span>
           ) : (

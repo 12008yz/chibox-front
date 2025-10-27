@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
+import Monetary from './Monetary';
 
 interface LiveDropItemProps {
   drop: LiveDropData;
@@ -199,7 +200,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           {/* Цена */}
           <div className="flex items-center justify-center">
             <span className="text-sm font-bold text-green-400">
-              {drop.item.price.toFixed(0)}₽
+              <Monetary value={drop.item.price} iconSize="xs" />
             </span>
           </div>
         </div>

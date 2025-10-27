@@ -99,7 +99,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
-      icon: <FaCoins className="text-2xl" />,
+      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-8 h-8" />,
       color: 'from-pink-400 to-rose-500',
       available: subscriptionTier >= 1,
       action: () => navigate('/exchange')
@@ -117,13 +117,13 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       label: t('common.balance'),
       value: <Monetary value={user.balance || 0} />,
-      icon: <FaCoins className="text-yellow-400" />,
+      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />,
       color: 'text-yellow-400'
     },
     {
       label: t('public_profile.total_value'),
       value: <Monetary value={user.total_items_value || 0} />,
-      icon: <FaCoins className="text-emerald-400" />,
+      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />,
       color: 'text-emerald-400'
     },
     {

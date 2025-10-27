@@ -223,7 +223,9 @@ const RegisterPage: React.FC = () => {
               {/* Простой превью функций */}
               <div className="grid grid-cols-3 gap-3 my-6">
                 <div className="text-center p-3 bg-cyan-500/10 border border-cyan-400/30 rounded-xl">
-                  <div className="text-cyan-400 text-xl mb-2">💰</div>
+                  <div className="text-cyan-400 text-xl mb-2 flex justify-center">
+                    <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />
+                  </div>
                   <div className="text-xs text-cyan-300/80 font-medium">{t('auth.bonuses')}</div>
                 </div>
                 <div className="text-center p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl">
