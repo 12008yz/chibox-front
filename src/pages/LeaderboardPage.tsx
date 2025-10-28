@@ -209,6 +209,7 @@ const LeaderboardPage: React.FC = () => {
                       score: getScoreValue(leaderboardData.leaderboard[1])
                     }}
                     rank={2}
+                    leaderboardType={leaderboardData.type}
                   />
                 )}
                 {leaderboardData.leaderboard[0] && (
@@ -222,6 +223,7 @@ const LeaderboardPage: React.FC = () => {
                       score: getScoreValue(leaderboardData.leaderboard[0])
                     }}
                     rank={1}
+                    leaderboardType={leaderboardData.type}
                   />
                 )}
                 {leaderboardData.leaderboard[2] && (
@@ -235,6 +237,7 @@ const LeaderboardPage: React.FC = () => {
                       score: getScoreValue(leaderboardData.leaderboard[2])
                     }}
                     rank={3}
+                    leaderboardType={leaderboardData.type}
                   />
                 )}
               </div>

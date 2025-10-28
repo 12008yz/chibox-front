@@ -15,9 +15,10 @@ interface User {
 interface TopPlayerProps {
   user: User | null;
   rank: number;
+  leaderboardType?: string;
 }
 
-const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank }) => {
+const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) => {
   if (!user) return null;
 
   const getScore = () => {
@@ -34,7 +35,11 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank }) => {
           </span>
         </div>
         <div className="text-gray-400 truncate mt-6">
-          <Monetary value={getScore()} />
+          {leaderboardType === 'most_expensive_item' ? (
+            <Monetary value={getScore()} />
+          ) : (
+            <span className="font-semibold">{getScore()}</span>
+          )}
         </div>
       </div>
 

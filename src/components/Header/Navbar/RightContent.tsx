@@ -115,9 +115,6 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Баланс */}
       <div className="gaming-balance-container">
         <div className="flex items-center space-x-2">
-          <div className="gaming-coin-icon">
-            <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
-          </div>
           <div className="flex flex-col">
             <div className="gaming-balance-value">
               <Monetary value={user?.balance ?? 0} />
