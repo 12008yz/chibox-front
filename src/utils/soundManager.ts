@@ -1,6 +1,7 @@
 // Менеджер звуков для приложения
 class SoundManager {
   private sounds: Map<string, HTMLAudioElement> = new Map();
+  private activeClones: Set<HTMLAudioElement> = new Set(); // Отслеживаем все активные клоны
   private soundsEnabled: boolean = true;
   private volume: number = 0.5;
   private audioContext: AudioContext | null = null;
@@ -171,6 +172,16 @@ class SoundManager {
       clone.volume = this.volume;
       clone.loop = loop;
 
+      // Добавляем клон в Set для отслеживания
+      this.activeClones.add(clone);
+
+      // Удаляем клон из Set когда он закончится (если не зациклен)
+      if (!loop) {
+        clone.addEventListener('ended', () => {
+          this.activeClones.delete(clone);
+        }, { once: true });
+      }
+
       const playPromise = clone.play();
 
       if (playPromise !== undefined) {
@@ -179,6 +190,9 @@ class SoundManager {
             console.log(`🔊 SoundManager: Воспроизведен звук "${soundKey}"${loop ? ' (зациклен)' : ''}`);
           })
           .catch(error => {
+            // Если не удалось воспроизвести, удаляем из активных
+            this.activeClones.delete(clone);
+
             if (error.name === 'NotAllowedError') {
               console.warn(`🔇 SoundManager: Браузер блокирует автовоспроизведение "${soundKey}". Требуется взаимодействие пользователя.`);
               if (!this.unlocked) {
@@ -199,6 +213,8 @@ class SoundManager {
   // Остановка всех звуков
   stopAll() {
     console.log('🔊 SoundManager: Остановка всех звуков');
+
+    // Останавливаем оригинальные звуки
     this.sounds.forEach((sound, key) => {
       try {
         sound.pause();
@@ -207,6 +223,20 @@ class SoundManager {
         console.warn(`🔇 SoundManager: Не удалось остановить звук "${key}"`, error);
       }
     });
+
+    // Останавливаем все активные клоны
+    this.activeClones.forEach((clone) => {
+      try {
+        clone.pause();
+        clone.currentTime = 0;
+      } catch (error) {
+        console.warn(`🔇 SoundManager: Не удалось остановить клон`, error);
+      }
+    });
+
+    // Очищаем Set активных клонов
+    this.activeClones.clear();
+    console.log('🔊 SoundManager: Все звуки и клоны остановлены');
   }
 
   // Проверка статуса загрузки звуков

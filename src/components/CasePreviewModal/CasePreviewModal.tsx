@@ -47,6 +47,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const animationTimoutsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех таймаутов анимации
+  const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
   const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
@@ -98,6 +100,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowOpeningAnimation(false);
       setAnimationPhase('idle');
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
+      // Очищаем все таймауты и интервалы анимации при закрытии
+      animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      animationTimoutsRef.current = [];
+      animationIntervalsRef.current.forEach(interval => clearInterval(interval));
+      animationIntervalsRef.current = [];
       document.body.style.overflow = 'unset';
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -115,6 +122,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      // Очищаем все таймауты и интервалы анимации
+      animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      animationTimoutsRef.current = [];
+      animationIntervalsRef.current.forEach(interval => clearInterval(interval));
+      animationIntervalsRef.current = [];
     };
   }, []);
 
@@ -207,6 +219,25 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Улучшенная анимация открытия с fake slowdown
   const startAnimation = useCallback((wonItem: any) => {
+    // Очищаем все предыдущие таймауты и интервалы перед началом новой анимации
+    animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
+    animationTimoutsRef.current = [];
+    animationIntervalsRef.current.forEach(interval => clearInterval(interval));
+    animationIntervalsRef.current = [];
+
+    // Вспомогательные функции для отслеживания таймаутов и интервалов
+    const trackTimeout = (callback: () => void, delay: number) => {
+      const timeout = setTimeout(callback, delay);
+      animationTimoutsRef.current.push(timeout);
+      return timeout;
+    };
+
+    const trackInterval = (callback: () => void, delay: number) => {
+      const interval = setInterval(callback, delay);
+      animationIntervalsRef.current.push(interval);
+      return interval;
+    };
+
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
     setShowStrikeThrough(false);
@@ -272,13 +303,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setSliderPosition(currentItemInFullList);
 
         // Небольшая задержка перед началом wobbling для плавности
-        setTimeout(() => {
+        trackTimeout(() => {
           setAnimationPhase('wobbling');
 
           // Плавное перекатывание на следующий предмет (30%) и обратно
           let rollProgress = 0;
           const rollSteps = 60; // Увеличили количество шагов для более медленной анимации
-          const rollInterval = setInterval(() => {
+          const rollInterval = trackInterval(() => {
             rollProgress++;
 
             // Создаем плавную кривую: 0 -> 0.3 -> 0
@@ -307,27 +338,32 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
             if (rollProgress >= rollSteps) {
               clearInterval(rollInterval);
+              // Удаляем интервал из массива отслеживания
+              const index = animationIntervalsRef.current.indexOf(rollInterval);
+              if (index > -1) {
+                animationIntervalsRef.current.splice(index, 1);
+              }
               setSliderOffset(0);
               setAnimationPhase('falling');
 
               // Быстрое падение на выигрышный предмет
-              setTimeout(() => {
+              trackTimeout(() => {
                 const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
                 setSliderPosition(wonItemInFullList);
                 setAnimationPhase('stopped');
 
                 // Крутая последовательность эффектов выигрыша
-                setTimeout(() => {
+                trackTimeout(() => {
                   soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
                   setShowWinEffects(true);
                 }, 300);
-                setTimeout(() => setShowGoldenSparks(true), 800);
-                setTimeout(() => {
+                trackTimeout(() => setShowGoldenSparks(true), 800);
+                trackTimeout(() => {
                   if (caseData.id === "44444444-4444-4444-4444-444444444444") {
                     setShowStrikeThrough(true);
                   }
                 }, 1500);
-                setTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+                trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
               }, 200);
             }
           }, 25); // 25ms между шагами (60 шагов * 25ms = 1.5 секунды)
@@ -342,17 +378,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setAnimationPhase('stopped');
 
         // Крутая последовательность эффектов выигрыша
-        setTimeout(() => {
+        trackTimeout(() => {
           soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
           setShowWinEffects(true);
         }, 300); // Вспышка и круги
-        setTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
-        setTimeout(() => {
+        trackTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
+        trackTimeout(() => {
           if (caseData.id === "44444444-4444-4444-4444-444444444444") {
             setShowStrikeThrough(true);
           }
         }, 1500);
-        setTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
         return;
       }
 
@@ -409,10 +445,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         currentSpeed = initialSpeed + (450 * easeInOutCubic(progress));
       }
 
-      setTimeout(animateSlider, currentSpeed);
+      trackTimeout(animateSlider, currentSpeed);
     };
 
-    setTimeout(() => animateSlider(), 500);
+    trackTimeout(() => animateSlider(), 500);
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]);
 
   const handleBuyCase = async () => {
