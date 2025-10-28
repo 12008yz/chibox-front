@@ -3,6 +3,7 @@ interface MonetaryProps {
   showFraction?: boolean;
   currency?: 'chicoins' | 'RUB' | 'USD' | 'EUR' | 'GBP' | 'CNY';
   showEquivalent?: boolean; // Показывать эквивалент в других валютах
+  iconSize?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 const CURRENCY_SYMBOLS = {
@@ -18,7 +19,8 @@ const Monetary: React.FC<MonetaryProps> = ({
   value,
   showFraction = false,
   currency = 'chicoins',
-  showEquivalent = false
+  showEquivalent = false,
+  iconSize = 'md'
 }) => {
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
 
@@ -27,6 +29,13 @@ const Monetary: React.FC<MonetaryProps> = ({
      maximumFractionDigits: showFraction ? 2 : 0
   }).format(value);
 
+  const sizeClasses = {
+    xs: 'w-3 h-3',
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6'
+  };
+
   if (currency === 'chicoins') {
     return (
       <span className="inline-flex items-center gap-1">
@@ -34,7 +43,7 @@ const Monetary: React.FC<MonetaryProps> = ({
         <img
           src="/images/chiCoin.png"
           alt="chicoins"
-          className="w-5 h-5 inline-block object-contain"
+          className={`${sizeClasses[iconSize]} inline-block object-contain`}
         />
       </span>
     );
@@ -46,7 +55,7 @@ const Monetary: React.FC<MonetaryProps> = ({
       <img
         src="/images/chiCoin.png"
         alt={currency}
-        className="w-5 h-5 inline-block object-contain"
+        className={`${sizeClasses[iconSize]} inline-block object-contain`}
       />
     </span>
   );
