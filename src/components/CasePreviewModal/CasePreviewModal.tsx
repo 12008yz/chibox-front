@@ -153,6 +153,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem]);
 
   const handleClose = () => {
+    // Останавливаем все звуки при закрытии
+    soundManager.stopAll();
     setIsAnimating(false);
     setTimeout(() => {
       setIsVisible(false);
@@ -190,6 +192,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShouldStopBetween(false);
     setIsProcessing(false);
 
+    // Останавливаем все звуки
+    soundManager.stopAll();
+
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
       animationTimeoutRef.current = null;
@@ -203,6 +208,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
     setShowWinEffects(false);
+
+    // Запускаем звук процесса
+    soundManager.play('process');
 
     // 25% шанс на fake slowdown
     const useFakeSlowdown = Math.random() < 0.25;
@@ -384,6 +392,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
       // Финальное замедление
       else {
+        if (animationPhase !== 'slowing') {
+          // Воспроизводим звук окончания процесса только один раз при переходе в slowing
+          soundManager.play('endProcess');
+        }
         setAnimationPhase('slowing');
         const stepsLeft = wonItemIndex - currentAvailablePosition;
         const progress = 1 - (stepsLeft / 8);

@@ -132,7 +132,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             if (result.game?.result === 'win') {
               soundManager.play('win');
               console.log('TicTacToeGame: Победа! Автоматический callback отключен для предотвращения закрытия окна.');
-            } else if (result.game?.result === 'loss') {
+            } else if (result.game?.result === 'lose') {
               soundManager.play('gameOver');
               console.log('TicTacToeGame: Результат игры:', result.game?.result);
             } else {
