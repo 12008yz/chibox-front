@@ -95,6 +95,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     } else {
       setIsAnimating(false);
       setIsProcessing(false);
+      setShowOpeningAnimation(false);
+      setAnimationPhase('idle');
+      soundManager.stopAll(); // Останавливаем все звуки при закрытии
       document.body.style.overflow = 'unset';
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -105,6 +108,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     return () => {
       document.body.style.overflow = 'unset';
+      soundManager.stopAll(); // Останавливаем все звуки при размонтировании
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
       }
