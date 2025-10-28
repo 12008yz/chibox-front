@@ -209,9 +209,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowGoldenSparks(false);
     setShowWinEffects(false);
 
-    // Запускаем звук процесса
-    soundManager.play('process');
-
     // 25% шанс на fake slowdown
     const useFakeSlowdown = Math.random() < 0.25;
     setShouldFakeSlowdown(useFakeSlowdown);
@@ -316,7 +313,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 setAnimationPhase('stopped');
 
                 // Крутая последовательность эффектов выигрыша
-                setTimeout(() => setShowWinEffects(true), 300);
+                setTimeout(() => {
+                  soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
+                  setShowWinEffects(true);
+                }, 300);
                 setTimeout(() => setShowGoldenSparks(true), 800);
                 setTimeout(() => {
                   if (caseData.id === "44444444-4444-4444-4444-444444444444") {
@@ -338,7 +338,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setAnimationPhase('stopped');
 
         // Крутая последовательность эффектов выигрыша
-        setTimeout(() => setShowWinEffects(true), 300); // Вспышка и круги
+        setTimeout(() => {
+          soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
+          setShowWinEffects(true);
+        }, 300); // Вспышка и круги
         setTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
         setTimeout(() => {
           if (caseData.id === "44444444-4444-4444-4444-444444444444") {
@@ -363,6 +366,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
 
       setSliderPosition(fullListPosition);
+
+      // Воспроизводим звук при каждой смене предмета, включая финальное замедление
+      // Последний звук будет совпадать с остановкой на выигрышном предмете
+      soundManager.play('process');
 
       // Логика fake slowdown
       if (useFakeSlowdown && currentAvailablePosition >= fakeSlowdownPoint && currentAvailablePosition < fakeSlowdownEnd && !hasFakeSlowedDown) {
@@ -392,10 +399,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
       // Финальное замедление
       else {
-        if (animationPhase !== 'slowing') {
-          // Воспроизводим звук окончания процесса только один раз при переходе в slowing
-          soundManager.play('endProcess');
-        }
         setAnimationPhase('slowing');
         const stepsLeft = wonItemIndex - currentAvailablePosition;
         const progress = 1 - (stepsLeft / 8);
