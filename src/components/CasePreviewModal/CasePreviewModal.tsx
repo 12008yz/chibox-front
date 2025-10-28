@@ -12,6 +12,7 @@ import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
 import { getCaseImageUrl } from '../../utils/steamImageUtils';
+import { soundManager } from '../../utils/soundManager';
 
 // Добавляем стили в head только один раз
 injectStyles();
@@ -505,6 +506,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       console.log('Отправка запроса на открытие кейса:', openCaseParams);
       console.log('userData:', { subscription_tier: userData?.subscription_tier, subscription_days_left: userData?.subscription_days_left });
+
+      // Звук открытия кейса
+      soundManager.play('openCase');
+
       const result = await openCase(openCaseParams).unwrap();
       console.log('Результат открытия кейса:', result);
 

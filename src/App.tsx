@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth, useAppDispatch } from './store/hooks';
+import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
 import { useEffect } from 'react';
-import './index.css'
+import './index.css';
+import { soundManager } from './utils/soundManager';
 
 // Импорты компонентов
 import Header from './components/Header';
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
   const { onlineUsers, isConnected } = useSocket();
+  const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
 
 
   // Проверяем, находимся ли мы на странице Steam авторизации
@@ -88,6 +90,11 @@ const App: React.FC = () => {
       dispatch(logout());
     }
   }, [userError, auth.token, shouldFetchUser, dispatch]);
+
+  // Синхронизация настройки звука с soundManager
+  useEffect(() => {
+    soundManager.setSoundsEnabled(soundsEnabled);
+  }, [soundsEnabled]);
 
   // Показываем загрузку только при первичной проверке токена
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {

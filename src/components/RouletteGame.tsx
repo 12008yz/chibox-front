@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Wheel } from 'react-custom-roulette';
 import { usePlayRouletteMutation } from '../features/user/userApi';
 import toast from 'react-hot-toast';
+import { soundManager } from '../utils/soundManager';
 
 // Конфигурация 9 секций рулетки (должна соответствовать серверу)
 const ROULETTE_SEGMENTS = [
@@ -130,6 +131,9 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         setPrizeNumber(winnerIndex);
         setMustSpin(true);
 
+        // Звук вращения
+        soundManager.play('process');
+
         // Сохраняем время следующей игры
         setNextPlayTime(response.next_time);
         localStorage.setItem('roulette_next_play_time', response.next_time);
@@ -165,6 +169,9 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
     // Показываем результат
     if (winnerSegment.type === 'empty') {
+      // Звук проигрыша
+      soundManager.play('lose');
+
       const randomLoseMessage = getRandomMessage(loseMessages);
       toast(randomLoseMessage, {
         icon: '😔',
@@ -176,6 +183,9 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         },
       });
     } else {
+      // Звук выигрыша
+      soundManager.play('win');
+
       const randomWinMessage = getRandomMessage(winMessages);
       const prizeText = winnerSegment.value === 1
         ? `1 ${t('time.day')}`

@@ -1,4 +1,5 @@
 import { JSX } from "react";
+import { soundManager } from "../utils/soundManager";
 
 interface MainButtonProps {
    text: string | JSX.Element;
@@ -12,7 +13,7 @@ interface MainButtonProps {
    pulse?: boolean;
    textSize?: string;
  }
- 
+
  const MainButton: React.FC<MainButtonProps> = ({
    text,
    onClick,
@@ -33,9 +34,16 @@ interface MainButtonProps {
      info: "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
      dark: "bg-gray-800 hover:bg-gray-900 focus:ring-gray-500",
    };
- 
+
    const pulseClass = pulse ? "animate-bounce " : "";
- 
+
+   const handleClick = () => {
+     if (!disabled && !loading) {
+       soundManager.play('click');
+       onClick();
+     }
+   };
+
    return (
      <button
        className={`flex items-center justify-center w-full h-10 ${colorClasses[type]}
@@ -43,7 +51,7 @@ interface MainButtonProps {
        text-white font-medium ${disabled ? "opacity-50 cursor-not-allowed" : pulseClass} ${
          textSize ? textSize : "md:text-lg"
        }`}
-       onClick={onClick}
+       onClick={handleClick}
        disabled={disabled}
        type={submit ? "submit" : "button"}
      >
@@ -59,6 +67,5 @@ interface MainButtonProps {
      </button>
    );
  };
- 
+
  export default MainButton;
- 

@@ -14,6 +14,7 @@ import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
+import { soundManager } from '../utils/soundManager';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -300,6 +301,8 @@ const ExchangePage: React.FC = () => {
 
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
+        // Звук продажи
+        soundManager.play('change');
         toast.success(t('exchange.sell_for', { price: Math.round(sellPrice) }) + ` - "${itemName}"`);
         // Принудительно обновляем инвентарь для ProfilePage
         setTimeout(() => {
@@ -352,6 +355,8 @@ const ExchangePage: React.FC = () => {
       }).unwrap();
 
       if (result.success) {
+        // Звук успешного обмена
+        soundManager.play('win');
         toast.success(
           <div>
             <div className="font-semibold">{t('common.success')}!</div>

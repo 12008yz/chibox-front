@@ -8,6 +8,7 @@ import type { SlotItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { t } from 'i18next';
 import CountdownTimer from '../components/CountdownTimer';
+import { soundManager } from '../utils/soundManager';
 
 // Функция для безопасного преобразования типов API в SlotItem
 const convertToSlotItem = (item: any): SlotItem => {
@@ -238,6 +239,9 @@ const SlotPage: React.FC = () => {
       setShowResult(false);
       setIsWinning(false);
 
+      // Звук вращения слота
+      soundManager.play('slotSpin');
+
       const response = await playSlot().unwrap();
 
       if (response.success && response.result) {
@@ -249,10 +253,14 @@ const SlotPage: React.FC = () => {
           setShowResult(true);
 
           if (response.result.isWin) {
+            // Звук выигрыша
+            soundManager.play('slotWin');
             toast.success(t('slots.game_result_congratulations', { itemName: response.result.wonItem?.name }), {
               duration: 5000,
             });
           } else {
+            // Звук проигрыша
+            soundManager.play('slotLose');
             toast(t('slots.game_result_no_luck'), { icon: '🎰' });
           }
         }, 4500); // Увеличили время для последнего барабана

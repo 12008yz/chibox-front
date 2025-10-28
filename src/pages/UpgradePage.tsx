@@ -11,6 +11,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
+import { soundManager } from '../utils/soundManager';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
@@ -913,6 +914,9 @@ const UpgradePage: React.FC = () => {
       // Устанавливаем флаг обработки перед началом запроса
       setIsProcessingUpgrade(true);
 
+      // Звук начала апгрейда
+      soundManager.play('upgrade');
+
       const result = await performUpgrade({
         sourceInventoryIds: selectedInventoryIds,
         targetItemId: selectedTargetItem
@@ -932,6 +936,13 @@ const UpgradePage: React.FC = () => {
       };
       setUpgradeResult(adaptedResult);
       setShowAnimation(true);
+
+      // Звук результата апгрейда
+      if (result.upgrade_success) {
+        setTimeout(() => soundManager.play('win'), 3000);
+      } else {
+        setTimeout(() => soundManager.play('horrorLose'), 3000);
+      }
 
 
 

@@ -5,6 +5,7 @@ import {
   useGetCurrentTicTacToeGameQuery,
   useMakeTicTacToeMoveMutation
 } from '../features/user/userApi';
+import { soundManager } from '../utils/soundManager';
 
 interface TicTacToeGameProps {
   isOpen: boolean;
@@ -105,6 +106,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     setSelectedCell(position);
     setAnimatingCells([position]);
 
+    // Звук клика
+    soundManager.play('click');
+
     try {
       const result = await makeMove({ position }).unwrap();
       if (result.success) {
@@ -124,9 +128,13 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             setShowResult(true);
             setIsProcessingResult(false);
 
-            // Если победа, логируем но НЕ вызываем автоматический callback
+            // Звуки результата
             if (result.game?.result === 'win') {
+              soundManager.play('win');
               console.log('TicTacToeGame: Победа! Автоматический callback отключен для предотвращения закрытия окна.');
+            } else if (result.game?.result === 'loss') {
+              soundManager.play('gameOver');
+              console.log('TicTacToeGame: Результат игры:', result.game?.result);
             } else {
               console.log('TicTacToeGame: Результат игры:', result.game?.result);
             }
