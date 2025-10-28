@@ -657,7 +657,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['TicTacToe'],
+      invalidatesTags: ['TicTacToe', 'Inventory', 'Cases'],
     }),
 
     // Upgrade API

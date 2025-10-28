@@ -562,8 +562,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       console.log('Отправка запроса на открытие кейса:', openCaseParams);
       console.log('userData:', { subscription_tier: userData?.subscription_tier, subscription_days_left: userData?.subscription_days_left });
 
-      // Звук открытия кейса
-      soundManager.play('openCase');
+      // Звук открытия кейса (не для ежедневного кейса)
+      const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444" || "11111111-1111-1111-1111-111111111111" || "22222222-2222-2222-2222-222222222222" || "33333333-3333-3333-3333-333333333333" || "55555555-5555-5555-5555-555555555555" || "66666666-6666-6666-6666-666666666666" || "77777777-7777-7777-7777-777777777777";
+      if (!isDailyCase) {
+        soundManager.play('openCase');
+      }
 
       const result = await openCase(openCaseParams).unwrap();
       console.log('Результат открытия кейса:', result);
