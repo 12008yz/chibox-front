@@ -140,8 +140,21 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
                       {/* Icon and Title */}
                       <div className="flex gap-3 mb-3">
-                        <div className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center text-3xl flex-shrink-0">
-                          🏆
+                        <div className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {achievement.icon_url ? (
+                            <img
+                              src={achievement.icon_url}
+                              alt={achievement.name}
+                              className="w-full h-full object-contain p-1"
+                              onError={(e) => {
+                                // Fallback to emoji if image fails to load
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement!.innerHTML = '<span class="text-3xl">🏆</span>';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-3xl">🏆</span>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0 pt-1">
                           <h4 className={`font-bold text-sm mb-1 leading-tight uppercase tracking-wide ${
