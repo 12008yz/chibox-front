@@ -47,7 +47,8 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
     category: ach.category || 'regular',
     badge_color: ach.badge_color || '#6B7280',
     is_completed: ach.completed,
-    current_progress: ach.progress || 0
+    current_progress: ach.progress || 0,
+    bonus_percentage: ach.bonus_percentage || 0.5
   }));
 
   return (
@@ -142,7 +143,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
           ) : achievementsProgress.length > 0 ? (
             <div className="p-6 max-h-[500px] overflow-y-auto custom-scrollbar">
               <div className="space-y-3">
-                {achievementsProgress.map((achievement, index) => {
+                {achievementsProgress.slice(0, 4).map((achievement, index) => {
                   // Проверяем, что achievement существует
                   if (!achievement) {
                     return null;
@@ -241,8 +242,8 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                 }).filter(Boolean)}
               </div>
 
-              {/* Кнопка "Посмотреть все" */}
-              <div className="px-6 pb-6 pt-2">
+              {/* Кнопка "Посмотреть все достижения" */}
+              <div className="pt-4">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
