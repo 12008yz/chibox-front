@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../../../../utils/imageUtils';
 
@@ -31,6 +31,20 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   loading = false
 }) => {
   const { t } = useTranslation();
+  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
+  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+
+  // Логирование при каждом рендере модального окна
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('🎯 AchievementsModal OPENED');
+      console.log('📊 Modal achievements data:', {
+        count: achievements.length,
+        loading: loading,
+        achievements: achievements
+      });
+    }
+  }, [isOpen, achievements, loading]);
 
   if (!isOpen) return null;
 
@@ -141,7 +155,19 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
                       {/* Icon and Title */}
                       <div className="flex gap-3 mb-3">
-                        <div className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div
+                          className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden relative cursor-pointer transition-all duration-200 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20"
+                          onMouseEnter={(e) => {
+                            if (achievement.icon_url) {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              setHoverPosition({ x: rect.right + 10, y: rect.top });
+                              setHoveredIcon(achievement.id);
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredIcon(null);
+                          }}
+                        >
                           {achievement.icon_url ? (
                             <img
                               src={(() => {
@@ -240,6 +266,34 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* Image Preview on Hover */}
+        {hoveredIcon && achievements.find(a => a.id === hoveredIcon)?.icon_url && (
+          <div
+            className="fixed pointer-events-none z-[200] transition-opacity duration-200"
+            style={{
+              left: `${hoverPosition.x}px`,
+              top: `${hoverPosition.y}px`,
+              opacity: hoveredIcon ? 1 : 0
+            }}
+          >
+            <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-blue-500 rounded-lg shadow-2xl shadow-blue-500/50 p-3 animate-in fade-in zoom-in-95 duration-200">
+              <img
+                src={getImageUrl(achievements.find(a => a.id === hoveredIcon)?.icon_url || '')}
+                alt="Preview"
+                className="w-48 h-48 object-contain"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))'
+                }}
+              />
+              <div className="mt-2 text-center">
+                <p className="text-white font-bold text-sm">
+                  {achievements.find(a => a.id === hoveredIcon)?.name}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

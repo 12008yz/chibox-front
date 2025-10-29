@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAchievements } from '../../hooks/useAchievements';
 import { getDaysDeclensionKey } from '../../../../utils/declension';
 import AchievementsModal from '../Modals/AchievementsModal';
+import { getImageUrl } from '../../../../utils/imageUtils';
 
 interface AchievementsCardProps {
   completedAchievementsCount: number;
@@ -28,6 +29,13 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
+    console.log('🎯 Opening Achievements Modal');
+    console.log('📊 Achievements data:', {
+      total: achievementsProgress.length,
+      completed: completedAchievementsCount,
+      loading: achievementsLoading,
+      achievements: achievementsProgress
+    });
     setIsModalOpen(true);
   };
 
@@ -36,20 +44,32 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
   };
 
   // Преобразуем данные для модального окна
-  const modalAchievements = achievementsProgress.map(ach => ({
-    id: ach.id,
-    name: ach.name,
-    description: ach.description,
-    xp_reward: ach.xp_reward || 0,
-    icon_url: ach.icon_url || '',
-    requirement_type: ach.requirement_type || '',
-    requirement_value: ach.target || 1,
-    category: ach.category || 'regular',
-    badge_color: ach.badge_color || '#6B7280',
-    is_completed: ach.completed,
-    current_progress: ach.progress || 0,
-    bonus_percentage: ach.bonus_percentage || 0.5
-  }));
+  const modalAchievements = achievementsProgress.map(ach => {
+    const transformed = {
+      id: ach.id,
+      name: ach.name,
+      description: ach.description,
+      xp_reward: ach.xp_reward || 0,
+      icon_url: ach.icon_url || '',
+      requirement_type: ach.requirement_type || '',
+      requirement_value: ach.target || 1,
+      category: ach.category || 'regular',
+      badge_color: ach.badge_color || '#6B7280',
+      is_completed: ach.completed,
+      current_progress: ach.progress || 0,
+      bonus_percentage: ach.bonus_percentage || 0.5
+    };
+
+    // Логируем данные для отладки
+    console.log('🖼️ Achievement icon data:', {
+      name: ach.name,
+      original_icon_url: ach.icon_url,
+      transformed_icon_url: transformed.icon_url,
+      all_data: ach
+    });
+
+    return transformed;
+  });
 
   return (
     <>
@@ -174,20 +194,52 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                       <div className="flex items-start gap-3">
                         {/* Achievement Icon */}
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
                             isCompleted
-                              ? 'bg-gradient-to-br from-green-500 to-green-600'
-                              : 'bg-gray-600/30'
+                              ? 'bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-500/30'
+                              : 'bg-gray-600/30 border border-gray-700/50'
                           }`}
                         >
-                          {isCompleted ? (
-                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
+                          {achievement.icon_url ? (
+                            <img
+                              src={(() => {
+                                const url = getImageUrl(achievement.icon_url);
+                                return url;
+                              })()}
+                              alt={achievement.name}
+                              className="w-full h-full object-contain p-1"
+                              onError={(e) => {
+                                // Fallback to checkmark/circle if image fails to load
+                                e.currentTarget.style.display = 'none';
+                                const parent = e.currentTarget.parentElement;
+                                if (parent && !parent.querySelector('svg')) {
+                                  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                                  svg.setAttribute('class', isCompleted ? 'w-5 h-5 text-white' : 'w-5 h-5 text-gray-400');
+                                  svg.setAttribute('fill', 'currentColor');
+                                  svg.setAttribute('viewBox', '0 0 20 20');
+                                  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                                  if (isCompleted) {
+                                    path.setAttribute('fill-rule', 'evenodd');
+                                    path.setAttribute('d', 'M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z');
+                                    path.setAttribute('clip-rule', 'evenodd');
+                                  } else {
+                                    path.setAttribute('d', 'M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z');
+                                  }
+                                  svg.appendChild(path);
+                                  parent.appendChild(svg);
+                                }
+                              }}
+                            />
                           ) : (
-                            <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
+                            isCompleted ? (
+                              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            )
                           )}
                         </div>
 
