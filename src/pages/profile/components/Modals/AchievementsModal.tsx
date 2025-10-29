@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from '../../../../utils/imageUtils';
 
 interface Achievement {
   id: string;
@@ -143,7 +144,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
                         <div className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {achievement.icon_url ? (
                             <img
-                              src={achievement.icon_url}
+                              src={getImageUrl(achievement.icon_url)}
                               alt={achievement.name}
                               className="w-full h-full object-contain p-1"
                               onError={(e) => {
