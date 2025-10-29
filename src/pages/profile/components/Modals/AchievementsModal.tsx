@@ -144,10 +144,26 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
                         <div className="w-16 h-16 bg-black/50 rounded border border-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
                           {achievement.icon_url ? (
                             <img
-                              src={getImageUrl(achievement.icon_url)}
+                              src={(() => {
+                                const url = getImageUrl(achievement.icon_url);
+                                console.log('🖼️ Achievement Image:', {
+                                  name: achievement.name,
+                                  originalPath: achievement.icon_url,
+                                  generatedURL: url
+                                });
+                                return url;
+                              })()}
                               alt={achievement.name}
                               className="w-full h-full object-contain p-1"
+                              onLoad={(e) => {
+                                console.log('✅ Image loaded successfully:', achievement.name, e.currentTarget.src);
+                              }}
                               onError={(e) => {
+                                console.error('❌ Image failed to load:', {
+                                  name: achievement.name,
+                                  src: e.currentTarget.src,
+                                  originalPath: achievement.icon_url
+                                });
                                 // Fallback to emoji if image fails to load
                                 e.currentTarget.style.display = 'none';
                                 e.currentTarget.parentElement!.innerHTML = '<span class="text-3xl">🏆</span>';
