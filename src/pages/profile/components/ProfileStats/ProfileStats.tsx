@@ -25,7 +25,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
   const achievementsProgress = achievementsProgressData?.success ? achievementsProgressData.data : [];
 
   // Общее количество достижений в системе (соответствует сидеру)
-  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 8;
+  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 23;
 
   // Завершенные достижения
   const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.completed).length;
