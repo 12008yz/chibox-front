@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAchievements } from '../../hooks/useAchievements';
 import { getDaysDeclensionKey } from '../../../../utils/declension';
+import AchievementsModal from '../Modals/AchievementsModal';
 
 interface AchievementsCardProps {
   completedAchievementsCount: number;
@@ -24,18 +25,51 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
     toggleAchievements
   } = useAchievements();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Преобразуем данные для модального окна
+  const modalAchievements = achievementsProgress.map(ach => ({
+    id: ach.id,
+    name: ach.name,
+    description: ach.description,
+    xp_reward: ach.xp_reward || 0,
+    icon_url: ach.icon_url || '',
+    requirement_type: ach.requirement_type || '',
+    requirement_value: ach.target || 1,
+    category: ach.category || 'regular',
+    badge_color: ach.badge_color || '#6B7280',
+    is_completed: ach.completed,
+    current_progress: ach.progress || 0
+  }));
+
   return (
-    <div
-      ref={achievementsRef}
-      data-achievements-section
-      className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-visible ${
-        isAchievementsExpanded
-          ? 'border-red-500/50 shadow-lg shadow-red-500/20'
-          : 'border-gray-700/30 hover:border-red-500/30'
-      }`}
-    >
-      {/* Main Achievement Card */}
-      <div className="p-6 cursor-pointer" onClick={toggleAchievements}>
+    <>
+      <AchievementsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        achievements={modalAchievements}
+        loading={achievementsLoading}
+      />
+
+      <div
+        ref={achievementsRef}
+        data-achievements-section
+        className={`relative bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl border transition-all duration-300 overflow-visible ${
+          isAchievementsExpanded
+            ? 'border-red-500/50 shadow-lg shadow-red-500/20'
+            : 'border-gray-700/30 hover:border-red-500/30'
+        }`}
+      >
+        {/* Main Achievement Card */}
+        <div className="p-6 cursor-pointer" onClick={toggleAchievements}>
         <div className="flex items-center gap-3 mb-2">
           <div className={`w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center transition-all duration-300 ${
             isAchievementsExpanded
@@ -206,6 +240,19 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                   );
                 }).filter(Boolean)}
               </div>
+
+              {/* Кнопка "Посмотреть все" */}
+              <div className="px-6 pb-6 pt-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal();
+                  }}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                >
+                  {t('achievements.view_all', 'Посмотреть все достижения')}
+                </button>
+              </div>
             </div>
           ) : (
             <div className="p-6 text-center">
@@ -220,6 +267,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -629,7 +629,80 @@
     "Иметь предмет с ценой выше 50,000 руб": {
       "name": "Expert",
       "description": "Have an item worth over 50,000 rubles"
-    }
+    },
+    "Обменник": {
+      "name": "Exchanger",
+      "description": "Exchange 5 items for subscription"
+    },
+    "Игрок в слоты": {
+      "name": "Slot Player",
+      "description": "Play slots 50 times"
+    },
+    "Легенда": {
+      "name": "Legend",
+      "description": "Get a legendary rarity item"
+    },
+    "Платиновый торговец": {
+      "name": "Platinum Trader",
+      "description": "Sell items for a total of 100,000 rubles"
+    },
+    "Мастер открытий": {
+      "name": "Master Opener",
+      "description": "Open 1,000 cases"
+    },
+    "Успешный улучшатель": {
+      "name": "Successful Upgrader",
+      "description": "Successfully upgrade an item with less than 10% probability"
+    },
+    "Элитный игрок": {
+      "name": "Elite Player",
+      "description": "Reach level 50"
+    },
+    "Открыватель-профи": {
+      "name": "Pro Opener",
+      "description": "Open 10,000 cases"
+    },
+    "Удачливая серия": {
+      "name": "Lucky Streak",
+      "description": "Get 5 rare items (Epic+) in a row"
+    },
+    "Элита элит": {
+      "name": "Elite of Elites",
+      "description": "Reach level 100"
+    },
+    "Джекпот": {
+      "name": "Jackpot",
+      "description": "Win the jackpot in slots"
+    },
+    "Ночной игрок": {
+      "name": "Night Player",
+      "description": "Open a case between 2:00 and 4:00 AM"
+    },
+    "Удача новичка": {
+      "name": "Beginner's Luck",
+      "description": "Get an Epic item from the first 5 cases"
+    },
+    "Марафонец": {
+      "name": "Marathoner",
+      "description": "Open cases 30 days in a row"
+    },
+    "Постоянный клиент": {
+      "name": "Loyal Customer",
+      "description": "Have an active subscription for 45 days straight"
+    },
+    "view_all": "View all achievements",
+    "modal": {
+      "title": "Achievements",
+      "completed": "Completed"
+    },
+    "category": {
+      "beginner": "Beginner",
+      "regular": "Regular",
+      "expert": "Expert",
+      "legendary": "Legendary"
+    },
+    "progress": "Progress",
+    "completed": "Completed"
   },
   "roulette": {
     "wheel_of_fortune": "🎰 Wheel of Fortune",
