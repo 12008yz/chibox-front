@@ -34,6 +34,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isFetchingTradeUrl, setIsFetchingTradeUrl] = useState(false);
 
+  // Блокировка скролла при открытии модального окна
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   // Синхронизируем данные с пользователем
   useEffect(() => {
     if (user?.steam_trade_url) {
@@ -244,11 +257,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999999]" onClick={() => {
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999999]" onClick={() => {
       onClose();
       resetForm();
     }}>
-      <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-white">{t('profile.settings.title')}</h3>
           <button

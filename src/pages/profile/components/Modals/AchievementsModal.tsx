@@ -35,16 +35,23 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
-  // Логирование при каждом рендере модального окна
+  // Блокировка скролла при открытии модального окна
   React.useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden';
       console.log('🎯 AchievementsModal OPENED');
       console.log('📊 Modal achievements data:', {
         count: achievements.length,
         loading: loading,
         achievements: achievements
       });
+    } else {
+      document.body.style.overflow = 'unset';
     }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, achievements, loading]);
 
   if (!isOpen) return null;
@@ -54,7 +61,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[99999998] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[99999998] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
       onClick={onClose}
     >
       <div
