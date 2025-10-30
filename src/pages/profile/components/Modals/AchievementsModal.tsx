@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../../../../utils/imageUtils';
 
@@ -51,9 +52,9 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const completedCount = achievements.filter(a => a.is_completed).length;
   const totalPoints = achievements.reduce((sum, a) => sum + (a.is_completed ? a.xp_reward : 0), 0);
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[99999998] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -297,6 +298,9 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
       </div>
     </div>
   );
+
+  // Рендерим модальное окно в body через портал
+  return createPortal(modalContent, document.body);
 };
 
 export default AchievementsModal;

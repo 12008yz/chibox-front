@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { throttle } from 'lodash-es';
@@ -601,13 +602,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  return (
+  const modalContent = (
     <>
       {/* Вспышка на весь экран при победе */}
       {showWinEffects && <div className="win-flash-overlay" />}
 
       <div
-        className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-300 ${
+        className={`fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
           isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
         }`}
         onClick={handleClose}
@@ -699,6 +700,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     </div>
     </>
   );
+
+  // Рендерим модальное окно в body через портал
+  return createPortal(modalContent, document.body);
 };
 
 export default CasePreviewModal;
