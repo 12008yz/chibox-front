@@ -302,7 +302,7 @@ const ExchangePage: React.FC = () => {
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
         // Звук продажи
-        soundManager.play('change');
+        soundManager.play('sellItem');
         toast.success(t('exchange.sell_for', { price: Math.round(sellPrice) }) + ` - "${itemName}"`);
         // Принудительно обновляем инвентарь для ProfilePage
         setTimeout(() => {

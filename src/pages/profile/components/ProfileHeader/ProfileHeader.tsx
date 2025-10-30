@@ -27,6 +27,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         {/* Settings Button */}
         <button
           onClick={onSettingsClick}
+          data-no-click-sound="true"
           className="p-2 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg transition-colors border border-white/20 hover:border-white/30"
           title={t('profile.profile_settings_title')}
         >

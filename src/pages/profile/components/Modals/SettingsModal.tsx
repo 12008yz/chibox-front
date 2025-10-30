@@ -42,9 +42,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       soundManager.play('modal');
     } else {
       document.body.style.overflow = 'unset';
-      if (document.body.style.overflow === 'unset') {
-        soundManager.play('modal');
-      }
     }
 
     return () => {

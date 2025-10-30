@@ -103,7 +103,10 @@ const App: React.FC = () => {
       const target = event.target as HTMLElement;
       const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [onclick]');
 
-      if (isInteractive && soundsEnabled) {
+      // Исключаем элементы, которые воспроизводят свои собственные звуки
+      const hasNoClickSound = target.closest('[data-no-click-sound]');
+
+      if (isInteractive && soundsEnabled && !hasNoClickSound) {
         soundManager.play('uiClick');
       }
     };

@@ -6,6 +6,8 @@ class SoundManager {
   private volume: number = 0.5;
   private audioContext: AudioContext | null = null;
   private unlocked: boolean = false;
+  private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
+  private minPlayInterval: number = 100; // Минимальная задержка между воспроизведениями в мс
 
   // Загружаем звуки
   private soundPaths = {
@@ -169,6 +171,15 @@ class SoundManager {
       console.log('🔊 SoundManager: Доступные звуки:', Array.from(this.sounds.keys()).join(', '));
       return;
     }
+
+    // Защита от множественного воспроизведения
+    const now = Date.now();
+    const lastPlay = this.lastPlayTime.get(soundKey) || 0;
+    if (now - lastPlay < this.minPlayInterval) {
+      console.log(`🔇 SoundManager: Пропускаем "${soundKey}" - слишком частое воспроизведение (${now - lastPlay}мс)`);
+      return;
+    }
+    this.lastPlayTime.set(soundKey, now);
 
     try {
       // Клонируем звук для множественного одновременного воспроизведения
