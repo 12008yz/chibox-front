@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar';
 import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { getItemImageUrl } from '../utils/steamImageUtils';
+import { getImageUrl } from '../utils/imageUtils';
 import Monetary from '../components/Monetary';
 
 const PublicProfilePage: React.FC = () => {
@@ -182,7 +183,8 @@ const PublicProfilePage: React.FC = () => {
           backgroundImage: 'url(/images/public_profile.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(8px)'
         }}
       />
       {/* Затемняющий overlay */}
@@ -390,10 +392,29 @@ const PublicProfilePage: React.FC = () => {
                 >
                   <div className="flex items-start gap-3">
                     <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getAchievementCategoryColor(achievement.category)} p-1 flex items-center justify-center flex-shrink-0`}>
-                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                        </svg>
+                      <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center overflow-hidden">
+                        {achievement.icon_url ? (
+                          <img
+                            src={getImageUrl(achievement.icon_url)}
+                            alt={achievement.name}
+                            className="w-full h-full object-contain p-0.5"
+                            onError={(e) => {
+                              console.error('❌ Achievement image failed to load:', {
+                                name: achievement.name,
+                                src: e.currentTarget.src,
+                                originalPath: achievement.icon_url
+                              });
+                              // Fallback to emoji if image fails to load
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<span class="text-3xl">🏆</span>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="text-3xl">🏆</span>
+                        )}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
