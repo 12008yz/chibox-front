@@ -244,7 +244,17 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="min-h-screen text-white relative">
       {/* Фиксированный фон на весь экран */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#151225] to-[#1a0e2e] -z-50" />
+      <div
+        className="fixed inset-0 -z-50"
+        style={{
+          backgroundImage: 'url(/images/profile.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      {/* Затемняющий overlay */}
+      <div className="fixed inset-0 bg-black/50 -z-40" />
 
       <ScrollToTopOnMount />
       <div className="relative z-10 container mx-auto max-w-7xl p-4 space-y-6">

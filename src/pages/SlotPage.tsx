@@ -311,14 +311,16 @@ const SlotPage: React.FC = () => {
     <div className="min-h-screen text-white relative">
       {/* Фиксированный фон на весь экран */}
       <div
-        className="fixed inset-0 bg-gradient-to-br from-gray-900/95 to-gray-800/95 -z-50"
+        className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(/images/slot.jpg)',
+          backgroundImage: 'url(/images/slot.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
       />
+      {/* Затемняющий overlay */}
+      <div className="fixed inset-0 bg-black/40 -z-40" />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Простой заголовок */}
