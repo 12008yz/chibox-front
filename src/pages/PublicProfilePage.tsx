@@ -183,8 +183,7 @@ const PublicProfilePage: React.FC = () => {
           backgroundImage: 'url(/images/public_profile.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          filter: 'blur(8px)'
+          backgroundRepeat: 'no-repeat'
         }}
       />
       {/* Затемняющий overlay */}
