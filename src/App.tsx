@@ -96,6 +96,25 @@ const App: React.FC = () => {
     soundManager.setSoundsEnabled(soundsEnabled);
   }, [soundsEnabled]);
 
+  // Глобальный звук клика
+  useEffect(() => {
+    const handleGlobalClick = (event: MouseEvent) => {
+      // Проверяем, что клик был по интерактивному элементу
+      const target = event.target as HTMLElement;
+      const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [onclick]');
+
+      if (isInteractive && soundsEnabled) {
+        soundManager.play('uiClick');
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, [soundsEnabled]);
+
   // Показываем загрузку только при первичной проверке токена
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
     console.log('Showing loading screen - fetching user data...');

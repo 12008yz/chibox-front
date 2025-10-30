@@ -23,6 +23,10 @@ class SoundManager {
     process: '/sounds/PPP.mp3',
     endProcess: '/sounds/end PPP.mp3',
     change: '/sounds/+-.mp3',
+    draw: '/sounds/ничья.mp3',
+    modal: '/sounds/модальное окно.mp3',
+    sellItem: '/sounds/продажа предмета.mp3',
+    uiClick: '/sounds/клик.mp3',
   };
 
   constructor() {

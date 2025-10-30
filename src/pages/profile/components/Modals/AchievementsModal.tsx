@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../../../../utils/imageUtils';
+import { soundManager } from '../../../../utils/soundManager';
 
 interface Achievement {
   id: string;
@@ -39,6 +40,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      soundManager.play('modal');
       console.log('🎯 AchievementsModal OPENED');
       console.log('📊 Modal achievements data:', {
         count: achievements.length,
@@ -47,6 +49,9 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
       });
     } else {
       document.body.style.overflow = 'unset';
+      if (document.body.style.overflow === 'unset') {
+        soundManager.play('modal');
+      }
     }
 
     return () => {

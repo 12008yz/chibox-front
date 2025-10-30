@@ -69,9 +69,15 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         setShowResult(true);
         setIsProcessingResult(false);
 
-        // Если победа, логируем но НЕ вызываем автоматический callback
+        // Воспроизводим звуки результата
         if (game.result === 'win') {
+          soundManager.play('win');
           console.log('TicTacToeGame: Победа! Автоматический callback отключен для предотвращения закрытия окна.');
+        } else if (game.result === 'lose') {
+          soundManager.play('gameOver');
+        } else if (game.result === 'draw') {
+          soundManager.play('draw');
+          console.log('TicTacToeGame: Ничья!');
         }
       }, 1500); // Задержка 1.5 секунды для всех результатов при загрузке
     }
@@ -135,6 +141,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             } else if (result.game?.result === 'lose') {
               soundManager.play('gameOver');
               console.log('TicTacToeGame: Результат игры:', result.game?.result);
+            } else if (result.game?.result === 'draw') {
+              soundManager.play('draw');
+              console.log('TicTacToeGame: Ничья!');
             } else {
               console.log('TicTacToeGame: Результат игры:', result.game?.result);
             }

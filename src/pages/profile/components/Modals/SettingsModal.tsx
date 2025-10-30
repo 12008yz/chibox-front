@@ -6,6 +6,7 @@ import Tooltip from '../../../../components/Tooltip';
 import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setSoundsEnabled } from '../../../../store/slices/uiSlice';
+import { soundManager } from '../../../../utils/soundManager';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -38,8 +39,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      soundManager.play('modal');
     } else {
       document.body.style.overflow = 'unset';
+      if (document.body.style.overflow === 'unset') {
+        soundManager.play('modal');
+      }
     }
 
     return () => {
