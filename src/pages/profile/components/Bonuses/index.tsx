@@ -9,7 +9,7 @@ const DropRateBonuses: React.FC<DropRateBonusesProps> = ({ user }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+    <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
       <h4 className="text-lg font-semibold mb-3">{t('profile.drop_bonuses')}</h4>
       <div className="space-y-2">
         {(user.level_bonus_percentage ?? 0) > 0 && (

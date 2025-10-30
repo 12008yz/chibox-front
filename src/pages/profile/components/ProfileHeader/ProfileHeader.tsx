@@ -15,7 +15,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
   const { xpInCurrentLevel, xpToNextLevel, progressPercentage } = calculateLevelProgress(user);
 
   return (
-    <div className="relative bg-gradient-to-r from-[#1a1530] via-[#2a1f47] to-[#1a1530] rounded-2xl p-8 border border-gray-700/30 overflow-hidden">
+    <div className="relative bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-white/10 overflow-hidden shadow-xl">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
@@ -27,7 +27,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         {/* Settings Button */}
         <button
           onClick={onSettingsClick}
-          className="p-2 bg-black/30 hover:bg-black/50 rounded-lg transition-colors border border-gray-600/50 hover:border-gray-500"
+          className="p-2 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg transition-colors border border-white/20 hover:border-white/30"
           title={t('profile.profile_settings_title')}
         >
           <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
 
         {/* Balance and Level Progress */}
         <div className="flex-1 space-y-4">
-          <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
+          <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-400 text-sm">{t('common.balance')}</span>
               <span className="text-2xl font-bold text-green-400">
@@ -89,7 +89,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
           </div>
 
           {/* Level Progress */}
-          <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm border border-gray-700/30">
+          <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-gray-400 text-sm">{t('profile.level_progress')}</span>

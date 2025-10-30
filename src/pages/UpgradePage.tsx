@@ -1014,7 +1014,7 @@ const UpgradePage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(https://s.iimg.su/s/25/uR0XDDXx5zfcmyKF9K872YIjR6O2hf8Zuwf7eiy1.png)',
+          backgroundImage: 'url(/images/upgrade.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

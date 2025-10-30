@@ -313,7 +313,7 @@ const SlotPage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(/images/slot.png)',
+          backgroundImage: 'url(/images/slot1.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'

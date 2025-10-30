@@ -51,7 +51,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     const weaponPrice = isDirectWeapon ? bestWeapon.price : (bestWeapon.item?.price || 0);
 
     return (
-      <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
+      <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border-2 border-white/10 hover:border-orange-500/50 transition-all duration-300">
         <div className="flex items-center gap-6">
           <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(
             weaponData?.rarity || ''
@@ -110,7 +110,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
   };
 
   return (
-    <div className="lg:col-span-2 bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+    <div className="lg:col-span-2 bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
       <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
         <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
           <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">

@@ -33,7 +33,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Cases Opened */}
-      <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-blue-500/50 transition-all duration-300">
+      <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 hover:border-blue-500/50 transition-all duration-300 shadow-lg">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -50,7 +50,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
       </div>
 
       {/* Inventory Count */}
-      <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-purple-500/50 transition-all duration-300">
+      <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-lg">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
@@ -74,7 +74,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
       />
 
       {/* Subscription */}
-      <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30 hover:border-yellow-500/50 transition-all duration-300">
+      <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 hover:border-yellow-500/50 transition-all duration-300 shadow-lg">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
