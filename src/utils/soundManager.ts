@@ -159,7 +159,7 @@ class SoundManager {
   }
 
   // Воспроизведение звука
-  play(soundKey: string, loop: boolean = false) {
+  play(soundKey: string, loop: boolean = false, ignoreThrottle: boolean = false) {
     if (!this.soundsEnabled) {
       console.log(`🔇 SoundManager: Звуки отключены, пропускаем "${soundKey}"`);
       return;
@@ -172,14 +172,16 @@ class SoundManager {
       return;
     }
 
-    // Защита от множественного воспроизведения
-    const now = Date.now();
-    const lastPlay = this.lastPlayTime.get(soundKey) || 0;
-    if (now - lastPlay < this.minPlayInterval) {
-      console.log(`🔇 SoundManager: Пропускаем "${soundKey}" - слишком частое воспроизведение (${now - lastPlay}мс)`);
-      return;
+    // Защита от множественного воспроизведения (можно отключить через ignoreThrottle)
+    if (!ignoreThrottle) {
+      const now = Date.now();
+      const lastPlay = this.lastPlayTime.get(soundKey) || 0;
+      if (now - lastPlay < this.minPlayInterval) {
+        console.log(`🔇 SoundManager: Пропускаем "${soundKey}" - слишком частое воспроизведение (${now - lastPlay}мс)`);
+        return;
+      }
+      this.lastPlayTime.set(soundKey, now);
     }
-    this.lastPlayTime.set(soundKey, now);
 
     try {
       // Клонируем звук для множественного одновременного воспроизведения
@@ -252,6 +254,38 @@ class SoundManager {
     // Очищаем Set активных клонов
     this.activeClones.clear();
     console.log('🔊 SoundManager: Все звуки и клоны остановлены');
+  }
+
+  // Остановка конкретного звука (для зацикленных звуков)
+  stop(soundKey: string) {
+    console.log(`🔊 SoundManager: Остановка звука "${soundKey}"`);
+
+    // Останавливаем оригинальный звук если он играет
+    const sound = this.sounds.get(soundKey);
+    if (sound) {
+      try {
+        sound.pause();
+        sound.currentTime = 0;
+      } catch (error) {
+        console.warn(`🔇 SoundManager: Не удалось остановить звук "${soundKey}"`, error);
+      }
+    }
+
+    // Останавливаем все клоны этого звука
+    this.activeClones.forEach((clone) => {
+      try {
+        // Проверяем если клон соответствует soundKey (можно сравнить по src)
+        if (sound && clone.src === sound.src) {
+          clone.pause();
+          clone.currentTime = 0;
+          this.activeClones.delete(clone);
+        }
+      } catch (error) {
+        console.warn(`🔇 SoundManager: Не удалось остановить клон "${soundKey}"`, error);
+      }
+    });
+
+    console.log(`🔊 SoundManager: Звук "${soundKey}" остановлен`);
   }
 
   // Проверка статуса загрузки звуков

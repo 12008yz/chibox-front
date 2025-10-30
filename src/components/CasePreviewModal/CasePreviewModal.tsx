@@ -408,9 +408,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       setSliderPosition(fullListPosition);
 
-      // Воспроизводим звук при каждой смене предмета, включая финальное замедление
-      // Последний звук будет совпадать с остановкой на выигрышном предмете
-      soundManager.play('process');
+      // Воспроизводим звук при каждой смене предмета (ignoreThrottle = true для частого воспроизведения)
+      soundManager.play('process', false, true);
 
       // Логика fake slowdown
       if (useFakeSlowdown && currentAvailablePosition >= fakeSlowdownPoint && currentAvailablePosition < fakeSlowdownEnd && !hasFakeSlowedDown) {
