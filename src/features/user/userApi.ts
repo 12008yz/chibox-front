@@ -61,36 +61,17 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'], // Инвалидируем все кэши инвентаря
       // Оптимистичное обновление инвентаря и баланса
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        // Оптимистичное обновление активного инвентаря (удаляем предмет)
-        const activePatchResult = dispatch(
-          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
+        // Оптимистичное обновление основного инвентаря (обновляем статус предмета на sold)
+        const mainPatchResult = dispatch(
+          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (draft) => {
             if (draft.data?.items) {
-              // Находим и УДАЛЯЕМ проданный предмет из списка активного инвентаря
+              // Находим проданный предмет и меняем его статус
               const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
               if (itemIndex !== -1) {
-                console.log('Optimistically removing sold item from active inventory:', draft.data.items[itemIndex]);
-                // Сохраняем данные предмета для добавления в "проданные"
-                const soldItem = { ...draft.data.items[itemIndex], status: 'sold' as const, transaction_date: new Date().toISOString() };
-
-                // Удаляем предмет из активного инвентаря
-                draft.data.items.splice(itemIndex, 1);
-                // Обновляем общее количество, если нужно
-                if (draft.data.totalItems) {
-                  draft.data.totalItems -= 1;
-                }
-
-                // Оптимистично добавляем предмет в кэш "проданных" предметов
-                dispatch(
-                  userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (allDraft) => {
-                    if (allDraft.data?.items) {
-                      // Добавляем проданный предмет в общий список
-                      allDraft.data.items.push(soldItem);
-                      if (allDraft.data.totalItems) {
-                        allDraft.data.totalItems += 1;
-                      }
-                    }
-                  })
-                );
+                console.log('Optimistically updating sold item status:', draft.data.items[itemIndex]);
+                // Меняем статус на sold
+                draft.data.items[itemIndex].status = 'sold';
+                draft.data.items[itemIndex].transaction_date = new Date().toISOString();
               }
             }
           })
@@ -106,7 +87,7 @@ export const userApi = baseApi.injectEndpoints({
           }
         } catch {
           // Откатываем оптимистичное обновление при ошибке
-          activePatchResult.undo();
+          mainPatchResult.undo();
         }
       },
     }),
@@ -122,6 +103,31 @@ export const userApi = baseApi.injectEndpoints({
         body: withdrawData,
       }),
       invalidatesTags: ['Inventory', 'Balance', 'User'],
+      // Оптимистичное обновление инвентаря
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        // Оптимистичное обновление основного инвентаря - меняем статус предмета
+        const mainPatchResult = dispatch(
+          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (draft) => {
+            if (draft.data?.items) {
+              // Находим предмет по inventoryItemId
+              const itemIndex = draft.data.items.findIndex(item => item.id === arg.inventoryItemId);
+              if (itemIndex !== -1) {
+                console.log('Optimistically updating withdrawn item status:', draft.data.items[itemIndex]);
+                // Меняем статус на pending_withdrawal
+                draft.data.items[itemIndex].status = 'pending_withdrawal';
+                draft.data.items[itemIndex].transaction_date = new Date().toISOString();
+              }
+            }
+          })
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          // Откатываем оптимистичное обновление при ошибке
+          mainPatchResult.undo();
+        }
+      },
     }),
 
     // Получение достижений
@@ -381,36 +387,17 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['User', 'Inventory', 'Subscription', 'CaseTemplates'], // Инвалидируем все кэши инвентаря
       // Оптимистичное обновление инвентаря и подписки
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        // Оптимистичное обновление инвентаря - удаляем обмененный предмет из активного инвентаря
+        // Оптимистичное обновление основного инвентаря - меняем статус предмета на used
         const inventoryPatch = dispatch(
-          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 100, status: 'inventory' }, (draft) => {
+          userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (draft) => {
             if (draft.data?.items) {
               // Находим предмет по ID экземпляра инвентаря
-              const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId && item.status === 'inventory');
+              const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
               if (itemIndex !== -1) {
-                console.log('Optimistically removing exchanged item:', draft.data.items[itemIndex]);
-                // Сохраняем данные предмета для добавления в "обмененные"
-                const exchangedItem = { ...draft.data.items[itemIndex], status: 'used' as const, transaction_date: new Date().toISOString() };
-
-                // Удаляем предмет из активного инвентаря
-                draft.data.items.splice(itemIndex, 1);
-                // Обновляем общее количество
-                if (draft.data.totalItems) {
-                  draft.data.totalItems -= 1;
-                }
-
-                // Оптимистично добавляем предмет в кэш всех предметов как "обмененный"
-                dispatch(
-                  userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (allDraft) => {
-                    if (allDraft.data?.items) {
-                      // Добавляем обмененный предмет в общий список
-                      allDraft.data.items.push(exchangedItem);
-                      if (allDraft.data.totalItems) {
-                        allDraft.data.totalItems += 1;
-                      }
-                    }
-                  })
-                );
+                console.log('Optimistically updating exchanged item status:', draft.data.items[itemIndex]);
+                // Меняем статус на used
+                draft.data.items[itemIndex].status = 'used';
+                draft.data.items[itemIndex].transaction_date = new Date().toISOString();
               }
             }
           })
