@@ -35,14 +35,6 @@ export const subscriptionsApi = baseApi.injectEndpoints({
     // Получение доступных тарифов подписки
     getSubscriptionTiers: builder.query<ApiResponse<SubscriptionTier[]>, void>({
       query: () => 'v1/subscription/tiers',
-      transformResponse: () => ({
-        success: true,
-        data: [
-          { id: 1, days: 30, max_daily_cases: 1, bonus_percentage: 3.0, name: 'Статус', price: 1210 },
-          { id: 2, days: 30, max_daily_cases: 1, bonus_percentage: 5.0, name: 'Статус+', price: 2890 },
-          { id: 3, days: 30, max_daily_cases: 1, bonus_percentage: 8.0, name: 'Статус++', price: 6819 }
-        ]
-      }),
       providesTags: ['Subscription'],
     }),
 
