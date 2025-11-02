@@ -31,8 +31,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [tradeUrl, setTradeUrl] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isFetchingTradeUrl, setIsFetchingTradeUrl] = useState(false);
 
   // Блокировка скролла при открытии модального окна
@@ -95,34 +93,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   // Функция для сохранения настроек
   const handleSaveSettings = async () => {
     try {
-      // Валидация пароля, если он введен
-      if (newPassword) {
-        if (newPassword.length < 8) {
-          showNotification(t('profile.settings.password_min_8_chars'), 'error');
-          return;
-        }
-        if (!/[A-Z]/.test(newPassword)) {
-          showNotification(t('profile.settings.password_need_uppercase'), 'error');
-          return;
-        }
-        if (!/[a-z]/.test(newPassword)) {
-          showNotification(t('profile.settings.password_need_lowercase'), 'error');
-          return;
-        }
-        if (!/[0-9]/.test(newPassword)) {
-          showNotification(t('profile.settings.password_need_digit'), 'error');
-          return;
-        }
-        if (!/[^A-Za-z0-9]/.test(newPassword)) {
-          showNotification(t('profile.settings.password_need_special'), 'error');
-          return;
-        }
-        if (newPassword !== confirmPassword) {
-          showNotification(t('profile.settings.passwords_not_match'), 'error');
-          return;
-        }
-      }
-
       // Валидация имени пользователя, если оно изменилось
       if (newUsername && newUsername !== user?.username) {
         const usernameValidation = validateUsername(newUsername);
@@ -147,10 +117,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         updateData.username = newUsername;
       }
 
-      if (newPassword) {
-        updateData.password = newPassword;
-      }
-
       // Если нет изменений, просто закрываем окно
       if (Object.keys(updateData).length === 0) {
         onClose();
@@ -167,10 +133,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
       showNotification(t('profile.settings.settings_saved'), 'success');
       onClose();
-
-      // Очищаем пароли
-      setNewPassword('');
-      setConfirmPassword('');
 
       // Обновляем данные пользователя
       setTimeout(() => {
@@ -252,8 +214,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const resetForm = () => {
-    setNewPassword('');
-    setConfirmPassword('');
+    // Form reset logic (if needed in the future)
   };
 
   if (!isOpen) return null;
@@ -307,46 +268,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </p>
             )}
           </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              {t('profile.settings.new_password')}
-            </label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder={t('profile.settings.new_password_placeholder')}
-              className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-              maxLength={128}
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              {t('profile.settings.password_requirements')}
-            </p>
-          </div>
-
-          {/* Confirm Password */}
-          {newPassword && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t('profile.settings.confirm_password')}
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder={t('profile.settings.confirm_password_placeholder')}
-                className="w-full px-3 py-2 bg-black/30 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                maxLength={128}
-              />
-              {newPassword !== confirmPassword && confirmPassword && (
-                <p className="text-xs text-red-400 mt-1">
-                  {t('profile.settings.passwords_not_match')}
-                </p>
-              )}
-            </div>
-          )}
 
          {/* Trade URL */}
          <div>
