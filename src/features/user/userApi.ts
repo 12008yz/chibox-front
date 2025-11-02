@@ -707,15 +707,18 @@ export const userApi = baseApi.injectEndpoints({
           price_ratio: number;
           base_chance: number;
           cheap_target_bonus: number;
+          expected_value?: number;
+          isProfitable?: boolean;
         }>;
       }>,
       string | string[]
     >({
-      query: (itemIds) => {
-        if (Array.isArray(itemIds)) {
-          return `v1/upgrade/options?itemIds=${itemIds.join(',')}`;
+      query: (inventoryIds) => {
+        // ИСПРАВЛЕНО: Теперь отправляем inventoryIds вместо itemIds
+        if (Array.isArray(inventoryIds)) {
+          return `v1/upgrade/options?inventoryIds=${inventoryIds.join(',')}`;
         }
-        return `v1/upgrade/options?itemIds=${itemIds}`;
+        return `v1/upgrade/options?inventoryIds=${inventoryIds}`;
       },
       providesTags: ['Inventory'],
     }),
