@@ -20,6 +20,7 @@ import EmailVerificationModal from './components/Modals/EmailVerificationModal';
 
 // Импорты утилит
 import { injectProfileStyles } from './utils/profileStyles';
+import { soundManager } from '../../utils/soundManager';
 
 const ProfilePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -175,6 +176,9 @@ const ProfilePage: React.FC = () => {
     // Устанавливаем ID открываемого кейса
     setOpeningCaseId(inventoryItemId);
 
+    // Воспроизводим звук открытия кейса из инвентаря
+    soundManager.play('openCase');
+
     try {
       const result = await openCase({ inventoryItemId }).unwrap();
 
@@ -288,6 +292,7 @@ const ProfilePage: React.FC = () => {
           <div className="space-y-6">
             {/* Purchase Button */}
             <button
+              data-no-click-sound
               onClick={() => {
                 setIsDepositModalOpen(true);
               }}

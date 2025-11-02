@@ -278,6 +278,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                     {activeTab === 'active' && inventoryItem.status === 'inventory' && (
                       <div className="mt-2">
                         <button
+                          data-no-click-sound
                           className={`w-full text-xs px-2 py-1 text-white rounded-full transition-colors duration-200 ${
                             openingCaseId === inventoryItem.id
                               ? 'bg-gray-500 cursor-not-allowed'

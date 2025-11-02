@@ -339,7 +339,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div data-no-click-sound className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/90 backdrop-blur-sm"
@@ -347,7 +347,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       />
 
       {/* Modal */}
-      <div className="relative bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden border border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
+      <div data-no-click-sound className="relative bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden border border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
         {/* Animated background effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-50"></div>
 
