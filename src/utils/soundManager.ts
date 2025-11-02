@@ -7,7 +7,7 @@ class SoundManager {
   private audioContext: AudioContext | null = null;
   private unlocked: boolean = false;
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
-  private minPlayInterval: number = 100; // Минимальная задержка между воспроизведениями в мс
+  private minPlayInterval: number = 350; // Минимальная задержка между воспроизведениями в мс
 
   // Загружаем звуки
   private soundPaths = {
