@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaCrown, FaDice, FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins } from 'react-icons/fa';
+import { FaCrown, FaDice, FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins, FaTrophy } from 'react-icons/fa';
 import { MdCasino, MdVideogameAsset, MdTrendingUp } from 'react-icons/md';
 import { RiVipCrownFill } from 'react-icons/ri';
 import { GiTicTacToe } from 'react-icons/gi';
@@ -117,13 +117,13 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       label: t('common.balance'),
       value: <Monetary value={user.balance || 0} />,
-      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />,
+      icon: <FaCoins className="text-yellow-400" />,
       color: 'text-yellow-400'
     },
     {
       label: t('public_profile.total_value'),
       value: <Monetary value={user.total_items_value || 0} />,
-      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />,
+      icon: <FaTrophy className="text-emerald-400" />,
       color: 'text-emerald-400'
     },
     {

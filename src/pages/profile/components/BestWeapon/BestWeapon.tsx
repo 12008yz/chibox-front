@@ -75,17 +75,19 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
                 <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
               </svg>
             </div>
-            {/* Бейдж редкости */}
-            <div className={`absolute top-1 right-1 px-2 py-0.5 rounded-md bg-gradient-to-r ${getRarityColor(
-              weaponData?.rarity || ''
-            )} text-white text-[10px] font-bold z-20`}>
-              {getRarityName(weaponData?.rarity || '', t)}
-            </div>
           </div>
           <div className="flex-1">
-            <h4 className="text-lg font-bold text-white mb-2">
-              {weaponData?.name || ''}
-            </h4>
+            <div className="flex items-center gap-2 mb-2">
+              <h4 className="text-lg font-bold text-white">
+                {weaponData?.name || ''}
+              </h4>
+              {/* Бейдж редкости */}
+              <span className={`px-3 py-1 rounded-md bg-gradient-to-r ${getRarityColor(
+                weaponData?.rarity || ''
+              )} text-white text-xs font-bold whitespace-nowrap`}>
+                {getRarityName(weaponData?.rarity || '', t)}
+              </span>
+            </div>
             <div className="flex items-center gap-4 mb-2">
               <span className="text-green-400 font-bold text-lg">
                 <Monetary value={Number(weaponPrice)} showFraction={true} />

@@ -498,15 +498,17 @@ const PublicProfilePage: React.FC = () => {
                       <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  {/* Бейдж редкости */}
-                  <div className={`absolute top-1 right-1 px-2 py-0.5 rounded-md bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white text-[10px] font-bold z-20`}>
-                    {getRarityName(bestWeapon.rarity || '')}
-                  </div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-lg font-bold text-white mb-2">
-                    {bestWeapon.name || ''}
-                  </h4>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="text-lg font-bold text-white">
+                      {bestWeapon.name || ''}
+                    </h4>
+                    {/* Бейдж редкости */}
+                    <span className={`px-3 py-1 rounded-md bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white text-xs font-bold whitespace-nowrap`}>
+                      {getRarityName(bestWeapon.rarity || '')}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-4 mb-2">
                     <span className="text-green-400 font-bold text-lg inline-flex items-center gap-1">
                       {Number(bestWeapon.price || 0).toFixed(2)}
@@ -541,8 +543,7 @@ const PublicProfilePage: React.FC = () => {
         </div>
 
         {/* Inventory Section */}
-        {(inventoryItems.length > 0 || caseItemsList.length > 0) && (
-          <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
+        <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
@@ -763,7 +764,6 @@ const PublicProfilePage: React.FC = () => {
               </div>
             )}
           </div>
-        )}
 
       </div>
     </div>
