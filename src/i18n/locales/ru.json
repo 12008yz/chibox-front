@@ -533,7 +533,7 @@
     "premium_cases": "Премиум кейсы",
     "premium_cases_description": "Кейсы с эксклюзивными наградами",
     "status_cases": "{{status}} кейсы",
-    "status_cases_description": "Эксклюзивные кейсы для подписчиков. Осталось {{days}} статуса",
+    "status_cases_description": "Эксклюзивные кейсы для ценителей. Осталось {{days}} статуса",
     "chibox_statuses": "Статусы ChiBox",
     "chibox_statuses_description": "Управляй своими привилегиями и получай эксклюзивные бонусы каждый день",
     "win_bonus_game": "Выдается за выигрыш в бонус игре",

@@ -59,9 +59,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   // Конфигурация статусов
   const statusConfig = {
-    1: { name: t('homepage.status_tier_1'), icon: <img src="/images/status.png" alt="Статус" className="w-16 h-16 object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 3 },
-    2: { name: t('homepage.status_tier_2'), icon: <img src="/images/status+.png" alt="Статус+" className="w-16 h-16 object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 5 },
-    3: { name: t('homepage.status_tier_3'), icon: <img src="/images/status++.png" alt="Статус++" className="w-16 h-16 object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 8 }
+    1: { name: t('homepage.status_tier_1'), icon: <img src="/images/status.png" alt="Статус" className="w-16 h-16 object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 2 },
+    2: { name: t('homepage.status_tier_2'), icon: <img src="/images/status+.png" alt="Статус+" className="w-16 h-16 object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 3 },
+    3: { name: t('homepage.status_tier_3'), icon: <img src="/images/status++.png" alt="Статус++" className="w-16 h-16 object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 5 }
   };
 
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
