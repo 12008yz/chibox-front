@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents, LiveDropData } from '../types/socket';
+import { useAppDispatch } from '../store/hooks';
+import { userApi } from '../features/user/userApi';
+import { toastWithSound } from '../utils/toastWithSound';
 
 interface UseSocketReturn {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
@@ -17,6 +20,7 @@ let globalSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null = nu
 let onlineUsersListeners = new Set<(count: number) => void>();
 let connectionListeners = new Set<(isConnected: boolean) => void>();
 let liveDropListeners = new Set<(drop: LiveDropData) => void>();
+let notificationListeners = new Set<(notification: any) => void>();
 
 // Глобальный кеш для предотвращения дублирования дропов
 let receivedDrops = new Map<string, number>();
@@ -120,6 +124,12 @@ const createGlobalSocket = () => {
     }
   });
 
+  // Обработчик уведомлений
+  globalSocket.on('notification', (data) => {
+    console.log('WebSocket: Получено уведомление', data);
+    notificationListeners.forEach(listener => listener(data));
+  });
+
   // Обработчик ошибок
   globalSocket.on('connect_error', (error) => {
     console.error('WebSocket: Ошибка подключения', error);
@@ -134,6 +144,7 @@ export const useSocket = (): UseSocketReturn => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() => loadLiveDropsFromStorage());
   const initialized = useRef(false);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     // Предотвращаем повторную инициализацию в React Strict Mode
@@ -169,10 +180,27 @@ export const useSocket = (): UseSocketReturn => {
       });
     };
 
+    // Обработчик уведомлений
+    const notificationListener = (notification: any) => {
+      console.log('useSocket: Получено уведомление в реальном времени:', notification);
+
+      // Инвалидируем кеш уведомлений, чтобы они обновились
+      dispatch(userApi.util.invalidateTags(['Notifications']));
+
+      // Показываем toast уведомление
+      const notificationType = notification.type || 'info';
+      const toastType = notificationType === 'success' ? 'success' :
+                        notificationType === 'error' ? 'error' :
+                        notificationType === 'warning' ? 'warning' : 'info';
+
+      toastWithSound(notification.title, toastType, 'notifications');
+    };
+
     // Регистрируем слушатели
     onlineUsersListeners.add(onlineUsersListener);
     connectionListeners.add(connectionListener);
     liveDropListeners.add(liveDropListener);
+    notificationListeners.add(notificationListener);
 
     // Устанавливаем начальное состояние
     setIsConnected(socket.connected);
@@ -182,9 +210,10 @@ export const useSocket = (): UseSocketReturn => {
       onlineUsersListeners.delete(onlineUsersListener);
       connectionListeners.delete(connectionListener);
       liveDropListeners.delete(liveDropListener);
+      notificationListeners.delete(notificationListener);
 
       // Если это последний компонент, закрываем соединение
-      if (onlineUsersListeners.size === 0 && connectionListeners.size === 0) {
+      if (onlineUsersListeners.size === 0 && connectionListeners.size === 0 && notificationListeners.size === 0) {
         console.log('WebSocket: Закрытие глобального подключения');
         if (globalSocket) {
           globalSocket.disconnect();
@@ -192,7 +221,7 @@ export const useSocket = (): UseSocketReturn => {
         }
       }
     };
-  }, []);
+  }, [dispatch]);
 
   return {
     socket: globalSocket,
