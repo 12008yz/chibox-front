@@ -53,26 +53,33 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     return (
       <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border-2 border-white/10 hover:border-orange-500/50 transition-all duration-300">
         <div className="flex items-center gap-6">
-          <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(
-            weaponData?.rarity || ''
-          )} p-1 flex items-center justify-center shadow-lg item-image-container`}>
+          <div className="relative w-20 h-20 rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container">
+            <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(
+              weaponData?.rarity || ''
+            )} opacity-20 rounded-xl`}></div>
             <img
               src={getItemImageUrl(
                 weaponData?.image_url || '',
                 weaponData?.name || ''
               )}
               alt={weaponData?.name || ''}
-              className="w-full h-full object-contain rounded-lg item-image"
+              className="absolute inset-0 w-full h-full object-contain rounded-lg z-10 item-image"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
                 if (nextElement) nextElement.style.display = 'flex';
               }}
             />
-            <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
+            <div className="absolute inset-0 w-full h-full bg-gray-800 rounded-lg flex items-center justify-center z-10" style={{ display: 'none' }}>
               <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
               </svg>
+            </div>
+            {/* Бейдж редкости */}
+            <div className={`absolute top-1 right-1 px-2 py-0.5 rounded-md bg-gradient-to-r ${getRarityColor(
+              weaponData?.rarity || ''
+            )} text-white text-[10px] font-bold z-20`}>
+              {getRarityName(weaponData?.rarity || '', t)}
             </div>
           </div>
           <div className="flex-1">
@@ -80,11 +87,6 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
               {weaponData?.name || ''}
             </h4>
             <div className="flex items-center gap-4 mb-2">
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(
-                weaponData?.rarity || ''
-              )} text-white`}>
-                {getRarityName(weaponData?.rarity || '', t)}
-              </span>
               <span className="text-green-400 font-bold text-lg">
                 <Monetary value={Number(weaponPrice)} showFraction={true} />
               </span>

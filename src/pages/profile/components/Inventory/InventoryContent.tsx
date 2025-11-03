@@ -138,7 +138,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
           >
             {/* Status Badge */}
             {activeTab !== 'active' && (
-              <div className="absolute top-2 right-2 z-10">
+              <div className="absolute top-2 left-2 z-30">
                 <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
                   activeTab === 'withdrawn' ?
                     (inventoryItem.status === 'pending_withdrawal' ? 'bg-orange-500' : 'bg-purple-500') :
@@ -156,21 +156,28 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
             {isUserItem(inventoryItem) ? (
               // Рендеринг предмета
               <>
-                <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center item-image-container`}>
+                <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} opacity-20 rounded-lg`}></div>
                   <img
                     src={getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                     alt={inventoryItem.item.name}
-                    className="w-full h-full object-contain rounded item-image"
+                    className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                       const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
                       if (nextElement) nextElement.style.display = 'flex';
                     }}
                   />
-                  <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: 'none' }}>
+                  <div className="absolute inset-0 w-full h-full bg-gray-800 rounded flex items-center justify-center z-10" style={{ display: 'none' }}>
                     <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
                     </svg>
+                  </div>
+                  {/* Бейдж редкости */}
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center z-20">
+                    <div className={`text-xs px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white font-bold`}>
+                      {getRarityName(inventoryItem.item.rarity, t)}
+                    </div>
                   </div>
                 </div>
                 <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
@@ -178,9 +185,6 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                 </h5>
                 <p className="text-green-400 text-sm font-bold">
                   <Monetary value={Number(inventoryItem.item.price)} showFraction={true} />
-                </p>
-                <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
-                  {getRarityName(inventoryItem.item.rarity, t)}
                 </p>
                 {/* Acquisition info */}
                 <div className="mt-2 text-xs text-gray-400">

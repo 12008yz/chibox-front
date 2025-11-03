@@ -453,21 +453,26 @@ const PublicProfilePage: React.FC = () => {
           {bestWeapon ? (
             <div className="bg-black/30 rounded-xl p-6 border-2 border-transparent bg-gradient-to-r from-transparent via-transparent to-transparent hover:border-orange-500/50 transition-all duration-300">
               <div className="flex items-center gap-6">
-                <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${getRarityColor(bestWeapon.rarity || '')} p-1 flex items-center justify-center shadow-lg item-image-container`}>
+                <div className="relative w-20 h-20 rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(bestWeapon.rarity || '')} opacity-20 rounded-xl`}></div>
                   <img
                     src={getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
                     alt={bestWeapon.name || ''}
-                    className="w-full h-full object-contain rounded-lg item-image"
+                    className="absolute inset-0 w-full h-full object-contain rounded-lg z-10 item-image"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                       const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
                       if (nextElement) nextElement.style.display = 'flex';
                     }}
                   />
-                  <div className="w-full h-full bg-gray-800 rounded-lg flex items-center justify-center" style={{ display: 'none' }}>
+                  <div className="absolute inset-0 w-full h-full bg-gray-800 rounded-lg flex items-center justify-center z-10" style={{ display: 'none' }}>
                     <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
                     </svg>
+                  </div>
+                  {/* Бейдж редкости */}
+                  <div className={`absolute top-1 right-1 px-2 py-0.5 rounded-md bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white text-[10px] font-bold z-20`}>
+                    {getRarityName(bestWeapon.rarity || '')}
                   </div>
                 </div>
                 <div className="flex-1">
@@ -475,9 +480,6 @@ const PublicProfilePage: React.FC = () => {
                     {bestWeapon.name || ''}
                   </h4>
                   <div className="flex items-center gap-4 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${getRarityColor(bestWeapon.rarity || '')} text-white`}>
-                      {getRarityName(bestWeapon.rarity || '')}
-                    </span>
                     <span className="text-green-400 font-bold text-lg inline-flex items-center gap-1">
                       {Number(bestWeapon.price || 0).toFixed(2)}
                       <img
@@ -613,25 +615,28 @@ const PublicProfilePage: React.FC = () => {
                       key={inventoryItem.id}
                       className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
                     >
-                      <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} p-1 mb-3 flex items-center justify-center item-image-container`}>
-                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                          {inventoryItem.item.image_url ? (
-                            <img
-                              src={inventoryItem.item.image_url}
-                              alt={inventoryItem.item.name}
-                              className="w-full h-full object-contain rounded item-image"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (nextElement) nextElement.style.display = 'flex';
-                              }}
-                            />
-                          ) : null}
-                          <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
-                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                            </svg>
-                          </div>
+                      <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} opacity-20 rounded-lg`}></div>
+                        {inventoryItem.item.image_url ? (
+                          <img
+                            src={inventoryItem.item.image_url}
+                            alt={inventoryItem.item.name}
+                            className="absolute inset-0 w-full h-full object-contain z-10 item-image"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (nextElement) nextElement.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className="absolute inset-0 w-full h-full bg-gray-800 rounded flex items-center justify-center z-10" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
+                          <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        {/* Бейдж редкости */}
+                        <div className={`absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-xs font-bold z-20`}>
+                          {getRarityName(inventoryItem.item.rarity)}
                         </div>
                       </div>
                       <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
@@ -639,9 +644,6 @@ const PublicProfilePage: React.FC = () => {
                       </h5>
                       <p className="text-green-400 text-sm font-bold">
                         <Monetary value={Number(inventoryItem.item?.price || inventoryItem.price || 0)} showFraction={true} />
-                      </p>
-                      <p className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-center mt-2`}>
-                        {getRarityName(inventoryItem.item.rarity)}
                       </p>
 
                       {/* Дополнительная информация о предмете */}
