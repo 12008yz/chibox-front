@@ -20,7 +20,7 @@ const PublicProfilePage: React.FC = () => {
   const [inventoryItems, setInventoryItems] = useState<any[]>([]);
   const [caseItemsList, setCaseItemsList] = useState<any[]>([]);
  // State для переключения между категориями инвентаря
- const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active'); 
+ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
   // Определяем текущую страницу в зависимости от активного таба
   const currentPage = activeInventoryTab === 'active' ? activePage : openedPage;
 
@@ -35,6 +35,12 @@ const PublicProfilePage: React.FC = () => {
   // State для отслеживания, нужно ли загружать больше данных
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Сбрасываем данные при переключении табов
+  React.useEffect(() => {
+    setInventoryItems([]);
+    setCaseItemsList([]);
+  }, [activeInventoryTab]);
+
 
 
   // Обновляем списки при получении новых данных
@@ -44,13 +50,25 @@ const PublicProfilePage: React.FC = () => {
         if (activePage === 1) {
           setInventoryItems(profileData.user.inventory || []);
         } else {
-          setInventoryItems(prev => [...prev, ...(profileData.user.inventory || [])]);
+          // Добавляем только новые предметы, которых еще нет в списке
+          setInventoryItems(prev => {
+            const newItems = (profileData.user.inventory || []).filter(
+              newItem => !prev.some(existingItem => existingItem.id === newItem.id)
+            );
+            return newItems.length > 0 ? [...prev, ...newItems] : prev;
+          });
         }
       } else {
         if (openedPage === 1) {
           setCaseItemsList(profileData.user.caseItems || []);
         } else {
-          setCaseItemsList(prev => [...prev, ...(profileData.user.caseItems || [])]);
+          // Добавляем только новые предметы, которых еще нет в списке
+          setCaseItemsList(prev => {
+            const newItems = (profileData.user.caseItems || []).filter(
+              newItem => !prev.some(existingItem => existingItem.id === newItem.id)
+            );
+            return newItems.length > 0 ? [...prev, ...newItems] : prev;
+          });
         }
       }
     }
@@ -539,7 +557,12 @@ const PublicProfilePage: React.FC = () => {
               {/* Вкладки инвентаря */}
               <div className="flex gap-2 mb-4">
                 <button
-                  onClick={() => setActiveInventoryTab('active')}
+                  onClick={() => {
+                    if (activeInventoryTab !== 'active') {
+                      setActiveInventoryTab('active');
+                      setActivePage(1);
+                    }
+                  }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                     activeInventoryTab === 'active'
                       ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
@@ -555,7 +578,12 @@ const PublicProfilePage: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => setActiveInventoryTab('opened')}
+                  onClick={() => {
+                    if (activeInventoryTab !== 'opened') {
+                      setActiveInventoryTab('opened');
+                      setOpenedPage(1);
+                    }
+                  }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                     (activeInventoryTab as 'active' | 'opened') === 'opened'
                       ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'

@@ -493,6 +493,7 @@ export const userApi = baseApi.injectEndpoints({
             source?: string;
             status?: string;
             acquisition_date?: string;
+            case_template_id?: string;
           }>;
           inventoryPagination?: {
             total: number;
@@ -515,6 +516,7 @@ export const userApi = baseApi.injectEndpoints({
             source?: string;
             status?: string;
             acquisition_date?: string;
+            case_template_id?: string;
           }>;
           caseItemsPagination?: {
             total: number;
@@ -558,12 +560,13 @@ export const userApi = baseApi.injectEndpoints({
           };
         };
       },
-      { userId: string; page?: number; limit?: number }
+      { userId: string; page?: number; limit?: number; tab?: 'active' | 'opened' }
     >({
-      query: ({ userId, page = 1, limit = 24 }) => {
+      query: ({ userId, page = 1, limit = 12, tab = 'active' }) => {
         const params = new URLSearchParams({
           page: page.toString(),
           limit: limit.toString(),
+          tab: tab,
         });
         return `v1/users/${userId}?${params.toString()}`;
       },
