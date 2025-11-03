@@ -541,7 +541,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   {t('public_profile.items_tab')}
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getActiveInventory().length}</span>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.inventoryPagination?.total || getActiveInventory().length}</span>
                 </button>
 
                 <button
@@ -556,7 +556,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   {t('public_profile.opened_cases_tab')}
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{getOpenedCases().length}</span>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.totalCasesOpened || 0}</span>
                 </button>
               </div>
 

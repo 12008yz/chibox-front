@@ -1055,7 +1055,7 @@ const UpgradePage: React.FC = () => {
                 <div>
                   <h3 className="text-red-300 font-semibold mb-1">Слишком низкая стоимость</h3>
                   <p className="text-red-200 text-sm">
-                    Минимальная общая стоимость для улучшения - 5 КР. Текущая: <span className="font-bold">{totalSelectedPrice.toFixed(2)} КР</span>.
+                    Минимальная общая стоимость для улучшения - 5 chiCoins. Текущая: <span className="font-bold">{totalSelectedPrice.toFixed(2)} chiCoins</span>.
                     Выберите более дорогие предметы или добавьте еще.
                   </p>
                 </div>
@@ -1184,7 +1184,7 @@ const UpgradePage: React.FC = () => {
             ) : upgradeOptions?.data?.upgrade_options.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-400">{t('upgrade.no_upgrade_options')}</p>
-                <p className="text-gray-500 text-sm mt-2">Попробуйте выбрать предметы подешевле или больше предметов</p>
+                <p className="text-gray-500 text-sm mt-2">Попробуйте выбрать другие предметы или увеличьте их количество</p>
               </div>
             ) : (
               <div>
