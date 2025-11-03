@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ServerToClientEvents, ClientToServerEvents, LiveDropData } from '../types/socket';
+import { ServerToClientEvents, ClientToServerEvents, LiveDropData, NotificationData } from '../types/socket';
 import { useAppDispatch } from '../store/hooks';
 import { userApi } from '../features/user/userApi';
 import { toastWithSound } from '../utils/toastWithSound';
@@ -20,7 +20,7 @@ let globalSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null = nu
 let onlineUsersListeners = new Set<(count: number) => void>();
 let connectionListeners = new Set<(isConnected: boolean) => void>();
 let liveDropListeners = new Set<(drop: LiveDropData) => void>();
-let notificationListeners = new Set<(notification: any) => void>();
+let notificationListeners = new Set<(notification: NotificationData) => void>();
 
 // Глобальный кеш для предотвращения дублирования дропов
 let receivedDrops = new Map<string, number>();
@@ -72,7 +72,8 @@ const createGlobalSocket = () => {
 
   // Обработчик успешного подключения
   globalSocket.on('connect', () => {
-    console.log('WebSocket: Подключено к серверу');
+    console.log('✅ WebSocket: Подключено к серверу');
+    console.log('🔌 Socket ID:', globalSocket.id);
     connectionListeners.forEach(listener => listener(true));
   });
 
@@ -181,19 +182,43 @@ export const useSocket = (): UseSocketReturn => {
     };
 
     // Обработчик уведомлений
-    const notificationListener = (notification: any) => {
-      console.log('useSocket: Получено уведомление в реальном времени:', notification);
+    const notificationListener = (notification: NotificationData) => {
+      console.log('🔔 useSocket: Получено уведомление в реальном времени:', notification);
 
-      // Инвалидируем кеш уведомлений, чтобы они обновились
+      // Немедленно инвалидируем кеш уведомлений и счетчика
       dispatch(userApi.util.invalidateTags(['Notifications']));
 
-      // Показываем toast уведомление
-      const notificationType = notification.type || 'info';
-      const toastType = notificationType === 'success' ? 'success' :
-                        notificationType === 'error' ? 'error' :
-                        notificationType === 'warning' ? 'warning' : 'info';
+      // Принудительно обновляем данные уведомлений
+      setTimeout(() => {
+        dispatch(userApi.endpoints.getUserNotifications.initiate({ limit: 20 }));
+        dispatch(userApi.endpoints.getUnreadNotificationsCount.initiate());
+      }, 100);
 
-      toastWithSound(notification.title, toastType, 'notifications');
+      // Показываем toast уведомление в зависимости от типа
+      const message = notification.title;
+      const toastOptions = notification.link ? {
+        duration: 6000,
+        position: 'top-right' as const,
+      } : undefined;
+
+      switch (notification.type) {
+        case 'success':
+          toastWithSound.success(message, toastOptions);
+          break;
+        case 'error':
+          toastWithSound.error(message, toastOptions);
+          break;
+        case 'warning':
+          toastWithSound.warning(message, toastOptions);
+          break;
+        case 'info':
+          toastWithSound.info(message, toastOptions);
+          break;
+        case 'system':
+        default:
+          toastWithSound.default(message, toastOptions);
+          break;
+      }
     };
 
     // Регистрируем слушатели

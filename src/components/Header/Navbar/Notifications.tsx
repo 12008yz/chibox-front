@@ -21,7 +21,8 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         refetch: refetchNotifications
     } = useGetUserNotificationsQuery({ limit: 20 }, {
         refetchOnMountOrArgChange: true,
-        pollingInterval: openNotifications ? 10000 : 0,
+        refetchOnFocus: true,
+        pollingInterval: openNotifications ? 3000 : 0, // Обновляем каждые 3 секунды когда панель открыта
     });
 
     // Мутации для работы с уведомлениями

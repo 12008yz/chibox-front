@@ -25,10 +25,23 @@ export interface LiveDropData {
   price: number;
 }
 
+export interface NotificationData {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error' | 'system';
+  category: 'general' | 'case_opening' | 'transaction' | 'achievement' | 'promotion' | 'subscription' | 'withdrawal' | 'bonus' | 'level_up';
+  link?: string;
+  importance: number;
+  is_read: boolean;
+  created_at: string;
+}
+
 export interface ServerToClientEvents {
    hello: (data: { message: string }) => void;
    onlineUsersUpdate: (data: { count: number }) => void;
    liveDrop: (data: LiveDropData) => void;
+   notification: (data: NotificationData) => void;
  }
 
  export interface ClientToServerEvents {

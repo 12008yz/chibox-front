@@ -13,6 +13,24 @@ export const toastWithSound = {
     return toast.error(message, options);
   },
 
+  // Toast для предупреждений
+  warning: (message: string, options?: any) => {
+    soundManager.play('notification');
+    return toast(message, {
+      icon: '⚠️',
+      ...options
+    });
+  },
+
+  // Toast для информационных сообщений
+  info: (message: string, options?: any) => {
+    soundManager.play('notification');
+    return toast(message, {
+      icon: 'ℹ️',
+      ...options
+    });
+  },
+
   // Обычный toast без специального типа
   default: (message: string, options?: any) => {
     soundManager.play('notification');

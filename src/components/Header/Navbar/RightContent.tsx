@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
 import { FaRegBell, FaBell, FaCoins, FaSignOutAlt, FaPlus } from "react-icons/fa";
@@ -34,9 +34,11 @@ const RightContent: React.FC<RightContentProps> = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
-  const { data: unreadCountData } = useGetUnreadNotificationsCountQuery(undefined, {
+  const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadNotificationsCountQuery(undefined, {
     skip: !user,
-    pollingInterval: 30000,
+    pollingInterval: 5000, // Проверяем каждые 5 секунд
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
   });
 
   // Получаем статус бонуса
@@ -65,6 +67,17 @@ const RightContent: React.FC<RightContentProps> = ({
   const toggleNotifications = () => {
     setOpenNotifications(!openNotifications);
   };
+
+  // Обновляем счетчик непрочитанных при закрытии панели уведомлений
+  useEffect(() => {
+    if (!openNotifications && user) {
+      // Обновляем счетчик после закрытия панели с небольшой задержкой
+      const timer = setTimeout(() => {
+        refetchUnreadCount();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [openNotifications, user, refetchUnreadCount]);
 
   if (!user) {
     return (
