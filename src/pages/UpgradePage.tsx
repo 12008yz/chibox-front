@@ -12,6 +12,7 @@ import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
+import { getRarityColor } from '../utils/rarityColors';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
@@ -51,19 +52,6 @@ const SelectedItemsDisplay: React.FC<{
   onRemoveTargetItem
 }) => {
   const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
-
-  const getRarityColor = (rarity: string) => {
-    switch (rarity?.toLowerCase()) {
-      case 'covert':
-      case 'contraband': return 'from-yellow-500 to-orange-500';
-      case 'classified': return 'from-purple-500 to-pink-500';
-      case 'restricted': return 'from-blue-500 to-cyan-500';
-      case 'milspec': return 'from-green-500 to-emerald-500';
-      case 'industrial':
-      case 'consumer': return 'from-gray-500 to-slate-500';
-      default: return 'from-gray-500 to-slate-500';
-    }
-  };
 
   const getChanceColor = (chance: number) => {
     if (chance >= 40) return 'text-green-400';
@@ -466,19 +454,6 @@ const SourceItemCard: React.FC<{
   // Проверяем, можно ли взаимодействовать с предметом (добавить или убрать)
   const canInteract = selectedCount > 0 || (selectedCount < count && !isLimitReached);
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity?.toLowerCase()) {
-      case 'covert':
-      case 'contraband': return 'from-yellow-500 to-orange-500';
-      case 'classified': return 'from-purple-500 to-pink-500';
-      case 'restricted': return 'from-blue-500 to-cyan-500';
-      case 'milspec': return 'from-green-500 to-emerald-500';
-      case 'industrial':
-      case 'consumer': return 'from-gray-500 to-slate-500';
-      default: return 'from-gray-500 to-slate-500';
-    }
-  };
-
   return (
     <div
       className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-xl p-3 border transition-all duration-300 ${
@@ -577,19 +552,6 @@ const TargetItemCard: React.FC<{
 }> = ({ item, onSelect, isSelected }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
-
-  const getRarityColor = (rarity: string) => {
-    switch (rarity?.toLowerCase()) {
-      case 'covert':
-      case 'contraband': return 'from-yellow-500 to-orange-500';
-      case 'classified': return 'from-purple-500 to-pink-500';
-      case 'restricted': return 'from-blue-500 to-cyan-500';
-      case 'milspec': return 'from-green-500 to-emerald-500';
-      case 'industrial':
-      case 'consumer': return 'from-gray-500 to-slate-500';
-      default: return 'from-gray-500 to-slate-500';
-    }
-  };
 
   const getChanceColor = (chance: number) => {
     if (chance >= 40) return 'text-green-400';

@@ -15,6 +15,7 @@ import type { UserInventoryItem, Item } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
+import { getRarityColor } from '../utils/rarityColors';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -43,18 +44,7 @@ const ItemCard: React.FC<{
   const sellPrice = itemPrice * 0.65; // 65% от цены предмета
   const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity?.toLowerCase()) {
-      case 'covert':
-      case 'contraband': return 'from-yellow-500 to-orange-500';
-      case 'classified': return 'from-purple-500 to-pink-500';
-      case 'restricted': return 'from-blue-500 to-cyan-500';
-      case 'milspec': return 'from-green-500 to-emerald-500';
-      case 'industrial':
-      case 'consumer': return 'from-gray-500 to-slate-500';
-      default: return 'from-gray-500 to-slate-500';
-    }
-  };
+
 
   const getRarityDisplayName = (rarity: string) => {
     switch (rarity?.toLowerCase()) {
