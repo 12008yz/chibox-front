@@ -249,8 +249,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const useFakeSlowdown = Math.random() < 0.25;
     setShouldFakeSlowdown(useFakeSlowdown);
 
-    // 50% шанс на остановку между предметами (для теста, потом будет 5%)
-    const useStopBetween = Math.random() < 0.5;
+    // Убрали выбор между двумя предметами
+    const useStopBetween = false;
     setShouldStopBetween(useStopBetween);
 
     const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);

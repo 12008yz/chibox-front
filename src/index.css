@@ -1056,6 +1056,48 @@ img.live-drop-item {
   }
 }
 
+/* Исключение для аватаров пользователей в LiveDrop */
+.user-avatar-live-drop {
+  all: revert !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  filter: none !important;
+  transform: none !important;
+  transition: border-color 0.2s ease !important;
+}
+
+/* Строгие правила для изображения предмета в LiveDrop */
+.live-drop-image-container {
+  width: 80px !important;
+  height: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  min-height: 80px !important;
+  max-height: 80px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.live-drop-image-container img.live-drop-item {
+  max-width: 72px !important;
+  max-height: 72px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
 /* ========================================
    КРАСИВЫЙ КАСТОМНЫЙ СКРОЛЛБАР ДЛЯ ВСЕГО САЙТА
    ======================================== */

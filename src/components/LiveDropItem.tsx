@@ -33,6 +33,18 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
   const rarityColor = getRarityColor(drop.item.rarity);
   const isHighValue = drop.item.price >= 100;
 
+  // Проверяем и логируем данные для отладки
+  React.useEffect(() => {
+    if (drop.item.image === drop.user.avatar) {
+      console.error('ОШИБКА: Изображение предмета совпадает с аватаром!', {
+        itemImage: drop.item.image,
+        userAvatar: drop.user.avatar,
+        itemName: drop.item.name,
+        userName: drop.user.username
+      });
+    }
+  }, [drop]);
+
   return (
     <Link
       to={`/user/${drop.user.id}`}
@@ -45,10 +57,15 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           ${drop.isHighlighted ? 'border-yellow-400 shadow-yellow-400/40 bg-yellow-400/10 shadow-lg' : rarityColor}
           transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer
           ${isHighValue ? 'animate-pulse' : ''}
-          backdrop-blur-sm overflow-visible
+          backdrop-blur-sm
         `}
         style={{
-          margin: '4px' // Добавляем отступ чтобы shadow и border не обрезались
+          margin: '4px', // Добавляем отступ чтобы shadow и border не обрезались
+          minWidth: '160px',
+          maxWidth: '160px',
+          minHeight: '176px',
+          maxHeight: '176px',
+          overflow: 'hidden'
         }}
       >
         {/* Спец эффекты для редких предметов */}
@@ -69,13 +86,21 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
         )}
 
         {/* Аватар пользователя (сверху слева) */}
-        <div className="absolute top-3 left-3 z-10">
-          <div className="block" title={`${drop.user.username} (Ур. ${drop.user.level})`}>
+        <div className="absolute top-3 left-3 z-10 w-7 h-7 flex-shrink-0">
+          <div className="w-7 h-7" title={`${drop.user.username} (Ур. ${drop.user.level})`}>
             {drop.user.avatar ? (
               <img
                 src={drop.user.avatar}
                 alt={drop.user.username}
-                className="w-7 h-7 rounded-full border-2 border-gray-600 hover:border-white transition-colors"
+                className="user-avatar-live-drop w-7 h-7 rounded-full border-2 border-gray-600 hover:border-white transition-colors object-cover"
+                style={{
+                  minWidth: '28px',
+                  maxWidth: '28px',
+                  minHeight: '28px',
+                  maxHeight: '28px',
+                  width: '28px !important',
+                  height: '28px !important'
+                }}
               />
             ) : (
               <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-gray-600 hover:border-white transition-colors">
@@ -96,23 +121,27 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
         </div>
 
         {/* Изображение предмета (центр) */}
-        <div className="flex items-center justify-center mt-6 mb-3">
+        <div className="flex items-center justify-center mt-6 mb-3 relative z-0">
           <div
-            className="w-20 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/20 live-drop-image-container"
+            className="w-20 h-20 flex items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/20 live-drop-image-container overflow-hidden"
             style={{
               filter: 'none',
               mixBlendMode: 'normal',
               colorScheme: 'light',
-              isolation: 'isolate'
+              isolation: 'isolate',
+              minWidth: '80px',
+              maxWidth: '80px',
+              minHeight: '80px',
+              maxHeight: '80px'
             }}
           >
             <img
               src={drop.item.image}
               alt={drop.item.name}
-              className="max-w-18 max-h-18 object-contain live-drop-item"
+              className="live-drop-item"
               style={{
-                filter: 'none !important',
-                backgroundColor: 'transparent !important',
+                filter: 'none',
+                backgroundColor: 'transparent',
                 imageRendering: 'auto',
                 mixBlendMode: 'normal',
                 opacity: 1,
