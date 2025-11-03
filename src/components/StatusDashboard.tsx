@@ -72,7 +72,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
       description: t('tic_tac_toe_game.won_bonus_case'),
-      icon: <GiTicTacToe className="text-2xl" />,
+      icon: <img src="../../public/images/status1.png"/>,
       color: 'from-green-400 to-emerald-500',
       available: true,
       action: () => onPlayTicTacToe?.()
@@ -81,7 +81,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'roulette',
       name: t('games.roulette'),
       description: t('homepage.win_bonus_game'),
-      icon: <MdCasino className="text-2xl" />,
+      icon: <img src="../../public/images/status2.png"/>,
       color: 'from-purple-400 to-pink-500',
       available: true,
       action: () => onPlayRoulette?.()
@@ -90,7 +90,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'slots',
       name: t('slots.title'),
       description: t('slots.description'),
-      icon: "a",
+      icon: <img src="../../public/images/status3.png"/>,
       color: 'from-yellow-400 to-orange-500',
       available: true,
       action: () => navigate('/slot')
@@ -99,7 +99,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
-      icon: <img src="/images/chiCoin.png" alt="chiCoin" className="w-8 h-8" />,
+      icon: <img src="../../public/images/status4.png"/>,
       color: 'from-pink-400 to-rose-500',
       available: subscriptionTier >= 1,
       action: () => navigate('/exchange')
