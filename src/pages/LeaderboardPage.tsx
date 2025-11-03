@@ -206,7 +206,8 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[1].username,
                       level: leaderboardData.leaderboard[1].level,
                       steam_avatar: leaderboardData.leaderboard[1].steam_avatar,
-                      score: getScoreValue(leaderboardData.leaderboard[1])
+                      score: getScoreValue(leaderboardData.leaderboard[1]),
+                      most_expensive_item_name: leaderboardData.leaderboard[1].most_expensive_item_name
                     }}
                     rank={2}
                     leaderboardType={leaderboardData.type}
@@ -220,7 +221,8 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[0].username,
                       level: leaderboardData.leaderboard[0].level,
                       steam_avatar: leaderboardData.leaderboard[0].steam_avatar,
-                      score: getScoreValue(leaderboardData.leaderboard[0])
+                      score: getScoreValue(leaderboardData.leaderboard[0]),
+                      most_expensive_item_name: leaderboardData.leaderboard[0].most_expensive_item_name
                     }}
                     rank={1}
                     leaderboardType={leaderboardData.type}
@@ -234,7 +236,8 @@ const LeaderboardPage: React.FC = () => {
                       username: leaderboardData.leaderboard[2].username,
                       level: leaderboardData.leaderboard[2].level,
                       steam_avatar: leaderboardData.leaderboard[2].steam_avatar,
-                      score: getScoreValue(leaderboardData.leaderboard[2])
+                      score: getScoreValue(leaderboardData.leaderboard[2]),
+                      most_expensive_item_name: leaderboardData.leaderboard[2].most_expensive_item_name
                     }}
                     rank={3}
                     leaderboardType={leaderboardData.type}

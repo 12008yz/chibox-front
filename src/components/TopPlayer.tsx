@@ -10,6 +10,7 @@ interface User {
   score?: number;
   cases_opened?: number;
   max_item_value?: number;
+  most_expensive_item_name?: string;
 }
 
 interface TopPlayerProps {
@@ -34,11 +35,18 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
             #{rank}
           </span>
         </div>
-        <div className="text-gray-400 truncate mt-6">
-          {leaderboardType === 'most_expensive_item' ? (
-            <Monetary value={getScore()} />
-          ) : (
-            <span className="font-semibold">{getScore()}</span>
+        <div className="flex flex-col items-center gap-1 mt-6">
+          <div className="text-gray-400">
+            {leaderboardType === 'most_expensive_item' ? (
+              <Monetary value={getScore()} />
+            ) : (
+              <span className="font-semibold">{getScore()}</span>
+            )}
+          </div>
+          {leaderboardType === 'most_expensive_item' && user.most_expensive_item_name && (
+            <span className="text-xs text-gray-400 text-center px-2 max-w-[200px] truncate">
+              {user.most_expensive_item_name}
+            </span>
           )}
         </div>
       </div>
