@@ -365,6 +365,10 @@
     "weapon_type": "Тип:",
     "weapon_type_default": "Оружие",
     "show_less": "Показать меньше",
+    "load_more": "Загрузить ещё",
+    "loading": "Загрузка...",
+    "inventory_description_active": "Активные предметы в инвентаре пользователя",
+    "inventory_description_opened": "Все предметы, полученные из открытых кейсов",
     "achievement_categories": {
       "beginner": "Новичок",
       "collector": "Коллекционер",

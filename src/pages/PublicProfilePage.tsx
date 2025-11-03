@@ -14,37 +14,47 @@ const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
-  // State для пагинации
-  const [page, setPage] = useState(1);
+  // State для пагинации (отдельно для каждого таба)
+  const [activePage, setActivePage] = useState(1);
+  const [openedPage, setOpenedPage] = useState(1);
   const [inventoryItems, setInventoryItems] = useState<any[]>([]);
   const [caseItemsList, setCaseItemsList] = useState<any[]>([]);
+ // State для переключения между категориями инвентаря
+ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active'); 
+  // Определяем текущую страницу в зависимости от активного таба
+  const currentPage = activeInventoryTab === 'active' ? activePage : openedPage;
 
   const { data: profileData, isLoading, error } = useGetPublicProfileQuery(
-    { userId: id || '', page, limit: 24 },
+    { userId: id || '', page: currentPage, limit: 12, tab: activeInventoryTab },
     { skip: !id }
   );
 
   // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
 
-  // State для переключения между превью и полным отображением инвентаря
-  const [showFullInventory, setShowFullInventory] = useState(false);
+  // State для отслеживания, нужно ли загружать больше данных
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // State для переключения между категориями инвентаря
-  const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
+
 
   // Обновляем списки при получении новых данных
   React.useEffect(() => {
     if (profileData?.user) {
-      if (page === 1) {
-        setInventoryItems(profileData.user.inventory || []);
-        setCaseItemsList(profileData.user.caseItems || []);
+      if (activeInventoryTab === 'active') {
+        if (activePage === 1) {
+          setInventoryItems(profileData.user.inventory || []);
+        } else {
+          setInventoryItems(prev => [...prev, ...(profileData.user.inventory || [])]);
+        }
       } else {
-        setInventoryItems(prev => [...prev, ...(profileData.user.inventory || [])]);
-        setCaseItemsList(prev => [...prev, ...(profileData.user.caseItems || [])]);
+        if (openedPage === 1) {
+          setCaseItemsList(profileData.user.caseItems || []);
+        } else {
+          setCaseItemsList(prev => [...prev, ...(profileData.user.caseItems || [])]);
+        }
       }
     }
-  }, [profileData, page]);
+  }, [profileData, activePage, openedPage, activeInventoryTab]);
 
   if (isLoading) {
     return (
@@ -565,37 +575,13 @@ const PublicProfilePage: React.FC = () => {
                 {(activeInventoryTab as 'active' | 'opened') === 'active' && t('public_profile.inventory_description_active')}
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' && t('public_profile.inventory_description_opened')}
               </div>
-
-              {/* Toggle Button для показа всех предметов */}
-              {filteredInventory.length > 12 && (
-                <button
-                  onClick={() => setShowFullInventory(!showFullInventory)}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-                >
-                  {showFullInventory ? (
-                    <>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                      </svg>
-                      {t('public_profile.hide')}
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                      {t('public_profile.show_all')}
-                    </>
-                  )}
-                </button>
-              )}
             </div>
 
             {filteredInventory.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
-                  (showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => {
+                  filteredInventory.map((inventoryItem: any) => {
                     const caseTemplate = inventoryItem.case_template_id
                       ? getCaseTemplateById(inventoryItem.case_template_id)
                       : null;
@@ -610,7 +596,7 @@ const PublicProfilePage: React.FC = () => {
                   })
                 ) : (
                   // Обычный рендеринг для активных предметов
-                  (showFullInventory ? filteredInventory : filteredInventory.slice(0, 12)).map((inventoryItem: any) => (
+                  filteredInventory.map((inventoryItem: any) => (
                     <div
                       key={inventoryItem.id}
                       className="bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
@@ -671,20 +657,6 @@ const PublicProfilePage: React.FC = () => {
                     </div>
                   ))
                 )}
-
-                {/* Показываем карточку "Ещё предметов" только если не показываем все предметы */}
-                {!showFullInventory && filteredInventory.length > 12 && (
-                <div
-                  className="bg-black/30 rounded-xl p-4 border border-gray-600/30 flex flex-col items-center justify-center cursor-pointer hover:border-gray-400/50 transition-all duration-300"
-                  onClick={() => setShowFullInventory(true)}
-                >
-                  <div className="text-2xl font-bold text-gray-400 mb-2">+{filteredInventory.length - 12}</div>
-                  <p className="text-gray-400 text-xs text-center mb-2">{t('public_profile.more_items')}</p>
-                  <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
               </div>
             ) : (
               <div className="text-center py-12">
@@ -705,17 +677,60 @@ const PublicProfilePage: React.FC = () => {
               </div>
             )}
 
-            {/* Кнопка "Показать меньше" в конце, если показан полный инвентарь */}
-            {showFullInventory && filteredInventory.length > 12 && (
+            {/* Кнопка "Загрузить ещё" */}
+            {activeInventoryTab === 'active' && profileData?.user?.inventoryPagination?.hasMore && (
               <div className="flex justify-center mt-6">
                 <button
-                  onClick={() => setShowFullInventory(false)}
-                  className="px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                  onClick={() => {
+                    setIsLoadingMore(true);
+                    setActivePage(activePage + 1);
+                    setTimeout(() => setIsLoadingMore(false), 500);
+                  }}
+                  disabled={isLoadingMore}
+                  className="px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
-                  </svg>
-                  {t('public_profile.show_less')}
+                  {isLoadingMore ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      {t('public_profile.loading')}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      {t('public_profile.load_more')} ({profileData.user.inventoryPagination.total - filteredInventory.length})
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Кнопка "Загрузить ещё" для открытых кейсов */}
+            {activeInventoryTab === 'opened' && profileData?.user?.caseItemsPagination?.hasMore && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => {
+                    setIsLoadingMore(true);
+                    setOpenedPage(openedPage + 1);
+                    setTimeout(() => setIsLoadingMore(false), 500);
+                  }}
+                  disabled={isLoadingMore}
+                  className="px-6 py-3 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      {t('public_profile.loading')}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      {t('public_profile.load_more')} ({profileData.user.caseItemsPagination.total - filteredInventory.length})
+                    </>
+                  )}
                 </button>
               </div>
             )}
