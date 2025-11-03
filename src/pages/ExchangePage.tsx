@@ -38,9 +38,9 @@ const ItemCard: React.FC<{
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const { item, count } = itemGroup;
-  // Используем price как sellPrice (цена продажи = 70% от рыночной стоимости)
+  // Используем price как sellPrice (цена продажи = 65% от рыночной стоимости)
   const itemPrice = parseFloat(item.price || '0');
-  const sellPrice = itemPrice * 0.7; // 70% от цены предмета
+  const sellPrice = itemPrice * 0.65; // 65% от цены предмета
   const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
   const getRarityColor = (rarity: string) => {
@@ -561,16 +561,6 @@ const ExchangePage: React.FC = () => {
                 <p className="text-white text-lg font-bold">{t('exchange.tier_3_price')}</p>
                 <p className="text-gray-400 text-sm">{t('exchange.tier_3_description')}</p>
               </div>
-            </div>
-
-            <div className="mt-4 p-4 rounded-lg border border-purple-500/30">
-              <h6 className="text-purple-300 font-medium mb-2">{t('exchange.important_conditions')}</h6>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>• {t('exchange.min_exchange_price', { price: minExchangePrice })}</li>
-                <li>• {t('exchange.sell_percentage')}</li>
-                <li>• {t('exchange.no_returns')}</li>
-                <li>• {t('exchange.days_accumulate')}</li>
-              </ul>
             </div>
           </div>
         )}

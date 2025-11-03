@@ -52,10 +52,10 @@ export function getSubscriptionStatus(user: User | null): {
   }
 
   const isExpiring = daysLeft <= 3 && daysLeft > 0;
-  let statusText = `${daysLeft} дней подписки`;
+  let statusText = `${daysLeft} дней статуса`;
 
   if (daysLeft === 1) {
-    statusText = 'Последний день подписки';
+    statusText = 'Последний день статуса';
   } else if (daysLeft === 0) {
     statusText = 'Подписка истекает сегодня';
   }
