@@ -316,6 +316,7 @@ const ProfilePage: React.FC = () => {
           onUserRefresh={refetchUser}
           translateCaseName={translateCaseName}
           openingCaseId={openingCaseId}
+          totalCasesOpened={user.total_cases_opened}
         />
 
       </div>
