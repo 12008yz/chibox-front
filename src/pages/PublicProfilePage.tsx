@@ -143,21 +143,19 @@ const PublicProfilePage: React.FC = () => {
   const bestWeapon = user.bestWeapon;
 
 
-  const inventory = user.inventory || [];
-  const caseItems = (user as any).caseItems || []; // Все предметы из кейсов
   const achievements = user.achievements || [];
   const dropBonuses = user.dropBonuses || { achievements: 0, subscription: 0, level: 0, total: 0 };
 
   // Функции для фильтрации инвентаря
   const getActiveInventory = () => {
-    return inventory.filter(item =>
+    return inventoryItems.filter(item =>
       item.status !== 'sold' && item.status !== 'withdrawn' && item.status !== 'used'
     );
   };
 
   const getOpenedCases = () => {
     // Все предметы, полученные из кейсов (включая проданные/выведенные)
-    return caseItems;
+    return caseItemsList;
   };
 
   // Получаем инвентарь в зависимости от активного таба
@@ -513,7 +511,7 @@ const PublicProfilePage: React.FC = () => {
         </div>
 
         {/* Inventory Section */}
-        {(inventory.length > 0 || caseItems.length > 0) && (
+        {(inventoryItems.length > 0 || caseItemsList.length > 0) && (
           <div className="bg-gradient-to-br from-[#1a1530] to-[#2a1f47] rounded-xl p-6 border border-gray-700/30">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2">
@@ -556,7 +554,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   {t('public_profile.opened_cases_tab')}
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.totalCasesOpened || 0}</span>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.caseItemsPagination?.total || 0}</span>
                 </button>
               </div>
 
