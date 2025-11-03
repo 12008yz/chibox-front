@@ -73,7 +73,7 @@ const createGlobalSocket = () => {
   // Обработчик успешного подключения
   globalSocket.on('connect', () => {
     console.log('✅ WebSocket: Подключено к серверу');
-    console.log('🔌 Socket ID:', globalSocket.id);
+    console.log('🔌 Socket ID:', globalSocket?.id);
     connectionListeners.forEach(listener => listener(true));
   });
 
