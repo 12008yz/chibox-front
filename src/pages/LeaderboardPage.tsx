@@ -50,19 +50,19 @@ const LeaderboardPage: React.FC = () => {
       id: 'cases_opened',
       name: t('leaderboard_page.cases_opened_tab'),
       description: t('leaderboard_page.cases_opened_description'),
-      icon: '📦'
+      icon: '/images/1.png'
     },
     {
       id: 'level',
       name: t('leaderboard_page.level_tab'),
       description: t('leaderboard_page.level_description'),
-      icon: '⭐'
+      icon: '/images/2.png'
     },
     {
       id: 'most_expensive_item',
       name: t('leaderboard_page.best_drop_tab'),
       description: t('leaderboard_page.best_drop_description'),
-      icon: '💎'
+      icon: '/images/3.png'
     }
   ];
 
@@ -155,7 +155,9 @@ const LeaderboardPage: React.FC = () => {
           {/* Описание текущей вкладки */}
           {currentTab && (
             <div className="text-center mb-8">
-              <div className="text-4xl mb-2">{currentTab.icon}</div>
+              <div className="flex justify-center mb-2">
+                <img src={currentTab.icon} alt={currentTab.name} className="w-16 h-16 object-contain" />
+              </div>
               <p className="text-gray-400">{currentTab.description}</p>
             </div>
           )}
@@ -175,7 +177,7 @@ const LeaderboardPage: React.FC = () => {
                 `}
               >
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-lg">{tab.icon}</span>
+                  <img src={tab.icon} alt={tab.name} className="w-8 h-8 object-contain" />
                   <span className="text-sm">{tab.name}</span>
                 </div>
                 {activeTab === tab.id && (
