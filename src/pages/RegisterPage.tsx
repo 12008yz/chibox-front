@@ -70,37 +70,44 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      console.log('Starting registration...');
+      console.log('[RegisterPage] Starting registration...');
+      console.log('[RegisterPage] Username:', username, 'Email:', email);
       isRegistrationInProgressRef.current = true;
+
       const registerResult = await register({ username, email, password }).unwrap();
-      console.log('Registration result:', registerResult);
+      console.log('[RegisterPage] Registration result:', registerResult);
 
       if (registerResult.success) {
         // ВАЖНО: Сначала показываем видео через глобальное состояние, ПОТОМ диспатчим логин
-        console.log('Showing intro video...');
+        console.log('[RegisterPage] Registration successful! Showing intro video...');
+        console.log('[RegisterPage] Dispatching setShowIntroVideo(true)');
         dispatch(setShowIntroVideo(true));
 
         try {
-          console.log('Attempting auto-login...');
+          console.log('[RegisterPage] Attempting auto-login...');
           const loginResult = await login({ email, password }).unwrap();
-          console.log('Auto-login result:', loginResult);
+          console.log('[RegisterPage] Auto-login result:', loginResult);
 
           if (loginResult.success && loginResult.data) {
+            console.log('[RegisterPage] Auto-login successful, dispatching loginSuccess');
             dispatch(loginSuccess({
               user: loginResult.data.user,
               token: loginResult.data.token
             }));
-            console.log('Login success dispatched');
+            console.log('[RegisterPage] Login success dispatched, user should be authenticated now');
+          } else {
+            console.error('[RegisterPage] Auto-login failed: no success or data in result');
           }
         } catch (loginErr: any) {
-          console.error('Auto-login error:', loginErr);
+          console.error('[RegisterPage] Auto-login error:', loginErr);
         }
       } else {
+        console.error('[RegisterPage] Registration failed: success = false');
         setError(t('auth.registration_error'));
         isRegistrationInProgressRef.current = false;
       }
     } catch (err: any) {
-      console.error('Registration error:', err);
+      console.error('[RegisterPage] Registration error:', err);
       setError(err?.data?.message || t('auth.registration_error'));
       isRegistrationInProgressRef.current = false;
     }

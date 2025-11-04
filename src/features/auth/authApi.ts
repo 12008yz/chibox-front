@@ -27,12 +27,16 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ user: User; token: string }>,
       LoginRequest
     >({
-      query: (credentials) => ({
-        url: 'v1/login',
-        method: 'POST',
-        body: credentials,
-      }),
+      query: (credentials) => {
+        console.log('[authApi] Login query:', { email: credentials.email });
+        return {
+          url: 'v1/login',
+          method: 'POST',
+          body: credentials,
+        };
+      },
       transformResponse: (response: any) => {
+        console.log('[authApi] Login response received:', response);
         // Трансформируем ответ бэкенда к ожидаемому формату
         if (response.success && response.token && response.user) {
           // Добавляем achievements и inventory к пользователю, если они есть
@@ -42,7 +46,7 @@ export const authApi = baseApi.injectEndpoints({
             inventory: response.inventory || []
           };
 
-          return {
+          const transformedResponse = {
             success: response.success,
             data: {
               user,
@@ -50,7 +54,10 @@ export const authApi = baseApi.injectEndpoints({
             },
             message: response.message
           };
+          console.log('[authApi] Login transformed response:', transformedResponse);
+          return transformedResponse;
         }
+        console.log('[authApi] Login response not successful, returning as is');
         return response;
       },
       invalidatesTags: ['User', 'Profile'],
@@ -61,15 +68,22 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ userId: string; email: string; codeExpires: string }> & { previewUrl?: string },
       RegisterRequest
     >({
-      query: (userData) => ({
-        url: 'v1/register',
-        method: 'POST',
-        body: userData,
-      }),
+      query: (userData) => {
+        console.log('[authApi] Register query:', {
+          username: userData.username,
+          email: userData.email
+        });
+        return {
+          url: 'v1/register',
+          method: 'POST',
+          body: userData,
+        };
+      },
       transformResponse: (response: any) => {
+        console.log('[authApi] Register response received:', response);
         // Регистрация возвращает другой формат - userId, email, codeExpires
         if (response.success) {
-          return {
+          const transformedResponse = {
             success: response.success,
             data: {
               userId: response.userId,
@@ -79,7 +93,10 @@ export const authApi = baseApi.injectEndpoints({
             message: response.message,
             previewUrl: response.previewUrl // для тестового режима
           };
+          console.log('[authApi] Register transformed response:', transformedResponse);
+          return transformedResponse;
         }
+        console.log('[authApi] Register response not successful, returning as is');
         return response;
       },
       invalidatesTags: ['User', 'Profile'],

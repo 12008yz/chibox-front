@@ -30,6 +30,10 @@ const authSlice = createSlice({
 
     // Успешная авторизация
     loginSuccess: (state, action: PayloadAction<{ user: User | null; token: string }>) => {
+      console.log('[authSlice] loginSuccess called with:', {
+        user: action.payload.user,
+        token: action.payload.token?.substring(0, 20) + '...'
+      });
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
@@ -38,7 +42,13 @@ const authSlice = createSlice({
       // Сохраняем токен в localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('auth_token', action.payload.token);
+        console.log('[authSlice] Token saved to localStorage');
       }
+      console.log('[authSlice] State after loginSuccess:', {
+        isAuthenticated: state.isAuthenticated,
+        hasUser: !!state.user,
+        hasToken: !!state.token
+      });
     },
 
     // Обновление данных пользователя

@@ -28,6 +28,13 @@ const App: React.FC = () => {
   const { onlineUsers, isConnected } = useSocket();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
 
+  console.log('[App] Current auth state:', {
+    isAuthenticated: auth.isAuthenticated,
+    hasToken: !!auth.token,
+    hasUser: !!auth.user,
+    userId: auth.user?.id
+  });
+
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/steam-auth';

@@ -18,13 +18,20 @@ import { BACKGROUNDS } from '../utils/config';
 import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { setShowIntroVideo as setGlobalShowIntroVideo } from '../store/slices/uiSlice';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { onlineUsers } = useSocket();
   const { userData, refetch: refetchUser } = useUserData({ autoRefresh: false }); // Получаем данные пользователя
+
+  // Получаем глобальное состояние показа интро из Redux
+  const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
+  console.log('[HomePage] Global showIntroVideo from Redux:', globalShowIntroVideo);
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
@@ -37,6 +44,15 @@ const HomePage: React.FC = () => {
     email: string;
     previewUrl?: string;
   } | null>(null);
+
+  // Синхронизируем локальное состояние с глобальным
+  useEffect(() => {
+    console.log('[HomePage] Синхронизация: globalShowIntroVideo =', globalShowIntroVideo);
+    if (globalShowIntroVideo) {
+      console.log('[HomePage] Устанавливаем локальный showIntroVideo = true');
+      setShowIntroVideo(true);
+    }
+  }, [globalShowIntroVideo]);
 
   // Состояние игры крестики-нолики
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
@@ -136,8 +152,9 @@ const HomePage: React.FC = () => {
   };
 
   const handleVideoEnd = () => {
-    console.log('Video ended, hiding intro video');
+    console.log('[HomePage] Video ended, hiding intro video');
     setShowIntroVideo(false);
+    dispatch(setGlobalShowIntroVideo(false)); // Сбрасываем глобальное состояние
     setRegistrationData(null); // Очищаем данные регистрации
     // После видео показываем главный экран без модального окна
   };
