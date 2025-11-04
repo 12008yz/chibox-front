@@ -109,26 +109,19 @@ const HomePage: React.FC = () => {
 
 
 
-  // Проверяем, нужно ли показать видео или модальное окно регистрации
+  // Проверяем, нужно ли показать модальное окно регистрации
   useEffect(() => {
     console.log('HomePage location.state:', location.state);
 
     if (location.state?.showRegistrationSuccess) {
-      console.log('Showing registration success - video mode:', location.state?.showIntroVideo);
+      console.log('Showing registration success modal');
 
       setRegistrationData({
         email: location.state.registrationEmail,
         previewUrl: location.state.previewUrl
       });
 
-      // Если нужно показать видео
-      if (location.state?.showIntroVideo) {
-        console.log('Setting showIntroVideo to true');
-        setShowIntroVideo(true);
-      } else {
-        console.log('Setting showRegistrationModal to true');
-        setShowRegistrationModal(true);
-      }
+      setShowRegistrationModal(true);
 
       // Очищаем state после обработки
       navigate('/', { replace: true, state: {} });

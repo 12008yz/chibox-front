@@ -22,21 +22,32 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
       // Загружаем видео
       video.load();
 
-      // Небольшая задержка перед воспроизведением
-      setTimeout(() => {
+      // Пытаемся запустить видео с несколькими попытками
+      const attemptPlay = (attemptNumber = 1, maxAttempts = 5) => {
+        console.log(`Play attempt ${attemptNumber}/${maxAttempts}`);
         const playPromise = video.play();
 
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               console.log('Video playing successfully');
+              setIsVideoReady(true);
             })
             .catch(error => {
-              console.error('Error playing video:', error);
-              console.log('Trying to play with user interaction...');
+              console.error(`Play attempt ${attemptNumber} failed:`, error);
+              // Повторные попытки с увеличивающимся интервалом
+              if (attemptNumber < maxAttempts) {
+                const delay = attemptNumber * 100; // 100ms, 200ms, 300ms, etc.
+                setTimeout(() => {
+                  attemptPlay(attemptNumber + 1, maxAttempts);
+                }, delay);
+              }
             });
         }
-      }, 100);
+      };
+
+      // Немедленная попытка воспроизведения
+      setTimeout(() => attemptPlay(), 0);
     }
   }, [isOpen]);
 
@@ -102,10 +113,10 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
       )}
       <video
         ref={videoRef}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
         playsInline
         preload="auto"
-        muted={true}
+        muted={false}
         autoPlay={true}
         controls={false}
         onClick={(e) => e.stopPropagation()}
