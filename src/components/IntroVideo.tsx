@@ -14,10 +14,29 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
     console.log('IntroVideo isOpen changed:', isOpen);
     if (isOpen && videoRef.current) {
       console.log('Attempting to play video...');
-      // Запускаем видео когда компонент открывается
-      videoRef.current.play().catch(error => {
-        console.error('Error playing video:', error);
-      });
+      const video = videoRef.current;
+
+      // Сбрасываем видео к началу
+      video.currentTime = 0;
+
+      // Загружаем видео
+      video.load();
+
+      // Небольшая задержка перед воспроизведением
+      setTimeout(() => {
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Video playing successfully');
+            })
+            .catch(error => {
+              console.error('Error playing video:', error);
+              console.log('Trying to play with user interaction...');
+            });
+        }
+      }, 100);
     }
   }, [isOpen]);
 
@@ -28,6 +47,13 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
     const handleCanPlay = () => {
       console.log('Video can play');
       setIsVideoReady(true);
+
+      // Автоматически начинаем воспроизведение когда видео готово
+      if (isOpen) {
+        video.play().catch(error => {
+          console.error('Error auto-playing video on canplay:', error);
+        });
+      }
     };
 
     const handleEnded = () => {
@@ -42,7 +68,7 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('ended', handleEnded);
     };
-  }, [onVideoEnd]);
+  }, [onVideoEnd, isOpen]);
 
   // Обработка нажатия ESC для пропуска видео
   useEffect(() => {
@@ -79,6 +105,9 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
         className="w-full h-full object-contain"
         playsInline
         preload="auto"
+        muted={true}
+        autoPlay={true}
+        controls={false}
         onClick={(e) => e.stopPropagation()}
       >
         <source src={videoUrl} type="video/mp4" />

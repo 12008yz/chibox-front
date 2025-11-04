@@ -143,7 +143,9 @@ const HomePage: React.FC = () => {
   };
 
   const handleVideoEnd = () => {
+    console.log('Video ended, hiding intro video');
     setShowIntroVideo(false);
+    setRegistrationData(null); // Очищаем данные регистрации
     // После видео показываем главный экран без модального окна
   };
 
@@ -476,7 +478,7 @@ const HomePage: React.FC = () => {
       <IntroVideo
         isOpen={showIntroVideo}
         onVideoEnd={handleVideoEnd}
-        videoUrl="/intro-video.mp4"
+        videoUrl="/preview.mp4"
       />
 
       {/* Модальное окно успешной регистрации */}

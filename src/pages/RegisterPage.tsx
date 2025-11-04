@@ -120,7 +120,7 @@ const RegisterPage: React.FC = () => {
 
       {/* Предзагрузка видео (скрыто) */}
       <video ref={videoRef} className="hidden" preload="auto">
-        <source src="/intro-video.mp4" type="video/mp4" />
+        <source src="/preview.mp4" type="video/mp4" />
       </video>
 
       {/* Игра в змейку в качестве фона */}
