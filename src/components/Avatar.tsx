@@ -45,12 +45,12 @@ const Avatar: React.FC<AvatarProps> = ({
 
         // Определяем источник изображения прямо здесь
         const getImageSource = () => {
-            // Приоритет: Steam аватар > обычное изображение > fallback
-            if (steamAvatar) {
-                return steamAvatar;
-            }
+            // Приоритет: пользовательское изображение > Steam аватар > fallback
             if (image) {
                 return image;
+            }
+            if (steamAvatar) {
+                return steamAvatar;
             }
             return generateFallbackAvatar(id);
         };

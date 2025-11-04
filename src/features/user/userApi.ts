@@ -798,6 +798,28 @@ export const userApi = baseApi.injectEndpoints({
         return currency ? `v1/currency?currency=${currency}` : 'v1/currency';
       },
     }),
+
+    // Загрузка аватара
+    uploadAvatar: builder.mutation<
+      ApiResponse<{ avatar_url: string }>,
+      FormData
+    >({
+      query: (formData) => ({
+        url: 'v1/profile/avatar',
+        method: 'POST',
+        body: formData,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    // Удаление аватара
+    deleteAvatar: builder.mutation<ApiResponse<null>, void>({
+      query: () => ({
+        url: 'v1/profile/avatar',
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
@@ -854,4 +876,8 @@ export const {
 
   // Валюты хук
   useGetCurrencyQuery,
+
+  // Аватар хуки
+  useUploadAvatarMutation,
+  useDeleteAvatarMutation,
 } = userApi;
