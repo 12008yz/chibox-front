@@ -3,7 +3,7 @@ class SoundManager {
   private sounds: Map<string, HTMLAudioElement> = new Map();
   private activeClones: Set<HTMLAudioElement> = new Set(); // Отслеживаем все активные клоны
   private soundsEnabled: boolean = true;
-  private volume: number = 0.5;
+  private volume: number = 0.35;
   private audioContext: AudioContext | null = null;
   private unlocked: boolean = false;
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
