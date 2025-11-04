@@ -47,6 +47,10 @@ export interface UIState {
 
   // Интро видео
   showIntroVideo: boolean;
+
+  // Онбординг
+  hasSeenOnboarding: boolean;
+  showOnboarding: boolean;
 }
 
 const initialState: UIState = {
@@ -61,6 +65,8 @@ const initialState: UIState = {
   animationsEnabled: true,
   soundsEnabled: true,
   showIntroVideo: false,
+  hasSeenOnboarding: false,
+  showOnboarding: false,
 };
 
 const uiSlice = createSlice({
@@ -169,6 +175,21 @@ const uiSlice = createSlice({
       console.log('[uiSlice] New value:', state.showIntroVideo);
     },
 
+    // Онбординг
+    setShowOnboarding: (state, action: PayloadAction<boolean>) => {
+      state.showOnboarding = action.payload;
+    },
+
+    setHasSeenOnboarding: (state, action: PayloadAction<boolean>) => {
+      state.hasSeenOnboarding = action.payload;
+      // Сохраняем в localStorage
+      if (action.payload) {
+        localStorage.setItem('hasSeenOnboarding', 'true');
+      } else {
+        localStorage.removeItem('hasSeenOnboarding');
+      }
+    },
+
     // Сброс состояния
     resetUIState: () => initialState,
   },
@@ -195,6 +216,8 @@ export const {
   setAnimationsEnabled,
   setSoundsEnabled,
   setShowIntroVideo,
+  setShowOnboarding,
+  setHasSeenOnboarding,
   resetUIState,
 } = uiSlice.actions;
 

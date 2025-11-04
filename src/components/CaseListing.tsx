@@ -67,15 +67,17 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
       <div className="flex flex-col md:flex-row items-center justify-center w-full gap-8 md:flex-wrap">
         {cases && cases.length > 0 ? (
-          cases.map((caseItem) => {
+          cases.map((caseItem, index) => {
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
+              const isFirstCase = index === 0;
 
               if (isBonusCase) {
                 // Для бонусного кейса не используем Link, чтобы кнопка "Играть" работала
                 return (
                   <div
                     key={caseItem.id}
+                    id={isFirstCase ? 'onboarding-cases' : undefined}
                     className="transition-transform hover:scale-105 cursor-pointer"
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
@@ -101,6 +103,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <Link
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
+                    id={isFirstCase ? 'onboarding-cases' : undefined}
                     className="transition-transform hover:scale-105"
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >

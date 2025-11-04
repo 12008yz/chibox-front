@@ -12,6 +12,7 @@ import AppFeatures from '../components/AppFeatures';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import RouletteGame from '../components/RouletteGame';
+import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
 
@@ -19,7 +20,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { setShowIntroVideo as setGlobalShowIntroVideo } from '../store/slices/uiSlice';
+import { setShowIntroVideo as setGlobalShowIntroVideo, setShowOnboarding, setHasSeenOnboarding } from '../store/slices/uiSlice';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,6 +32,8 @@ const HomePage: React.FC = () => {
 
   // Получаем глобальное состояние показа интро из Redux
   const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
+  const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
+  const hasSeenOnboarding = useAppSelector(state => state.ui.hasSeenOnboarding);
   console.log('[HomePage] Global showIntroVideo from Redux:', globalShowIntroVideo);
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
@@ -156,7 +159,30 @@ const HomePage: React.FC = () => {
     setShowIntroVideo(false);
     dispatch(setGlobalShowIntroVideo(false)); // Сбрасываем глобальное состояние
     setRegistrationData(null); // Очищаем данные регистрации
-    // После видео показываем главный экран без модального окна
+
+    // После видео показываем онбординг, если пользователь его еще не видел
+    const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboardingStorage && userData?.id) {
+      setTimeout(() => {
+        dispatch(setShowOnboarding(true));
+      }, 500);
+    }
+  };
+
+  // Проверяем, нужно ли показать онбординг при первом входе
+  useEffect(() => {
+    const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboardingStorage && userData?.id && !showIntroVideo && !showRegistrationModal) {
+      // Показываем онбординг только если пользователь авторизован и не смотрит видео
+      setTimeout(() => {
+        dispatch(setShowOnboarding(true));
+      }, 1000);
+    }
+  }, [userData?.id, showIntroVideo, showRegistrationModal, dispatch]);
+
+  const handleOnboardingComplete = () => {
+    dispatch(setShowOnboarding(false));
+    dispatch(setHasSeenOnboarding(true));
   };
 
   // Функция для покупки и открытия кейса - ВОЗВРАЩАЕТ результат для анимации в модале
@@ -512,6 +538,12 @@ const HomePage: React.FC = () => {
       <RouletteGame
         isOpen={showRouletteGame}
         onClose={handleRouletteClose}
+      />
+
+      {/* Онбординг тур */}
+      <OnboardingTour
+        isActive={showOnboarding}
+        onComplete={handleOnboardingComplete}
       />
 
     </div>

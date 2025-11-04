@@ -1035,5 +1035,14 @@
     "select_source_first": "Select source item first",
     "loading_options": "Loading upgrade options...",
     "no_upgrade_options": "No upgrade options available for this item"
+  },
+  "onboarding": {
+    "cases_title": "🎁 Cases",
+    "cases_description": "Click on a case to see what's inside and open it! Each case contains unique items.",
+    "deposit_title": "💰 Deposit Balance",
+    "deposit_description": "Here you can top up your balance to buy premium cases and also purchase status. By purchasing status you get free cases throughout your entire activity.",
+    "skip": "Skip",
+    "next": "Next",
+    "finish": "Finish"
   }
 }

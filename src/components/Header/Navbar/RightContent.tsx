@@ -136,6 +136,7 @@ const RightContent: React.FC<RightContentProps> = ({
             <div className="gaming-balance-label">{t('header.balance')}</div>
           </div>
           <button
+            id="onboarding-deposit-button"
             onClick={() => {
               setIsDepositModalOpen(true);
             }}
