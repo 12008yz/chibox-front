@@ -472,6 +472,7 @@ export const userApi = baseApi.injectEndpoints({
           username: string;
           createdAt: string;
           level: number;
+          avatar_url?: string;
           subscriptionTier?: number;
           subscriptionStatus?: string;
           totalCasesOpened: number;
