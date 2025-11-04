@@ -6,6 +6,7 @@ interface User {
   id: string;
   username: string;
   level?: number;
+  avatar_url?: string;
   steam_avatar?: string;
   steam_avatar_url?: string;
 }
@@ -32,6 +33,7 @@ const Player: React.FC<PlayerProps> = ({
       }`}>
         <Avatar
           id={user.id}
+          image={user.avatar_url}
           steamAvatar={user.steam_avatar_url || user.steam_avatar}
           size={size}
           showLevel={showLevel}

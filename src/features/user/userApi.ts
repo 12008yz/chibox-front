@@ -808,8 +808,7 @@ export const userApi = baseApi.injectEndpoints({
         url: 'v1/profile/avatar',
         method: 'POST',
         body: formData,
-        // Используем formData: true чтобы отключить автоматическую установку Content-Type
-        formData: true,
+        // Не устанавливаем Content-Type - браузер автоматически установит multipart/form-data с boundary для FormData
       }),
       invalidatesTags: ['User'],
     }),

@@ -126,12 +126,12 @@ const Avatar: React.FC<AvatarProps> = ({
     );
 
     const getImageSrc = () => {
-        // Приоритет: Steam аватар > обычное изображение > fallback
-        if (steamAvatar && !imageError) {
-            return steamAvatar;
-        }
+        // Приоритет: загруженное изображение > Steam аватар > fallback
         if (image && !imageError) {
             return image;
+        }
+        if (steamAvatar && !imageError) {
+            return steamAvatar;
         }
         return generateFallbackAvatar(id);
     };
