@@ -22,10 +22,10 @@ const InventoryTabs: React.FC<InventoryTabsProps> = ({ activeTab, onTabChange, c
       label: t('profile.inventory_tabs.active'),
       count: counts.active,
       icon: (
-        <>
+        <g>
           <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
           <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
-        </>
+        </g>
       ),
       gradient: 'from-green-500 to-blue-500'
     },
@@ -34,7 +34,7 @@ const InventoryTabs: React.FC<InventoryTabsProps> = ({ activeTab, onTabChange, c
       label: t('profile.inventory_tabs.opened_cases'),
       count: counts.opened,
       icon: (
-        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
       ),
       gradient: 'from-orange-500 to-red-500'
     },
@@ -43,7 +43,7 @@ const InventoryTabs: React.FC<InventoryTabsProps> = ({ activeTab, onTabChange, c
       label: t('profile.inventory_tabs.withdrawn'),
       count: counts.withdrawn,
       icon: (
-        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586 7.707 9.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
       ),
       gradient: 'from-purple-500 to-pink-500'
     },
