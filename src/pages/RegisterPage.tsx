@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../store/hooks';
 import { useRegisterMutation, useLoginMutation } from '../features/auth/authApi';
 import { loginSuccess } from '../features/auth/authSlice';
+import { setShowIntroVideo } from '../store/slices/uiSlice';
 import SteamLoginButton from '../components/SteamLoginButton';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import SnakeGameBackground from '../components/SnakeGameBackground';
-import IntroVideo from '../components/IntroVideo';
 import { validateUsername, suggestAlternativeUsername } from '../utils/profanityFilter';
 
 const RegisterPage: React.FC = () => {
@@ -19,7 +19,6 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [showIntroVideo, setShowIntroVideo] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -30,6 +29,8 @@ const RegisterPage: React.FC = () => {
 
   // Предзагрузка видео
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Используем ref для синхронного отслеживания процесса регистрации
+  const isRegistrationInProgressRef = useRef(false);
 
   useEffect(() => {
     // Начинаем предзагрузку видео как только пользователь начинает вводить данные
@@ -38,8 +39,8 @@ const RegisterPage: React.FC = () => {
     }
   }, [username, email, password]);
 
-  // Если пользователь уже авторизован И не показывается видео, перенаправляем на главную
-  if (auth.isAuthenticated && !showIntroVideo) {
+  // Если пользователь уже авторизован И не идет регистрация, перенаправляем на главную
+  if (auth.isAuthenticated && !isRegistrationInProgressRef.current) {
     return <Navigate to="/" replace />;
   }
 
@@ -70,10 +71,15 @@ const RegisterPage: React.FC = () => {
 
     try {
       console.log('Starting registration...');
+      isRegistrationInProgressRef.current = true;
       const registerResult = await register({ username, email, password }).unwrap();
       console.log('Registration result:', registerResult);
 
       if (registerResult.success) {
+        // ВАЖНО: Сначала показываем видео через глобальное состояние, ПОТОМ диспатчим логин
+        console.log('Showing intro video...');
+        dispatch(setShowIntroVideo(true));
+
         try {
           console.log('Attempting auto-login...');
           const loginResult = await login({ email, password }).unwrap();
@@ -89,24 +95,15 @@ const RegisterPage: React.FC = () => {
         } catch (loginErr: any) {
           console.error('Auto-login error:', loginErr);
         }
-
-        console.log('Showing intro video...');
-        // Показываем видео сразу на этой странице
-        setShowIntroVideo(true);
       } else {
         setError(t('auth.registration_error'));
+        isRegistrationInProgressRef.current = false;
       }
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err?.data?.message || t('auth.registration_error'));
+      isRegistrationInProgressRef.current = false;
     }
-  };
-
-  const handleVideoEnd = () => {
-    console.log('Video ended, navigating to homepage...');
-    setShowIntroVideo(false);
-    // Переходим на главную страницу после видео
-    navigate('/', { replace: true });
   };
 
   return (
@@ -278,13 +275,6 @@ const RegisterPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Вступительное видео после успешной регистрации */}
-      <IntroVideo
-        isOpen={showIntroVideo}
-        onVideoEnd={handleVideoEnd}
-        videoUrl="/preview.mp4"
-      />
     </div>
   );
 };

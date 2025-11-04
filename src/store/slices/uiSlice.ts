@@ -44,6 +44,9 @@ export interface UIState {
 
   // Звуки
   soundsEnabled: boolean;
+
+  // Интро видео
+  showIntroVideo: boolean;
 }
 
 const initialState: UIState = {
@@ -57,6 +60,7 @@ const initialState: UIState = {
   language: 'ru',
   animationsEnabled: true,
   soundsEnabled: true,
+  showIntroVideo: false,
 };
 
 const uiSlice = createSlice({
@@ -157,6 +161,11 @@ const uiSlice = createSlice({
       state.soundsEnabled = action.payload;
     },
 
+    // Интро видео
+    setShowIntroVideo: (state, action: PayloadAction<boolean>) => {
+      state.showIntroVideo = action.payload;
+    },
+
     // Сброс состояния
     resetUIState: () => initialState,
   },
@@ -182,6 +191,7 @@ export const {
   setLanguage,
   setAnimationsEnabled,
   setSoundsEnabled,
+  setShowIntroVideo,
   resetUIState,
 } = uiSlice.actions;
 

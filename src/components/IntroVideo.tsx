@@ -9,6 +9,7 @@ interface IntroVideoProps {
 const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Начинаем с отключенным звуком для автоплея
 
   useEffect(() => {
     console.log('IntroVideo isOpen changed:', isOpen);
@@ -99,6 +100,15 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
     };
   }, [isOpen, onVideoEnd]);
 
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      const newMutedState = !isMuted;
+      setIsMuted(newMutedState);
+      videoRef.current.muted = newMutedState;
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -116,13 +126,24 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
         className="w-full h-full object-cover"
         playsInline
         preload="auto"
-        muted={false}
+        muted={isMuted}
         autoPlay={true}
         controls={false}
         onClick={(e) => e.stopPropagation()}
       >
         <source src={videoUrl} type="video/mp4" />
       </video>
+
+      {/* Кнопка звука */}
+      <button
+        onClick={toggleMute}
+        className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200 text-2xl"
+        title={isMuted ? 'Включить звук' : 'Выключить звук'}
+      >
+        {isMuted ? '🔇' : '🔊'}
+      </button>
+
+      {/* Кнопка пропуска */}
       <button
         onClick={onVideoEnd}
         className="absolute top-8 right-8 text-white bg-black/50 hover:bg-black/80 px-6 py-3 rounded-lg transition-all duration-200 text-lg font-semibold"
