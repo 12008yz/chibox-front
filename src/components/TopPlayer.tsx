@@ -6,6 +6,7 @@ interface User {
   id: string;
   username: string;
   level?: number;
+  avatar_url?: string;
   steam_avatar?: string;
   score?: number;
   cases_opened?: number;

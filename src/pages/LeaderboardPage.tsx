@@ -13,6 +13,7 @@ interface User {
   user_id: string;
   username: string;
   level?: number;
+  avatar_url?: string;
   steam_avatar?: string;
   steam_avatar_url?: string;
   score?: number;
@@ -207,6 +208,7 @@ const LeaderboardPage: React.FC = () => {
                       id: leaderboardData.leaderboard[1].user_id,
                       username: leaderboardData.leaderboard[1].username,
                       level: leaderboardData.leaderboard[1].level,
+                      avatar_url: leaderboardData.leaderboard[1].avatar_url,
                       steam_avatar: leaderboardData.leaderboard[1].steam_avatar,
                       score: getScoreValue(leaderboardData.leaderboard[1]),
                       most_expensive_item_name: leaderboardData.leaderboard[1].most_expensive_item_name
@@ -222,6 +224,7 @@ const LeaderboardPage: React.FC = () => {
                       id: leaderboardData.leaderboard[0].user_id,
                       username: leaderboardData.leaderboard[0].username,
                       level: leaderboardData.leaderboard[0].level,
+                      avatar_url: leaderboardData.leaderboard[0].avatar_url,
                       steam_avatar: leaderboardData.leaderboard[0].steam_avatar,
                       score: getScoreValue(leaderboardData.leaderboard[0]),
                       most_expensive_item_name: leaderboardData.leaderboard[0].most_expensive_item_name
@@ -237,6 +240,7 @@ const LeaderboardPage: React.FC = () => {
                       id: leaderboardData.leaderboard[2].user_id,
                       username: leaderboardData.leaderboard[2].username,
                       level: leaderboardData.leaderboard[2].level,
+                      avatar_url: leaderboardData.leaderboard[2].avatar_url,
                       steam_avatar: leaderboardData.leaderboard[2].steam_avatar,
                       score: getScoreValue(leaderboardData.leaderboard[2]),
                       most_expensive_item_name: leaderboardData.leaderboard[2].most_expensive_item_name
@@ -276,6 +280,7 @@ const LeaderboardPage: React.FC = () => {
                                 id: user.user_id,
                                 username: user.username,
                                 level: user.level,
+                                avatar_url: user.avatar_url,
                                 steam_avatar: user.steam_avatar,
                                 steam_avatar_url: user.steam_avatar_url
                               }}
