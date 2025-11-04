@@ -18,8 +18,9 @@ const baseQuery = fetchBaseQuery({
       headers.set('authorization', `Bearer ${token}`);
     }
 
-    // Не устанавливаем Content-Type для FormData (браузер сделает это автоматически)
-    // Проверяем, есть ли уже установленный Content-Type
+    // Не устанавливаем Content-Type для FormData (браузер сделает это автоматически с boundary)
+    // Content-Type будет удален в prepareHeaders конкретного endpoint для FormData
+    // Если Content-Type был явно удален (для FormData), не добавляем его обратно
     if (!headers.has('content-type')) {
       headers.set('content-type', 'application/json');
     }
