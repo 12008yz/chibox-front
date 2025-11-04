@@ -49,7 +49,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
               title={t('profile.change_avatar') || 'Изменить аватар'}
             >
               <Avatar
-                image={user.avatar_url ? `${import.meta.env.VITE_API_URL}${user.avatar_url}` : undefined}
+                image={user.avatar_url}
                 steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
                 id={user.id}
                 size="large"

@@ -169,16 +169,7 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Проверяем, нужно ли показать онбординг при первом входе
-  useEffect(() => {
-    const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeenOnboardingStorage && userData?.id && !showIntroVideo && !showRegistrationModal) {
-      // Показываем онбординг только если пользователь авторизован и не смотрит видео
-      setTimeout(() => {
-        dispatch(setShowOnboarding(true));
-      }, 1000);
-    }
-  }, [userData?.id, showIntroVideo, showRegistrationModal, dispatch]);
+  // Онбординг показывается только после интро-видео при регистрации (см. handleVideoEnd)
 
   const handleOnboardingComplete = () => {
     dispatch(setShowOnboarding(false));
