@@ -808,6 +808,11 @@ export const userApi = baseApi.injectEndpoints({
         url: 'v1/profile/avatar',
         method: 'POST',
         body: formData,
+        // Удаляем Content-Type, чтобы браузер установил правильный multipart/form-data с boundary
+        prepareHeaders: (headers: Headers) => {
+          headers.delete('content-type');
+          return headers;
+        },
       }),
       invalidatesTags: ['User'],
     }),

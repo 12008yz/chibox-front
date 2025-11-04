@@ -9,7 +9,7 @@ const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   timeout: 60000, // 60 секунд таймаут (увеличен для медленных операций)
   credentials: 'include', // Включаем отправку cookies для session-based аутентификации
-  prepareHeaders: (headers, { getState }) => {
+  prepareHeaders: (headers, { getState, endpoint }) => {
     // Добавляем токен авторизации из состояния
     const state = getState() as RootState;
     const token = state.auth.token;
@@ -18,7 +18,12 @@ const baseQuery = fetchBaseQuery({
       headers.set('authorization', `Bearer ${token}`);
     }
 
-    headers.set('content-type', 'application/json');
+    // Не устанавливаем Content-Type для FormData (браузер сделает это автоматически)
+    // Проверяем, есть ли уже установленный Content-Type
+    if (!headers.has('content-type')) {
+      headers.set('content-type', 'application/json');
+    }
+
     return headers;
   },
 });

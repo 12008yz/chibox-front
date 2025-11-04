@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useUploadAvatarMutation, useDeleteAvatarMutation } from '../../../../features/user/userApi';
 import { toast } from 'react-hot-toast';
@@ -27,7 +28,63 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Функция для сжатия изображения
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Максимальные размеры
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                reject(new Error('Compression failed'));
+              }
+            },
+            'image/jpeg',
+            0.85
+          );
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,20 +95,31 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
       return;
     }
 
-    // Проверка размера (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(t('profile.avatar_too_large') || 'Файл слишком большой (максимум 5MB)');
-      return;
+    try {
+      // Сжимаем изображение если оно больше 1MB
+      let processedFile = file;
+      if (file.size > 1 * 1024 * 1024) {
+        processedFile = await compressImage(file);
+      }
+
+      // Проверка размера после сжатия (5MB)
+      if (processedFile.size > 5 * 1024 * 1024) {
+        toast.error(t('profile.avatar_too_large') || 'Файл слишком большой (максимум 5MB)');
+        return;
+      }
+
+      setSelectedFile(processedFile);
+
+      // Создаем превью
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(processedFile);
+    } catch (error) {
+      toast.error('Ошибка при обработке изображения');
+      console.error('Image processing error:', error);
     }
-
-    setSelectedFile(file);
-
-    // Создаем превью
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleUpload = async () => {
@@ -59,6 +127,12 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
     const formData = new FormData();
     formData.append('avatar', selectedFile);
+
+    console.log('Uploading file:', {
+      name: selectedFile.name,
+      size: selectedFile.size,
+      type: selectedFile.type
+    });
 
     try {
       const result = await uploadAvatar(formData).unwrap();
@@ -69,6 +143,7 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
         onClose();
       }
     } catch (error: any) {
+      console.error('Upload error:', error);
       toast.error(error?.data?.message || t('profile.avatar_upload_error') || 'Ошибка при загрузке аватара');
     }
   };
@@ -93,9 +168,9 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
     }
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
       <div className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
@@ -185,6 +260,8 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default AvatarUploadModal;

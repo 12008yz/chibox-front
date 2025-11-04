@@ -21,7 +21,9 @@
     "cases_available": "Кейсы доступны",
     "hours_short": "ч",
     "minutes_short": "м",
-    "seconds_short": "с"
+    "seconds_short": "с",
+    "uploading": "Загрузка...",
+    "deleting": "Удаление..."
   },
   "case_names": {
     "Ежедневный кейс - Бесплатный": "Ежедневный кейс - Бесплатный",
@@ -328,7 +330,19 @@
         "step4": "4. Скопируйте URL из поля \"Trade URL\"",
         "example": "Ссылка выглядит как: https://steamcommunity.com/tradeoffer/new/?partner=XXXXXXX&token=XXXXXXXX"
       }
-    }
+    },
+    "change_avatar": "Изменить аватар",
+    "select_file": "Выбрать файл",
+    "upload": "Загрузить",
+    "delete_avatar": "Удалить аватар",
+    "avatar_uploaded": "Аватар успешно загружен",
+    "avatar_deleted": "Аватар успешно удален",
+    "avatar_upload_error": "Ошибка при загрузке аватара",
+    "avatar_delete_error": "Ошибка при удалении аватара",
+    "avatar_invalid_format": "Недопустимый формат файла. Разрешены: JPEG, PNG, GIF, WEBP",
+    "avatar_too_large": "Файл слишком большой. Максимальный размер: 5 МБ",
+    "avatar_format_info": "Поддерживаемые форматы: JPEG, PNG, GIF, WEBP",
+    "avatar_size_info": "Максимальный размер: 5 МБ"
   },
   "public_profile": {
     "loading_profile": "Загрузка профиля...",

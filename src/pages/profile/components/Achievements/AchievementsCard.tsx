@@ -60,14 +60,6 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       bonus_percentage: ach.bonus_percentage || 0.5
     };
 
-    // Логируем данные для отладки
-    console.log('🖼️ Achievement icon data:', {
-      name: ach.name,
-      original_icon_url: ach.icon_url,
-      transformed_icon_url: transformed.icon_url,
-      all_data: ach
-    });
-
     return transformed;
   });
 
