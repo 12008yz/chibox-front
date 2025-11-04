@@ -15,7 +15,8 @@ interface BasicItem {
 interface User {
   id: number;
   name: string;
-  profilePicture: string;
+  avatar_url?: string;
+  steam_avatar_url?: string;
 }
 
 interface CaseOpeningItem {

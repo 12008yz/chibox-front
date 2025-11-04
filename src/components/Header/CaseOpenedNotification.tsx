@@ -5,7 +5,8 @@ import Monetary from '../Monetary';
 interface User {
   id: number;
   name: string;
-  profilePicture: string;
+  avatar_url?: string;
+  steam_avatar_url?: string;
 }
 
 interface BasicItem {
@@ -103,7 +104,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
       {/* Информация о пользователе */}
       <div className="flex items-center space-x-2 mb-3">
         <img
-          src={user.profilePicture || '/images/default-avatar.png'}
+          src={user.avatar_url || user.steam_avatar_url || '/images/default-avatar.png'}
           alt={user.name}
           className="w-8 h-8 rounded-full"
          //  onError={(e) => {

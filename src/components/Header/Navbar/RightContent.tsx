@@ -190,7 +190,7 @@ const RightContent: React.FC<RightContentProps> = ({
         <div className="flex items-center space-x-3">
           <div className="gaming-avatar-wrapper">
             <Avatar
-              image={user.profilePicture}
+              image={user.avatar_url}
               steamAvatar={user.steam_avatar}
               id={user.id || user.username}
               size="small"

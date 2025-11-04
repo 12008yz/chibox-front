@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                             {/* Информация о пользователе */}
                             <div className="flex items-center space-x-3">
                                 <img
-                                    src={user.profilePicture || '/images/default-avatar.png'}
+                                    src={user.avatar_url || user.steam_avatar_url || '/images/default-avatar.png'}
                                     alt={user.username}
                                     className="w-10 h-10 rounded-full" // TODO изменить favicon везде
                                     // onError={(e) => {
