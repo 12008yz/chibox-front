@@ -350,6 +350,9 @@ export interface TicTacToeCurrentGameResponse {
   success: boolean;
   game: TicTacToeGame | null;
   canPlay: boolean;
+  has_subscription: boolean;
+  has_won_today: boolean;
+  attempts_left: number;
   message?: string;
 }
 

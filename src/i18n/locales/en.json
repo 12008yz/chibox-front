@@ -998,7 +998,11 @@
     "attempts_remaining": "Attempts remaining:",
     "you_play": "You play:",
     "goal": "Goal:",
-    "goal_description": "Get 3 symbols in a row (horizontally, vertically or diagonally) to win!"
+    "goal_description": "Get 3 symbols in a row (horizontally, vertically or diagonally) to win!",
+    "no_subscription_title": "Subscription Required",
+    "no_subscription_message": "Purchase a status to access the bonus Tic-Tac-Toe game",
+    "already_won_title": "You've already won today!",
+    "already_won_message": "You've already received a bonus case today. Come back tomorrow at 4:00 PM MSK for a new game!"
   },
   "upgrade": {
     "title": "Item Upgrade",
