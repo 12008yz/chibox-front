@@ -606,7 +606,7 @@
       "name": "Collector",
       "description": "Find 5 rare items"
     },
-    "Найдите 3 предмета стоимостью от 100 руб": {
+    "Найдите 3 предмета стоимостью от 100 chiCoins": {
       "name": "Premium Player",
       "description": "Find 3 items worth 100+ rubles"
     },

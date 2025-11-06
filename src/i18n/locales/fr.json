@@ -912,9 +912,9 @@
       "name": "Collectionneur",
       "description": "Trouver 5 objets rares"
     },
-    "Найдите 3 предмета стоимостью от 100 руб": {
+    "Найдите 3 предмета стоимостью от 100 chiCoins": {
       "name": "Joueur Premium",
-      "description": "Trouver 3 objets d'une valeur de 100+ roubles"
+      "description": "Trouver 3 objets d'une valeur de 100+ chiCoins"
     },
     "Иметь активную подписку 30 дней подряд": {
       "name": "Abonné",

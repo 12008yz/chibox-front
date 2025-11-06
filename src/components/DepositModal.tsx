@@ -404,7 +404,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             }`}
           >
             <RiVipCrownFill className="text-xl" />
-            <span>Подписка VIP</span>
+            <span>Статус VIP</span>
           </button>
         </div>
 

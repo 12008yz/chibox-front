@@ -268,7 +268,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           <div className="text-center">
             <div className="text-6xl mb-6">🔒</div>
             <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется подписка'}</p>
-            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.no_subscription_message') || 'Приобретите статус для доступа к бонусной игре крестики-нолики'}</p>
+            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.no_subscription_message') || 'Приобретите статус для доступа к бонусной игре'}</p>
             <button
               onClick={onClose}
               className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"

@@ -137,9 +137,9 @@
     "total_spent": "Всего потрачено",
     "total_won": "Всего выиграно",
     "winnings": "Выигрыши",
-    "subscription": "Подписка",
-    "subscription_active": "Подписка активна",
-    "subscription_expires": "Подписка истекает",
+    "subscription": "Статус",
+    "subscription_active": "Статус активен",
+    "subscription_expires": "Статус истекает",
     "subscription_days_left": "Дней осталось: {{days}}",
     "steam_profile": "Steam профиль",
     "trade_url": "Trade URL",
@@ -447,7 +447,7 @@
     "case_won": "Выигрыш в кейсе",
     "achievement_unlocked": "Достижение разблокировано",
     "bonus_available": "Доступен бонус",
-    "subscription_expiring": "Подписка истекает",
+    "subscription_expiring": "Статус истекает",
     "new_items": "Новые предметы добавлены",
     "title": "Уведомления",
     "mark_all_notifications_read": "Прочитать все уведомления",
@@ -476,9 +476,9 @@
       "bonus_claimed_message": "Вы получили бонус: {{amount}}₽",
       "achievement_unlocked": "Достижение разблокировано",
       "achievement_unlocked_message": "Поздравляем! Вы разблокировали достижение: {{achievementName}}",
-      "subscription_activated": "Подписка активирована",
+      "subscription_activated": "Статус активирован",
       "subscription_activated_message": "Ваша подписка {{tierName}} активирована на {{days}} дней",
-      "subscription_expiring": "Подписка истекает",
+      "subscription_expiring": "Статус истекает",
       "subscription_expiring_message": "Ваша подписка истекает через {{days}} дней",
       "item_withdrawn": "Предмет выведен",
       "item_withdrawn_message": "Предмет {{itemName}} успешно отправлен в Steam",
@@ -560,7 +560,7 @@
   "modals": {
     "shop": "Магазин",
     "top_up_balance": "Пополнить баланс",
-    "subscriptions": "Подписки",
+    "subscriptions": "Статусы",
     "balance_top_up": "Пополнение баланса",
     "or_enter_custom": "Или введите свою сумму:",
     "enter_amount": "Введите сумму",
@@ -627,7 +627,7 @@
     },
     "Найдите 3 предмета стоимостью от 100 руб": {
       "name": "Премиум игрок",
-      "description": "Найдите 3 предмета стоимостью от 100 руб"
+      "description": "Найдите 3 предмета стоимостью от 100 chiCoins"
     },
     "Иметь активный статус 30 дней подряд": {
       "name": "Подписчик",
@@ -1019,7 +1019,7 @@
     "goal": "Цель:",
     "goal_description": "Соберите 3 символа в ряд (по горизонтали, вертикали или диагонали), чтобы выиграть!",
     "no_subscription_title": "Требуется статус",
-    "no_subscription_message": "Приобретите статус для доступа к бонусной игре крестики-нолики",
+    "no_subscription_message": "Приобретите статус для доступа к бонусной игре",
     "already_won_title": "Вы уже победили сегодня!",
     "already_won_message": "Вы уже получили бонусный кейс сегодня. Возвращайтесь завтра за новой игрой!"
   },
