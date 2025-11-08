@@ -7,6 +7,8 @@ import { store, persistor } from "./store/index";
 import "./index.css";
 import "./i18n";
 import App from "./App.tsx";
+// Импортируем утилиту очистки данных (будет доступна в консоли как window.clearAllAuthData)
+import "./utils/clearAllAuth";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
