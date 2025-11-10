@@ -31,56 +31,52 @@ const SteamAuthPage: React.FC = () => {
   }, []); // Выполняется только при монтировании
 
   useEffect(() => {
-    // Добавляем небольшую задержку чтобы дать первому useEffect время на очистку
-    const timer = setTimeout(() => {
-      console.log('SteamAuthPage: Processing Steam auth callback');
-      const token = searchParams.get('token');
-      const provider = searchParams.get('provider');
+    // Обрабатываем Steam auth callback сразу после очистки состояния
+    console.log('SteamAuthPage: Processing Steam auth callback');
+    const token = searchParams.get('token');
+    const provider = searchParams.get('provider');
 
-      console.log('SteamAuthPage: Token present:', !!token);
-      console.log('SteamAuthPage: Provider:', provider);
+    console.log('SteamAuthPage: Token present:', !!token);
+    console.log('SteamAuthPage: Provider:', provider);
 
-      if (token && provider === 'steam') {
-        try {
-          // Проверяем что токен валидный (базовая проверка формата)
-          const tokenParts = token.split('.');
-          if (tokenParts.length === 3) {
-            console.log('SteamAuthPage: Valid JWT token format, processing...');
+    if (token && provider === 'steam') {
+      try {
+        // Проверяем что токен валидный (базовая проверка формата)
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+          console.log('SteamAuthPage: Valid JWT token format, processing...');
 
-            // Сохраняем только токен, данные пользователя загрузятся через getCurrentUser API
-            const userData = {
-              user: null, // Не извлекаем данные из токена, пусть API их загрузит
-              token
-            };
+          // Сохраняем только токен, данные пользователя загрузятся через getCurrentUser API
+          const userData = {
+            user: null, // Не извлекаем данные из токена, пусть API их загрузит
+            token
+          };
 
-            console.log('SteamAuthPage: Calling handleLoginSuccess with token');
-            // Обновляем состояние авторизации
-            handleLoginSuccess(userData);
+          console.log('SteamAuthPage: Calling handleLoginSuccess with token');
+          // Обновляем состояние авторизации
+          handleLoginSuccess(userData);
 
-            console.log('SteamAuthPage: Redirecting to home page...');
-            // Перенаправляем на главную страницу
-            navigate('/', { replace: true });
-          } else {
-            throw new Error('Неверный формат токена');
-          }
-        } catch (error) {
-          console.error('Ошибка обработки Steam токена:', error);
-          setError('Ошибка обработки данных авторизации');
-          setTimeout(() => {
-            navigate('/login?error=steam_auth_failed', { replace: true });
-          }, 3000);
+          console.log('SteamAuthPage: Redirecting to home page...');
+          // Перенаправляем на главную страницу
+          navigate('/', { replace: true });
+        } else {
+          throw new Error('Неверный формат токена');
         }
-      } else {
-        // Если нет токена или провайдера, перенаправляем на страницу входа
-        console.error('SteamAuthPage: Missing token or provider');
-        setError('Отсутствуют данные авторизации');
+      } catch (error) {
+        console.error('Ошибка обработки Steam токена:', error);
+        setError('Ошибка обработки данных авторизации');
         setTimeout(() => {
-          navigate('/login?error=missing_token', { replace: true });
+          navigate('/login?error=steam_auth_failed', { replace: true });
         }, 3000);
       }
-    }, 200); // Задержка 200мс для гарантии очистки
-
-    return () => clearTimeout(timer);
+    } else {
+      // Если нет токена или провайдера, перенаправляем на страницу входа
+      console.error('SteamAuthPage: Missing token or provider');
+      setError('Отсутствуют данные авторизации');
+      setTimeout(() => {
+        navigate('/login?error=missing_token', { replace: true });
+      }, 3000);
+    }
   }, [searchParams, navigate, handleLoginSuccess, dispatch]);
 
   if (error) {

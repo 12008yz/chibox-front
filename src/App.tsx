@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/loginPage';
 import RegisterPage from './pages/RegisterPage';
 import SteamAuthPage from './pages/SteamAuthPage';
+import SteamLoadingPage from './components/SteamLoadingPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import LeaderboardPage from './pages/LeaderboardPage';
@@ -165,6 +166,10 @@ const App: React.FC = () => {
             <Route
               path="/auth/success"
               element={<SteamAuthPage />}
+            />
+            <Route
+              path="/steam-loading"
+              element={<SteamLoadingPage />}
             />
 
             {/* Защищенные маршруты */}

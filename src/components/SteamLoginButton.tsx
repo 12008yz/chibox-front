@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store/hooks';
 import { logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
@@ -15,6 +16,7 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleSteamLogin = () => {
     if (disabled || isLoading) return;
@@ -36,15 +38,9 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
     dispatch(baseApi.util.resetApiState());
     dispatch(logout());
 
-    // Небольшая задержка чтобы убедиться что все очистилось
-    setTimeout(() => {
-      // Перенаправляем на серверный endpoint для Steam авторизации
-      const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-      console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-      console.log('Final serverUrl:', serverUrl);
-      console.log('Redirecting to:', `${serverUrl}/v1/auth/steam`);
-      window.location.href = `${serverUrl}/v1/auth/steam`;
-    }, 100);
+    // Переходим на промежуточную страницу загрузки
+    console.log('Navigating to Steam loading page...');
+    navigate('/steam-loading');
   };
 
   return (
