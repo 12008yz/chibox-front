@@ -312,15 +312,45 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
+    // Получить статус игры Plinko
+    getPlinkoStatus: builder.query<
+      {
+        success: boolean;
+        occupied_slots: number[];
+        remaining_attempts: number;
+        all_slots: Array<{
+          index: number;
+          type: 'coins' | 'status';
+          value: number;
+          occupied: boolean;
+        }>;
+        total_slots: number;
+        game_completed: boolean;
+      },
+      void
+    >({
+      query: () => 'v1/games/plinko-status',
+      providesTags: ['User'],
+    }),
+
     // Игра в Plinko
     playPlinko: builder.mutation<
       {
         success: boolean;
         message: string;
-        next_time: string;
-        multiplier: number;
         slot_index: number;
-        days_won: number;
+        prize_type: 'coins' | 'status';
+        prize_amount: number;
+        status_days: number;
+        occupied_slots: number[];
+        remaining_attempts: number;
+        new_balance: number;
+        all_slots: Array<{
+          index: number;
+          type: 'coins' | 'status';
+          value: number;
+          occupied: boolean;
+        }>;
       },
       void
     >({
@@ -866,6 +896,7 @@ export const {
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   usePlayRouletteMutation,
+  useGetPlinkoStatusQuery,
   usePlayPlinkoMutation,
   usePlaySlotMutation,
   useGetSlotItemsQuery,
