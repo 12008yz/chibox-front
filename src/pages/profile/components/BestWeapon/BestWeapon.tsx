@@ -17,9 +17,17 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
 
   // Используем лучшее оружие за всё время с сервера
   // Если bestWeapon не установлено на сервере, ищем среди всех предметов в инвентаре
-  const bestWeapon = user.bestWeapon || inventory
+  let bestWeapon = user.bestWeapon || inventory
     .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item?.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
+
+  // Если цена предмета 0 или меньше, считаем что предмета нет
+  if (bestWeapon) {
+    const price = parseFloat(String(bestWeapon.price || bestWeapon.item?.price || 0));
+    if (price <= 0) {
+      bestWeapon = null;
+    }
+  }
 
 
 

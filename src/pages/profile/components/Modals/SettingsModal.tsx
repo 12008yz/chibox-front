@@ -440,7 +440,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <>
                   <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16 4a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2H6z" clipRule="evenodd" />
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -452,7 +453,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <>
                   <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" clipRule="evenodd" />
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
                   </div>
                   <div className="flex-1">
