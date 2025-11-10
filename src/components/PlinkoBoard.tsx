@@ -1,11 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { usePlayPlinkoMutation } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
-import { PlinkoBoard } from './PlinkoBoard';
+
+// Компонент доски Plinko
+interface PlinkoBoardProps {
+  onBallLanded: (multiplier: number) => void;
+  isDropping: boolean;
+  onDropComplete: () => void;
+}
+
+const PlinkoBoard: React.FC<PlinkoBoardProps> = ({ onBallLanded, isDropping, onDropComplete }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (!isDropping) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Простая анимация падения шарика
+    let ballY = 0;
+    const targetSlot = Math.floor(Math.random() * 8); // 8 слотов
+    const multipliers = [110, 41, 10, 5, 3, 1.5, 1, 0.5];
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Рисуем шарик
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2 + (targetSlot - 3.5) * 40, ballY, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFD700';
+      ctx.fill();
+
+      ballY += 5;
+
+      if (ballY < canvas.height) {
+        requestAnimationFrame(animate);
+      } else {
+        onBallLanded(multipliers[targetSlot]);
+        onDropComplete();
+      }
+    };
+
+    animate();
+  }, [isDropping, onBallLanded, onDropComplete]);
+
+  return (
+    <div className="relative w-full max-w-2xl mx-auto">
+      <canvas
+        ref={canvasRef}
+        width={600}
+        height={400}
+        className="w-full bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-purple-500/30"
+      />
+    </div>
+  );
+};
 
 interface PlinkoGameProps {
   isOpen: boolean;

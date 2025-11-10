@@ -11,8 +11,7 @@ import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../features/user/userApi";
 import Notifications from './Navbar/Notifications';
-import PlinkoGame from '../PlinkoGame';
-import PurchaseModal from '../DepositModal';
+import PlinkoGame from '../PlinkoBoard';
 import DepositModal from '../DepositModal';
 import LanguageSwitcher from '../LanguageSwitcher';
 
@@ -32,8 +31,6 @@ const RightContent: React.FC<RightContentProps> = ({
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [showBonusGame, setShowBonusGame] = useState(false);
-  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
-  const [purchaseModalTab, setPurchaseModalTab] = useState<'balance' | 'subscription'>('balance');
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
@@ -204,13 +201,6 @@ const RightContent: React.FC<RightContentProps> = ({
       >
         <FaSignOutAlt className="text-lg" />
       </button>
-
-      {/* Purchase Modal */}
-      <PurchaseModal
-        isOpen={isPurchaseModalOpen}
-        onClose={() => setIsPurchaseModalOpen(false)}
-        initialTab={purchaseModalTab}
-      />
 
       {/* Deposit Modal */}
       <DepositModal

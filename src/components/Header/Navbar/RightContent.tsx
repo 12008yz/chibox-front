@@ -11,7 +11,7 @@ import { useLogoutMutation } from "../../../features/auth/authApi";
 import { performFullLogout } from "../../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
-import PlinkoGame from '../../PlinkoGame';
+import PlinkoGame from '../../PlinkoBoard';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 

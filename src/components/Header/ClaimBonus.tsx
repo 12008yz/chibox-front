@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGetBonusStatusQuery } from "../../features/user/userApi";
-import PlinkoGame from "../PlinkoGame";
+import PlinkoGame from "../PlinkoBoard";
 
 interface ClaimBonusProps {
   onClaimBonus?: () => Promise<void>;

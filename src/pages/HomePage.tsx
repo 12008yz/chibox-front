@@ -8,10 +8,10 @@ import IntroVideo from '../components/IntroVideo';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
-import AppFeatures from '../components/AppFeatures';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
-import PlinkoGame from '../components/PlinkoGame';
+import PlinkoGame from '../components/PlinkoBoard';
+import RouletteGame from '../components/RouletteGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
@@ -27,13 +27,12 @@ const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { onlineUsers } = useSocket();
+  useSocket(); // Подключаем сокеты
   const { userData, refetch: refetchUser } = useUserData({ autoRefresh: false }); // Получаем данные пользователя
 
   // Получаем глобальное состояние показа интро из Redux
   const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
-  const hasSeenOnboarding = useAppSelector(state => state.ui.hasSeenOnboarding);
   console.log('[HomePage] Global showIntroVideo from Redux:', globalShowIntroVideo);
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
@@ -61,8 +60,9 @@ const HomePage: React.FC = () => {
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
-  // Состояние рулетки
+  // Состояние игр
   const [showPlinkoGame, setShowPlinkoGame] = useState(false);
+  const [showRouletteGame, setShowRouletteGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {
