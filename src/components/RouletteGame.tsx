@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Wheel } from 'react-custom-roulette';
+import { motion, useAnimationControls } from 'framer-motion';
 import { usePlayRouletteMutation } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
+import { RouletteWheel } from './RouletteWheel';
 
 // Конфигурация 9 секций рулетки (должна соответствовать серверу)
 const ROULETTE_SEGMENTS = [
@@ -90,6 +91,7 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
+  const controls = useAnimationControls();
 
   const [playRoulette, { isLoading, error }] = usePlayRouletteMutation();
 
@@ -138,6 +140,20 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
         setNextPlayTime(response.next_time);
         localStorage.setItem('roulette_next_play_time', response.next_time);
 
+        // Запускаем анимацию вращения
+        const segmentAngle = 360 / ROULETTE_SEGMENTS.length;
+        const targetRotation = 360 * 5 + (360 - (winnerIndex * segmentAngle + segmentAngle / 2));
+
+        await controls.start({
+          rotate: targetRotation,
+          transition: {
+            duration: 4,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }
+        });
+
+        handleSpinComplete();
+
       } else {
         setIsSpinning(false);
         toast.error(response.message || t('roulette.something_went_wrong'));
@@ -158,6 +174,9 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
 
     setMustSpin(false);
     setIsSpinning(false);
+
+    // Сбрасываем вращение для следующей игры
+    controls.set({ rotate: 0 });
 
     const winnerSegment = ROULETTE_SEGMENTS[prizeNumber];
     console.log('🏆 Выигрышная секция:', {
@@ -214,14 +233,14 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
       return '';
     }
 
-    const totalMinutes = Math.ceil(diff / (1000 * 60));
+    const totalSeconds = Math.ceil(diff / 1000);
 
-    if (totalMinutes < 60) {
-      return `${totalMinutes}м`;
+    if (totalSeconds < 60) {
+      return `${totalSeconds}с`;
     } else {
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      return `${hours}ч ${minutes}м`;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}м ${seconds}с`;
     }
   };
 
@@ -281,25 +300,50 @@ const RouletteGame: React.FC<RouletteGameProps> = ({ isOpen, onClose, className 
             <p className="text-xs text-gray-400">{t('roulette.games_per_day')}</p>
           </div>
 
-          {/* Колесо рулетки с react-custom-roulette */}
-          <div className="relative flex justify-center">
-            <Wheel
-              mustStartSpinning={mustSpin}
-              prizeNumber={prizeNumber}
-              data={localizedSegments}
-              backgroundColors={['#3B82F6', '#EF4444']}
-              textColors={['#FFFFFF']}
-              outerBorderColor="#374151"
-              outerBorderWidth={8}
-              innerBorderColor="#4B5563"
-              innerBorderWidth={4}
-              radiusLineColor="#6B7280"
-              radiusLineWidth={2}
-              fontSize={12}
-              textDistance={75}
-              spinDuration={0.8}
-              onStopSpinning={handleSpinComplete}
-            />
+          {/* Колесо рулетки с Framer Motion */}
+          <div className="relative flex justify-center items-center py-8">
+            {/* Указатель сверху */}
+            <motion.div
+              className="absolute top-8 left-1/2 -translate-x-1/2 z-10"
+              animate={{
+                scale: mustSpin ? [1, 1.2, 1] : 1,
+              }}
+              transition={{
+                duration: 0.3,
+                repeat: mustSpin ? Infinity : 0,
+                repeatDelay: 0.2,
+              }}
+            >
+              <div className="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-t-[30px] border-t-yellow-400 drop-shadow-2xl"></div>
+            </motion.div>
+
+            {/* Вращающееся колесо */}
+            <motion.div
+              animate={controls}
+              className="relative"
+              style={{ width: 320, height: 320 }}
+            >
+              <RouletteWheel segments={localizedSegments} />
+            </motion.div>
+
+            {/* Световой эффект при вращении */}
+            {mustSpin && (
+              <motion.div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
+                }}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.95, 1.05, 0.95],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            )}
           </div>
 
           {/* Кнопка для вращения */}
