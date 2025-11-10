@@ -11,7 +11,7 @@ import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../features/user/userApi";
 import Notifications from './Navbar/Notifications';
-import RouletteGame from '../RouletteGame';
+import PlinkoGame from '../PlinkoGame';
 import PurchaseModal from '../DepositModal';
 import DepositModal from '../DepositModal';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -108,7 +108,7 @@ const RightContent: React.FC<RightContentProps> = ({
           )}
         </button>
         {showBonusGame && (
-          <RouletteGame
+          <PlinkoGame
             isOpen={showBonusGame}
             onClose={() => setShowBonusGame(false)}
           />

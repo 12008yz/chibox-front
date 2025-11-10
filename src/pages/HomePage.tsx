@@ -11,7 +11,7 @@ import CaseListing from '../components/CaseListing';
 import AppFeatures from '../components/AppFeatures';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
-import RouletteGame from '../components/RouletteGame';
+import PlinkoGame from '../components/PlinkoGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
@@ -62,7 +62,7 @@ const HomePage: React.FC = () => {
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
   // Состояние рулетки
-  const [showRouletteGame, setShowRouletteGame] = useState(false);
+  const [showPlinkoGame, setShowPlinkoGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {
@@ -103,12 +103,12 @@ const HomePage: React.FC = () => {
 
   const handlePlayRoulette = () => {
     console.log('HomePage: Открываем рулетку из StatusDashboard');
-    setShowRouletteGame(true);
+    setShowPlinkoGame(true);
   };
 
   const handleRouletteClose = () => {
     console.log('HomePage: Закрываем рулетку');
-    setShowRouletteGame(false);
+    setShowPlinkoGame(false);
     // Обновляем данные пользователя
     refetchUser();
   };

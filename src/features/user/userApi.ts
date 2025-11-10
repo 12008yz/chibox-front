@@ -312,6 +312,25 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
+    // Игра в Plinko
+    playPlinko: builder.mutation<
+      {
+        success: boolean;
+        message: string;
+        next_time: string;
+        multiplier: number;
+        slot_index: number;
+        days_won: number;
+      },
+      void
+    >({
+      query: () => ({
+        url: 'v1/games/play-plinko',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Balance', 'User', 'Inventory'],
+    }),
+
     // Игра в слот
     playSlot: builder.mutation<PlaySlotResponse, void>({
       query: () => ({
@@ -847,6 +866,7 @@ export const {
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   usePlayRouletteMutation,
+  usePlayPlinkoMutation,
   usePlaySlotMutation,
   useGetSlotItemsQuery,
   useGetSlotStatusQuery,
