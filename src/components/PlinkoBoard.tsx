@@ -1,209 +1,231 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { usePlayPlinkoMutation } from '../features/user/userApi';
+import { motion, AnimatePresence } from 'framer-motion';
+import Matter from 'matter-js';
+import { usePlayPlinkoMutation, useGetPlinkoStatusQuery } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
-
-// Компонент доски Plinko
-interface PlinkoBoardProps {
-  onBallLanded: (multiplier: number) => void;
-  isDropping: boolean;
-  onDropComplete: () => void;
-}
-
-const PlinkoBoard: React.FC<PlinkoBoardProps> = ({ onBallLanded, isDropping, onDropComplete }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    if (!isDropping) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Простая анимация падения шарика
-    let ballY = 0;
-    const targetSlot = Math.floor(Math.random() * 8); // 8 слотов
-    const multipliers = [110, 41, 10, 5, 3, 1.5, 1, 0.5];
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Рисуем шарик
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2 + (targetSlot - 3.5) * 40, ballY, 10, 0, Math.PI * 2);
-      ctx.fillStyle = '#FFD700';
-      ctx.fill();
-
-      ballY += 5;
-
-      if (ballY < canvas.height) {
-        requestAnimationFrame(animate);
-      } else {
-        onBallLanded(multipliers[targetSlot]);
-        onDropComplete();
-      }
-    };
-
-    animate();
-  }, [isDropping, onBallLanded, onDropComplete]);
-
-  return (
-    <div className="relative w-full max-w-2xl mx-auto">
-      <canvas
-        ref={canvasRef}
-        width={600}
-        height={400}
-        className="w-full bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg border-2 border-purple-500/30"
-      />
-    </div>
-  );
-};
 
 interface PlinkoGameProps {
   isOpen: boolean;
   onClose: () => void;
-  className?: string;
 }
 
-const PlinkoGame: React.FC<PlinkoGameProps> = ({ isOpen, onClose, className = '' }) => {
+const PlinkoGame: React.FC<PlinkoGameProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<Matter.Engine | null>(null);
+  const ballRef = useRef<Matter.Body | null>(null);
   const [isDropping, setIsDropping] = useState(false);
-  const [lastMultiplier, setLastMultiplier] = useState<number | null>(null);
-  const [nextPlayTime, setNextPlayTime] = useState<string | null>(null);
-  const [serverMultiplier, setServerMultiplier] = useState<number | null>(null);
+  const [lastResult, setLastResult] = useState<{ type: string; value: number; slotIndex: number } | null>(null);
 
+  const { data: plinkoStatus, refetch: refetchStatus } = useGetPlinkoStatusQuery();
   const [playPlinko, { isLoading }] = usePlayPlinkoMutation();
 
-  // Проверяем, можно ли играть
-  const canPlay = !isDropping && !isLoading && !nextPlayTime;
+  // Константы для игры
+  const CANVAS_WIDTH = 800;
+  const CANVAS_HEIGHT = 600;
+  const PEG_RADIUS = 4;
+  const BALL_RADIUS = 8;
+  const SLOT_WIDTH = CANVAS_WIDTH / 17; // 17 слотов
+  const ROWS = 12;
 
+  const canPlay = !isDropping && !isLoading && (plinkoStatus?.remaining_attempts || 0) > 0;
+
+  // Инициализация Matter.js
   useEffect(() => {
-    // Проверяем сохраненное время следующей игры
-    const savedNextPlayTime = localStorage.getItem('plinko_next_play_time');
-    if (savedNextPlayTime) {
-      const nextTime = new Date(savedNextPlayTime);
-      if (nextTime > new Date()) {
-        setNextPlayTime(savedNextPlayTime);
-      } else {
-        localStorage.removeItem('plinko_next_play_time');
+    if (!isOpen || !canvasRef.current) return;
+
+    // Создаем движок
+    const engine = Matter.Engine.create({
+      gravity: { x: 0, y: 1 }
+    });
+    engineRef.current = engine;
+
+    // Создаем рендерер
+    const render = Matter.Render.create({
+      element: canvasRef.current,
+      engine: engine,
+      options: {
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+        wireframes: false,
+        background: 'transparent'
+      }
+    });
+
+    // Создаем колышки (pegs) в шахматном порядке
+    const pegs: Matter.Body[] = [];
+    for (let row = 0; row < ROWS; row++) {
+      const pegsInRow = row + 3;
+      const rowY = 100 + row * 40;
+      const offsetX = CANVAS_WIDTH / 2 - (pegsInRow * 30) / 2;
+
+      for (let col = 0; col < pegsInRow; col++) {
+        const peg = Matter.Bodies.circle(
+          offsetX + col * 30 + (row % 2 === 0 ? 15 : 0),
+          rowY,
+          PEG_RADIUS,
+          {
+            isStatic: true,
+            render: {
+              fillStyle: '#8B5CF6',
+              strokeStyle: '#A78BFA',
+              lineWidth: 2
+            },
+            friction: 0.1,
+            restitution: 0.5
+          }
+        );
+        pegs.push(peg);
       }
     }
-  }, []);
 
+    // Создаем стены
+    const walls = [
+      // Левая стена
+      Matter.Bodies.rectangle(0, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, {
+        isStatic: true,
+        render: { fillStyle: '#4C1D95' }
+      }),
+      // Правая стена
+      Matter.Bodies.rectangle(CANVAS_WIDTH, CANVAS_HEIGHT / 2, 20, CANVAS_HEIGHT, {
+        isStatic: true,
+        render: { fillStyle: '#4C1D95' }
+      }),
+      // Нижняя стена
+      Matter.Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT, CANVAS_WIDTH, 20, {
+        isStatic: true,
+        render: { fillStyle: '#4C1D95' }
+      })
+    ];
+
+    // Создаем разделители слотов
+    const dividers: Matter.Body[] = [];
+    for (let i = 0; i <= 17; i++) {
+      const divider = Matter.Bodies.rectangle(
+        i * SLOT_WIDTH,
+        CANVAS_HEIGHT - 60,
+        2,
+        120,
+        {
+          isStatic: true,
+          render: {
+            fillStyle: '#6366F1',
+            opacity: 0.5
+          }
+        }
+      );
+      dividers.push(divider);
+    }
+
+    // Добавляем все тела в мир
+    Matter.World.add(engine.world, [...pegs, ...walls, ...dividers]);
+
+    // Запускаем рендерер и движок
+    Matter.Render.run(render);
+    const runner = Matter.Runner.create();
+    Matter.Runner.run(runner, engine);
+
+    return () => {
+      Matter.Render.stop(render);
+      Matter.Runner.stop(runner);
+      Matter.World.clear(engine.world, false);
+      Matter.Engine.clear(engine);
+      render.canvas.remove();
+    };
+  }, [isOpen]);
+
+  // Бросаем шарик
   const handleDrop = async () => {
-    if (!canPlay) return;
+    if (!canPlay || !engineRef.current) return;
 
     try {
-      console.log('🎲 Plinko: Отправляем запрос на сервер...');
-
+      // Запрашиваем результат с сервера
       const response = await playPlinko().unwrap();
-      console.log('🎲 Plinko - ответ сервера:', response);
 
-      if (response.success) {
-        // Сохраняем множитель от сервера
-        setServerMultiplier(response.multiplier);
-
-        // Запускаем анимацию
-        setIsDropping(true);
-        soundManager.play('process');
-
-        // Сохраняем время следующей игры
-        setNextPlayTime(response.next_time);
-        localStorage.setItem('plinko_next_play_time', response.next_time);
-      } else {
-        toast.error(response.message || t('plinko.something_went_wrong'));
-        if (response.next_time) {
-          setNextPlayTime(response.next_time);
-          localStorage.setItem('plinko_next_play_time', response.next_time);
-        }
+      if (!response.success) {
+        toast.error(response.message);
+        return;
       }
+
+      setIsDropping(true);
+
+      // Создаем шарик
+      const randomX = CANVAS_WIDTH / 2 + (Math.random() - 0.5) * 20;
+      const ball = Matter.Bodies.circle(randomX, 50, BALL_RADIUS, {
+        restitution: 0.5,
+        friction: 0.01,
+        density: 0.001,
+        render: {
+          fillStyle: response.prize_type === 'status' ? '#F59E0B' : '#10B981',
+          strokeStyle: '#FFF',
+          lineWidth: 2
+        }
+      });
+
+      ballRef.current = ball;
+      Matter.World.add(engineRef.current.world, ball);
+
+      // Воспроизводим звук
+      soundManager.play('process');
+
+      // Отслеживаем когда шарик упадет в слот
+      const checkInterval = setInterval(() => {
+        if (ball.position.y > CANVAS_HEIGHT - 100 && Math.abs(ball.velocity.y) < 0.5) {
+          clearInterval(checkInterval);
+
+          // Вычисляем в какой слот упал
+          const slotIndex = Math.floor(ball.position.x / SLOT_WIDTH);
+
+          // Показываем результат
+          setLastResult({
+            type: response.prize_type,
+            value: response.prize_type === 'coins' ? response.prize_amount : response.status_days,
+            slotIndex: response.slot_index
+          });
+
+          // Звук выигрыша
+          if (response.prize_type === 'status') {
+            soundManager.play('win');
+            toast.success(response.message, {
+              icon: '🎉',
+              duration: 4000,
+            });
+          } else {
+            soundManager.play('win');
+            toast.success(response.message, {
+              icon: '💰',
+              duration: 3000,
+            });
+          }
+
+          // Удаляем шарик через секунду
+          setTimeout(() => {
+            if (ballRef.current && engineRef.current) {
+              Matter.World.remove(engineRef.current.world, ballRef.current);
+              ballRef.current = null;
+            }
+            setIsDropping(false);
+            refetchStatus();
+          }, 1000);
+        }
+      }, 100);
+
     } catch (err: any) {
       console.error('Ошибка Plinko:', err);
-      toast.error(err.data?.message || t('plinko.error_occurred'));
+      toast.error(err.data?.message || 'Произошла ошибка');
+      setIsDropping(false);
     }
   };
 
-  const handleBallLanded = (multiplier: number) => {
-    console.log('🎯 Шарик упал в слот с множителем:', multiplier);
-    setLastMultiplier(multiplier);
-
-    // Показываем результат
-    if (multiplier < 1) {
-      soundManager.play('lose');
-      toast(`Множитель: ${multiplier}x`, {
-        icon: '😔',
-        style: {
-          background: '#374151',
-          color: '#fff',
-          border: '1px solid #6b7280',
-          zIndex: 999999999,
-        },
-      });
-    } else if (multiplier >= 10) {
-      soundManager.play('win');
-      toast(`Отличный результат! ${multiplier}x`, {
-        icon: '🎉',
-        style: {
-          background: '#059669',
-          color: '#fff',
-          border: '1px solid #10b981',
-          zIndex: 999999999,
-        },
-      });
-    } else {
-      soundManager.play('win');
-      toast(`Множитель: ${multiplier}x`, {
-        icon: '✨',
-        style: {
-          background: '#3B82F6',
-          color: '#fff',
-          border: '1px solid #60A5FA',
-          zIndex: 999999999,
-        },
-      });
-    }
-  };
-
-  const handleDropComplete = () => {
-    setIsDropping(false);
-    setServerMultiplier(null);
-  };
-
-  const formatTimeRemaining = (nextTime: string) => {
-    const now = new Date();
-    const next = new Date(nextTime);
-    const diff = next.getTime() - now.getTime();
-
-    if (diff <= 0) {
-      setNextPlayTime(null);
-      localStorage.removeItem('plinko_next_play_time');
-      return '';
-    }
-
-    const totalSeconds = Math.ceil(diff / 1000);
-
-    if (totalSeconds < 60) {
-      return `${totalSeconds}с`;
-    } else {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      return `${minutes}м ${seconds}с`;
-    }
-  };
-
-  // Предотвращаем скроллинг страницы когда модальное окно открыто
+  // Предотвращаем скроллинг страницы
   useEffect(() => {
     if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-
       return () => {
-        document.body.style.overflow = originalOverflow;
+        document.body.style.overflow = '';
       };
     }
   }, [isOpen]);
@@ -211,124 +233,147 @@ const PlinkoGame: React.FC<PlinkoGameProps> = ({ isOpen, onClose, className = ''
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-75 backdrop-blur-sm"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full mx-4 my-auto max-h-[95vh] overflow-y-auto border border-gray-700">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="relative bg-gradient-to-b from-purple-900 via-purple-800 to-purple-900 rounded-2xl shadow-2xl max-w-5xl w-full border-2 border-purple-500/30 overflow-hidden"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <div>
-            <h3 className="text-2xl font-bold text-white">
-              🎯 Plinko
-            </h3>
-            <p className="text-sm text-gray-400 mt-1">
-              Бросайте шарик и выигрывайте до 110x!
-            </p>
-          </div>
+        <div className="relative px-6 py-4 bg-gradient-to-r from-purple-600/50 to-pink-600/50 border-b border-purple-500/30">
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-10"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-1">
+              🎯 Plinko Game
+            </h2>
+            <p className="text-purple-200 text-sm">
+              Бросайте шарик и выигрывайте призы!
+            </p>
+          </div>
         </div>
 
         {/* Content */}
-        <div className={`p-6 flex flex-col items-center space-y-6 ${className}`}>
-          {/* Информация о последнем результате */}
-          {lastMultiplier !== null && !isDropping && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-lg"
-            >
-              <p className="text-white font-bold text-lg">
-                Последний результат: {lastMultiplier}x
+        <div className="p-6">
+          {/* Статистика */}
+          <div className="mb-4 flex justify-between items-center">
+            <div className="bg-purple-800/50 px-4 py-2 rounded-lg border border-purple-500/30">
+              <p className="text-purple-200 text-xs">Осталось попыток</p>
+              <p className="text-2xl font-bold text-white">
+                {plinkoStatus?.remaining_attempts || 0}
               </p>
-            </motion.div>
-          )}
+            </div>
 
-          {/* Plinko Board */}
-          <div className="w-full flex justify-center">
-            <PlinkoBoard
-              onBallLanded={handleBallLanded}
-              isDropping={isDropping}
-              onDropComplete={handleDropComplete}
-            />
+            {lastResult && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-lg"
+              >
+                <p className="text-white font-bold text-lg">
+                  {lastResult.type === 'status'
+                    ? `🎉 ${lastResult.value} ${lastResult.value === 1 ? 'день' : 'дня'} статуса!`
+                    : `💰 ${lastResult.value} рублей!`
+                  }
+                </p>
+              </motion.div>
+            )}
+
+            <div className="bg-purple-800/50 px-4 py-2 rounded-lg border border-purple-500/30">
+              <p className="text-purple-200 text-xs">Занято слотов</p>
+              <p className="text-2xl font-bold text-white">
+                {plinkoStatus?.occupied_slots?.length || 0}/{plinkoStatus?.total_slots || 17}
+              </p>
+            </div>
           </div>
 
-          {/* Кнопка для броска */}
-          <div className="text-center">
-            {nextPlayTime ? (
-              <div className="space-y-2">
-                <p className="text-gray-300">Следующая игра через:</p>
-                <p className="text-xl font-bold text-yellow-400">
-                  {formatTimeRemaining(nextPlayTime)}
-                </p>
+          {/* Игровое поле */}
+          <div className="relative bg-gradient-to-b from-purple-950 to-purple-900 rounded-xl overflow-hidden border-2 border-purple-500/30">
+            <div ref={canvasRef} className="flex justify-center" />
+
+            {/* Слоты внизу */}
+            <div className="absolute bottom-0 left-0 right-0 flex">
+              {plinkoStatus?.all_slots.map((slot, index) => (
+                <div
+                  key={index}
+                  className={`flex-1 h-16 flex items-center justify-center text-xs font-bold border-l border-purple-500/30 transition-all ${
+                    slot.occupied
+                      ? 'bg-gray-800/90 text-gray-500'
+                      : slot.type === 'status'
+                      ? 'bg-gradient-to-t from-yellow-600/80 to-yellow-500/80 text-yellow-100'
+                      : 'bg-gradient-to-t from-green-600/80 to-green-500/80 text-green-100'
+                  }`}
+                >
+                  {slot.occupied ? (
+                    <div className="flex flex-col items-center">
+                      <span className="text-xl">🔒</span>
+                      <span className="text-[8px]">Занято</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <span className="text-sm">
+                        {slot.type === 'status' ? '👑' : '💰'}
+                      </span>
+                      <span className="text-[10px]">
+                        {slot.type === 'status'
+                          ? `${slot.value}д`
+                          : `${slot.value}₽`
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Кнопка броска */}
+          <div className="mt-6 text-center">
+            {plinkoStatus?.game_completed ? (
+              <div className="bg-purple-800/50 px-6 py-4 rounded-lg border border-purple-500/30">
+                <p className="text-xl font-bold text-white mb-2">🎊 Игра завершена!</p>
+                <p className="text-purple-200 text-sm">Все слоты заняты. Поздравляем!</p>
               </div>
             ) : (
               <button
                 onClick={handleDrop}
                 disabled={!canPlay}
-                className={`px-8 py-3 rounded-lg font-bold text-lg transition-all transform ${
+                className={`px-12 py-4 rounded-xl font-bold text-lg transition-all transform ${
                   canPlay
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:scale-105'
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 hover:from-purple-600 hover:via-pink-600 hover:to-purple-600 text-white shadow-lg hover:shadow-purple-500/50 hover:scale-105 animate-pulse'
+                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {isDropping ? 'Падает...' : isLoading ? 'Загрузка...' : 'Бросить шарик'}
+                {isDropping ? '🎲 Падает...' : isLoading ? '⏳ Загрузка...' : '🚀 Бросить шарик'}
               </button>
             )}
           </div>
 
-          {/* Информация о множителях */}
-          <div className="text-center space-y-3 max-w-2xl">
-            <h3 className="text-lg font-semibold text-white">💎 Множители призов</h3>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 text-xs">
-              <div className="p-2 bg-red-600/20 border border-red-600 rounded">
-                <span className="text-red-400 font-bold">110x</span>
-              </div>
-              <div className="p-2 bg-orange-600/20 border border-orange-600 rounded">
-                <span className="text-orange-400 font-bold">41x</span>
-              </div>
-              <div className="p-2 bg-yellow-600/20 border border-yellow-600 rounded">
-                <span className="text-yellow-400 font-bold">10x</span>
-              </div>
-              <div className="p-2 bg-green-600/20 border border-green-600 rounded">
-                <span className="text-green-400 font-bold">5x</span>
-              </div>
-              <div className="p-2 bg-green-600/20 border border-green-600 rounded">
-                <span className="text-green-400 font-bold">3x</span>
-              </div>
-              <div className="p-2 bg-blue-600/20 border border-blue-600 rounded">
-                <span className="text-blue-400 font-bold">1.5x</span>
-              </div>
-              <div className="p-2 bg-blue-600/20 border border-blue-600 rounded">
-                <span className="text-blue-400 font-bold">1x</span>
-              </div>
-              <div className="p-2 bg-gray-600/20 border border-gray-600 rounded">
-                <span className="text-gray-400 font-bold">0.5x</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              Чем ближе к краям, тем выше множитель! Центральные слоты дают меньше.
-            </p>
-          </div>
-
-          {/* Дополнительная информация */}
-          <div className="text-center text-xs text-gray-500 max-w-lg">
-            <p>⏱ Кулдаун: 5 секунд между играми</p>
-            <p className="mt-1">🎮 Только для подписчиков</p>
+          {/* Подсказка */}
+          <div className="mt-4 text-center text-xs text-purple-300">
+            <p>💡 Физика реального шарика - каждый бросок уникален!</p>
+            <p className="mt-1">🎁 Выиграйте дни статуса или монетки</p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 
