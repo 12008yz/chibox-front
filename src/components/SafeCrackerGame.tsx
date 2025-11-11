@@ -206,8 +206,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
           <div className="text-center">
             <h2 className="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2">
               <span>🔒</span>
-              <span>СЕЙФ-ВЗЛОМ</span>
-              <span>(Safe Cracker)</span>
+              <span>ВЗЛОМАЙ СЕЙФ</span>
             </h2>
           </div>
         </div>
@@ -326,9 +325,6 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                     </motion.div>
                   ))}
                 </div>
-                <span className="text-purple-300 text-sm">
-                  (<span className="font-bold text-purple-100">{matches}</span>/3)
-                </span>
               </div>
             </motion.div>
           )}
