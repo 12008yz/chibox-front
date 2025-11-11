@@ -93,11 +93,14 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
       setIsSpinning(true);
 
-      // Воспроизводим звук вращения
-      soundManager.play('process');
+      // Воспроизводим циклический звук вращения барабанов
+      soundManager.play('bonusGame', true);
 
       // Анимация вращения барабанов
       await spinDrums(response.user_code);
+
+      // Останавливаем звук вращения
+      soundManager.stop('bonusGame');
 
       // Небольшая пауза перед показом результата
       await new Promise(resolve => setTimeout(resolve, 300));
