@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePlaySafeCrackerMutation, useGetSafeCrackerStatusQuery } from '../features/user/userApi';
 import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
+import { useAppSelector } from '../store/hooks';
+import { hasActiveSubscription } from '../utils/subscriptionUtils';
 
 interface SafeCrackerGameProps {
   isOpen: boolean;
@@ -23,7 +25,11 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const { data: status, refetch: refetchStatus } = useGetSafeCrackerStatusQuery();
   const [playSafeCracker, { isLoading }] = usePlaySafeCrackerMutation();
 
-  const canPlay = !isSpinning && !isLoading && (status?.remaining_attempts || 0) > 0;
+  // Проверка подписки
+  const user = useAppSelector(state => state.auth.user);
+  const hasSubscription = hasActiveSubscription(user);
+
+  const canPlay = !isSpinning && !isLoading && (status?.remaining_attempts || 0) > 0 && hasSubscription;
 
   // Анимация вращения барабанов
   const spinDrums = async (finalCode: number[]) => {
@@ -60,6 +66,14 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
   // Начать игру
   const handlePlay = async () => {
+    if (!hasSubscription) {
+      toast.error('Для игры в Safe Cracker требуется активная подписка!', {
+        icon: '🔒',
+        duration: 4000,
+      });
+      return;
+    }
+
     if (!canPlay) return;
 
     try {
@@ -175,130 +189,104 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
           </button>
 
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-1 flex items-center justify-center gap-2">
+            <h2 className="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2">
               <span>🔒</span>
               <span>СЕЙФ-ВЗЛОМ</span>
               <span>(Safe Cracker)</span>
             </h2>
-            <p className="text-yellow-200 text-sm">
-              Вводишь 3-значный код сейфа (автоматически)
-            </p>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-8">
           {/* Статистика */}
-          <div className="mb-6 flex justify-between items-center">
-            <div className="bg-gray-800/70 px-6 py-3 rounded-lg border border-yellow-500/30">
-              <p className="text-yellow-200 text-xs mb-1">Осталось попыток</p>
-              <p className="text-3xl font-bold text-white">
-                {status?.remaining_attempts || 0}
-              </p>
-            </div>
+          {hasSubscription && !(matches && matches >= 2) && (
+            <div className="mb-6 flex justify-between items-center">
+              <div className="bg-gray-800/70 px-6 py-3 rounded-lg border border-yellow-500/30">
+                <p className="text-yellow-200 text-xs mb-1">Осталось попыток</p>
+                <p className="text-3xl font-bold text-white">
+                  {status?.remaining_attempts || 0}
+                </p>
+              </div>
 
-            <div className="bg-gray-800/70 px-6 py-3 rounded-lg border border-yellow-500/30">
-              <p className="text-yellow-200 text-xs mb-1">Дней подписки</p>
-              <p className="text-3xl font-bold text-white">
-                {status?.subscription_days || 0}
-              </p>
+              <div className="bg-gray-800/70 px-6 py-3 rounded-lg border border-yellow-500/30">
+                <p className="text-yellow-200 text-xs mb-1">Дней подписки</p>
+                <p className="text-3xl font-bold text-white">
+                  {status?.subscription_days || 0}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Визуализация сейфа */}
-          <div className="mb-6 bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl p-8 border-4 border-yellow-600/50 shadow-2xl">
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-yellow-400 mb-2">СЕЙФ</h3>
-              <div className="flex items-center justify-center gap-1 text-xs text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Крутятся барабаны с цифрами</span>
+          <div className="mb-6 flex justify-center px-4">
+            <motion.div
+              className="relative w-full max-w-[500px]"
+              animate={isSpinning ? {
+                x: [0, -2, 2, -2, 2, 0],
+                y: [0, -1, 1, -1, 1, 0],
+                rotate: [0, -0.5, 0.5, -0.5, 0.5, 0],
+                transition: {
+                  duration: 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              } : {}}
+            >
+              {/* Изображение сейфа */}
+              <img
+                src="/images/bonus-safe.png"
+                alt="Safe"
+                className="w-full h-auto"
+              />
+
+              {/* Цифры в пустых блоках сейфа */}
+              <div className="absolute top-[19%] min-[425px]:top-[20%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
+                {displayCode.map((digit, index) => (
+                  <motion.div
+                    key={index}
+                    animate={isSpinning ? {
+                      y: [0, -5, 5, -5, 5, 0],
+                      x: [0, -1, 1, -1, 1, 0],
+                      rotate: [0, -1, 1, -1, 1, 0],
+                      transition: {
+                        duration: 0.15,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }
+                    } : {}}
+                    className="relative flex-1"
+                  >
+                    <div className="w-full aspect-[1.2/1] flex items-center justify-center">
+                      <span className="font-bold text-black font-mono drop-shadow-lg" style={{ fontSize: 'clamp(0.5rem, 8vw, 3rem)' }}>
+                        {digit}
+                      </span>
+                    </div>
+                    {showResult && userCode && (
+                      <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-16 left-1/2 transform -translate-x-1/2">
+                        {secretCode![index] === userCode[index] ? (
+                          <span className="text-2xl sm:text-3xl">✅</span>
+                        ) : (
+                          <span className="text-2xl sm:text-3xl">❌</span>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
               </div>
-            </div>
-
-            {/* Барабаны с кодом */}
-            <div className="flex justify-center gap-4 mb-6">
-              {displayCode.map((digit, index) => (
-                <motion.div
-                  key={index}
-                  animate={isSpinning ? {
-                    y: [0, -10, 0],
-                    transition: {
-                      duration: 0.1,
-                      repeat: Infinity,
-                      ease: "linear"
-                    }
-                  } : {}}
-                  className="relative"
-                >
-                  <div className="w-24 h-32 bg-black rounded-lg border-4 border-yellow-600 shadow-lg flex items-center justify-center overflow-hidden">
-                    <span className="text-6xl font-bold text-yellow-400 font-mono">
-                      {digit}
-                    </span>
-                  </div>
-                  {showResult && userCode && (
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-                      {secretCode![index] === userCode[index] ? (
-                        <span className="text-2xl">✅</span>
-                      ) : (
-                        <span className="text-2xl">❌</span>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Результат */}
-            <AnimatePresence>
-              {showResult && secretCode && userCode && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="mt-12 text-center"
-                >
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-yellow-500/30">
-                    <p className="text-sm text-gray-400 mb-2">Секретный код:</p>
-                    <div className="flex justify-center gap-2 mb-4">
-                      {secretCode.map((digit, index) => (
-                        <span key={index} className="text-2xl font-bold text-white font-mono">
-                          {digit}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className={`text-2xl font-bold ${
-                      matches === 3 ? 'text-green-400' :
-                      matches === 2 ? 'text-yellow-400' :
-                      'text-red-400'
-                    }`}>
-                      {matches === 3 && '🎉 3 СОВПАДЕНИЯ! 5 ДНЕЙ ПОДПИСКИ!'}
-                      {matches === 2 && '🎊 2 СОВПАДЕНИЯ! 1 ДЕНЬ ПОДПИСКИ!'}
-                      {matches === 1 && '😐 1 СОВПАДЕНИЕ'}
-                      {matches === 0 && '😔 НЕ УГАДАЛИ'}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            </motion.div>
           </div>
 
-          {/* Информация о призах */}
-          <div className="mb-6 bg-gray-800/50 rounded-lg p-4 border border-yellow-500/20">
-            <h4 className="text-yellow-400 font-bold mb-3 text-center">Призы:</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between text-gray-300">
-                <span>• 2 цифры совпали</span>
-                <span className="text-yellow-400 font-semibold">1 день подписки (15% шанс)</span>
-              </div>
-              <div className="flex items-center justify-between text-gray-300">
-                <span>• 3 цифры совпали</span>
-                <span className="text-green-400 font-semibold">5 дней подписки (1% шанс)</span>
+          {/* Предупреждение о необходимости подписки */}
+          {!hasSubscription && (
+            <div className="mb-6 bg-red-900/30 border-2 border-red-500/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <h4 className="text-red-400 text-center font-bold text-lg mb-1">Требуется активный статус</h4>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Кнопка игры */}
           <div className="text-center">
@@ -311,14 +299,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   : 'bg-gray-700 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {isSpinning ? '🔄 Взлом...' : isLoading ? '⏳ Загрузка...' : '🔓 ВЗЛОМАТЬ СЕЙФ'}
+              {isSpinning ? '🔄 Взлом...' : isLoading ? '⏳ Загрузка...' : !hasSubscription ? '🔒 Играть' : '🔓 ВЗЛОМАТЬ СЕЙФ'}
             </button>
           </div>
 
-          {/* Подсказка */}
-          <div className="mt-6 text-center text-xs text-gray-400">
-            <p>💡 Плюсы: Уникальная механика, крутая анимация</p>
-          </div>
         </div>
       </motion.div>
     </div>
