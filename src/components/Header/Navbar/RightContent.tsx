@@ -9,9 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store/hooks";
 import { useLogoutMutation } from "../../../features/auth/authApi";
 import { performFullLogout } from "../../../utils/authUtils";
-import { useGetUnreadNotificationsCountQuery, useGetBonusStatusQuery } from "../../../features/user/userApi";
+import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
-import PlinkoGame from '../../PlinkoBoard';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 
@@ -30,7 +29,6 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
-  const [showBonusGame, setShowBonusGame] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
@@ -39,12 +37,6 @@ const RightContent: React.FC<RightContentProps> = ({
     pollingInterval: 5000, // Проверяем каждые 5 секунд
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
-  });
-
-  // Получаем статус бонуса
-  const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
-    skip: !user,
-    pollingInterval: 30000,
   });
 
   const notificationCount = unreadCountData?.data?.count || 0;
@@ -100,31 +92,6 @@ const RightContent: React.FC<RightContentProps> = ({
 
   return (
     <div className="flex items-center space-x-4 relative overflow-visible">
-      {/* Бонус игра */}
-      <div className="relative">
-        <button
-          className="gaming-bonus-button group"
-          onClick={() => setShowBonusGame(!showBonusGame)}
-          disabled={(bonusStatus?.time_until_next_seconds || 0) > 0}
-        >
-          <div className="flex items-center space-x-2">
-            <MdLocalFireDepartment className="text-lg gaming-icon-fire" />
-            <span className="font-bold text-sm">{t('header.bonus')}</span>
-          </div>
-          {bonusStatus && (bonusStatus.time_until_next_seconds || 0) > 0 && (
-            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
-              {Math.ceil((bonusStatus.time_until_next_seconds || 0) / 60)}м
-            </div>
-          )}
-        </button>
-        {showBonusGame && (
-          <PlinkoGame
-            isOpen={showBonusGame}
-            onClose={() => setShowBonusGame(false)}
-          />
-        )}
-      </div>
-
       {/* Баланс */}
       <div className="gaming-balance-container">
         <div className="flex items-center space-x-2">

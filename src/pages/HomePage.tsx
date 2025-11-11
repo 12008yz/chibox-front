@@ -11,7 +11,6 @@ import CaseListing from '../components/CaseListing';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import SafeCrackerGame from '../components/SafeCrackerGame';
-import RouletteGame from '../components/RouletteGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
@@ -62,7 +61,6 @@ const HomePage: React.FC = () => {
 
   // Состояние игр
   const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
-  const [showRouletteGame, setShowRouletteGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {
@@ -104,13 +102,6 @@ const HomePage: React.FC = () => {
   const handlePlayRoulette = () => {
     console.log('HomePage: Открываем Safe Cracker из StatusDashboard');
     setShowSafeCrackerGame(true);
-  };
-
-  const handleRouletteClose = () => {
-    console.log('HomePage: Закрываем Safe Cracker');
-    setShowSafeCrackerGame(false);
-    // Обновляем данные пользователя
-    refetchUser();
   };
 
 
@@ -523,12 +514,6 @@ const HomePage: React.FC = () => {
         isOpen={showTicTacToeGame}
         onClose={handleTicTacToeGameClose}
         onRewardReceived={handleTicTacToeWin}
-      />
-
-      {/* Бонусная рулетка */}
-      <RouletteGame
-        isOpen={showRouletteGame}
-        onClose={handleRouletteClose}
       />
 
       {/* Онбординг тур */}

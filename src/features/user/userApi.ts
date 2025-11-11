@@ -293,74 +293,6 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
 
-    // Игра в рулетку
-    playRoulette: builder.mutation<
-      {
-        success: boolean;
-        message: string;
-        next_time: string;
-        winner_index: number;
-        prize_type: 'sub_1_day' | 'sub_2_days' | 'empty';
-        prize_value: number;
-      },
-      void
-    >({
-      query: () => ({
-        url: 'v1/bonus/play-roulette',
-        method: 'POST',
-      }),
-      invalidatesTags: ['Balance', 'User', 'Inventory'],
-    }),
-
-    // Получить статус игры Plinko
-    getPlinkoStatus: builder.query<
-      {
-        success: boolean;
-        occupied_slots: number[];
-        remaining_attempts: number;
-        all_slots: Array<{
-          index: number;
-          type: 'coins' | 'status';
-          value: number;
-          occupied: boolean;
-        }>;
-        total_slots: number;
-        game_completed: boolean;
-      },
-      void
-    >({
-      query: () => 'v1/games/plinko-status',
-      providesTags: ['User'],
-    }),
-
-    // Игра в Plinko
-    playPlinko: builder.mutation<
-      {
-        success: boolean;
-        message: string;
-        slot_index: number;
-        prize_type: 'coins' | 'status';
-        prize_amount: number;
-        status_days: number;
-        occupied_slots: number[];
-        remaining_attempts: number;
-        new_balance: number;
-        all_slots: Array<{
-          index: number;
-          type: 'coins' | 'status';
-          value: number;
-          occupied: boolean;
-        }>;
-      },
-      void
-    >({
-      query: () => ({
-        url: 'v1/games/play-plinko',
-        method: 'POST',
-      }),
-      invalidatesTags: ['User'],
-    }),
-
     // Получить статус игры Safe Cracker
     getSafeCrackerStatus: builder.query<
       {
@@ -929,9 +861,6 @@ export const {
   useWithdrawBalanceMutation,
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
-  usePlayRouletteMutation,
-  useGetPlinkoStatusQuery,
-  usePlayPlinkoMutation,
   useGetSafeCrackerStatusQuery,
   usePlaySafeCrackerMutation,
   usePlaySlotMutation,
