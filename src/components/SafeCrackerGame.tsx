@@ -29,7 +29,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
-  const canPlay = !isSpinning && !isLoading && (status?.remaining_attempts || 0) > 0 && hasSubscription;
+  const canPlay = !isSpinning && !isLoading && (status?.remaining_attempts || 0) > 0 && hasSubscription && !status?.has_won;
 
   // Анимация вращения барабанов
   const spinDrums = async (finalCode: number[]) => {
@@ -99,6 +99,15 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       // Анимация вращения барабанов
       await spinDrums(response.user_code);
 
+      // Небольшая пауза перед показом результата
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Останавливаем анимацию вращения
+      setIsSpinning(false);
+
+      // Еще небольшая пауза для плавности
+      await new Promise(resolve => setTimeout(resolve, 200));
+
       // Показываем результат
       setSecretCode(response.secret_code);
       setUserCode(response.user_code);
@@ -126,7 +135,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
         });
       }
 
-      setIsSpinning(false);
+      // Ждем немного перед обновлением статуса, чтобы пользователь увидел результат
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Обновляем статус в самом конце
       refetchStatus();
 
     } catch (err: any) {
@@ -200,7 +212,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
         {/* Content */}
         <div className="p-8">
           {/* Статистика */}
-          {hasSubscription && !(matches && matches >= 2) && (
+          {hasSubscription && !status?.has_won && !(matches && matches >= 2) && (
             <div className="mb-6 flex justify-between items-center">
               <div className="bg-gray-800/70 px-6 py-3 rounded-lg border border-yellow-500/30">
                 <p className="text-yellow-200 text-xs mb-1">Осталось попыток</p>
@@ -288,6 +300,18 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
             </div>
           )}
 
+          {/* Сообщение о том, что пользователь уже выиграл */}
+          {status?.has_won && hasSubscription && !isSpinning && !isLoading && (
+            <div className="mb-6 bg-green-900/30 border-2 border-green-500/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <h4 className="text-green-400 text-center font-bold text-lg mb-1">🎉 Вы уже выиграли в Safe Cracker сегодня!</h4>
+                  <p className="text-green-300 text-center text-sm">Следующие попытки будут доступны в 16:00 МСК.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Кнопка игры */}
           <div className="text-center">
             <button
@@ -299,7 +323,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   : 'bg-gray-700 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {isSpinning ? '🔄 Взлом...' : isLoading ? '⏳ Загрузка...' : !hasSubscription ? '🔒 Играть' : '🔓 ВЗЛОМАТЬ СЕЙФ'}
+              {isSpinning ? '🔄 Взлом...' : isLoading ? '⏳ Загрузка...' : !hasSubscription ? '🔒 Играть' : status?.has_won ? '✅ Бонус получен' : '🔓 ВЗЛОМАТЬ СЕЙФ'}
             </button>
           </div>
 

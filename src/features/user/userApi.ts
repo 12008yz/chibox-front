@@ -299,6 +299,10 @@ export const userApi = baseApi.injectEndpoints({
         success: boolean;
         remaining_attempts: number;
         subscription_days: number;
+        subscription_tier: number;
+        max_attempts: number;
+        has_won: boolean;
+        can_play: boolean;
       },
       void
     >({
