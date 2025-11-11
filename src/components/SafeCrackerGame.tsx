@@ -253,7 +253,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
               />
 
               {/* Цифры в пустых блоках сейфа */}
-              <div className="absolute top-[19%] min-[425px]:top-[20%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
+              <div className="absolute top-[19%] min-[425px]:top-[21%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
                 {displayCode.map((digit, index) => (
                   <motion.div
                     key={index}
