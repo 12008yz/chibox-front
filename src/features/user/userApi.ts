@@ -358,6 +358,40 @@ export const userApi = baseApi.injectEndpoints({
         url: 'v1/games/play-plinko',
         method: 'POST',
       }),
+      invalidatesTags: ['User'],
+    }),
+
+    // Получить статус игры Safe Cracker
+    getSafeCrackerStatus: builder.query<
+      {
+        success: boolean;
+        remaining_attempts: number;
+        subscription_days: number;
+      },
+      void
+    >({
+      query: () => 'v1/games/safe-cracker-status',
+      providesTags: ['User'],
+    }),
+
+    // Игра в Safe Cracker
+    playSafeCracker: builder.mutation<
+      {
+        success: boolean;
+        message: string;
+        secret_code: number[];
+        user_code: number[];
+        matches: number;
+        prize_type: 'subscription' | 'none';
+        prize_days: number;
+        remaining_attempts: number;
+      },
+      void
+    >({
+      query: () => ({
+        url: 'v1/games/play-safe-cracker',
+        method: 'POST',
+      }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
     }),
 
@@ -898,6 +932,8 @@ export const {
   usePlayRouletteMutation,
   useGetPlinkoStatusQuery,
   usePlayPlinkoMutation,
+  useGetSafeCrackerStatusQuery,
+  usePlaySafeCrackerMutation,
   usePlaySlotMutation,
   useGetSlotItemsQuery,
   useGetSlotStatusQuery,

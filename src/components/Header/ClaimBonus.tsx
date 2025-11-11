@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGetBonusStatusQuery } from "../../features/user/userApi";
-import PlinkoGame from "../PlinkoBoard";
+import SafeCrackerGame from "../SafeCrackerGame";
 
 interface ClaimBonusProps {
   onClaimBonus?: () => Promise<void>;
@@ -12,7 +12,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
   isLoading = false
 }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
-  const [showPlinkoGame, setShowPlinkoGame] = useState(false);
+  const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
   const [isGlowing, setIsGlowing] = useState(false);
 
   const { data: bonusStatus } = useGetBonusStatusQuery(undefined, {
@@ -61,7 +61,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
   }, [bonusStatus?.is_available]);
 
   const handleOpenBonusGame = () => {
-    setShowPlinkoGame(true);
+    setShowSafeCrackerGame(true);
     if (onClaimBonus) {
       onClaimBonus();
     }
@@ -205,9 +205,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
       </div>
 
       {/* Модальное окно игры */}
-      <PlinkoGame
-        isOpen={showPlinkoGame}
-        onClose={() => setShowPlinkoGame(false)}
+      <SafeCrackerGame
+        isOpen={showSafeCrackerGame}
+        onClose={() => setShowSafeCrackerGame(false)}
       />
     </>
   );

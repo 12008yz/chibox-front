@@ -10,7 +10,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
-import PlinkoGame from '../components/PlinkoBoard';
+import SafeCrackerGame from '../components/SafeCrackerGame';
 import RouletteGame from '../components/RouletteGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
   const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
   // Состояние игр
-  const [showPlinkoGame, setShowPlinkoGame] = useState(false);
+  const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
   const [showRouletteGame, setShowRouletteGame] = useState(false);
 
   // Логирование изменений состояния игры
@@ -102,13 +102,13 @@ const HomePage: React.FC = () => {
   };
 
   const handlePlayRoulette = () => {
-    console.log('HomePage: Открываем рулетку из StatusDashboard');
-    setShowPlinkoGame(true);
+    console.log('HomePage: Открываем Safe Cracker из StatusDashboard');
+    setShowSafeCrackerGame(true);
   };
 
   const handleRouletteClose = () => {
-    console.log('HomePage: Закрываем рулетку');
-    setShowPlinkoGame(false);
+    console.log('HomePage: Закрываем Safe Cracker');
+    setShowSafeCrackerGame(false);
     // Обновляем данные пользователя
     refetchUser();
   };
