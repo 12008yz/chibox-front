@@ -13,6 +13,7 @@ import { useGetUnreadNotificationsCountQuery } from "../../../features/user/user
 import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
+import SafeCrackerButton from '../SafeCrackerButton';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -114,6 +115,9 @@ const RightContent: React.FC<RightContentProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Бонус Safe Cracker */}
+      <SafeCrackerButton />
 
       {/* Уведомления */}
       <div className="relative">
