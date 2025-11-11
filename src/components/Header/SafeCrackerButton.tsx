@@ -15,8 +15,6 @@ const SafeCrackerButton = () => {
   const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
-  // Показываем количество попыток только если есть подписка и пользователь еще не выиграл
-  const shouldShowAttempts = hasSubscription && !status?.has_won;
   const canPlay = (status?.remaining_attempts || 0) > 0 && hasSubscription && !status?.has_won;
 
   return (
@@ -43,11 +41,6 @@ const SafeCrackerButton = () => {
       >
         <FaLock className={`text-lg ${canPlay ? 'animate-pulse' : ''}`} />
         <span className="hidden lg:inline">Safe Cracker</span>
-        {shouldShowAttempts && canPlay && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {status?.remaining_attempts}
-          </span>
-        )}
       </button>
 
       <SafeCrackerGame

@@ -256,10 +256,11 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
               />
 
               {/* Цифры в пустых блоках сейфа */}
-              <div className="absolute top-[19%] min-[425px]:top-[21%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
+              <div className="absolute top-[19%] min-[340px]:top-[20%] min-[425px]:top-[21%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
                 {displayCode.map((digit, index) => (
                   <motion.div
                     key={index}
+                    initial={{ y: 0, x: 0, rotate: 0 }}
                     animate={isSpinning ? {
                       y: [0, -5, 5, -5, 5, 0],
                       x: [0, -1, 1, -1, 1, 0],
@@ -269,7 +270,15 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                         repeat: Infinity,
                         ease: "easeInOut"
                       }
-                    } : {}}
+                    } : {
+                      y: 0,
+                      x: 0,
+                      rotate: 0,
+                      transition: {
+                        duration: 0.2,
+                        ease: "easeOut"
+                      }
+                    }}
                     className="relative flex-1"
                   >
                     <div className="w-full aspect-[1.2/1] flex items-center justify-center">
@@ -291,6 +300,38 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
               </div>
             </motion.div>
           </div>
+
+          {/* Блок с загаданными числами */}
+          {showResult && secretCode && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-4 bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border-2 border-purple-500/50 rounded-lg p-3"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-purple-200 font-semibold text-sm">🎯 Загаданный код:</span>
+                <div className="flex gap-2">
+                  {secretCode.map((digit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
+                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center border border-purple-400/50 shadow-lg"
+                    >
+                      <span className="text-xl sm:text-2xl font-bold text-white font-mono">
+                        {digit}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+                <span className="text-purple-300 text-sm">
+                  (<span className="font-bold text-purple-100">{matches}</span>/3)
+                </span>
+              </div>
+            </motion.div>
+          )}
 
           {/* Предупреждение о необходимости подписки */}
           {!hasSubscription && (

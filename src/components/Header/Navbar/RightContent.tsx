@@ -93,6 +93,9 @@ const RightContent: React.FC<RightContentProps> = ({
 
   return (
     <div className="flex items-center space-x-4 relative overflow-visible">
+      {/* Бонус Safe Cracker */}
+      <SafeCrackerButton />
+
       {/* Баланс */}
       <div className="gaming-balance-container">
         <div className="flex items-center space-x-2">
@@ -115,9 +118,6 @@ const RightContent: React.FC<RightContentProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Бонус Safe Cracker */}
-      <SafeCrackerButton />
 
       {/* Уведомления */}
       <div className="relative">
