@@ -179,26 +179,58 @@ export const CaseItem = memo(({
             </div>
           )}
 
-          {/* Оптимизированное перечеркивание */}
+          {/* Красивое перечеркивание */}
           {!shouldRenderSimplified && ((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
-            <div className="absolute inset-0 z-20">
-              <div className={`absolute inset-0 bg-black bg-opacity-40 ${
+            <div className="absolute inset-0 z-20 rounded overflow-hidden">
+              {/* Затемнённый фон с градиентом */}
+              <div className={`absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/60 ${
                 isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
               }`} />
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className={`absolute bg-red-500 rounded-full ${
-                  isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-1' : 'w-0 h-0 opacity-0'
-                }`} style={{ transform: 'rotate(45deg)' }} />
+              {/* SVG крест с анимацией */}
+              <svg
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                style={{ pointerEvents: 'none' }}
+              >
+                {/* Первая линия (слева-сверху вправо-вниз) */}
+                <line
+                  x1="15" y1="15"
+                  x2="85" y2="85"
+                  stroke={isWinningItemStopped && showStrikeThrough ? "#ef4444" : "#dc2626"}
+                  strokeWidth={isWinningItemStopped && showStrikeThrough ? "4" : "3"}
+                  strokeLinecap="round"
+                  className={isWinningItemStopped && showStrikeThrough ? 'animate-svg-line-1' : ''}
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.9))',
+                    strokeDasharray: isWinningItemStopped && showStrikeThrough ? '113' : undefined,
+                    strokeDashoffset: isWinningItemStopped && showStrikeThrough ? '0' : undefined,
+                    opacity: isWinningItemStopped && showStrikeThrough ? undefined : 1
+                  }}
+                />
 
-                <div className={`absolute bg-red-500 rounded-full ${
-                  isWinningItemStopped && showStrikeThrough ? 'animate-cross-line-2' : 'w-0 h-0 opacity-0'
-                }`} style={{ transform: 'rotate(-45deg)' }} />
-              </div>
+                {/* Вторая линия (справа-сверху влево-вниз) */}
+                <line
+                  x1="85" y1="15"
+                  x2="15" y2="85"
+                  stroke={isWinningItemStopped && showStrikeThrough ? "#ef4444" : "#dc2626"}
+                  strokeWidth={isWinningItemStopped && showStrikeThrough ? "4" : "3"}
+                  strokeLinecap="round"
+                  className={isWinningItemStopped && showStrikeThrough ? 'animate-svg-line-2' : ''}
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.9))',
+                    strokeDasharray: isWinningItemStopped && showStrikeThrough ? '113' : undefined,
+                    strokeDashoffset: isWinningItemStopped && showStrikeThrough ? '0' : undefined,
+                    opacity: isWinningItemStopped && showStrikeThrough ? undefined : 1
+                  }}
+                />
+              </svg>
 
+              {/* Галочка подтверждения */}
               {isWinningItemStopped && showStrikeThrough && (
-                <div className="absolute top-1 right-1 animate-checkmark-bounce">
-                  <div className="bg-green-500 text-white text-xs px-1 py-0.5 rounded font-bold">
+                <div className="absolute top-2 right-2 animate-checkmark-bounce">
+                  <div className="bg-gradient-to-br from-green-400 to-green-600 text-white text-sm px-2.5 py-1 rounded-full font-bold shadow-lg border-2 border-green-300">
                     ✓
                   </div>
                 </div>

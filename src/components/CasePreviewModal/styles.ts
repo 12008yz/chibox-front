@@ -234,24 +234,30 @@ export const strikeAnimationStyles = `
     }
   }
 
-  @keyframes cross-line-draw {
+  @keyframes svg-line-draw-1 {
     0% {
-      transform: scaleX(0);
+      stroke-dashoffset: 113;
       opacity: 0;
     }
+    10% {
+      opacity: 1;
+    }
     100% {
-      transform: scaleX(1);
+      stroke-dashoffset: 0;
       opacity: 1;
     }
   }
 
-  @keyframes cross-line-draw-reverse {
+  @keyframes svg-line-draw-2 {
     0% {
-      transform: scaleX(0);
+      stroke-dashoffset: 113;
       opacity: 0;
     }
+    10% {
+      opacity: 1;
+    }
     100% {
-      transform: scaleX(1);
+      stroke-dashoffset: 0;
       opacity: 1;
     }
   }
@@ -268,14 +274,17 @@ export const strikeAnimationStyles = `
   @keyframes checkmark-bounce {
     0% {
       opacity: 0;
-      transform: scale3d(0, 0, 1);
+      transform: scale(0) rotate(-180deg);
     }
     50% {
-      transform: scale3d(1.2, 1.2, 1);
+      transform: scale(1.3) rotate(10deg);
+    }
+    70% {
+      transform: scale(0.9) rotate(-5deg);
     }
     100% {
       opacity: 1;
-      transform: scale3d(1, 1, 1);
+      transform: scale(1) rotate(0deg);
     }
   }
 
@@ -284,19 +293,13 @@ export const strikeAnimationStyles = `
     will-change: filter, border-color;
   }
 
-  .animate-cross-line-1 {
-    animation: cross-line-draw 0.6s ease-out forwards;
-    width: 70%;
-    height: 4px;
-    transform-origin: left center;
+  .animate-svg-line-1 {
+    animation: svg-line-draw-1 0.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
   }
 
-  .animate-cross-line-2 {
-    animation: cross-line-draw-reverse 0.6s ease-out forwards;
-    animation-delay: 0.3s;
-    width: 70%;
-    height: 4px;
-    transform-origin: left center;
+  .animate-svg-line-2 {
+    animation: svg-line-draw-2 0.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    animation-delay: 0.25s;
   }
 
   .animate-overlay-fade {
@@ -304,8 +307,8 @@ export const strikeAnimationStyles = `
   }
 
   .animate-checkmark-bounce {
-    animation: checkmark-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-    animation-delay: 1s;
+    animation: checkmark-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: 0.8s;
   }
 
   .golden-spark {
