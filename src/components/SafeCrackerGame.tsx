@@ -21,6 +21,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const [userCode, setUserCode] = useState<number[] | null>(null);
   const [matches, setMatches] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [prizeType, setPrizeType] = useState<string | null>(null);
+  const [prizeValue, setPrizeValue] = useState<number | null>(null);
+  const [wonItem, setWonItem] = useState<any>(null);
+  const [showPrizeAnimation, setShowPrizeAnimation] = useState(false);
 
   const { data: status, refetch: refetchStatus } = useGetSafeCrackerStatusQuery();
   const [playSafeCracker, { isLoading }] = usePlaySafeCrackerMutation();
@@ -82,6 +86,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       setMatches(null);
       setSecretCode(null);
       setUserCode(null);
+      setPrizeType(null);
+      setPrizeValue(null);
+      setWonItem(null);
+      setShowPrizeAnimation(false);
 
       // Запрашиваем результат с сервера
       const response = await playSafeCracker().unwrap();
@@ -117,6 +125,11 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       setMatches(response.matches);
       setShowResult(true);
 
+      // Сохраняем информацию о призе
+      setPrizeType(response.prize_type);
+      setPrizeValue(response.prize_value);
+      setWonItem(response.won_item);
+
       // Звук результата
       if (response.matches === 3) {
         soundManager.play('win');
@@ -136,6 +149,17 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
           icon: '😔',
           duration: 3000,
         });
+      }
+
+      // Показываем анимацию приза если есть выигрыш
+      if (response.prize_type === 'money' || response.prize_type === 'item') {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setShowPrizeAnimation(true);
+
+        // Скрываем анимацию через 3 секунды
+        setTimeout(() => {
+          setShowPrizeAnimation(false);
+        }, 3000);
       }
 
       // Ждем немного перед обновлением статуса, чтобы пользователь увидел результат
@@ -169,6 +193,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       setMatches(null);
       setSecretCode(null);
       setUserCode(null);
+      setPrizeType(null);
+      setPrizeValue(null);
+      setWonItem(null);
+      setShowPrizeAnimation(false);
     }
   }, [isOpen]);
 
@@ -297,6 +325,106 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   </motion.div>
                 ))}
               </div>
+
+              {/* Анимация выигрыша баланса */}
+              <AnimatePresence>
+                {showPrizeAnimation && prizeType === 'money' && prizeValue && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5, y: 0 }}
+                    animate={{
+                      opacity: [0, 1, 1, 0],
+                      scale: [0.5, 1.2, 1.2, 0.8],
+                      y: [0, -10, -10, -20]
+                    }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ duration: 3, ease: "easeOut" }}
+                    className="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
+                  >
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-3 rounded-xl shadow-2xl border-2 border-green-300">
+                      <div className="text-white font-bold text-2xl sm:text-3xl md:text-4xl whitespace-nowrap flex items-center gap-2">
+                        <span>💰</span>
+                        <span>+{prizeValue}₽</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Анимация выигрыша предмета */}
+              <AnimatePresence>
+                {showPrizeAnimation && prizeType === 'item' && wonItem && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                    animate={{
+                      opacity: [0, 1, 1, 1, 0],
+                      scale: [0, 1.5, 1.3, 1.3, 0.8],
+                      rotate: [-180, 0, 0, 0, 180],
+                      y: [0, -20, -15, -15, -30]
+                    }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ duration: 3, ease: "easeOut" }}
+                    className="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
+                  >
+                    <div className="relative">
+                      {/* Свечение вокруг предмета */}
+                      <motion.div
+                        animate={{
+                          boxShadow: [
+                            '0 0 20px 10px rgba(251, 191, 36, 0.3)',
+                            '0 0 40px 20px rgba(251, 191, 36, 0.5)',
+                            '0 0 20px 10px rgba(251, 191, 36, 0.3)',
+                          ]
+                        }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="absolute inset-0 rounded-xl"
+                      />
+
+                      {/* Предмет */}
+                      <div className="relative bg-gradient-to-br from-yellow-600/90 to-orange-600/90 p-4 rounded-xl border-4 border-yellow-400 shadow-2xl">
+                        <img
+                          src={wonItem.image_url}
+                          alt={wonItem.name}
+                          className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                        />
+                        <div className="mt-2 bg-black/50 px-3 py-1 rounded-lg">
+                          <p className="text-white font-bold text-sm sm:text-base text-center truncate max-w-[200px]">
+                            {wonItem.name}
+                          </p>
+                          <p className="text-yellow-300 font-bold text-xs sm:text-sm text-center">
+                            {wonItem.price}₽
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Искры вокруг предмета */}
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 1, 0.5]
+                        }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="absolute inset-0 pointer-events-none"
+                      >
+                        {[...Array(8)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            animate={{
+                              x: [0, Math.cos(i * Math.PI / 4) * 60],
+                              y: [0, Math.sin(i * Math.PI / 4) * 60],
+                              opacity: [1, 0]
+                            }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="absolute top-1/2 left-1/2 w-2 h-2 bg-yellow-400 rounded-full"
+                            style={{
+                              transform: 'translate(-50%, -50%)'
+                            }}
+                          />
+                        ))}
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
 

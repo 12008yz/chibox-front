@@ -318,8 +318,16 @@ export const userApi = baseApi.injectEndpoints({
         secret_code: number[];
         user_code: number[];
         matches: number;
-        prize_type: 'subscription' | 'none';
-        prize_days: number;
+        prize_type: 'money' | 'item' | 'subscription' | 'none';
+        prize_value: number;
+        won_item?: {
+          id: string;
+          name: string;
+          image_url: string;
+          price: number;
+          rarity: string;
+        };
+        new_balance: number;
         remaining_attempts: number;
       },
       void
