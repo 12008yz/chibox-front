@@ -62,17 +62,35 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
 
   // Обработчик отмены вывода
   const handleCancelWithdrawal = async (inventoryItem: any) => {
+    console.log('🔍 [CANCEL WITHDRAWAL] Начало отмены вывода:', {
+      inventoryItem_id: inventoryItem?.id,
+      withdrawal_id: inventoryItem?.withdrawal_id,
+      status: inventoryItem?.status,
+      полный_объект: inventoryItem
+    });
+
     if (!inventoryItem.withdrawal_id) {
+      console.error('❌ [CANCEL WITHDRAWAL] withdrawal_id не найден!', {
+        inventoryItem_keys: Object.keys(inventoryItem || {}),
+        inventoryItem_data: inventoryItem
+      });
       showNotification(t('profile.withdrawal_id_not_found'), 'error');
       return;
     }
 
+    console.log('✅ [CANCEL WITHDRAWAL] withdrawal_id найден:', inventoryItem.withdrawal_id);
     setCancellingIds(prev => new Set(prev).add(inventoryItem.id));
 
     try {
+      console.log('📤 [CANCEL WITHDRAWAL] Отправка запроса на отмену:', {
+        withdrawalId: inventoryItem.withdrawal_id
+      });
+
       const result = await cancelWithdrawal({
         withdrawalId: inventoryItem.withdrawal_id
       }).unwrap();
+
+      console.log('📥 [CANCEL WITHDRAWAL] Получен ответ:', result);
 
       if (result.success) {
         showNotification(t('profile.withdrawal_cancelled_success'), 'success');
