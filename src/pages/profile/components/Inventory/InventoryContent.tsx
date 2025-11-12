@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import CaseWithDrop from '../../../../components/CaseWithDrop';
@@ -7,6 +7,7 @@ import { getRarityColor, getRarityName } from '../../utils/profileUtils';
 import { getItemImageUrl, getCaseImageUrl } from '../../../../utils/steamImageUtils';
 import { isUserItem, isUserCase, type InventoryTab } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
+import { useCancelWithdrawalMutation } from '../../../../features/user/userApi';
 
 interface InventoryContentProps {
   activeTab: InventoryTab;
@@ -32,6 +33,8 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
   translateCaseName
 }) => {
   const { t } = useTranslation();
+  const [cancelWithdrawal] = useCancelWithdrawalMutation();
+  const [cancellingIds, setCancellingIds] = useState<Set<string>>(new Set());
 
   // Debug: проверяем данные
   if (activeTab === 'opened') {
@@ -54,6 +57,45 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
       default:
         toast(message);
         break;
+    }
+  };
+
+  // Обработчик отмены вывода
+  const handleCancelWithdrawal = async (inventoryItem: any) => {
+    if (!inventoryItem.withdrawal_id) {
+      showNotification(t('profile.withdrawal_id_not_found'), 'error');
+      return;
+    }
+
+    setCancellingIds(prev => new Set(prev).add(inventoryItem.id));
+
+    try {
+      const result = await cancelWithdrawal({
+        withdrawalId: inventoryItem.withdrawal_id
+      }).unwrap();
+
+      if (result.success) {
+        showNotification(t('profile.withdrawal_cancelled_success'), 'success');
+        // Обновляем инвентарь
+        setTimeout(() => {
+          onInventoryRefresh();
+          onUserRefresh();
+        }, 100);
+      } else {
+        showNotification(result.message || t('profile.withdrawal_cancel_failed'), 'error');
+      }
+    } catch (error: any) {
+      console.error('Cancel withdrawal error:', error);
+      showNotification(
+        error?.data?.message || t('profile.withdrawal_cancel_error'),
+        'error'
+      );
+    } finally {
+      setCancellingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(inventoryItem.id);
+        return newSet;
+      });
     }
   };
 
@@ -212,6 +254,26 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                       showNotification(message, 'error');
                     }}
                   />
+                )}
+
+                {/* Cancel Withdrawal Button - показывается для pending_withdrawal в табе withdrawn */}
+                {activeTab === 'withdrawn' && inventoryItem.status === 'pending_withdrawal' && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => handleCancelWithdrawal(inventoryItem)}
+                      disabled={cancellingIds.has(inventoryItem.id)}
+                      className={`w-full text-xs px-3 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                        cancellingIds.has(inventoryItem.id)
+                          ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+                          : 'bg-red-600 hover:bg-red-700 text-white hover:shadow-lg hover:scale-105'
+                      }`}
+                    >
+                      {cancellingIds.has(inventoryItem.id)
+                        ? t('profile.cancelling_withdrawal')
+                        : t('profile.cancel_withdrawal')
+                      }
+                    </button>
+                  </div>
                 )}
               </>
             ) : isUserCase(inventoryItem) ? (

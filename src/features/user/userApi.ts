@@ -130,6 +130,26 @@ export const userApi = baseApi.injectEndpoints({
       },
     }),
 
+    // Отмена вывода предмета
+    cancelWithdrawal: builder.mutation<
+      ApiResponse<{ withdrawal_id: string; status: string }>,
+      { withdrawalId: string }
+    >({
+      query: ({ withdrawalId }) => ({
+        url: `v1/withdraw-item/${withdrawalId}/cancel`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Inventory', 'User'],
+      // Оптимистичное обновление инвентаря
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch (error) {
+          console.error('Failed to cancel withdrawal:', error);
+        }
+      },
+    }),
+
     // Получение достижений
     getUserAchievements: builder.query<ApiResponse<Achievement[]>, void>({
       query: () => 'v1/achievements',
@@ -858,6 +878,7 @@ export const {
   useGetUserInventoryQuery,
   useSellItemMutation,
   useWithdrawItemMutation,
+  useCancelWithdrawalMutation,
   useGetUserAchievementsQuery,
   useGetAchievementsProgressQuery,
   useGetUserMissionsQuery,
