@@ -272,6 +272,9 @@ const UpgradeAnimationComponent: React.FC<{
       // Увеличиваем рулетку во время вращения
       setScale(1.5);
 
+      // Воспроизводим звук апгрейда в момент начала вращения
+      soundManager.play('upgrade');
+
       // Вычисляем финальный угол
       const successChance = upgradeResult.data.success_chance;
       const isActualSuccess = upgradeResult.upgrade_success;
@@ -301,6 +304,13 @@ const UpgradeAnimationComponent: React.FC<{
         setShowResult(true);
         // Возвращаем рулетку к нормальному размеру
         setScale(1);
+
+        // Воспроизводим звук результата
+        if (upgradeResult.upgrade_success) {
+          soundManager.play('win');
+        } else {
+          soundManager.play('horrorLose');
+        }
       }, 3000); // 3 секунды вращения
 
       return () => clearTimeout(timer2);
@@ -877,9 +887,6 @@ const UpgradePage: React.FC = () => {
       // Устанавливаем флаг обработки перед началом запроса
       setIsProcessingUpgrade(true);
 
-      // Звук начала апгрейда
-      soundManager.play('upgrade');
-
       const result = await performUpgrade({
         sourceInventoryIds: selectedInventoryIds,
         targetItemId: selectedTargetItem
@@ -900,12 +907,7 @@ const UpgradePage: React.FC = () => {
       setUpgradeResult(adaptedResult);
       setShowAnimation(true);
 
-      // Звук результата апгрейда
-      if (result.upgrade_success) {
-        setTimeout(() => soundManager.play('win'), 3000);
-      } else {
-        setTimeout(() => soundManager.play('horrorLose'), 3000);
-      }
+      // Звуки теперь воспроизводятся в компоненте анимации
 
 
 
