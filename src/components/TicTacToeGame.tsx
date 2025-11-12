@@ -410,10 +410,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                   )}
                   {gameResult === 'draw' && (
                     <div>
-                      <div className="text-6xl mb-4">🤝</div>
                       <h3 className="text-2xl font-bold text-yellow-400 mb-2">{t('tic_tac_toe_game.draw')}</h3>
                       <p className="text-white mb-4">{t('tic_tac_toe_game.good_game')}</p>
-                      <p className="text-sm text-gray-400">{t('tic_tac_toe_game.draw_nobody_won')}</p>
                     </div>
                   )}
 
