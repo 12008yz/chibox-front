@@ -16,12 +16,20 @@ export const useAchievements = () => {
     const key = `achievements.${achievementName}.${field}`;
     const translation = t(key);
 
+    // Debug logging для отладки переводов
+    console.log('translateAchievement:', {
+      achievementName,
+      field,
+      key,
+      translation,
+      isTranslated: translation !== key,
+      fallback: field === 'name' ? achievementName : achievementName
+    });
 
     // Если перевод не найден, пробуем найти по базовому названию
     if (translation === key) {
-
       // Возвращаем оригинальное значение с fallback
-      return field === 'name' ? achievementName : t('profile.no_description');
+      return field === 'name' ? achievementName : achievementName;
     }
 
     return translation;
