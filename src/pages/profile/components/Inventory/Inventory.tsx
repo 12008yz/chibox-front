@@ -47,6 +47,13 @@ const Inventory: React.FC<InventoryProps> = ({
     sold: getSoldItems().length
   };
 
+  // Отладка счётчика открытых кейсов
+  console.log('Inventory tab counts:', {
+    totalCasesOpened,
+    openedCasesInInventory: getOpenedCases().length,
+    usedCount: tabCounts.opened
+  });
+
   return (
     <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
       <h3 className="text-xl font-bold mb-6 flex items-center gap-2">

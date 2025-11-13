@@ -186,13 +186,16 @@ const ProfilePage: React.FC = () => {
         const item = result.data.item;
         showNotification(t('profile.item_received', { itemName: item.name }), 'success');
 
-        // Автоматически обновляем инвентарь через 2 секунды
+        // Автоматически обновляем инвентарь и данные пользователя через 2 секунды
         setTimeout(async () => {
           try {
-            await refetchInventory();
-            console.log('Inventory automatically refreshed after case opening');
+            await Promise.all([
+              refetchInventory(),
+              refetchUser()
+            ]);
+            console.log('Inventory and user data automatically refreshed after case opening');
           } catch (error) {
-            console.error('Failed to auto-refresh inventory:', error);
+            console.error('Failed to auto-refresh inventory and user data:', error);
           }
         }, 2000);
       } else {
