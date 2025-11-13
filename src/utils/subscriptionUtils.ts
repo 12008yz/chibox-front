@@ -34,7 +34,7 @@ export function getSubscriptionStatus(user: User | null): {
     return {
       hasSubscription: false,
       daysLeft: 0,
-      statusText: 'Подписка отсутствует',
+      statusText: 'Статус отсутствует',
       isExpiring: false
     };
   }
@@ -46,7 +46,7 @@ export function getSubscriptionStatus(user: User | null): {
     return {
       hasSubscription: false,
       daysLeft: 0,
-      statusText: 'Подписка отсутствует',
+      statusText: 'Статус отсутствует',
       isExpiring: false
     };
   }
@@ -114,7 +114,7 @@ export function getSubscriptionWarning(user: User | null): {
     return {
       showWarning: true,
       type: 'missing',
-      title: 'Подписка отсутствует',
+      title: 'Статус отсутствует',
       message: 'Для вывода предметов в Steam необходима действующая подписка',
       actionText: 'Купить подписку'
     };

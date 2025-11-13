@@ -13,7 +13,6 @@ interface InventoryProps {
   onUserRefresh: () => void;
   translateCaseName: (name: string) => string;
   openingCaseId: string | null;
-  totalCasesOpened?: number;
 }
 
 const Inventory: React.FC<InventoryProps> = ({
@@ -24,8 +23,7 @@ const Inventory: React.FC<InventoryProps> = ({
   onInventoryRefresh,
   onUserRefresh,
   translateCaseName,
-  openingCaseId,
-  totalCasesOpened
+  openingCaseId
 }) => {
   const { t } = useTranslation();
 
@@ -42,17 +40,12 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const tabCounts = {
     active: getActiveInventory().length,
-    opened: totalCasesOpened !== undefined ? totalCasesOpened : getOpenedCases().length,
+    opened: getOpenedCases().length,
     withdrawn: getWithdrawnItems().length,
     sold: getSoldItems().length
   };
 
-  // Отладка счётчика открытых кейсов
-  console.log('Inventory tab counts:', {
-    totalCasesOpened,
-    openedCasesInInventory: getOpenedCases().length,
-    usedCount: tabCounts.opened
-  });
+
 
   return (
     <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">

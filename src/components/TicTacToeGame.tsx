@@ -283,7 +283,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         {!hasSubscription ? (
           <div className="text-center">
             <div className="text-6xl mb-6">🔒</div>
-            <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется подписка'}</p>
+            <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется статус'}</p>
             <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.no_subscription_message') || 'Приобретите статус для доступа к бонусной игре'}</p>
             <button
               onClick={onClose}

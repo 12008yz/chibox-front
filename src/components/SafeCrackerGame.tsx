@@ -71,7 +71,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   // Начать игру
   const handlePlay = async () => {
     if (!hasSubscription) {
-      toast.error('Для игры в Safe Cracker требуется активная подписка!', {
+      toast.error('Для игры в Safe Cracker требуется активный статус!', {
         icon: '🔒',
         duration: 4000,
       });

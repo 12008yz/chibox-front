@@ -31,7 +31,7 @@ const SafeCrackerButton = () => {
         `}
         title={
           !hasSubscription
-            ? 'Требуется активная подписка'
+            ? 'Требуется активный статус'
             : status?.has_won
             ? 'Вы уже выиграли в Safe Cracker сегодня! Попытки обновятся в 16:00 МСК'
             : canPlay

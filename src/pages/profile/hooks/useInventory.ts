@@ -38,7 +38,7 @@ export const useInventory = (inventoryData: any[], caseTemplatesData: any) => {
   };
 
   const getOpenedCases = () => {
-    // Предметы, полученные из кейсов
+    // Все предметы, полученные из кейсов (история открытий)
     return inventory.filter(item =>
       isUserItem(item) && item.source === 'case'
     ) as UserInventoryItem[];

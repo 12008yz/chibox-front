@@ -433,7 +433,7 @@ const SlotPage: React.FC = () => {
 
                   {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
                     <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
-                      <div className="font-medium">💎 Требуется подписка</div>
+                      <div className="font-medium">💎 Требуется статус</div>
                       <div className="text-sm mt-1">Оформите статус для игры в слот</div>
                     </div>
                   )}
