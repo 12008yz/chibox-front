@@ -7,7 +7,6 @@ import { SiTether, SiBinance, SiDogecoin, SiLitecoin, SiTon, SiPolygon } from 'r
 import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
-import { useAppSelector } from '../store/hooks';
 import Monetary from './Monetary';
 
 interface DepositModalProps {
@@ -45,7 +44,7 @@ const SbpIcon: React.FC = () => {
 };
 
 const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance' }) => {
-  const { t } = useTranslation();
+  const { } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedCountry, setSelectedCountry] = useState('RU');
@@ -615,7 +614,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
               {/* Subscription Tiers */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {subscriptionTiers.map((tier) => {
-                  const isBasic = tier.id === 1;
+                  // const isBasic = tier.id === 1;
                   const isPro = tier.id === 2;
                   const isPremium = tier.id === 3;
                   const isSelected = selectedSubscription === tier.id;

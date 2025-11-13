@@ -3,7 +3,7 @@ import type {
   CaseTemplate,
   BuyCaseRequest,
   OpenCaseRequest,
-  UserInventoryItem,
+  // UserInventoryItem,
   Item,
   ApiResponse,
   PaginatedResponse
@@ -62,7 +62,7 @@ export const casesApi = baseApi.injectEndpoints({
       extraOptions: { maxRetries: 0 }, // Отключаем retry для избежания дублирования покупок
       invalidatesTags: ['Cases', 'Balance', 'User'],
       // Обновление баланса после покупки
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           if (data.success) {
@@ -99,7 +99,7 @@ export const casesApi = baseApi.injectEndpoints({
       extraOptions: { maxRetries: 0 }, // Отключаем retry для избежания дублирования открытий
       invalidatesTags: ['Cases', 'Inventory', 'Balance', 'User', 'CaseTemplates'],
       // Обновляем баланс и инвентарь после открытия
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data.new_balance !== undefined) {

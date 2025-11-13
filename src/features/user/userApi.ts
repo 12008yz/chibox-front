@@ -104,7 +104,7 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Inventory', 'Balance', 'User'],
       // Оптимистичное обновление инвентаря
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { queryFulfilled }) {
         // Оптимистичное обновление основного инвентаря - меняем статус предмета
         const mainPatchResult = dispatch(
           userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (draft) => {
@@ -141,7 +141,7 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Inventory', 'User'],
       // Оптимистичное обновление инвентаря
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { queryFulfilled }) {
         try {
           await queryFulfilled;
         } catch (error) {
@@ -886,7 +886,7 @@ export const {
   useGetUnreadNotificationsCountQuery,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
-  useDeleteNotificationMutation,
+  // useDeleteNotificationMutation, // Удалено - дублирует экспорт из notificationsApi
   useGetUserTransactionsQuery,
   useGetUserStatisticsQuery,
   useGetUserSubscriptionQuery,

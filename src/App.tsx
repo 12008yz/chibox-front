@@ -26,7 +26,7 @@ import { useSocket } from './hooks/useSocket';
 const App: React.FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
-  const { onlineUsers, isConnected } = useSocket();
+  const { onlineUsers } = useSocket();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
 
   console.log('[App] Current auth state:', {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaArrowDown, FaArrowRight, FaTimes } from 'react-icons/fa';
+import { FaArrowDown, FaTimes } from 'react-icons/fa';
 
 interface OnboardingStep {
   id: string;

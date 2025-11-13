@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './Modal';
-import MainButton from './MainButton';
+// import Modal from './Modal';
+// import MainButton from './MainButton';
 import { useTranslation } from 'react-i18next';
 
 interface RegistrationSuccessModalProps {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaCrown, FaDice, FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins, FaTrophy } from 'react-icons/fa';
-import { MdCasino, MdVideogameAsset, MdTrendingUp } from 'react-icons/md';
+import { FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins, FaTrophy } from 'react-icons/fa';
+import { MdTrendingUp } from 'react-icons/md';
 import { RiVipCrownFill } from 'react-icons/ri';
-import { GiTicTacToe } from 'react-icons/gi';
+// import { GiTicTacToe } from 'react-icons/gi';
 import { IoSparkles } from 'react-icons/io5';
 import { formatDaysI18n } from '../utils/declension';
 import Monetary from './Monetary';
@@ -39,7 +39,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   user,
   onPlayTicTacToe,
   onPlayRoulette,
-  onOpenSlots
+  // onOpenSlots
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();

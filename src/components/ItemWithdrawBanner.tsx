@@ -16,7 +16,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   onWithdrawSuccess,
   onError,
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
 
   const [isWithdrawing, setIsWithdrawing] = useState(false);

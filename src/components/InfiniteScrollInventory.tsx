@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import CaseWithDrop from './CaseWithDrop';

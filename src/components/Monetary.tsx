@@ -19,10 +19,10 @@ const Monetary: React.FC<MonetaryProps> = ({
   value,
   showFraction = false,
   currency = 'chicoins',
-  showEquivalent = false,
+  // showEquivalent = false,
   iconSize = 'md'
 }) => {
-  const symbol = CURRENCY_SYMBOLS[currency] || currency;
+  // const symbol = CURRENCY_SYMBOLS[currency] || currency;
 
   const formattedValue = new Intl.NumberFormat('ru-RU', {
      minimumFractionDigits: showFraction ? 2 : 0,
