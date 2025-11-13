@@ -294,7 +294,11 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </div>
         ) : hasWonToday ? (
           <div className="text-center">
-            <div className="text-6xl mb-6">🎉</div>
+            <img
+              src="/images/caseWin.png"
+              alt="Bonus Case"
+              className="w-32 h-32 mx-auto mb-6 object-contain"
+            />
             <p className="text-green-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.already_won_title') || 'Вы уже победили сегодня!'}</p>
             <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.already_won_message') || 'Вы уже получили бонусный кейс сегодня. Возвращайтесь завтра в 16:00 МСК за новой игрой!'}</p>
             <button
@@ -321,7 +325,11 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {/* Экран победы */}
             <div className="mb-8">
               <div className="animate-bounce">
-                <div className="text-8xl mb-6">🎉</div>
+                <img
+                  src="/images/caseWin.png"
+                  alt="Bonus Case"
+                  className="w-48 h-48 mx-auto mb-6 object-contain"
+                />
                 <h3 className="text-3xl font-bold text-green-400 mb-4">{t('tic_tac_toe_game.congratulations')}</h3>
                 <p className="text-white mb-6 text-lg">{t('tic_tac_toe_game.won_bonus_case')}</p>
               </div>
