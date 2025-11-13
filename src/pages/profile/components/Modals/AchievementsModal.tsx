@@ -62,7 +62,6 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   if (!isOpen) return null;
 
   const completedCount = achievements.filter(a => a.is_completed).length;
-  const totalPoints = achievements.reduce((sum, a) => sum + (a.is_completed ? a.xp_reward : 0), 0);
 
   const modalContent = (
     <div

@@ -7,23 +7,49 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'animation-vendor': ['react-custom-roulette'],
-          'ui-vendor': ['lucide-react', 'react-hot-toast'],
-          'store-vendor': ['@reduxjs/toolkit', 'react-redux', 'redux-persist'],
-          'i18n-vendor': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'react-vendor';
+          }
+          // Redux
+          if (id.includes('node_modules/@reduxjs') || id.includes('node_modules/react-redux') || id.includes('node_modules/redux-persist')) {
+            return 'store-vendor';
+          }
+          // i18n
+          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+            return 'i18n-vendor';
+          }
+          // Router
+          if (id.includes('node_modules/react-router')) {
+            return 'router-vendor';
+          }
+          // Animations
+          if (id.includes('node_modules/framer-motion')) {
+            return 'animation-vendor';
+          }
+          // Socket
+          if (id.includes('node_modules/socket.io-client')) {
+            return 'socket-vendor';
+          }
+          // UI libraries
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/react-hot-toast')) {
+            return 'ui-vendor';
+          }
+          // Utilities
+          if (id.includes('node_modules/lodash') || id.includes('node_modules/clsx')) {
+            return 'utils-vendor';
+          }
+          // Matter.js (physics)
+          if (id.includes('node_modules/matter-js')) {
+            return 'physics-vendor';
+          }
         }
       }
     },
-    target: 'es2015', // лучшая совместимость
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // убрать console.log в продакшене
-        drop_debugger: true,
-      }
-    }
+    target: 'es2015',
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 600
   },
   server: {
     host: '0.0.0.0',
@@ -36,6 +62,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-custom-roulette']
+    include: ['react', 'react-dom']
   }
 })

@@ -22,9 +22,7 @@ authMiddleware.startListening({
 // Слушаем успешные результаты регистрации
 authMiddleware.startListening({
   matcher: authApi.endpoints.register.matchFulfilled,
-  effect: async (action, listenerApi) => {
-    const result = action.payload;
-
+  effect: async (_action, _listenerApi) => {
     // if (result.success && result.data) {
     //   // Автоматически обновляем состояние Redux
     //   listenerApi.dispatch(loginSuccess(result.data));
@@ -35,7 +33,7 @@ authMiddleware.startListening({
 // Слушаем loginSuccess action (в том числе от Steam авторизации)
 authMiddleware.startListening({
   actionCreator: loginSuccess,
-  effect: async (action, listenerApi) => {
+  effect: async (_action, listenerApi) => {
     console.log('🔄 LoginSuccess detected, invalidating cache...');
 
     // Инвалидируем кэш пользовательских данных

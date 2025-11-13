@@ -104,7 +104,7 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Inventory', 'Balance', 'User'],
       // Оптимистичное обновление инвентаря
-      async onQueryStarted(_, { queryFulfilled }) {
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         // Оптимистичное обновление основного инвентаря - меняем статус предмета
         const mainPatchResult = dispatch(
           userApi.util.updateQueryData('getUserInventory', { page: 1, limit: 1000 }, (draft) => {

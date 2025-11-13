@@ -10,7 +10,6 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
-import SafeCrackerGame from '../components/SafeCrackerGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
@@ -57,10 +56,10 @@ const HomePage: React.FC = () => {
 
   // Состояние игры крестики-нолики
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
-  const [bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
+  const [_bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
   // Состояние игр
-  const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
+  const [_showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {

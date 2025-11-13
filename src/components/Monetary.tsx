@@ -6,15 +6,6 @@ interface MonetaryProps {
   iconSize?: 'xxxs' | 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
 }
 
-const CURRENCY_SYMBOLS = {
-  chicoins: '⚡',
-  RUB: '₽',
-  USD: "$",
-  EUR: '€',
-  GBP: '£',
-  CNY: '¥'
-};
-
 const Monetary: React.FC<MonetaryProps> = ({
   value,
   showFraction = false,

@@ -10,7 +10,6 @@ import {
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
-import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
 

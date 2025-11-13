@@ -78,7 +78,7 @@ i18n
     cleanCode: true,
 
     // Настройки отладки
-    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+    missingKeyHandler: (lng, _ns, key, _fallbackValue) => {
       if (process.env.NODE_ENV === 'development') {
         console.warn(`Missing translation key: ${key} for language: ${lng}`);
       }

@@ -14,7 +14,7 @@ interface SafeCrackerGameProps {
 }
 
 const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) => {
-  const { t } = useTranslation();
+  const { t: _t } = useTranslation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [displayCode, setDisplayCode] = useState<number[]>([9, 9, 9]);
   const [secretCode, setSecretCode] = useState<number[] | null>(null);

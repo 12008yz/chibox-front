@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import Monetary from '../components/Monetary';
 import type { SlotItem } from '../types/api';
 import { getItemImageUrl } from '../utils/steamImageUtils';
-import { t } from 'i18next';
 import CountdownTimer from '../components/CountdownTimer';
 import { soundManager } from '../utils/soundManager';
 
@@ -200,14 +199,14 @@ const SlotPage: React.FC = () => {
   const { t } = useTranslation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<SlotItem[]>([]);
-  const [showResult, setShowResult] = useState(false);
+  const [_showResult, setShowResult] = useState(false);
   const [displayItems, setDisplayItems] = useState<SlotItem[]>([]);
   const [isWinning, setIsWinning] = useState(false);
   const auth = useAuth();
 
   // Получаем предметы для слота из API
   const { data: slotItemsData, isLoading: isLoadingItems, error: itemsError } = useGetSlotItemsQuery();
-  const { data: slotStatusData, isLoading: isLoadingStatus, refetch: refetchSlotStatus } = useGetSlotStatusQuery(undefined, {
+  const { data: slotStatusData, isLoading: _isLoadingStatus, refetch: refetchSlotStatus } = useGetSlotStatusQuery(undefined, {
     skip: !auth.user
   });
   const [playSlot, { isLoading }] = usePlaySlotMutation();

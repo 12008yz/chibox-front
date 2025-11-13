@@ -3,25 +3,27 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 
-// Импорты компонентов
+// Импорты компонентов (всегда загружаемые)
 import Header from './components/Header';
 import FloatingWatermark from './components/FloatingWatermark';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/loginPage';
-import RegisterPage from './pages/RegisterPage';
-import SteamAuthPage from './pages/SteamAuthPage';
 import SteamLoadingPage from './components/SteamLoadingPage';
-import ProfilePage from './pages/profile/ProfilePage';
-import PublicProfilePage from './pages/PublicProfilePage';
-import LeaderboardPage from './pages/LeaderboardPage';
-import ExchangePage from './pages/ExchangePage';
-import UpgradePage from './pages/UpgradePage';
-import SlotPage from './pages/SlotPage';
 import { useSocket } from './hooks/useSocket';
+
+// Lazy loading страниц
+const HomePage = lazy(() => import('./pages/HomePage'));
+const LoginPage = lazy(() => import('./pages/loginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const SteamAuthPage = lazy(() => import('./pages/SteamAuthPage'));
+const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
+const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
+const ExchangePage = lazy(() => import('./pages/ExchangePage'));
+const UpgradePage = lazy(() => import('./pages/UpgradePage'));
+const SlotPage = lazy(() => import('./pages/SlotPage'));
 
 const App: React.FC = () => {
   const auth = useAuth();
@@ -151,7 +153,12 @@ const App: React.FC = () => {
           />
 
           <main>
-          <Routes>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div>
+            </div>
+          }>
+            <Routes>
             <Route path="/" element={<HomePage />} />
             <Route
               path="/login"
@@ -240,6 +247,7 @@ const App: React.FC = () => {
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </Suspense>
         </main>
         </div>
       </div>

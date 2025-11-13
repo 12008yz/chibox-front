@@ -40,8 +40,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
   const [showGoldenSparks, setShowGoldenSparks] = useState(false);
-  const [shouldFakeSlowdown, setShouldFakeSlowdown] = useState(false);
-  const [shouldStopBetween, setShouldStopBetween] = useState(false);
+  const [_shouldFakeSlowdown, setShouldFakeSlowdown] = useState(false);
+  const [_shouldStopBetween, setShouldStopBetween] = useState(false);
   const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
 
@@ -288,7 +288,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const animateSlider = () => {
       // Проверка на остановку между предметами (за 1 позицию до выигрыша)
       if (useStopBetween && currentAvailablePosition === wonItemIndex - 1) {
-        const currentItemInFullList = itemsWithAdjustedChances.findIndex((item, idx) => {
+        const currentItemInFullList = itemsWithAdjustedChances.findIndex((_item, idx) => {
           let availableCount = 0;
           for (let i = 0; i <= idx; i++) {
             if (!itemsWithAdjustedChances[i].isExcluded) {
