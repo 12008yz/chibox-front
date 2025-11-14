@@ -279,7 +279,9 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
               <img
                 src="/images/bonus-safe.png"
                 alt="Safe"
-                className="w-full h-auto"
+                className="w-full h-auto select-none pointer-events-none"
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
               />
 
               {/* Цифры в пустых блоках сейфа */}
@@ -384,7 +386,9 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                         <img
                           src={wonItem.image_url}
                           alt={wonItem.name}
-                          className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
+                          className="w-32 h-32 sm:w-40 sm:h-40 object-contain select-none pointer-events-none"
+                          draggable={false}
+                          onContextMenu={(e) => e.preventDefault()}
                         />
                         <div className="mt-2 bg-black/50 px-3 py-1 rounded-lg">
                           <p className="text-white font-bold text-sm sm:text-base text-center truncate max-w-[200px]">
