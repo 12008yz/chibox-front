@@ -24,6 +24,7 @@ export const casesApi = baseApi.injectEndpoints({
       paid_cases: CaseTemplate[];
       user_cases: any[];
       user_subscription_tier: number;
+      next_case_available_time?: string | null;
     }>, void>({
       query: () => 'v1/cases',
       providesTags: ['Cases', 'CaseTemplates'],

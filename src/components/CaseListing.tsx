@@ -85,7 +85,10 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
               // Проверяем, является ли это бесплатным кейсом для новых пользователей
               const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
-              const caseNextAvailableTime = isFreeCase && freeCaseStatus ? freeCaseStatus.nextAvailableTime : nextCaseAvailableTime;
+              // Используем next_available_time из каждого кейса, если он есть
+              const caseNextAvailableTime = isFreeCase && freeCaseStatus
+                ? freeCaseStatus.nextAvailableTime
+                : (caseItem.next_available_time || nextCaseAvailableTime);
 
               if (isBonusCase) {
                 // Для бонусного кейса не используем Link, чтобы кнопка "Играть" работала

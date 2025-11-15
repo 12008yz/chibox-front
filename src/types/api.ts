@@ -78,6 +78,7 @@ export interface CaseTemplate {
   color_scheme?: string | null;
   guaranteed_min_value?: string | null;
   is_daily?: boolean;
+  next_available_time?: string | null;
   created_at?: string;
   updated_at?: string;
   createdAt?: string;

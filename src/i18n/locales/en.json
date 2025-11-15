@@ -19,6 +19,9 @@
     "currency_suffix": " CR",
     "bonus_keyword": "bonus",
     "cases_available": "Cases available",
+    "next_case": "Next case",
+    "available_at_msk": "Available at 4:00 PM MSK",
+    "daily_reset_time": "Daily reset at 4:00 PM MSK",
     "hours_short": "h",
     "minutes_short": "m",
     "seconds_short": "s"
