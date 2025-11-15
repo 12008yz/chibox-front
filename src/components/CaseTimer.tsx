@@ -60,7 +60,7 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
 
   if (isAvailable) {
     return (
-      <div className={`inline-flex items-center space-x-2 ${className}`}>
+      <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30 ${className}`}>
         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
         <span className="text-green-400 text-sm font-medium">{t('common.cases_available')}</span>
       </div>
@@ -70,11 +70,14 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
 
 
   return (
-    <div className={`inline-flex items-center space-x-2 ${className}`}>
-      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-      <span className="text-orange-400 text-sm font-medium">
-         <span className="text-white font-mono">{timeLeft}</span>
-      </span>
+    <div className={`inline-flex flex-col items-center space-y-1 px-4 py-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 ${className}`}>
+      <div className="flex items-center space-x-2">
+        <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+        <span className="text-orange-400 text-xs font-medium uppercase tracking-wide">
+          {t('common.next_case')}
+        </span>
+      </div>
+      <span className="text-white text-base font-mono font-bold">{timeLeft}</span>
     </div>
   );
 };

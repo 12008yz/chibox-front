@@ -16,6 +16,16 @@ interface CaseListingProps {
   nextCaseAvailableTime?: string;
   onDataUpdate?: () => void;
   onPlayBonusGame?: (caseTemplate: CaseTemplate) => void;
+  freeCaseStatus?: {
+    canClaim: boolean;
+    reason: string;
+    nextAvailableTime: string | null;
+    claimCount: number;
+    maxClaims: number;
+    firstClaimDate: string | null;
+    lastClaimDate: string | null;
+    caseTemplateId: string;
+  };
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -26,7 +36,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
   fixedPrices = false,
   nextCaseAvailableTime,
   onDataUpdate,
-  onPlayBonusGame
+  onPlayBonusGame,
+  freeCaseStatus
 }) => {
   const { t } = useTranslation();
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
@@ -72,6 +83,10 @@ const CaseListing: React.FC<CaseListingProps> = ({
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
               const isFirstCase = index === 0;
 
+              // Проверяем, является ли это бесплатным кейсом для новых пользователей
+              const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
+              const caseNextAvailableTime = isFreeCase && freeCaseStatus ? freeCaseStatus.nextAvailableTime : nextCaseAvailableTime;
+
               if (isBonusCase) {
                 // Для бонусного кейса не используем Link, чтобы кнопка "Играть" работала
                 return (
@@ -92,7 +107,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       price={caseItem.price}
                       fixedPrices={fixedPrices}
                       description={t('homepage.win_bonus_game')}
-                      nextCaseAvailableTime={nextCaseAvailableTime}
+                      nextCaseAvailableTime={caseNextAvailableTime}
                       isBonusCase={true}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
                     />
@@ -113,7 +128,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       price={caseItem.price}
                       fixedPrices={fixedPrices}
                       description={caseItem.name?.toLowerCase().includes('бонус') ? t('homepage.win_bonus_game') : undefined}
-                      nextCaseAvailableTime={nextCaseAvailableTime}
+                      nextCaseAvailableTime={caseNextAvailableTime}
                       isBonusCase={false}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
                     />

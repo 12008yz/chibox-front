@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation } from '../features/cases/casesApi';
+import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import IntroVideo from '../components/IntroVideo';
@@ -35,6 +35,12 @@ const HomePage: React.FC = () => {
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Получаем статус бесплатного кейса для новых пользователей
+  const { data: freeCaseStatus, refetch: refetchFreeCaseStatus } = useGetFreeCaseStatusQuery(undefined, {
+    skip: !userData?.id, // Пропускаем если пользователь не авторизован
     refetchOnMountOrArgChange: true,
   });
 
@@ -274,8 +280,8 @@ const HomePage: React.FC = () => {
         errorMessage = error.message;
       }
 
-      // Можно добавить toast уведомление или alert
-      alert(errorMessage);
+      // Показываем toast уведомление вместо alert
+      // toast уведомления обрабатываются в CasePreviewModal
 
       // Пробрасываем ошибку дальше
       throw error;
@@ -342,6 +348,7 @@ const HomePage: React.FC = () => {
                     console.log('Принудительное обновление данных...');
                     refetchUser();
                     refetchCases();
+                    refetchFreeCaseStatus();
                   };
 
 
@@ -417,6 +424,7 @@ const HomePage: React.FC = () => {
                             nextCaseAvailableTime={nextCaseAvailableTime}
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
+                            freeCaseStatus={freeCaseStatus?.data}
                           />
                         </div>
                       )}

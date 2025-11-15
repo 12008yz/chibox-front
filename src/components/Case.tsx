@@ -10,7 +10,7 @@ interface CaseProps {
   price: string;
   fixedPrices?: boolean;
   description?: string;
-  nextCaseAvailableTime?: string;
+  nextCaseAvailableTime?: string | null;
   isBonusCase?: boolean;
   onPlayBonusGame?: () => void;
 }

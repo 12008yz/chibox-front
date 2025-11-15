@@ -166,6 +166,24 @@ export const casesApi = baseApi.injectEndpoints({
       query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/status`,
       providesTags: ['Cases', 'User'],
     }),
+
+    // Получение статуса бесплатного кейса для новых пользователей
+    getFreeCaseStatus: builder.query<
+      ApiResponse<{
+        canClaim: boolean;
+        reason: string;
+        nextAvailableTime: string | null;
+        claimCount: number;
+        maxClaims: number;
+        firstClaimDate: string | null;
+        lastClaimDate: string | null;
+        caseTemplateId: string;
+      }>,
+      void
+    >({
+      query: () => 'v1/free-case/status',
+      providesTags: ['Cases', 'User'],
+    }),
   }),
 });
 
@@ -180,4 +198,5 @@ export const {
   useGetRecentDropsQuery,
   useGetCasePurchaseInfoQuery,
   useGetCaseStatusQuery,
+  useGetFreeCaseStatusQuery,
 } = casesApi;
