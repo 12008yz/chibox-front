@@ -230,8 +230,11 @@ const SlotPage: React.FC = () => {
 
   const handleSpin = async () => {
     if (!canPlay) {
+      console.log('[SLOT DEBUG] Cannot play - conditions not met');
       return;
     }
+
+    console.log('[SLOT DEBUG] Starting spin...');
 
     try {
       setIsSpinning(true);
@@ -241,9 +244,12 @@ const SlotPage: React.FC = () => {
       // Звук вращения слота
       soundManager.play('slotSpin');
 
+      console.log('[SLOT DEBUG] Calling playSlot API...');
       const response = await playSlot().unwrap();
+      console.log('[SLOT DEBUG] API response received:', response);
 
       if (response.success && response.result) {
+        console.log('[SLOT DEBUG] Processing result:', response.result);
         setResult(response.result.items);
         setIsWinning(response.result.isWin);
 
@@ -262,14 +268,38 @@ const SlotPage: React.FC = () => {
             soundManager.play('slotLose');
             toast(t('slots.game_result_no_luck'), { icon: '🎰' });
           }
+
+          // Обновляем статус слота
+          refetchSlotStatus();
         }, 4500); // Увеличили время для последнего барабана
       } else {
+        console.error('[SLOT DEBUG] Invalid response:', response);
         setIsSpinning(false);
         toast.error(response.message || t('slots.unknown_error'));
       }
     } catch (err: any) {
+      console.error('[SLOT DEBUG] Error caught:', err);
+      console.error('[SLOT DEBUG] Error details:', {
+        message: err?.message,
+        data: err?.data,
+        status: err?.status,
+        originalStatus: err?.originalStatus
+      });
+
       setIsSpinning(false);
-      toast.error(t('slots.connection_error'));
+
+      // Более детальная обработка ошибок
+      if (err?.data?.message) {
+        toast.error(err.data.message);
+      } else if (err?.status === 'TIMEOUT_ERROR') {
+        toast.error('Превышено время ожидания ответа от сервера');
+      } else if (err?.status === 'FETCH_ERROR') {
+        toast.error('Ошибка соединения с сервером');
+      } else if (err?.status === 401) {
+        toast.error('Требуется авторизация');
+      } else {
+        toast.error(err?.message || t('slots.connection_error'));
+      }
     }
   };
 
