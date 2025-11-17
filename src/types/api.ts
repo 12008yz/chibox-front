@@ -354,6 +354,15 @@ export interface TicTacToeCurrentGameResponse {
   has_subscription: boolean;
   has_won_today: boolean;
   attempts_left: number;
+  free_attempts_remaining?: number;
+  free_attempts_info?: {
+    can_use: boolean;
+    reason: string;
+    next_available: string | null;
+    claim_count: number;
+    first_claim_date: string | null;
+    last_claim_date: string | null;
+  };
   message?: string;
 }
 

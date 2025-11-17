@@ -280,19 +280,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </button>
         </div>
 
-        {!hasSubscription ? (
-          <div className="text-center">
-            <div className="text-6xl mb-6">🔒</div>
-            <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется статус'}</p>
-            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.no_subscription_message') || 'Приобретите статус для доступа к бонусной игре'}</p>
-            <button
-              onClick={onClose}
-              className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
-            >
-              {t('tic_tac_toe_game.close')}
-            </button>
-          </div>
-        ) : hasWonToday ? (
+        {hasWonToday ? (
           <div className="text-center">
             <img
               src="/images/caseWin.png"
@@ -310,9 +298,32 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </div>
         ) : !canPlay ? (
           <div className="text-center">
-            <div className="text-6xl mb-6">😴</div>
-            <p className="text-red-400 mb-4 text-lg">{t('tic_tac_toe_game.no_attempts_left')}</p>
-            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.come_back_tomorrow')}</p>
+            {!hasSubscription ? (
+              <>
+                <div className="text-6xl mb-6">🔒</div>
+                <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется статус'}</p>
+                <p className="text-gray-400 mb-8">
+                  {currentGameData?.free_attempts_info?.reason ||
+                   t('tic_tac_toe_game.no_subscription_message') ||
+                   'Приобретите статус для доступа к бонусной игре'}
+                </p>
+                {/* Дополнительная информация о бесплатных попытках */}
+                {currentGameData?.free_attempts_info && (
+                  <div className="text-sm text-gray-500 mb-4">
+                    <p>Использовано бесплатных попыток: {currentGameData.free_attempts_info.claim_count} из 2</p>
+                    {currentGameData.free_attempts_info.first_claim_date && (
+                      <p>Первая попытка: {new Date(currentGameData.free_attempts_info.first_claim_date).toLocaleString('ru-RU')}</p>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="text-6xl mb-6">😴</div>
+                <p className="text-red-400 mb-4 text-lg">{t('tic_tac_toe_game.no_attempts_left')}</p>
+                <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.come_back_tomorrow')}</p>
+              </>
+            )}
             <button
               onClick={onClose}
               className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
