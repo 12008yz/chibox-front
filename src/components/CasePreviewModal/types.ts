@@ -55,7 +55,6 @@ export interface ModalFooterProps {
   statusLoading: boolean;
   fixedPrices: boolean;
   paymentMethod: 'balance' | 'bank_card';
-  setPaymentMethod: (method: 'balance' | 'bank_card') => void;
   userData: any;
   caseData: CaseTemplate;
   isProcessing: boolean;

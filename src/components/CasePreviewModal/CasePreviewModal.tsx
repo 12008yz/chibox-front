@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { throttle } from 'lodash-es';
+import toast from 'react-hot-toast';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../../features/cases/casesApi';
 import { CaseTemplate } from '../../types/api';
 import { useUserData } from '../../hooks/useUserData';
@@ -30,7 +31,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const navigate = useNavigate();
   const { userData } = useUserData();
 
-  const [paymentMethod, setPaymentMethod] = useState<'balance' | 'bank_card'>('balance');
+  const paymentMethod = 'balance'; // Всегда используем только баланс
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -66,9 +67,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Проверяем, достаточно ли средств на балансе
   const checkBalanceSufficient = useCallback((price: number): boolean => {
-    if (paymentMethod === 'bank_card') return true;
     return (userData?.balance || 0) >= price;
-  }, [paymentMethod, userData]);
+  }, [userData]);
 
   // Проверяем авторизацию пользователя
   useEffect(() => {
@@ -485,36 +485,27 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       console.log('Результат покупки:', result);
 
       if (result.success) {
-        if (paymentMethod === 'bank_card') {
-          console.log('Метод оплаты: банковская карта');
-          if (result.data?.paymentUrl) {
-            window.location.href = result.data.paymentUrl;
-          } else {
-            alert('Ошибка: не получена ссылка для оплаты');
-          }
+        console.log('Метод оплаты: баланс');
+        console.log('inventory_cases:', result.data?.inventory_cases);
+
+        if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
+          const inventoryCase = result.data.inventory_cases[0];
+          console.log('Найден купленный кейс в инвентаре:', inventoryCase);
+          console.log('Вызываем handleOpenCase с inventoryItemId:', inventoryCase.id);
+
+          // Сбрасываем isProcessing перед вызовом handleOpenCase
+          setIsProcessing(false);
+          await handleOpenCase(undefined, inventoryCase.id);
+          console.log('handleOpenCase завершен');
+          return; // Возвращаемся, чтобы не сбрасывать isProcessing в finally
         } else {
-          console.log('Метод оплаты: баланс');
-          console.log('inventory_cases:', result.data?.inventory_cases);
-
-          if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
-            const inventoryCase = result.data.inventory_cases[0];
-            console.log('Найден купленный кейс в инвентаре:', inventoryCase);
-            console.log('Вызываем handleOpenCase с inventoryItemId:', inventoryCase.id);
-
-            // Сбрасываем isProcessing перед вызовом handleOpenCase
-            setIsProcessing(false);
-            await handleOpenCase(undefined, inventoryCase.id);
-            console.log('handleOpenCase завершен');
-            return; // Возвращаемся, чтобы не сбрасывать isProcessing в finally
-          } else {
-            console.log('inventory_cases пустой или отсутствует');
-            alert('Кейс успешно куплен!');
-            handleClose();
-          }
+          console.log('inventory_cases пустой или отсутствует');
+          toast.success('Кейс успешно куплен!');
+          handleClose();
         }
       } else {
         console.error('Покупка не успешна:', result.message);
-        alert('Ошибка покупки: ' + (result.message || 'Неизвестная ошибка'));
+        toast.error(result.message || 'Ошибка покупки');
       }
     } catch (error: any) {
       console.error('Ошибка покупки кейса:', error);
@@ -522,9 +513,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const requiredAmount = error?.data?.data?.required || 0;
         const availableAmount = error?.data?.data?.available || 0;
         const shortfall = requiredAmount - availableAmount;
-        alert(`Недостаточно средств на балансе!\nТребуется: ${requiredAmount}₽\nДоступно: ${availableAmount}₽\nНе хватает: ${shortfall}₽`);
+        toast.error(`Недостаточно ${shortfall}₽ для покупки`, {
+          duration: 3000,
+          icon: '💳',
+        });
       } else {
-        alert('Ошибка покупки кейса: ' + (error?.data?.message || error?.message || 'Неизвестная ошибка'));
+        toast.error(error?.data?.message || error?.message || 'Ошибка покупки кейса', {
+          duration: 3000,
+        });
       }
     } finally {
       console.log('=== handleBuyCase FINALLY ===');
@@ -581,13 +577,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     } catch (error: any) {
       console.error('Ошибка открытия кейса:', error);
       if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
-        alert(error.data.message || 'Кейс уже получен сегодня');
+        toast.error(error.data.message || 'Кейс уже получен сегодня', {
+          duration: 4000,
+        });
         onClose();
         if (onDataUpdate) {
           setTimeout(() => onDataUpdate(), 100);
         }
       } else {
-        alert(error?.data?.message || 'Произошла ошибка при открытии кейса');
+        toast.error(error?.data?.message || 'Произошла ошибка при открытии кейса');
       }
     } finally {
       console.log('=== handleOpenCase FINALLY ===');
@@ -681,7 +679,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           statusLoading={statusLoading}
           fixedPrices={fixedPrices}
           paymentMethod={paymentMethod}
-          setPaymentMethod={setPaymentMethod}
           userData={userData}
           caseData={caseData}
           isProcessing={isProcessing}
