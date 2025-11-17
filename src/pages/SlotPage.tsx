@@ -420,7 +420,7 @@ const SlotPage: React.FC = () => {
                           onComplete={handleTimerComplete}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">16:00 МСК ежедневно</div>
+                      <div className="text-xs text-gray-500 mt-1">Заходите каждый день</div>
                     </div>
                   </div>
 
@@ -447,17 +447,6 @@ const SlotPage: React.FC = () => {
                     </div>
                   )}
 
-                  {!slotStatusData.data.hasSubscription && slotStatusData.data.free_attempts_remaining === 0 && (
-                    <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300">
-                      <div className="font-medium">Нужен статус для игры в слот!</div>
-                      <div className="text-sm mt-1">
-                        Статус (1 спин) • Статус+ (2 спина) • Статус++ (3 спина)
-                      </div>
-                      <div className="text-xs text-yellow-200 mt-2">
-                        Новые пользователи получают 2 бесплатные попытки в первые 2 дня после регистрации
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -488,7 +477,7 @@ const SlotPage: React.FC = () => {
                 <>
 
                   {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
-                    <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300 max-w-sm mx-auto">
+                    <div className="mt-4 p-4 bg-yellow-900/20 border border-red-800/550 rounded-lg text-red-300 max-w-sm mx-auto">
                       <div className="font-medium">💎 Требуется статус</div>
                       <div className="text-sm mt-1">Оформите статус для игры в слот</div>
                     </div>

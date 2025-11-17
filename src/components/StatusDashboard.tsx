@@ -17,7 +17,7 @@ interface StatusDashboardProps {
   description: string;
   user?: any;
   onPlayTicTacToe?: () => void;
-  onPlayRoulette?: () => void;
+  onPlaySafeCracker?: () => void;
   onOpenSlots?: () => void;
 }
 
@@ -38,7 +38,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   description,
   user,
   onPlayTicTacToe,
-  onPlayRoulette,
+  onPlaySafeCracker,
   // onOpenSlots
 }) => {
   const navigate = useNavigate();
@@ -72,25 +72,25 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
       description: t('tic_tac_toe_game.won_bonus_case'),
-      icon: <img src="../../public/images/status1.png"/>,
+      icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
       action: () => onPlayTicTacToe?.()
     },
     {
-      id: 'roulette',
-      name: t('games.roulette'),
-      description: t('homepage.win_bonus_game'),
-      icon: <img src="../../public/images/status2.png"/>,
+      id: 'safe-cracker',
+      name: 'Взлом сейфа',
+      description: 'Подбери код и получи награду',
+      icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
-      action: () => onPlayRoulette?.()
+      action: () => onPlaySafeCracker?.()
     },
     {
       id: 'slots',
       name: t('slots.title'),
       description: t('slots.description'),
-      icon: <img src="../../public/images/status3.png"/>,
+      icon: <img src="/images/status3.png" alt="Слот-машина" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
       action: () => navigate('/slot')
@@ -99,7 +99,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
-      icon: <img src="../../public/images/status4.png"/>,
+      icon: <img src="/images/status4.png" alt="Обмен предметов" className="w-16 h-16 object-contain"/>,
       color: '',
       available: subscriptionTier >= 1,
       action: () => navigate('/exchange')
@@ -297,7 +297,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                   <span className="text-purple-400 font-bold">{subscriptionTier + 2}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('games.roulette')}</span>
+                  <span className="text-gray-300">Взлом сейфа</span>
                   <span className="text-yellow-400 font-bold">{subscriptionTier}</span>
                 </div>
               </div>

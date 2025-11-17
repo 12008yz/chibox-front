@@ -31,7 +31,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const navigate = useNavigate();
   const { userData } = useUserData();
 
-  const paymentMethod = 'balance'; // Всегда используем только баланс
+  const paymentMethod = 'balance' as const; // Всегда используем только баланс
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);

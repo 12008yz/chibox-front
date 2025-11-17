@@ -10,6 +10,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
+import SafeCrackerGame from '../components/SafeCrackerGame';
 import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
@@ -65,7 +66,7 @@ const HomePage: React.FC = () => {
   const [_bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
 
   // Состояние игр
-  const [_showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
+  const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
 
   // Логирование изменений состояния игры
   useEffect(() => {
@@ -104,7 +105,7 @@ const HomePage: React.FC = () => {
     setShowTicTacToeGame(true);
   };
 
-  const handlePlayRoulette = () => {
+  const handlePlaySafeCracker = () => {
     console.log('HomePage: Открываем Safe Cracker из StatusDashboard');
     setShowSafeCrackerGame(true);
   };
@@ -486,7 +487,7 @@ const HomePage: React.FC = () => {
                 description={t('homepage.chibox_statuses_description')}
                 user={userData}
                 onPlayTicTacToe={handlePlayTicTacToe}
-                onPlayRoulette={handlePlayRoulette}
+                onPlaySafeCracker={handlePlaySafeCracker}
               />
             </div>
           </div>
@@ -521,6 +522,12 @@ const HomePage: React.FC = () => {
         isOpen={showTicTacToeGame}
         onClose={handleTicTacToeGameClose}
         onRewardReceived={handleTicTacToeWin}
+      />
+
+      {/* Игра Safe Cracker */}
+      <SafeCrackerGame
+        isOpen={showSafeCrackerGame}
+        onClose={() => setShowSafeCrackerGame(false)}
       />
 
       {/* Онбординг тур */}
