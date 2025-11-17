@@ -353,7 +353,7 @@
     "more_achievements": "Weitere Erfolge",
     "all_time_record": "Allzeit-Rekord",
     "no_record_set": "Noch kein Rekord aufgestellt",
-    "inventory_section": "Inventar ({{count}} Gegenstände)",
+    "inventory_section": "Inventar",
     "items_tab": "Gegenstände",
     "opened_cases_tab": "Geöffnete Kisten",
     "inventory_description_active": "🎮 Aktive Gegenstände des Benutzers",

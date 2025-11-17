@@ -352,7 +352,7 @@
     "more_achievements": "Plus de succès",
     "all_time_record": "Record de Tous les Temps",
     "no_record_set": "Aucun record établi pour le moment",
-    "inventory_section": "Inventaire ({{count}} objets)",
+    "inventory_section": "Inventaire",
     "items_tab": "Objets",
     "opened_cases_tab": "Caisses Ouvertes",
     "inventory_description_active": "🎮 Objets actifs de l'utilisateur",

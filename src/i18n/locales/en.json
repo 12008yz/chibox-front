@@ -357,7 +357,7 @@
     "more_achievements": "More achievements",
     "all_time_record": "All-Time Record",
     "no_record_set": "No record set yet",
-    "inventory_section": "Inventory ({{count}} items)",
+    "inventory_section": "Inventory",
     "items_tab": "Items",
     "opened_cases_tab": "Opened Cases",
     "show_all": "Show All",

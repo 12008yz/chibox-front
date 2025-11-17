@@ -371,7 +371,7 @@ const PublicProfilePage: React.FC = () => {
                 <p className="text-xl font-bold text-white inline-flex items-center gap-1">
                   {(Number(user.totalItemsValue) || 0).toFixed(2)}
                   <img
-                    src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+                    src="/images/chiCoin.png"
                     alt="currency"
                     className="w-5 h-5 inline-block object-contain"
                   />
@@ -514,7 +514,7 @@ const PublicProfilePage: React.FC = () => {
                     <span className="text-green-400 font-bold text-lg inline-flex items-center gap-1">
                       {Number(bestWeapon.price || 0).toFixed(2)}
                       <img
-                        src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+                        src="/images/chiCoin.png"
                         alt="currency"
                         className="w-5 h-5 inline-block object-contain"
                       />
@@ -553,7 +553,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
-                {t('public_profile.inventory_section', { count: filteredInventory.length })}
+                {t('public_profile.inventory_section')}
               </h3>
 
               {/* Вкладки инвентаря */}

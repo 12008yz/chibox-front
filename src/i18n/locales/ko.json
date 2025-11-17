@@ -369,7 +369,7 @@
     "more_achievements": "その他の実績",
     "all_time_record": "歴代記録",
     "no_record_set": "まだ記録が設定されていません",
-    "inventory_section": "インベントリ ({{count}} アイテム)",
+    "inventory_section": "인벤토리",
     "items_tab": "アイテム",
     "opened_cases_tab": "開封済みケース",
     "inventory_description_active": "🎮 ユーザーのアクティブアイテム",

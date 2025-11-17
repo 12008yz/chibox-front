@@ -123,7 +123,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
           <p className="text-yellow-400 text-sm font-bold inline-flex items-center gap-1">
             {Number(caseTemplate?.price || '0').toFixed(2)}
             <img
-              src="https://tempfile.aiquickdraw.com/s/88f1c5efcf1d421b83e020062b079c5a_0_1760729039_2514.png"
+              src="/images/chiCoin.png"
               alt="currency"
               className="w-4 h-4 inline-block object-contain"
             />

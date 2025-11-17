@@ -353,7 +353,7 @@
     "more_achievements": "更多成就",
     "all_time_record": "历史最佳",
     "no_record_set": "尚未设定记录",
-    "inventory_section": "背包 ({{count}} 物品)",
+    "inventory_section": "背包",
     "items_tab": "物品",
     "opened_cases_tab": "已开箱子",
     "inventory_description_active": "🎮 用户的活跃物品",

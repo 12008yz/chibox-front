@@ -372,7 +372,7 @@
     "more_achievements": "Ещё достижений",
     "all_time_record": "Рекорд за всё время",
     "no_record_set": "Пока не установлен рекорд",
-    "inventory_section": "Инвентарь ({{count}} предметов)",
+    "inventory_section": "Инвентарь",
     "items_tab": "Предметы",
     "opened_cases_tab": "Открытые кейсы",
     "show_all": "Показать все",
