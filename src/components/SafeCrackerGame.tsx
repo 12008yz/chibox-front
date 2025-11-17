@@ -33,7 +33,8 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
-  const canPlay = !isSpinning && !isLoading && (((status?.remaining_attempts || 0) > 0 && hasSubscription) || (status?.free_attempts_remaining || 0) > 0) && !status?.has_won;
+  // Используем can_play с бэкенда, который уже учитывает и бесплатные попытки, и подписку
+  const canPlay = !isSpinning && !isLoading && status?.can_play;
 
   // Анимация вращения барабанов
   const spinDrums = async (finalCode: number[]) => {
@@ -70,15 +71,16 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
   // Начать игру
   const handlePlay = async () => {
-    if (!hasSubscription && (status?.free_attempts_remaining || 0) === 0) {
-      toast.error('Для игры в Safe Cracker требуется активный статус или бесплатные попытки!', {
-        icon: '🔒',
-        duration: 4000,
-      });
+    // Проверяем can_play с бэкенда (уже учитывает бесплатные попытки и подписку)
+    if (!canPlay) {
+      if (!hasSubscription && (status?.free_attempts_remaining || 0) === 0) {
+        toast.error('Для игры в Safe Cracker требуется активный статус или бесплатные попытки!', {
+          icon: '🔒',
+          duration: 4000,
+        });
+      }
       return;
     }
-
-    if (!canPlay) return;
 
     try {
       // Сбрасываем предыдущие результаты
