@@ -25,16 +25,48 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     {
       id: 'cases',
       targetId: 'onboarding-cases',
-      title: t('onboarding.cases_title', 'Кейсы'),
-      description: t('onboarding.cases_description', 'Нажмите на кейс, чтобы посмотреть что внутри и открыть его!'),
+      title: t('onboarding.cases_title', '🎁 Кейсы'),
+      description: t('onboarding.cases_description', 'Нажмите на кейс, чтобы посмотреть что внутри и открыть его! Каждый кейс содержит уникальные предметы.'),
       position: 'bottom',
       arrowDirection: 'down'
     },
     {
-      id: 'deposit',
-      targetId: 'onboarding-deposit-button',
-      title: t('onboarding.deposit_title', 'Пополнение баланса'),
-      description: t('onboarding.deposit_description', 'Здесь вы можете пополнить баланс для покупки премиум кейсов, а так же покупка статуса. Покупая статус вы получаете бесплатные кейсы на протяжении всей вашей активности.'),
+      id: 'free_trial',
+      targetId: 'onboarding-cases',
+      title: t('onboarding.free_trial_title', '🎁 2 Дня Бесплатного Доступа!'),
+      description: t('onboarding.free_trial_description', 'Поздравляем! У вас есть 2 дня полного бесплатного доступа ко всем возможностям: открытие кейсов, игры в слоты, сейф и крестики-нолики. Сейчас покажем все функции!'),
+      position: 'bottom',
+      arrowDirection: 'down'
+    },
+    {
+      id: 'slot',
+      targetId: 'onboarding-slot-button',
+      title: t('onboarding.slot_title', '🎰 Игра в Слоты'),
+      description: t('onboarding.slot_description', 'Испытайте удачу в слот-машине! Крутите барабан и выигрывайте ценные предметы. У вас есть бесплатные попытки!'),
+      position: 'bottom',
+      arrowDirection: 'down'
+    },
+    {
+      id: 'safe',
+      targetId: 'onboarding-safe-button',
+      title: t('onboarding.safe_title', '💰 Взлом Сейфа'),
+      description: t('onboarding.safe_description', 'Подберите правильный код и откройте сейф! Внутри вас ждут награды. Попробуйте свою удачу!'),
+      position: 'bottom',
+      arrowDirection: 'down'
+    },
+    {
+      id: 'tictactoe',
+      targetId: 'onboarding-tictactoe-button',
+      title: t('onboarding.tictactoe_title', '⭕❌ Крестики-Нолики'),
+      description: t('onboarding.tictactoe_description', 'Сразитесь с компьютером в классической игре! Победа принесет вам бонусный кейс.'),
+      position: 'top',
+      arrowDirection: 'down'
+    },
+    {
+      id: 'balance',
+      targetId: 'onboarding-balance',
+      title: t('onboarding.balance_title', '💎 Ваш Баланс'),
+      description: t('onboarding.balance_description', 'Здесь отображается ваш баланс. Используйте его для открытия премиум кейсов и других активностей. Пополнить можно в любое время!'),
       position: 'bottom',
       arrowDirection: 'down'
     }
@@ -49,13 +81,19 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
       const element = document.getElementById(step.targetId);
       if (element) {
-        const rect = element.getBoundingClientRect();
-        setTargetPosition({
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height
-        });
+        // Прокручиваем к элементу плавно
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Небольшая задержка для завершения скроллинга
+        setTimeout(() => {
+          const rect = element.getBoundingClientRect();
+          setTargetPosition({
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height
+          });
+        }, 300);
       }
     };
 

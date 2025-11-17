@@ -81,7 +81,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
           cases.map((caseItem, index) => {
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
-              const isFirstCase = index === 0;
+              const isFirstCase = index === 1; // Второй кейс - это бесплатный кейс для онбординга
 
               // Проверяем, является ли это бесплатным кейсом для новых пользователей
               const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
