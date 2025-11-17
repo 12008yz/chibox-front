@@ -15,7 +15,8 @@ const SafeCrackerButton = () => {
   const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
-  const canPlay = (status?.remaining_attempts || 0) > 0 && hasSubscription && !status?.has_won;
+  // Можно играть если есть обычные попытки ИЛИ бесплатные попытки, и пользователь еще не выигрывал
+  const canPlay = status?.can_play ?? false;
 
   return (
     <>
@@ -30,12 +31,14 @@ const SafeCrackerButton = () => {
           }
         `}
         title={
-          !hasSubscription
-            ? 'Требуется активный статус'
-            : status?.has_won
+          status?.has_won
             ? 'Вы уже выиграли в Safe Cracker сегодня! Попытки обновятся в 16:00 МСК'
-            : canPlay
+            : (status?.free_attempts_remaining || 0) > 0
+            ? `Safe Cracker (${status?.free_attempts_remaining} бесплатных попыток)`
+            : (status?.remaining_attempts || 0) > 0
             ? `Safe Cracker (${status?.remaining_attempts} попыток)`
+            : !hasSubscription
+            ? 'Требуется активный статус или бесплатные попытки для новых пользователей'
             : 'Нет доступных попыток'
         }
       >
