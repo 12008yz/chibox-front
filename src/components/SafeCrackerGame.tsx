@@ -33,7 +33,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
-  const canPlay = !isSpinning && !isLoading && (status?.remaining_attempts || 0) > 0 && hasSubscription && !status?.has_won;
+  const canPlay = !isSpinning && !isLoading && (((status?.remaining_attempts || 0) > 0 && hasSubscription) || (status?.free_attempts_remaining || 0) > 0) && !status?.has_won;
 
   // Анимация вращения барабанов
   const spinDrums = async (finalCode: number[]) => {
@@ -70,8 +70,8 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
   // Начать игру
   const handlePlay = async () => {
-    if (!hasSubscription) {
-      toast.error('Для игры в Safe Cracker требуется активный статус!', {
+    if (!hasSubscription && (status?.free_attempts_remaining || 0) === 0) {
+      toast.error('Для игры в Safe Cracker требуется активный статус или бесплатные попытки!', {
         icon: '🔒',
         duration: 4000,
       });
@@ -256,6 +256,32 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                 <p className="text-3xl font-bold text-white">
                   {status?.subscription_days || 0}
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Бесплатные попытки для новых пользователей */}
+          {!hasSubscription && (status?.free_attempts_remaining || 0) > 0 && (
+            <div className="mb-6">
+              <div className="bg-green-900/20 border border-green-400/50 rounded-lg p-4">
+                <div className="text-green-300 font-semibold mb-2 flex items-center gap-2">
+                  <span>🎁</span>
+                  <span>Бесплатные попытки: {status?.free_attempts_remaining || 0} из 2</span>
+                </div>
+                <div className="text-sm text-green-200">
+                  {status?.free_attempts_info?.reason || ''}
+                </div>
+                {status?.free_attempts_info?.next_available && (
+                  <div className="text-xs text-green-300 mt-2">
+                    Следующая попытка доступна: {new Date(status.free_attempts_info.next_available).toLocaleString('ru-RU', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}

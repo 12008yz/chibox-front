@@ -394,11 +394,37 @@ const SlotPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {!slotStatusData.data.hasSubscription && (
+                  {/* Бесплатные попытки для новых пользователей */}
+                  {slotStatusData.data.free_attempts_remaining > 0 && (
+                    <div className="mt-4 p-4 bg-green-900/20 border border-green-400/50 rounded-lg">
+                      <div className="text-green-300 font-semibold mb-2">
+                        🎁 Бесплатные попытки: {slotStatusData.data.free_attempts_remaining} из 2
+                      </div>
+                      <div className="text-sm text-green-200">
+                        {slotStatusData.data.free_attempts_info.reason}
+                      </div>
+                      {slotStatusData.data.free_attempts_info.next_available && (
+                        <div className="text-xs text-green-300 mt-2">
+                          Следующая попытка доступна: {new Date(slotStatusData.data.free_attempts_info.next_available).toLocaleString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {!slotStatusData.data.hasSubscription && slotStatusData.data.free_attempts_remaining === 0 && (
                     <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-400/50 rounded-lg text-yellow-300">
                       <div className="font-medium">Нужен статус для игры в слот!</div>
                       <div className="text-sm mt-1">
                         Статус (1 спин) • Статус+ (2 спина) • Статус++ (3 спина)
+                      </div>
+                      <div className="text-xs text-yellow-200 mt-2">
+                        Новые пользователи получают 2 бесплатные попытки в первые 2 дня после регистрации
                       </div>
                     </div>
                   )}

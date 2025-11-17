@@ -392,12 +392,23 @@ export interface PlaySlotResponse {
   message?: string;
 }
 
+export interface FreeAttemptsInfo {
+  can_use: boolean;
+  reason: string;
+  next_available: string | null;
+  claim_count: number;
+  first_claim_date: string | null;
+  last_claim_date: string | null;
+}
+
 export interface SlotStatusData {
   subscriptionTier: number;
   subscriptionName: string;
   limit: number;
   used: number;
   remaining: number;
+  free_attempts_remaining: number;
+  free_attempts_info: FreeAttemptsInfo;
   canPlay: boolean;
   cost: number;
   balance: number;
