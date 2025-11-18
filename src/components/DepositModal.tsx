@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { FaTimes, FaWallet, FaCreditCard, FaBitcoin, FaEthereum, FaCrown } from 'react-icons/fa';
+import { FaTimes, FaWallet } from 'react-icons/fa';
 import { RiVipCrownFill } from 'react-icons/ri';
-import { SiTether, SiBinance, SiDogecoin, SiLitecoin, SiTon, SiPolygon } from 'react-icons/si';
 import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
@@ -24,30 +23,12 @@ type PaymentMethod = {
   type: 'sbp' | 'card' | 'crypto' | 'other';
 };
 
-const SbpIcon: React.FC = () => {
-  const [imageError, setImageError] = useState(false);
-
-  return (
-    <div className="flex items-center justify-center w-full h-full">
-      {imageError ? (
-        <div className="text-2xl font-bold text-green-400">СБП</div>
-      ) : (
-        <img
-          src="https://payment.kassa.ai/build/assets/favicon-0dca7b36.png"
-          alt="СБП"
-          className="w-12 h-12 object-contain"
-          onError={() => setImageError(true)}
-        />
-      )}
-    </div>
-  );
-};
-
 const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance' }) => {
   const { } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('robokassa');
+  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'robokassa' | 'yookassa'>('robokassa');
   const [amount, setAmount] = useState<string>('100');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -174,7 +155,8 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     try {
       const result = await buySubscription({
         tierId,
-        method: 'bank_card'
+        method: 'bank_card',
+        paymentMethod: selectedSubscriptionMethod
       }).unwrap();
 
       if (result.success) {
@@ -376,7 +358,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">RUB</span>
               </div>
               <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
-                <span>💵</span>
                 Минимум: <span className="text-yellow-400 font-bold">{minAmount} RUB</span>
               </div>
             </div>
@@ -395,7 +376,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             {/* Promo Code */}
             <div>
               <label className="text-sm font-semibold text-gray-300 mb-2 block">
-                🎁 Промокод (опционально)
+                 Промокод (опционально)
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -452,154 +433,291 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             </div>
           ) : (
             /* Subscription Tab */
-            <div className="space-y-6">
-              {/* Info Banner */}
-              <div className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 border border-purple-500/30 rounded-xl p-4 backdrop-blur-sm">
-                <div className="flex items-start space-x-3">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <RiVipCrownFill className="text-purple-400 text-xl" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-purple-300 mb-1">VIP Статус дает:</h3>
-                    <ul className="text-sm text-purple-200/80 space-y-1">
-                      <li>✨ Бонус к шансу выпадения редких предметов</li>
-                      <li>🎁 Ежедневные бесплатные кейсы</li>
-                      <li>⭐ Уникальные привилегии и значки</li>
-                      <li>💬 Особый статус в чате</li>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+              {/* Left Side - Subscription Tiers */}
+              <div className="space-y-6">
+                {/* Title */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Выберите VIP статус</h3>
+                  <p className="text-sm text-gray-400">Получите эксклюзивные привилегии и бонусы</p>
+                </div>
+
+                {/* Subscription Tiers Grid */}
+                <div className="grid grid-cols-1 gap-4">
+                  {subscriptionTiers.map((tier) => {
+                    const isPro = tier.id === 2;
+                    const isPremium = tier.id === 3;
+                    const isSelected = selectedSubscription === tier.id;
+
+                    return (
+                      <button
+                        key={tier.id}
+                        onClick={() => setSelectedSubscription(tier.id)}
+                        className={`
+                          relative rounded-xl border-2 transition-all duration-300 overflow-hidden text-left group
+                          ${isSelected
+                            ? isPremium
+                              ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500 shadow-xl shadow-yellow-500/30 scale-[1.02]'
+                              : isPro
+                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-xl shadow-purple-500/30 scale-[1.02]'
+                              : 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-500 shadow-xl shadow-blue-500/30 scale-[1.02]'
+                            : 'bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-gray-600/50 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
+                          }
+                        `}
+                      >
+                        {/* Most Popular Badge */}
+                        {isPro && (
+                          <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-[10px] font-bold text-white uppercase shadow-lg z-10">
+                            Популярный
+                          </div>
+                        )}
+
+                        {/* Check Mark */}
+                        {isSelected && (
+                          <div className={`absolute top-3 left-3 w-6 h-6 rounded-full flex items-center justify-center shadow-lg z-10 ${
+                            isPremium ? 'bg-yellow-500' : isPro ? 'bg-purple-500' : 'bg-blue-500'
+                          }`}>
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+
+                        <div className="p-6 flex items-center gap-6">
+                          {/* Icon */}
+                          <div className={`p-3 rounded-2xl shadow-xl flex-shrink-0 ${
+                            isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
+                            isPro ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
+                            'bg-gradient-to-br from-blue-500 to-cyan-500'
+                          }`}>
+                            <img
+                              src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
+                              alt={tier.name}
+                              className="w-14 h-14 object-contain drop-shadow-lg"
+                            />
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline gap-3 mb-2">
+                              <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
+                              <span className="text-sm text-gray-400">30 дней</span>
+                            </div>
+
+                            {/* Features Grid */}
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="bg-black/20 rounded-lg p-2.5">
+                                <div className="text-xs text-gray-400 mb-1">Бонус к дропу</div>
+                                <div className={`text-lg font-bold ${
+                                  isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'
+                                }`}>+{tier.bonus_percentage}%</div>
+                              </div>
+                              <div className="bg-black/20 rounded-lg p-2.5">
+                                <div className="text-xs text-gray-400 mb-1">
+                                  {isPremium ? 'Без дубликатов' : 'Кейсов в день'}
+                                </div>
+                                <div className="text-lg font-bold text-white">
+                                  {isPremium ? '✓' : tier.max_daily_cases}
+                                </div>
+                              </div>
+                              <div className="bg-black/20 rounded-lg p-2.5">
+                                <div className="text-xs text-gray-400 mb-1">VIP чат</div>
+                                <div className="text-lg font-bold text-green-400">✓</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Price */}
+                          <div className="flex-shrink-0 text-right">
+                            <div className="text-3xl font-bold text-white mb-1">
+                              <Monetary value={tier.price} />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover Effect */}
+                        <div className={`absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Info Text */}
+                <div className="text-sm text-gray-300 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/30 flex items-start gap-3">
+                  <span className="text-xl">👑</span>
+                  <div>
+                    <p className="font-medium text-white mb-1">Преимущества VIP статуса</p>
+                    <ul className="text-gray-400 space-y-1 text-xs">
+                      <li>• Повышенный шанс выпадения редких предметов из кейсов</li>
+                      <li>• Ежедневный бесплатный кейс (автоматически начисляется)</li>
+                      <li>• Уникальная VIP иконка в профиле и чате</li>
+                      <li>• Приоритетная поддержка</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
-              {/* Subscription Tiers */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {subscriptionTiers.map((tier) => {
-                  // const isBasic = tier.id === 1;
-                  const isPro = tier.id === 2;
-                  const isPremium = tier.id === 3;
-                  const isSelected = selectedSubscription === tier.id;
+              {/* Right Side - Purchase Summary */}
+              <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-6 border border-purple-500/20 shadow-lg space-y-5 h-fit sticky top-0 backdrop-blur-sm">
+                {selectedSubscription ? (
+                  <>
+                    {/* Selected Tier Preview */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                        <RiVipCrownFill className="text-purple-400" />
+                        Выбранный статус
+                      </label>
+                      <div className="bg-gray-900/70 border-2 border-purple-500/30 rounded-lg p-4">
+                        {(() => {
+                          const selectedTier = subscriptionTiers.find(t => t.id === selectedSubscription);
+                          if (!selectedTier) return null;
 
-                  return (
-                    <div
-                      key={tier.id}
-                      className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer group ${
-                        isSelected
-                          ? 'border-purple-500 shadow-xl shadow-purple-500/40 scale-105'
-                          : 'border-gray-700/50 hover:border-purple-400/50 hover:scale-102'
-                      } ${isPro ? 'md:scale-105 md:z-10' : ''}`}
-                      onClick={() => setSelectedSubscription(tier.id)}
+                          const isPremium = selectedTier.id === 3;
+                          const isPro = selectedTier.id === 2;
+
+                          return (
+                            <>
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className={`p-2.5 rounded-xl ${
+                                  isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
+                                  isPro ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
+                                  'bg-gradient-to-br from-blue-500 to-cyan-500'
+                                }`}>
+                                  <img
+                                    src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
+                                    alt={selectedTier.name}
+                                    className="w-12 h-12 object-contain"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="text-xl font-bold text-white">{selectedTier.name}</div>
+                                  <div className="text-sm text-gray-400">30 дней подписки</div>
+                                </div>
+                              </div>
+
+                              {/* Benefits List */}
+                              <div className="space-y-2 mb-4">
+                                <div className="flex items-start gap-2 text-sm">
+                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="text-gray-300">
+                                    Бонус <span className={`font-bold ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>+{selectedTier.bonus_percentage}%</span> к шансу выпадения
+                                  </span>
+                                </div>
+                                <div className="flex items-start gap-2 text-sm">
+                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="text-gray-300">
+                                    {isPremium ? 'Предметы выпадают без дубликатов' : 'Доступ ко всем бонусам'}
+                                  </span>
+                                </div>
+                                <div className="flex items-start gap-2 text-sm">
+                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="text-gray-300">VIP значок в профиле и чате</span>
+                                </div>
+                                <div className="flex items-start gap-2 text-sm">
+                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="text-gray-300">Приоритетная поддержка</span>
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-700/50"></div>
+
+                    {/* Purchase Button */}
+                    <button
+                      onClick={() => handleSubscriptionPurchase(selectedSubscription)}
+                      disabled={isSubscriptionLoading}
+                      className={`w-full py-4 bg-gradient-to-r disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-lg rounded-lg transition-all duration-200 flex items-center justify-center gap-3 uppercase tracking-wide shadow-xl hover:shadow-2xl disabled:shadow-none ${
+                        (() => {
+                          const selectedTier = subscriptionTiers.find(t => t.id === selectedSubscription);
+                          const isPremium = selectedTier?.id === 3;
+                          const isPro = selectedTier?.id === 2;
+
+                          return isPremium
+                            ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-yellow-500/30 hover:shadow-yellow-500/50'
+                            : isPro
+                            ? 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/30 hover:shadow-purple-500/50'
+                            : 'from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-blue-500/30 hover:shadow-blue-500/50';
+                        })()
+                      }`}
                     >
-                      {/* Background Gradient */}
-                      <div className={`absolute inset-0 ${
-                        isPremium ? 'bg-gradient-to-br from-yellow-500/20 via-orange-500/20 to-pink-500/20' :
-                        isPro ? 'bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-indigo-500/20' :
-                        'bg-gradient-to-br from-blue-500/20 via-cyan-500/20 to-blue-500/20'
-                      }`} />
+                      <RiVipCrownFill className="text-xl" />
+                      <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить статус'}</span>
+                    </button>
 
-                      {/* Most Popular Badge */}
-                      {isPro && (
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg border-2 border-white/20">
-                          ⭐ ПОПУЛЯРНЫЙ
-                        </div>
-                      )}
-
-                      {/* Content */}
-                      <div className="relative p-5">
-                        {/* Icon & Title */}
-                        <div className="flex flex-col items-center mb-4">
-                          <div className={`p-4 rounded-2xl shadow-xl mb-3 ${
-                            isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
-                            isPro ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                            'bg-gradient-to-br from-blue-500 to-cyan-500'
-                          }`}>
-                            <RiVipCrownFill className="text-3xl text-white drop-shadow-lg" />
-                          </div>
-                          <h3 className="text-2xl font-bold text-white mb-1">{tier.name}</h3>
-                          <p className="text-sm text-gray-400">30 дней подписки</p>
-                        </div>
-
-                        {/* Price */}
-                        <div className="text-center mb-4 p-3 bg-black/30 rounded-lg">
-                          <div className="text-3xl font-bold text-white mb-1">
-                            <Monetary value={tier.price} />
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            ~<Monetary value={Math.round(tier.price / 30)} /> в день
-                          </div>
-                        </div>
-
-                        {/* Features */}
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center space-x-2 text-sm bg-black/20 rounded-lg p-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
-                            }`} />
-                            <span className="text-gray-200 flex-1">
-                              Бонус к дропам: <strong className={`${
-                                isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'
-                              }`}>+{tier.bonus_percentage}%</strong>
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm bg-black/20 rounded-lg p-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
-                            }`} />
-                            <span className="text-gray-200 flex-1">
-                              <strong className="text-white">{tier.max_daily_cases}</strong> кейс в день
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm bg-black/20 rounded-lg p-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              isPremium ? 'bg-yellow-400' : isPro ? 'bg-purple-400' : 'bg-blue-400'
-                            }`} />
-                            <span className="text-gray-200 flex-1">
-                              VIP статус в чате
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Buy Button */}
+                    {/* Payment Method Selection */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-300 mb-3 block">
+                        Способ оплаты
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSubscriptionPurchase(tier.id);
-                          }}
-                          disabled={isSubscriptionLoading}
-                          className={`w-full py-3 rounded-lg font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                            isPremium
-                              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-lg shadow-yellow-500/30'
-                              : isPro
-                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/30'
-                              : 'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg shadow-blue-500/30'
-                          } ${isSelected ? 'ring-2 ring-white/50' : ''}`}
+                          onClick={() => setSelectedSubscriptionMethod('robokassa')}
+                          className={`
+                            relative rounded-lg border-2 transition-all duration-300 p-4 h-20
+                            ${selectedSubscriptionMethod === 'robokassa'
+                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                              : 'bg-gray-900/50 border-gray-600/50 hover:border-purple-400/50'
+                            }
+                          `}
                         >
-                          <div className="flex items-center justify-center space-x-2">
-                            <FaCrown />
-                            <span>
-                              {isSubscriptionLoading && isSelected
-                                ? 'Создание платежа...'
-                                : `Купить ${tier.name}`}
-                            </span>
+                          {selectedSubscriptionMethod === 'robokassa' && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-center h-full">
+                            <div className="w-full text-black dark:text-white">
+                              <RobokassaLogo />
+                            </div>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => setSelectedSubscriptionMethod('yookassa')}
+                          className={`
+                            relative rounded-lg border-2 transition-all duration-300 p-4 h-20
+                            ${selectedSubscriptionMethod === 'yookassa'
+                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
+                              : 'bg-gray-900/50 border-gray-600/50 hover:border-purple-400/50'
+                            }
+                          `}
+                        >
+                          {selectedSubscriptionMethod === 'yookassa' && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-center h-full pb-13">
+                            <YooKassaLogo />
                           </div>
                         </button>
                       </div>
-
-                      {/* Selection Indicator */}
-                      {isSelected && (
-                        <div className="absolute top-3 right-3 w-7 h-7 bg-purple-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white/30">
-                          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      )}
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Payment Info */}
-              <div className="text-center text-sm text-gray-400 bg-gray-800/30 rounded-lg p-3 border border-gray-700/50">
-                💳 Оплата через защищенное соединение YooKassa
+                  </>
+                ) : (
+                  /* No Selection State */
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                      <img
+                        src="/images/status+.png"
+                        alt="VIP статус"
+                        className="w-16 h-16 object-contain opacity-50"
+                      />
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                      Выберите VIP статус<br />для продолжения
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
