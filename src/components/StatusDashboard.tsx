@@ -214,7 +214,6 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
             {bonusActivities.map((activity) => (
               <div
                 key={activity.id}
-                id={activity.id === 'tic-tac-toe' ? 'onboarding-tictactoe-button' : undefined}
                 onClick={activity.available ? activity.action : undefined}
                 className={`group relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 status-card-hover activity-glow cursor-pointer ${
                   activity.available

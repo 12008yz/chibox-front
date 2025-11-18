@@ -13,9 +13,10 @@ interface CaseProps {
   nextCaseAvailableTime?: string | null;
   isBonusCase?: boolean;
   onPlayBonusGame?: () => void;
+  isTicTacToeCase?: boolean;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame, isTicTacToeCase = false }) => {
   const { t } = useTranslation();
 
   // Функция для перевода названий кейсов
@@ -119,6 +120,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         {/* Отображение кнопки "Играть" для бонусного кейса или таймера для обычных бесплатных кейсов */}
         {isBonusCase ? (
           <button
+            id={isTicTacToeCase ? 'onboarding-tictactoe-button' : undefined}
             onClick={(e) => {
               console.log('=== КНОПКА ИГРАТЬ НАЖАТА ===');
               console.log('Кнопка "Играть" нажата для кейса:', title);

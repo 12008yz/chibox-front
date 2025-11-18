@@ -58,9 +58,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       id: 'tictactoe',
       targetId: 'onboarding-tictactoe-button',
       title: t('onboarding.tictactoe_title', '⭕❌ Крестики-нолики - 2 Попытки!'),
-      description: t('onboarding.tictactoe_description', 'Прокрутите вниз, чтобы найти эту карточку! 2 бесплатные игры в крестики-нолики. Победите компьютер и получите бонусный кейс. Первая игра сейчас, вторая — в 16:00 МСК. 2 дня!'),
-      position: 'top',
-      arrowDirection: 'up'
+      description: t('onboarding.tictactoe_description', 'Нажмите "Играть" на этом кейсе! 2 бесплатные игры в крестики-нолики. Победите компьютер и получите бонусный кейс. Первая игра сейчас, вторая — в 16:00 МСК. 2 дня!'),
+      position: 'bottom',
+      arrowDirection: 'down'
     },
     {
       id: 'bonus_reminder',
@@ -89,19 +89,13 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
       const element = document.getElementById(step.targetId);
       if (element) {
-        // Прокручиваем к элементу плавно
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // Небольшая задержка для завершения скроллинга
-        setTimeout(() => {
-          const rect = element.getBoundingClientRect();
-          setTargetPosition({
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height
-          });
-        }, 300);
+        const rect = element.getBoundingClientRect();
+        setTargetPosition({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        });
       }
     };
 
@@ -136,35 +130,73 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
     const offset = 20;
     const arrowSize = 40;
+    const tooltipMaxWidth = 400; // примерная ширина подсказки
+    const tooltipHeight = 300; // примерная высота подсказки
+
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    let position: any = {};
 
     switch (step.position) {
       case 'bottom':
-        return {
+        position = {
           top: targetPosition.top + targetPosition.height + offset + arrowSize,
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%)'
         };
+        // Проверяем, не выходит ли подсказка за нижнюю границу экрана
+        if (position.top + tooltipHeight > viewportHeight) {
+          // Показываем сверху вместо снизу
+          position.top = targetPosition.top - offset - arrowSize;
+          position.transform = 'translateX(-50%) translateY(-100%)';
+        }
+        break;
       case 'top':
-        return {
+        position = {
           top: targetPosition.top - offset - arrowSize,
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%) translateY(-100%)'
         };
+        // Проверяем, не выходит ли подсказка за верхнюю границу экрана
+        if (position.top - tooltipHeight < 0) {
+          // Показываем снизу вместо сверху
+          position.top = targetPosition.top + targetPosition.height + offset + arrowSize;
+          position.transform = 'translateX(-50%)';
+        }
+        break;
       case 'left':
-        return {
+        position = {
           top: targetPosition.top + targetPosition.height / 2,
           left: targetPosition.left - offset - arrowSize,
           transform: 'translateY(-50%) translateX(-100%)'
         };
+        break;
       case 'right':
-        return {
+        position = {
           top: targetPosition.top + targetPosition.height / 2,
           left: targetPosition.left + targetPosition.width + offset + arrowSize,
           transform: 'translateY(-50%)'
         };
+        break;
       default:
         return {};
     }
+
+    // Дополнительная проверка для горизонтального позиционирования
+    if (position.left) {
+      const estimatedLeft = position.transform?.includes('translateX(-50%)')
+        ? position.left - tooltipMaxWidth / 2
+        : position.left;
+
+      if (estimatedLeft < 20) {
+        position.left = tooltipMaxWidth / 2 + 20;
+      } else if (estimatedLeft + tooltipMaxWidth > viewportWidth - 20) {
+        position.left = viewportWidth - tooltipMaxWidth / 2 - 20;
+      }
+    }
+
+    return position;
   };
 
   const getArrowPosition = () => {
@@ -172,35 +204,50 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
     const arrowSize = 40;
     const offset = 10;
+    const tooltipHeight = 300;
+    const viewportHeight = window.innerHeight;
+
+    let arrowPos: any = {};
 
     switch (step.arrowDirection) {
       case 'down':
-        return {
+        arrowPos = {
           top: targetPosition.top - arrowSize - offset,
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%)'
         };
+        break;
       case 'up':
-        return {
+        arrowPos = {
           top: targetPosition.top + targetPosition.height + offset,
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%) rotate(180deg)'
         };
+        // Если элемент в верхней части экрана, разворачиваем стрелку вниз
+        if (targetPosition.top - tooltipHeight < 0) {
+          arrowPos.top = targetPosition.top - arrowSize - offset;
+          arrowPos.transform = 'translateX(-50%)';
+        }
+        break;
       case 'right':
-        return {
+        arrowPos = {
           top: targetPosition.top + targetPosition.height / 2,
           left: targetPosition.left - arrowSize - offset,
           transform: 'translateY(-50%) rotate(-90deg)'
         };
+        break;
       case 'left':
-        return {
+        arrowPos = {
           top: targetPosition.top + targetPosition.height / 2,
           left: targetPosition.left + targetPosition.width + offset,
           transform: 'translateY(-50%) rotate(90deg)'
         };
+        break;
       default:
         return {};
     }
+
+    return arrowPos;
   };
 
   return (
@@ -220,7 +267,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             transform: translateY(0) translateX(-50%);
           }
           50% {
-            transform: translateY(-15px) translateX(-50%);
+            transform: translateY(-20px) translateX(-50%) scale(1.1);
           }
         }
 
@@ -229,7 +276,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             transform: translateX(0) translateY(-50%) rotate(-90deg);
           }
           50% {
-            transform: translateX(-15px) translateY(-50%) rotate(-90deg);
+            transform: translateX(-20px) translateY(-50%) rotate(-90deg) scale(1.1);
           }
         }
 
@@ -238,7 +285,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             transform: translateX(0) translateY(-50%) rotate(90deg);
           }
           50% {
-            transform: translateX(15px) translateY(-50%) rotate(90deg);
+            transform: translateX(20px) translateY(-50%) rotate(90deg) scale(1.1);
           }
         }
 
@@ -247,7 +294,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             transform: translateY(0) translateX(-50%) rotate(180deg);
           }
           50% {
-            transform: translateY(15px) translateX(-50%) rotate(180deg);
+            transform: translateY(20px) translateX(-50%) rotate(180deg) scale(1.1);
           }
         }
 
@@ -308,10 +355,15 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
         {/* Анимированная стрелка */}
         <div
-          className={`absolute onboarding-arrow-${step.arrowDirection}`}
+          className={`absolute onboarding-arrow-${step.arrowDirection} z-[9999]`}
           style={getArrowPosition()}
         >
-          <FaArrowDown className="text-cyan-400 text-5xl drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+          <div className="relative">
+            {/* Свечение вокруг стрелки */}
+            <div className="absolute inset-0 blur-xl bg-cyan-400 opacity-60 animate-pulse"></div>
+            {/* Основная стрелка */}
+            <FaArrowDown className="relative text-cyan-400 text-6xl drop-shadow-[0_0_20px_rgba(34,211,238,1)] filter brightness-150" />
+          </div>
         </div>
 
         {/* Подсказка */}

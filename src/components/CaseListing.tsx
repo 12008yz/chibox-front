@@ -82,6 +82,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
               const isFirstCase = index === 1; // Второй кейс - это бесплатный кейс для онбординга
+              const isTicTacToeCase = index === 2 && isBonusCase; // Третий кейс - это крестики-нолики
 
               // Проверяем, является ли это бесплатным кейсом для новых пользователей
               const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
@@ -113,6 +114,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       nextCaseAvailableTime={caseNextAvailableTime}
                       isBonusCase={true}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
+                      isTicTacToeCase={isTicTacToeCase}
                     />
                   </div>
                 );
@@ -134,6 +136,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       nextCaseAvailableTime={caseNextAvailableTime}
                       isBonusCase={false}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
+                      isTicTacToeCase={false}
                     />
                   </Link>
                 );

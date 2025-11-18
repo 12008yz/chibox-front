@@ -21,6 +21,7 @@ const SafeCrackerButton = () => {
   return (
     <>
       <button
+        id="onboarding-safe-button"
         onClick={() => setShowSafeCrackerGame(true)}
         disabled={!canPlay}
         className={`
