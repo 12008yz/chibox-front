@@ -60,7 +60,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   // YooKassa Logo Component
   const YooKassaLogo = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 28" fill="none" className="w-full h-auto mt-15">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 28" fill="none" className="w-3/4 h-auto mx-auto">
       <path fillRule="evenodd" clipRule="evenodd" d="M11.342 13.937C11.376 6.257 17.565 0 25.342 0c7.709 0 14.088 6.291 14 14 0 7.709-6.291 14-14 14-7.688 0-13.966-6.169-14-13.937v10.393H6.38L0 4.076h11.342v9.861zm8.772.063c0 2.835 2.392 5.228 5.228 5.228 2.924 0 5.228-2.393 5.228-5.228s-2.393-5.228-5.228-5.228c-2.836 0-5.228 2.393-5.228 5.228z" fill="#0070F0"/>
     </svg>
   );
@@ -434,7 +434,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 </div>
 
                 {/* Subscription Tiers Grid */}
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-3">
                   {subscriptionTiers.map((tier) => {
                     const isPro = tier.id === 2;
                     const isPremium = tier.id === 3;
@@ -468,47 +468,47 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           </div>
                         )}
 
-                        <div className="p-6 flex items-center gap-6">
+                        <div className="p-4 flex items-center gap-4">
                           {/* Icon */}
-                          <div className="p-3 rounded-lg bg-gray-700 flex-shrink-0">
+                          <div className="p-2 rounded-lg bg-gray-700 flex-shrink-0">
                             <img
                               src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
                               alt={tier.name}
-                              className="w-14 h-14 object-contain"
+                              className="w-12 h-12 object-contain"
                             />
                           </div>
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline gap-3 mb-2">
-                              <h3 className="text-2xl font-semibold text-white">{tier.name}</h3>
-                              <span className="text-sm text-gray-400">30 дней</span>
+                            <div className="flex items-baseline gap-2 mb-1.5">
+                              <h3 className="text-xl font-semibold text-white">{tier.name}</h3>
+                              <span className="text-xs text-gray-400">30 дней</span>
                             </div>
 
                             {/* Features Grid */}
-                            <div className="grid grid-cols-3 gap-3">
-                              <div className="bg-gray-900/40 rounded-lg p-2.5">
-                                <div className="text-xs text-gray-400 mb-1">Бонус к дропу</div>
-                                <div className="text-lg font-semibold text-white">+{tier.bonus_percentage}%</div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div className="bg-gray-900/40 rounded-lg p-2">
+                                <div className="text-[10px] text-gray-400 mb-0.5">Бонус к дропу</div>
+                                <div className="text-base font-semibold text-white">+{tier.bonus_percentage}%</div>
                               </div>
-                              <div className="bg-gray-900/40 rounded-lg p-2.5">
-                                <div className="text-xs text-gray-400 mb-1">
+                              <div className="bg-gray-900/40 rounded-lg p-2">
+                                <div className="text-[10px] text-gray-400 mb-0.5">
                                   {isPremium ? 'Без дубликатов' : 'Кейсов в день'}
                                 </div>
-                                <div className="text-lg font-semibold text-white">
+                                <div className="text-base font-semibold text-white">
                                   {isPremium ? '✓' : tier.max_daily_cases}
                                 </div>
                               </div>
-                              <div className="bg-gray-900/40 rounded-lg p-2.5">
-                                <div className="text-xs text-gray-400 mb-1">VIP чат</div>
-                                <div className="text-lg font-semibold text-white">✓</div>
+                              <div className="bg-gray-900/40 rounded-lg p-2">
+                                <div className="text-[10px] text-gray-400 mb-0.5">VIP чат</div>
+                                <div className="text-base font-semibold text-white">✓</div>
                               </div>
                             </div>
                           </div>
 
                           {/* Price */}
                           <div className="flex-shrink-0 text-right">
-                            <div className="text-3xl font-semibold text-white mb-1">
+                            <div className="text-2xl font-semibold text-white mb-1">
                               <Monetary value={tier.price} />
                             </div>
                           </div>
@@ -519,11 +519,11 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 </div>
 
                 {/* Info Text */}
-                <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 flex items-start gap-3">
-                  <span className="text-xl">👑</span>
+                <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-3 border border-gray-700/30 flex items-start gap-2">
+                  <span className="text-lg">👑</span>
                   <div>
-                    <p className="font-medium text-white mb-1">Преимущества VIP статуса</p>
-                    <ul className="text-gray-400 space-y-1 text-xs">
+                    <p className="font-medium text-white mb-1 text-sm">Преимущества VIP статуса</p>
+                    <ul className="text-gray-400 space-y-0.5 text-xs">
                       <li>• Повышенный шанс выпадения редких предметов из кейсов</li>
                       <li>• Ежедневный бесплатный кейс (автоматически начисляется)</li>
                       <li>• Уникальная VIP иконка в профиле и чате</li>
@@ -534,16 +534,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
               </div>
 
               {/* Right Side - Purchase Summary */}
-              <div className="bg-gray-800/40 rounded-lg p-6 border border-gray-700/30 space-y-5 h-fit sticky top-0">
+              <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/30 space-y-4 h-fit sticky top-0">
                 {selectedSubscription ? (
                   <>
                     {/* Selected Tier Preview */}
                     <div>
-                      <label className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
                         <RiVipCrownFill />
                         Выбранный статус
                       </label>
-                      <div className="bg-gray-900/70 border border-gray-700/50 rounded-lg p-4">
+                      <div className="bg-gray-900/70 border border-gray-700/50 rounded-lg p-3">
                         {(() => {
                           const selectedTier = subscriptionTiers.find(t => t.id === selectedSubscription);
                           if (!selectedTier) return null;
@@ -553,39 +553,39 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                           return (
                             <>
-                              <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2.5 rounded-lg bg-gray-700">
+                              <div className="flex items-center gap-2.5 mb-3">
+                                <div className="p-2 rounded-lg bg-gray-700">
                                   <img
                                     src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
                                     alt={selectedTier.name}
-                                    className="w-12 h-12 object-contain"
+                                    className="w-10 h-10 object-contain"
                                   />
                                 </div>
                                 <div>
-                                  <div className="text-xl font-semibold text-white">{selectedTier.name}</div>
-                                  <div className="text-sm text-gray-400">30 дней подписки</div>
+                                  <div className="text-lg font-semibold text-white">{selectedTier.name}</div>
+                                  <div className="text-xs text-gray-400">30 дней подписки</div>
                                 </div>
                               </div>
 
                               {/* Benefits List */}
-                              <div className="space-y-2 mb-4">
-                                <div className="flex items-start gap-2 text-sm">
+                              <div className="space-y-1.5 mb-3">
+                                <div className="flex items-start gap-2 text-xs">
                                   <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">
                                     Бонус <span className="font-semibold text-white">+{selectedTier.bonus_percentage}%</span> к шансу выпадения
                                   </span>
                                 </div>
-                                <div className="flex items-start gap-2 text-sm">
+                                <div className="flex items-start gap-2 text-xs">
                                   <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">
                                     {isPremium ? 'Предметы выпадают без дубликатов' : 'Доступ ко всем бонусам'}
                                   </span>
                                 </div>
-                                <div className="flex items-start gap-2 text-sm">
+                                <div className="flex items-start gap-2 text-xs">
                                   <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">VIP значок в профиле и чате</span>
                                 </div>
-                                <div className="flex items-start gap-2 text-sm">
+                                <div className="flex items-start gap-2 text-xs">
                                   <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">Приоритетная поддержка</span>
                                 </div>
@@ -603,22 +603,22 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     <button
                       onClick={() => handleSubscriptionPurchase(selectedSubscription)}
                       disabled={isSubscriptionLoading}
-                      className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-base rounded-lg transition-colors flex items-center justify-center gap-3"
+                      className="w-full py-3 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
-                      <RiVipCrownFill className="text-lg" />
+                      <RiVipCrownFill className="text-base" />
                       <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить статус'}</span>
                     </button>
 
                     {/* Payment Method Selection */}
                     <div>
-                      <label className="text-sm font-medium text-gray-300 mb-3 block">
+                      <label className="text-xs font-medium text-gray-300 mb-2 block">
                         Способ оплаты
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => setSelectedSubscriptionMethod('robokassa')}
                           className={`
-                            relative rounded-lg border transition-colors p-4 h-20
+                            relative rounded-lg border transition-colors p-3 h-16
                             ${selectedSubscriptionMethod === 'robokassa'
                               ? 'bg-gray-800 border-white'
                               : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
@@ -626,8 +626,8 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           `}
                         >
                           {selectedSubscriptionMethod === 'robokassa' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                              <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
@@ -642,7 +642,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         <button
                           onClick={() => setSelectedSubscriptionMethod('yookassa')}
                           className={`
-                            relative rounded-lg border transition-colors p-4 h-20
+                            relative rounded-lg border transition-colors p-3 h-16
                             ${selectedSubscriptionMethod === 'yookassa'
                               ? 'bg-gray-800 border-white'
                               : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
@@ -650,13 +650,13 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           `}
                         >
                           {selectedSubscriptionMethod === 'yookassa' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                              <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
                           )}
-                          <div className="flex items-center justify-center h-full pb-13">
+                          <div className="flex items-center justify-center h-full">
                             <YooKassaLogo />
                           </div>
                         </button>
@@ -665,17 +665,19 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   </>
                 ) : (
                   /* No Selection State */
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-lg bg-gray-800 flex items-center justify-center">
-                      <img
-                        src="/images/status+.png"
-                        alt="VIP статус"
-                        className="w-16 h-16 object-contain opacity-50"
-                      />
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-lg bg-gray-800 flex items-center justify-center">
+                        <img
+                          src="/images/status+.png"
+                          alt="VIP статус"
+                          className="w-16 h-16 object-contain opacity-50"
+                        />
+                      </div>
+                      <p className="text-gray-400 text-sm">
+                        Выберите VIP статус<br />для продолжения
+                      </p>
                     </div>
-                    <p className="text-gray-400 text-sm">
-                      Выберите VIP статус<br />для продолжения
-                    </p>
                   </div>
                 )}
               </div>
