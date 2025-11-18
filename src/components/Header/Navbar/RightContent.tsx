@@ -97,7 +97,7 @@ const RightContent: React.FC<RightContentProps> = ({
       <SafeCrackerButton />
 
       {/* Баланс */}
-      <div className="gaming-balance-container">
+      <div id="onboarding-balance" className="gaming-balance-container">
         <div className="flex items-center space-x-2">
           <FaCoins className="text-yellow-400 text-xl animate-pulse mr-3" />
           <div className="flex flex-col">

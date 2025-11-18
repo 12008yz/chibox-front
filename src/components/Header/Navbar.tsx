@@ -104,6 +104,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link
                   key={index}
                   to={link.to}
+                  id={link.to === '/slot' ? 'onboarding-slot-button' : undefined}
                   className="gaming-nav-item group"
                 >
                   <div className="nav-item-content">
