@@ -588,6 +588,15 @@
     "going_to_payment": "Переходим к оплате...",
     "going_to_subscription_payment": "Переходим к оплате статуса...",
     "status_purchased": "Статус успешно приобретен!",
+    "attempts_per_day": "попыток в день",
+    "daily_attempts": "попыток",
+    "tic_tac_toe_attempts": "Крестики-нолики",
+    "safe_cracker_attempts": "Взлом сейфа",
+    "slots_attempts": "Игра в слоты",
+    "item_withdrawal": "Вывод предметов",
+    "no_case_duplicates": "Без дубликатов из кейса",
+    "all_bonuses_access": "Доступ ко всем бонусам",
+    "drop_chance_bonus": "К шансу выпадения",
     "enter_correct_amount": "Введите корректную сумму для пополнения",
     "minimum_amount": "Минимальная сумма пополнения: 100 рублей",
     "payment_error": "Ошибка при создании платежа",
@@ -884,7 +893,9 @@
     "level_label": "Уровень",
     "cases_opened_label": "Кейсов открыто",
     "most_expensive_item_label": "Самый дорогой предмет",
-    "level_prefix": "Уровень {{level}}"
+    "level_prefix": "Уровень {{level}}",
+    "cases_suffix": "кейсов",
+    "level_suffix": "уровень"
   },
   "case_preview_modal": {
     "opening": "Открытие...",

@@ -575,7 +575,9 @@
     "level_label": "Niveau",
     "cases_opened_label": "Caisses Ouvertes",
     "most_expensive_item_label": "Objet le Plus Cher",
-    "level_prefix": "Niveau {{level}}"
+    "level_prefix": "Niveau {{level}}",
+    "cases_suffix": "cas",
+    "level_suffix": "niveau"
   },
   "case_preview_modal": {
     "free_case": "Caisse Gratuite",

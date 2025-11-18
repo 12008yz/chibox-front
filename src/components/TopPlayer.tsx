@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Player from './Player';
 import Monetary from './Monetary';
 
@@ -21,10 +22,23 @@ interface TopPlayerProps {
 }
 
 const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) => {
+  const { t } = useTranslation();
+
   if (!user) return null;
 
   const getScore = () => {
     return user.score || user.cases_opened || user.max_item_value || 0;
+  };
+
+  const getScoreSuffix = () => {
+    if (rank > 3) return ''; // Только для топ-3
+
+    if (leaderboardType === 'cases_opened') {
+      return ` ${t('leaderboard_page.cases_suffix')}`;
+    } else if (leaderboardType === 'level') {
+      return ` ${t('leaderboard_page.level_suffix')}`;
+    }
+    return '';
   };
 
   return (
@@ -41,7 +55,7 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
             {leaderboardType === 'most_expensive_item' ? (
               <Monetary value={getScore()} />
             ) : (
-              <span className="font-semibold">{getScore()}</span>
+              <span className="font-semibold">{getScore()}{getScoreSuffix()}</span>
             )}
           </div>
           {leaderboardType === 'most_expensive_item' && user.most_expensive_item_name && (

@@ -576,7 +576,9 @@
     "level_label": "Level",
     "cases_opened_label": "Geöffnete Kisten",
     "most_expensive_item_label": "Teuerster Gegenstand",
-    "level_prefix": "Level {{level}}"
+    "level_prefix": "Level {{level}}",
+    "cases_suffix": "Fälle",
+    "level_suffix": "Level"
   },
   "case_preview_modal": {
     "opening": "Öffnung...",

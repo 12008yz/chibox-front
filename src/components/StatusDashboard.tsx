@@ -66,12 +66,15 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
 
+  // Количество попыток в зависимости от уровня подписки
+  const attemptsCount = subscriptionTier + 2; // 1->3, 2->4, 3->5
+
   // Доступные активности
   const bonusActivities: BonusActivity[] = [
     {
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
-      description: t('tic_tac_toe_game.won_bonus_case'),
+      description: `${attemptsCount} ${t('modals.daily_attempts')} | Выиграй бонусный кейс`,
       icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
@@ -80,7 +83,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       id: 'safe-cracker',
       name: 'Взлом сейфа',
-      description: 'Подбери код и получи награду',
+      description: `${attemptsCount} ${t('modals.daily_attempts')} | Подбери код и получи награду`,
       icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
@@ -89,7 +92,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       id: 'slots',
       name: t('slots.title'),
-      description: t('slots.description'),
+      description: `${attemptsCount} ${t('modals.daily_attempts')} | +${currentStatus.bonus}% к шансу`,
       icon: <img src="/images/status3.png" alt="Слот-машина" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
@@ -285,47 +288,77 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('common.bonus_keyword')}</span>
+                  <span className="text-gray-300">{t('modals.drop_chance_bonus')}</span>
                   <span className="text-green-400 font-bold">+{currentStatus.bonus}%</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300">{t('cases.daily_case')}</span>
-                  <span className="text-blue-400 font-bold">1</span>
+                  <span className="text-blue-400 font-bold">1 {t('modals.case_per_day')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('tic_tac_toe.title')}</span>
-                  <span className="text-purple-400 font-bold">{subscriptionTier + 2}</span>
+                  <span className="text-gray-300">{t('modals.tic_tac_toe_attempts')}</span>
+                  <span className="text-purple-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Взлом сейфа</span>
-                  <span className="text-yellow-400 font-bold">{subscriptionTier}</span>
+                  <span className="text-gray-300">{t('modals.safe_cracker_attempts')}</span>
+                  <span className="text-yellow-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">{t('modals.slots_attempts')}</span>
+                  <span className="text-cyan-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">{t('modals.item_withdrawal')}</span>
+                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <span className="text-green-400 text-sm">✓</span>
+                  </div>
+                </div>
+                {subscriptionTier === 3 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">{t('modals.no_case_duplicates')}</span>
+                    <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <span className="text-purple-400 text-sm">✓</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <MdTrendingUp className="text-green-400" />
-                {t('profile.achievements')}
+                {t('modals.all_bonuses_access')}
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                     <span className="text-green-400">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('profile.subscription')}</span>
+                  <span className="text-gray-300">{t('tic_tac_toe.title')}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <span className="text-yellow-400">✓</span>
+                  </div>
+                  <span className="text-gray-300">Взлом сейфа</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                    <span className="text-cyan-400">✓</span>
+                  </div>
+                  <span className="text-gray-300">{t('slots.title')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                     <span className="text-blue-400">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('auth.bonuses')}</span>
+                  <span className="text-gray-300">{t('exchange.title')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
                     <span className="text-purple-400">✓</span>
                   </div>
-                  <span className="text-gray-300">VIP</span>
+                  <span className="text-gray-300">{t('modals.item_withdrawal')}</span>
                 </div>
               </div>
             </div>

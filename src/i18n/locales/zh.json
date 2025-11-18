@@ -576,7 +576,9 @@
     "level_label": "等级",
     "cases_opened_label": "开箱数",
     "most_expensive_item_label": "最贵物品",
-    "level_prefix": "等级 {{level}}"
+    "level_prefix": "等级 {{level}}",
+    "cases_suffix": "箱子",
+    "level_suffix": "等级"
   },
   "case_preview_modal": {
     "free_case": "免费箱子",

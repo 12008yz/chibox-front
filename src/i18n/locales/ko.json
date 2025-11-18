@@ -610,7 +610,9 @@
     "level_label": "レベル",
     "cases_opened_label": "開封ケース",
     "most_expensive_item_label": "最高額アイテム",
-    "level_prefix": "レベル {{level}}"
+    "level_prefix": "レベル {{level}}",
+    "cases_suffix": "케이스",
+    "level_suffix": "레벨"
   },
   "case_preview_modal": {
     "free_case": "無料ケース",

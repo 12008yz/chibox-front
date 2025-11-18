@@ -569,6 +569,15 @@
     "going_to_payment": "Going to payment...",
     "going_to_subscription_payment": "Going to subscription payment...",
     "status_purchased": "Status successfully purchased!",
+    "attempts_per_day": "attempts per day",
+    "daily_attempts": "attempts",
+    "tic_tac_toe_attempts": "Tic-Tac-Toe",
+    "safe_cracker_attempts": "Safe Cracker",
+    "slots_attempts": "Slot Game",
+    "item_withdrawal": "Item Withdrawal",
+    "no_case_duplicates": "No duplicates from cases",
+    "all_bonuses_access": "Access to all bonuses",
+    "drop_chance_bonus": "Drop chance bonus",
     "enter_correct_amount": "Enter correct amount for deposit",
     "minimum_amount": "Minimum deposit amount: 100 rubles",
     "payment_error": "Error creating payment",
@@ -861,7 +870,9 @@
     "level_label": "Level",
     "cases_opened_label": "Cases Opened",
     "most_expensive_item_label": "Most Expensive Item",
-    "level_prefix": "Level {{level}}"
+    "level_prefix": "Level {{level}}",
+    "cases_suffix": "cases",
+    "level_suffix": "level"
   },
   "case_preview_modal": {
     "opening": "Opening...",

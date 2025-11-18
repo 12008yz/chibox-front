@@ -575,7 +575,9 @@
     "level_label": "Nivel",
     "cases_opened_label": "Cajas Abiertas",
     "most_expensive_item_label": "Objeto Más Caro",
-    "level_prefix": "Nivel {{level}}"
+    "level_prefix": "Nivel {{level}}",
+    "cases_suffix": "casos",
+    "level_suffix": "nivel"
   },
   "case_preview_modal": {
     "free_case": "Caja Gratuita",
