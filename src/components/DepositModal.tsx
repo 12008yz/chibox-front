@@ -180,54 +180,48 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     <div data-no-click-sound className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/80"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div data-no-click-sound className="relative bg-gradient-to-br from-[#0f1419] via-[#1a1f2e] to-[#0f1419] rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden border border-cyan-500/20 shadow-2xl shadow-cyan-500/10">
-        {/* Animated background effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5 opacity-50"></div>
+      <div data-no-click-sound className="relative bg-[#1a1f2e] rounded-xl w-full max-w-6xl max-h-[95vh] overflow-hidden border border-gray-700/30">
 
         {/* Header */}
-        <div className="relative flex items-center justify-between p-6 border-b border-gray-700/30 bg-black/40 backdrop-blur-sm">
+        <div className="relative flex items-center justify-between p-6 border-b border-gray-700/20">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
             {activeTab === 'balance' ? (
               <>
-                <div className="p-2 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500">
+                <div className="p-2 rounded-lg bg-gray-800">
                   <FaWallet className="text-white text-xl" />
                 </div>
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                  Пополнение баланса
-                </span>
+                <span>Пополнение баланса</span>
               </>
             ) : (
               <>
-                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+                <div className="p-2 rounded-lg bg-gray-800">
                   <RiVipCrownFill className="text-white text-xl" />
                 </div>
-                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Премиум подписка
-                </span>
+                <span>Премиум подписка</span>
               </>
             )}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-all duration-200 border border-gray-700/50 hover:border-gray-600"
+            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
           >
             <FaTimes className="text-xl" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="relative flex space-x-2 p-4 bg-black/20">
+        <div className="relative flex space-x-2 p-4 bg-[#151a26]">
           <button
             onClick={() => setActiveTab('balance')}
-            className={`flex-1 py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 font-semibold ${
+            className={`flex-1 py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 font-medium ${
               activeTab === 'balance'
-                ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border-2 border-yellow-500/50 shadow-lg shadow-yellow-500/20'
-                : 'bg-gray-800/30 text-gray-400 hover:text-white hover:bg-gray-700/40 border-2 border-transparent'
+                ? 'bg-gray-700 text-white'
+                : 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
             }`}
           >
             <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
@@ -235,10 +229,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
           </button>
           <button
             onClick={() => setActiveTab('subscription')}
-            className={`flex-1 py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-2 font-semibold ${
+            className={`flex-1 py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 font-medium ${
               activeTab === 'subscription'
-                ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-400 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20'
-                : 'bg-gray-800/30 text-gray-400 hover:text-white hover:bg-gray-700/40 border-2 border-transparent'
+                ? 'bg-gray-700 text-white'
+                : 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
             }`}
           >
             <RiVipCrownFill className="text-xl" />
@@ -255,7 +249,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
           <div className="space-y-6">
             {/* Title */}
             <div>
-              <h3 className="text-xl font-bold text-white mb-2">Выберите платежную систему</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">Выберите платежную систему</h3>
               <p className="text-sm text-gray-400">Безопасная оплата через проверенных партнеров</p>
             </div>
 
@@ -267,26 +261,26 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   onClick={() => method.enabled && setSelectedMethod(method.id)}
                   disabled={!method.enabled}
                   className={`
-                    relative rounded-xl border-2 transition-all duration-300 overflow-hidden group
+                    relative rounded-lg border transition-colors overflow-hidden
                     ${selectedMethod === method.id && method.enabled
-                      ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500 shadow-xl shadow-green-500/30 scale-[1.02]'
+                      ? 'bg-gray-800 border-white'
                       : method.enabled
-                      ? 'bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-gray-600/50 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10'
+                      ? 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
                       : 'bg-gray-900/20 border-gray-700/30 opacity-40 cursor-not-allowed'
                     }
                   `}
                 >
                   {/* Badge */}
                   {method.badge && (
-                    <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-[10px] font-bold text-white uppercase shadow-lg z-10">
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-gray-700 rounded text-[10px] font-medium text-gray-300 uppercase">
                       {method.badge}
                     </div>
                   )}
 
                   {/* Check Mark */}
                   {selectedMethod === method.id && method.enabled && (
-                    <div className="absolute top-3 left-3 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg z-10">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="absolute top-3 left-3 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                      <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -300,7 +294,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                     {/* Name */}
                     <div className="text-center">
-                      <div className="text-sm font-semibold text-gray-300">
+                      <div className="text-sm font-medium text-gray-300">
                         {method.name}
                       </div>
                     </div>
@@ -309,27 +303,24 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     <div className="text-xs text-gray-500 text-center">
                       {method.id === 'robokassa' ? (
                         <div className="flex flex-wrap gap-1 justify-center">
-                          <span className="px-2 py-1 bg-gray-800/50 rounded">МИР</span>
-                          <span className="px-2 py-1 bg-gray-800/50 rounded">Visa</span>
-                          <span className="px-2 py-1 bg-gray-800/50 rounded">Mastercard</span>
-                          <span className="px-2 py-1 bg-gray-800/50 rounded">СБП</span>
+                          <span className="px-2 py-1 bg-gray-700/50 rounded">МИР</span>
+                          <span className="px-2 py-1 bg-gray-700/50 rounded">Visa</span>
+                          <span className="px-2 py-1 bg-gray-700/50 rounded">Mastercard</span>
+                          <span className="px-2 py-1 bg-gray-700/50 rounded">СБП</span>
                         </div>
                       ) : (
                         <div className="flex flex-wrap gap-1 justify-center">
-                          <span className="px-2 py-1 bg-gray-800/50 rounded">Банковские карты</span>
+                          <span className="px-2 py-1 bg-gray-700/50 rounded">Банковские карты</span>
                         </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-green-500/0 via-green-500/0 to-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </button>
               ))}
             </div>
 
             {/* Info Text */}
-            <div className="text-sm text-gray-300 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-lg p-4 border border-blue-500/30 flex items-start gap-3">
+            <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 flex items-start gap-3">
               <span className="text-xl">🔒</span>
               <div>
                 <p className="font-medium text-white mb-1">Защищенная оплата</p>
@@ -339,10 +330,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
           </div>
 
           {/* Right Side - Payment Form */}
-          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-6 border border-yellow-500/20 shadow-lg space-y-5 h-fit sticky top-0 backdrop-blur-sm">
+          <div className="bg-gray-800/40 rounded-lg p-6 border border-gray-700/30 space-y-5 h-fit sticky top-0">
             {/* Amount Input */}
             <div>
-              <label className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
                 <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
                 Сумма пополнения
               </label>
@@ -352,30 +343,30 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   min={minAmount}
-                  className="w-full bg-gray-900/70 border-2 border-gray-600 rounded-lg pl-4 pr-16 py-4 text-white text-2xl font-bold focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
+                  className="w-full bg-gray-900/70 border border-gray-700 rounded-lg pl-4 pr-16 py-4 text-white text-2xl font-semibold focus:outline-none focus:border-gray-500 transition-colors"
                   placeholder="100"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">RUB</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">RUB</span>
               </div>
               <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
-                Минимум: <span className="text-yellow-400 font-bold">{minAmount} RUB</span>
+                Минимум: <span className="text-white font-medium">{minAmount} RUB</span>
               </div>
             </div>
 
             {/* Bonus Display */}
-            <div className="bg-gradient-to-r from-yellow-500/15 to-orange-500/15 border-2 border-yellow-500/40 rounded-lg p-4">
+            <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-yellow-200/90 font-medium">Вы получите:</span>
+                <span className="text-sm text-gray-300 font-medium">Вы получите:</span>
                 <div className="flex items-center gap-2">
                   <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />
-                  <span className="text-2xl font-bold text-yellow-400">{amount || '0'}</span>
+                  <span className="text-2xl font-semibold text-white">{amount || '0'}</span>
                 </div>
               </div>
             </div>
 
             {/* Promo Code */}
             <div>
-              <label className="text-sm font-semibold text-gray-300 mb-2 block">
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
                  Промокод (опционально)
               </label>
               <div className="flex items-center gap-2">
@@ -384,11 +375,11 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                   placeholder="Введите промокод"
-                  className="flex-1 bg-gray-900/70 border-2 border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all uppercase"
+                  className="flex-1 bg-gray-900/70 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 transition-colors uppercase"
                 />
                 <button
                   onClick={handleApplyPromo}
-                  className="px-5 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-lg transition-all shadow-lg"
+                  className="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
                 >
                   OK
                 </button>
@@ -405,11 +396,11 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 id="terms"
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-0.5 w-5 h-5 rounded border-gray-600 bg-gray-900/50 text-green-500 focus:ring-2 focus:ring-green-500 cursor-pointer"
+                className="mt-0.5 w-5 h-5 rounded border-gray-600 bg-gray-900/50 text-white focus:ring-2 focus:ring-gray-500 cursor-pointer"
               />
               <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer select-none leading-relaxed">
                 Я принимаю условия{' '}
-                <a href="#" className="text-green-400 hover:text-green-300 underline font-semibold">
+                <a href="#" className="text-white hover:text-gray-200 underline font-medium">
                   Пользовательского соглашения
                 </a>
               </label>
@@ -419,15 +410,15 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             <button
               onClick={handleDeposit}
               disabled={isTopUpLoading || !agreedToTerms || parseInt(amount) < minAmount || !selectedPaymentMethod?.enabled}
-              className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-lg rounded-lg transition-all duration-200 flex items-center justify-center gap-3 uppercase tracking-wide shadow-xl shadow-yellow-500/30 hover:shadow-yellow-500/50 disabled:shadow-none"
+              className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-base rounded-lg transition-colors flex items-center justify-center gap-3"
             >
-              <FaWallet className="text-xl" />
+              <FaWallet className="text-lg" />
               <span>{isTopUpLoading ? 'Создание платежа...' : 'Пополнить баланс'}</span>
             </button>
 
             {/* Selected Method Info */}
             <div className="text-center text-xs text-gray-500 pt-2">
-              Оплата через: <span className="text-gray-300 font-semibold">{selectedPaymentMethod?.name || 'Не выбрано'}</span>
+              Оплата через: <span className="text-gray-300 font-medium">{selectedPaymentMethod?.name || 'Не выбрано'}</span>
             </div>
           </div>
             </div>
@@ -438,7 +429,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
               <div className="space-y-6">
                 {/* Title */}
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-2">Выберите VIP статус</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">Выберите VIP статус</h3>
                   <p className="text-sm text-gray-400">Получите эксклюзивные привилегии и бонусы</p>
                 </div>
 
@@ -454,30 +445,24 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         key={tier.id}
                         onClick={() => setSelectedSubscription(tier.id)}
                         className={`
-                          relative rounded-xl border-2 transition-all duration-300 overflow-hidden text-left group
+                          relative rounded-lg border transition-colors overflow-hidden text-left
                           ${isSelected
-                            ? isPremium
-                              ? 'bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500 shadow-xl shadow-yellow-500/30 scale-[1.02]'
-                              : isPro
-                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-xl shadow-purple-500/30 scale-[1.02]'
-                              : 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-500 shadow-xl shadow-blue-500/30 scale-[1.02]'
-                            : 'bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-gray-600/50 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
+                            ? 'bg-gray-800 border-white'
+                            : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
                           }
                         `}
                       >
                         {/* Most Popular Badge */}
                         {isPro && (
-                          <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-[10px] font-bold text-white uppercase shadow-lg z-10">
+                          <div className="absolute top-3 right-3 px-2.5 py-1 bg-gray-700 rounded text-[10px] font-medium text-gray-300 uppercase">
                             Популярный
                           </div>
                         )}
 
                         {/* Check Mark */}
                         {isSelected && (
-                          <div className={`absolute top-3 left-3 w-6 h-6 rounded-full flex items-center justify-center shadow-lg z-10 ${
-                            isPremium ? 'bg-yellow-500' : isPro ? 'bg-purple-500' : 'bg-blue-500'
-                          }`}>
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="absolute top-3 left-3 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           </div>
@@ -485,65 +470,56 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                         <div className="p-6 flex items-center gap-6">
                           {/* Icon */}
-                          <div className={`p-3 rounded-2xl shadow-xl flex-shrink-0 ${
-                            isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
-                            isPro ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                            'bg-gradient-to-br from-blue-500 to-cyan-500'
-                          }`}>
+                          <div className="p-3 rounded-lg bg-gray-700 flex-shrink-0">
                             <img
                               src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
                               alt={tier.name}
-                              className="w-14 h-14 object-contain drop-shadow-lg"
+                              className="w-14 h-14 object-contain"
                             />
                           </div>
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-baseline gap-3 mb-2">
-                              <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
+                              <h3 className="text-2xl font-semibold text-white">{tier.name}</h3>
                               <span className="text-sm text-gray-400">30 дней</span>
                             </div>
 
                             {/* Features Grid */}
                             <div className="grid grid-cols-3 gap-3">
-                              <div className="bg-black/20 rounded-lg p-2.5">
+                              <div className="bg-gray-900/40 rounded-lg p-2.5">
                                 <div className="text-xs text-gray-400 mb-1">Бонус к дропу</div>
-                                <div className={`text-lg font-bold ${
-                                  isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'
-                                }`}>+{tier.bonus_percentage}%</div>
+                                <div className="text-lg font-semibold text-white">+{tier.bonus_percentage}%</div>
                               </div>
-                              <div className="bg-black/20 rounded-lg p-2.5">
+                              <div className="bg-gray-900/40 rounded-lg p-2.5">
                                 <div className="text-xs text-gray-400 mb-1">
                                   {isPremium ? 'Без дубликатов' : 'Кейсов в день'}
                                 </div>
-                                <div className="text-lg font-bold text-white">
+                                <div className="text-lg font-semibold text-white">
                                   {isPremium ? '✓' : tier.max_daily_cases}
                                 </div>
                               </div>
-                              <div className="bg-black/20 rounded-lg p-2.5">
+                              <div className="bg-gray-900/40 rounded-lg p-2.5">
                                 <div className="text-xs text-gray-400 mb-1">VIP чат</div>
-                                <div className="text-lg font-bold text-green-400">✓</div>
+                                <div className="text-lg font-semibold text-white">✓</div>
                               </div>
                             </div>
                           </div>
 
                           {/* Price */}
                           <div className="flex-shrink-0 text-right">
-                            <div className="text-3xl font-bold text-white mb-1">
+                            <div className="text-3xl font-semibold text-white mb-1">
                               <Monetary value={tier.price} />
                             </div>
                           </div>
                         </div>
-
-                        {/* Hover Effect */}
-                        <div className={`absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
                       </button>
                     );
                   })}
                 </div>
 
                 {/* Info Text */}
-                <div className="text-sm text-gray-300 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/30 flex items-start gap-3">
+                <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 flex items-start gap-3">
                   <span className="text-xl">👑</span>
                   <div>
                     <p className="font-medium text-white mb-1">Преимущества VIP статуса</p>
@@ -558,16 +534,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
               </div>
 
               {/* Right Side - Purchase Summary */}
-              <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-6 border border-purple-500/20 shadow-lg space-y-5 h-fit sticky top-0 backdrop-blur-sm">
+              <div className="bg-gray-800/40 rounded-lg p-6 border border-gray-700/30 space-y-5 h-fit sticky top-0">
                 {selectedSubscription ? (
                   <>
                     {/* Selected Tier Preview */}
                     <div>
-                      <label className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-                        <RiVipCrownFill className="text-purple-400" />
+                      <label className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                        <RiVipCrownFill />
                         Выбранный статус
                       </label>
-                      <div className="bg-gray-900/70 border-2 border-purple-500/30 rounded-lg p-4">
+                      <div className="bg-gray-900/70 border border-gray-700/50 rounded-lg p-4">
                         {(() => {
                           const selectedTier = subscriptionTiers.find(t => t.id === selectedSubscription);
                           if (!selectedTier) return null;
@@ -578,11 +554,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           return (
                             <>
                               <div className="flex items-center gap-3 mb-4">
-                                <div className={`p-2.5 rounded-xl ${
-                                  isPremium ? 'bg-gradient-to-br from-yellow-500 to-orange-500' :
-                                  isPro ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
-                                  'bg-gradient-to-br from-blue-500 to-cyan-500'
-                                }`}>
+                                <div className="p-2.5 rounded-lg bg-gray-700">
                                   <img
                                     src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
                                     alt={selectedTier.name}
@@ -590,7 +562,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                                   />
                                 </div>
                                 <div>
-                                  <div className="text-xl font-bold text-white">{selectedTier.name}</div>
+                                  <div className="text-xl font-semibold text-white">{selectedTier.name}</div>
                                   <div className="text-sm text-gray-400">30 дней подписки</div>
                                 </div>
                               </div>
@@ -598,23 +570,23 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                               {/* Benefits List */}
                               <div className="space-y-2 mb-4">
                                 <div className="flex items-start gap-2 text-sm">
-                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">
-                                    Бонус <span className={`font-bold ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>+{selectedTier.bonus_percentage}%</span> к шансу выпадения
+                                    Бонус <span className="font-semibold text-white">+{selectedTier.bonus_percentage}%</span> к шансу выпадения
                                   </span>
                                 </div>
                                 <div className="flex items-start gap-2 text-sm">
-                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">
                                     {isPremium ? 'Предметы выпадают без дубликатов' : 'Доступ ко всем бонусам'}
                                   </span>
                                 </div>
                                 <div className="flex items-start gap-2 text-sm">
-                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">VIP значок в профиле и чате</span>
                                 </div>
                                 <div className="flex items-start gap-2 text-sm">
-                                  <span className={`mt-0.5 ${isPremium ? 'text-yellow-400' : isPro ? 'text-purple-400' : 'text-blue-400'}`}>✓</span>
+                                  <span className="mt-0.5 text-white">✓</span>
                                   <span className="text-gray-300">Приоритетная поддержка</span>
                                 </div>
                               </div>
@@ -631,43 +603,31 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     <button
                       onClick={() => handleSubscriptionPurchase(selectedSubscription)}
                       disabled={isSubscriptionLoading}
-                      className={`w-full py-4 bg-gradient-to-r disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-lg rounded-lg transition-all duration-200 flex items-center justify-center gap-3 uppercase tracking-wide shadow-xl hover:shadow-2xl disabled:shadow-none ${
-                        (() => {
-                          const selectedTier = subscriptionTiers.find(t => t.id === selectedSubscription);
-                          const isPremium = selectedTier?.id === 3;
-                          const isPro = selectedTier?.id === 2;
-
-                          return isPremium
-                            ? 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-yellow-500/30 hover:shadow-yellow-500/50'
-                            : isPro
-                            ? 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/30 hover:shadow-purple-500/50'
-                            : 'from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-blue-500/30 hover:shadow-blue-500/50';
-                        })()
-                      }`}
+                      className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-base rounded-lg transition-colors flex items-center justify-center gap-3"
                     >
-                      <RiVipCrownFill className="text-xl" />
+                      <RiVipCrownFill className="text-lg" />
                       <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить статус'}</span>
                     </button>
 
                     {/* Payment Method Selection */}
                     <div>
-                      <label className="text-sm font-semibold text-gray-300 mb-3 block">
+                      <label className="text-sm font-medium text-gray-300 mb-3 block">
                         Способ оплаты
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           onClick={() => setSelectedSubscriptionMethod('robokassa')}
                           className={`
-                            relative rounded-lg border-2 transition-all duration-300 p-4 h-20
+                            relative rounded-lg border transition-colors p-4 h-20
                             ${selectedSubscriptionMethod === 'robokassa'
-                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
-                              : 'bg-gray-900/50 border-gray-600/50 hover:border-purple-400/50'
+                              ? 'bg-gray-800 border-white'
+                              : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
                             }
                           `}
                         >
                           {selectedSubscriptionMethod === 'robokassa' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
@@ -682,16 +642,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         <button
                           onClick={() => setSelectedSubscriptionMethod('yookassa')}
                           className={`
-                            relative rounded-lg border-2 transition-all duration-300 p-4 h-20
+                            relative rounded-lg border transition-colors p-4 h-20
                             ${selectedSubscriptionMethod === 'yookassa'
-                              ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500 shadow-lg shadow-purple-500/20'
-                              : 'bg-gray-900/50 border-gray-600/50 hover:border-purple-400/50'
+                              ? 'bg-gray-800 border-white'
+                              : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
                             }
                           `}
                         >
                           {selectedSubscriptionMethod === 'yookassa' && (
-                            <div className="absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                              <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
@@ -706,7 +666,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 ) : (
                   /* No Selection State */
                   <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-lg bg-gray-800 flex items-center justify-center">
                       <img
                         src="/images/status+.png"
                         alt="VIP статус"
