@@ -324,7 +324,7 @@ const SlotPage: React.FC = () => {
             });
           } else {
             soundManager.play('slotLose');
-            toast(t('slots.game_result_no_luck'), { icon: '🎰' });
+            toast(t('slots.game_result_no_luck'));
           }
 
           refetchSlotStatus();
@@ -410,8 +410,9 @@ const SlotPage: React.FC = () => {
         {/* Улучшенный заголовок */}
         <div className="text-center mb-10">
           <div className="inline-block">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 animate-pulse">
-              🎰 {t('slots.title')}
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 animate-pulse flex items-center justify-center gap-4">
+              <img src="/images/status3.png" alt="Slot" className="w-16 h-16 object-contain" />
+              {t('slots.title')}
             </h1>
             <div className="h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full"></div>
           </div>
