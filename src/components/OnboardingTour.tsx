@@ -34,7 +34,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       id: 'free_cases',
       targetId: 'onboarding-cases',
       title: t('onboarding.free_cases_title', '🎁 2 Бесплатных Кейса!'),
-      description: t('onboarding.free_cases_description', 'Вот ваш бесплатный кейс! У вас есть 2 попытки: первая доступна прямо сейчас, вторая — в 16:00 МСК. Успейте открыть их в течение 2 дней с момента регистрации!'),
+      description: t('onboarding.free_cases_description', 'Вот ваш бесплатный кейс! У вас есть 2 попытки. Успейте открыть их!'),
       position: 'bottom',
       arrowDirection: 'down'
     },
