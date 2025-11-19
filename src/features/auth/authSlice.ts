@@ -54,14 +54,24 @@ const authSlice = createSlice({
     // Обновление данных пользователя
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
-        // Глубокое слияние для сложных объектов
-        state.user = {
-          ...state.user,
-          ...action.payload,
-          // Специальная обработка для массивов - полная замена если есть новые данные
-          inventory: action.payload.inventory || state.user.inventory,
-          achievements: action.payload.achievements || state.user.achievements,
-        };
+        // Проверяем, нужно ли обновление (сравниваем ID и основные поля)
+        const needsUpdate =
+          action.payload.id !== state.user.id ||
+          action.payload.username !== state.user.username ||
+          action.payload.balance !== state.user.balance ||
+          action.payload.email !== state.user.email ||
+          JSON.stringify(action.payload.inventory) !== JSON.stringify(state.user.inventory);
+
+        if (needsUpdate) {
+          // Глубокое слияние для сложных объектов
+          state.user = {
+            ...state.user,
+            ...action.payload,
+            // Специальная обработка для массивов - полная замена если есть новые данные
+            inventory: action.payload.inventory || state.user.inventory,
+            achievements: action.payload.achievements || state.user.achievements,
+          };
+        }
       }
     },
 

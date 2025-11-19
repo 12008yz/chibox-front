@@ -26,6 +26,8 @@ interface CaseListingProps {
     lastClaimDate: string | null;
     caseTemplateId: string;
   };
+  isAuthenticated?: boolean;
+  onAuthRequired?: () => void;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -37,7 +39,9 @@ const CaseListing: React.FC<CaseListingProps> = ({
   nextCaseAvailableTime,
   onDataUpdate,
   onPlayBonusGame,
-  freeCaseStatus
+  freeCaseStatus,
+  isAuthenticated = false,
+  onAuthRequired
 }) => {
   const { t } = useTranslation();
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
@@ -115,6 +119,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       isBonusCase={true}
                       onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
                       isTicTacToeCase={isTicTacToeCase}
+                      isAuthenticated={isAuthenticated}
+                      onAuthRequired={onAuthRequired}
                     />
                   </div>
                 );

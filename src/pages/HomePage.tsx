@@ -110,6 +110,12 @@ const HomePage: React.FC = () => {
     setShowSafeCrackerGame(true);
   };
 
+  // Обработчик для показа модального окна авторизации
+  const handleAuthRequired = () => {
+    console.log('HomePage: Требуется авторизация, перенаправляем на /login');
+    navigate('/login');
+  };
+
 
 
 
@@ -426,6 +432,8 @@ const HomePage: React.FC = () => {
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             freeCaseStatus={freeCaseStatus?.data}
+                            isAuthenticated={!!userData?.id}
+                            onAuthRequired={handleAuthRequired}
                           />
                         </div>
                       )}
@@ -441,6 +449,8 @@ const HomePage: React.FC = () => {
                             fixedPrices={true}
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
+                            isAuthenticated={!!userData?.id}
+                            onAuthRequired={handleAuthRequired}
                           />
                         </div>
                       )}

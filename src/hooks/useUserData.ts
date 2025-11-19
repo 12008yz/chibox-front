@@ -36,7 +36,7 @@ export const useUserData = (options: {
         dispatch(updateUser(currentUserData.user));
       }
     }
-  }, [currentUserData?.success, currentUserData?.user?.id, dispatch]);
+  }, [currentUserData?.user?.id, dispatch]);
 
   return {
     userData: currentUserData?.user,

@@ -14,9 +14,11 @@ interface CaseProps {
   isBonusCase?: boolean;
   onPlayBonusGame?: () => void;
   isTicTacToeCase?: boolean;
+  isAuthenticated?: boolean;
+  onAuthRequired?: () => void;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame, isTicTacToeCase = false }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame, isTicTacToeCase = false, isAuthenticated = false, onAuthRequired }) => {
   const { t } = useTranslation();
 
   // Функция для перевода названий кейсов
@@ -124,10 +126,19 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             onClick={(e) => {
               console.log('=== КНОПКА ИГРАТЬ НАЖАТА ===');
               console.log('Кнопка "Играть" нажата для кейса:', title);
-              console.log('Event target:', e.target);
-              console.log('Event currentTarget:', e.currentTarget);
+              console.log('isAuthenticated:', isAuthenticated);
               e.preventDefault();
               e.stopPropagation();
+
+              // Проверяем авторизацию пользователя
+              if (!isAuthenticated) {
+                console.log('Пользователь не авторизован, показываем модальное окно');
+                if (onAuthRequired) {
+                  onAuthRequired();
+                }
+                return;
+              }
+
               if (onPlayBonusGame) {
                 console.log('Вызываем onPlayBonusGame для кейса:', title);
                 try {
@@ -141,7 +152,12 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
               }
               console.log('=== КОНЕЦ ОБРАБОТКИ КНОПКИ ИГРАТЬ ===');
             }}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
+            disabled={!isAuthenticated}
+            className={`mt-2 px-4 py-2 rounded transition-colors text-sm font-medium ${
+              isAuthenticated
+                ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
+            }`}
           >
             🎮 {t('common.play')}
           </button>
