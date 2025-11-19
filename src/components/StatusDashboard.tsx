@@ -67,7 +67,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
 
   // Количество попыток в зависимости от уровня подписки
-  const attemptsCount = subscriptionTier + 2; // 1->3, 2->4, 3->5
+  const attemptsCount = subscriptionTier; // 1->1, 2->2, 3->3
 
   // Доступные активности
   const bonusActivities: BonusActivity[] = [
@@ -92,7 +92,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       id: 'slots',
       name: t('slots.title'),
-      description: `${attemptsCount} ${t('modals.daily_attempts')} | +${currentStatus.bonus}% к шансу`,
+      description: `Испытай удачу в слоте`,
       icon: <img src="/images/status3.png" alt="Слот-машина" className="w-16 h-16 object-contain"/>,
       color: '',
       available: true,
@@ -297,15 +297,15 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300">{t('modals.tic_tac_toe_attempts')}</span>
-                  <span className="text-purple-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
+                  <span className="text-purple-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300">{t('modals.safe_cracker_attempts')}</span>
-                  <span className="text-yellow-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
+                  <span className="text-yellow-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300">{t('modals.slots_attempts')}</span>
-                  <span className="text-cyan-400 font-bold">{subscriptionTier + 2} {t('modals.daily_attempts')}</span>
+                  <span className="text-cyan-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300">{t('modals.item_withdrawal')}</span>
