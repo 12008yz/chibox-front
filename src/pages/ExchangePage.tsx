@@ -8,7 +8,6 @@ import {
   useExchangeItemForSubscriptionMutation,
   useGetUserSubscriptionQuery
 } from '../features/user/userApi';
-import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import Monetary from '../components/Monetary';
 import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
@@ -383,8 +382,6 @@ const ExchangePage: React.FC = () => {
       />
       {/* Затемняющий оверлей */}
       <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 -z-40"></div>
-
-      <ScrollToTopOnMount />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Простой игровой заголовок */}
