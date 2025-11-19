@@ -14,6 +14,7 @@ import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 import SafeCrackerButton from '../SafeCrackerButton';
+import AuthModal from '../../AuthModal';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -31,6 +32,8 @@ const RightContent: React.FC<RightContentProps> = ({
   const dispatch = useAppDispatch();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
 
   // Получаем количество непрочитанных уведомлений
   const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadNotificationsCountQuery(undefined, {
@@ -74,20 +77,34 @@ const RightContent: React.FC<RightContentProps> = ({
 
   if (!user) {
     return (
-      <div className="flex items-center space-x-3">
-        <button
-          onClick={() => navigate('/login')}
-          className="gaming-button gaming-button-secondary"
-        >
-          {t('header.login')}
-        </button>
-        <button
-          onClick={() => navigate('/register')}
-          className="gaming-button gaming-button-primary"
-        >
-          {t('header.register')}
-        </button>
-      </div>
+      <>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => {
+              setAuthModalTab('login');
+              setIsAuthModalOpen(true);
+            }}
+            className="gaming-button gaming-button-secondary"
+          >
+            {t('header.login')}
+          </button>
+          <button
+            onClick={() => {
+              setAuthModalTab('register');
+              setIsAuthModalOpen(true);
+            }}
+            className="gaming-button gaming-button-primary"
+          >
+            {t('header.register')}
+          </button>
+        </div>
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          defaultTab={authModalTab}
+        />
+      </>
     );
   }
 
