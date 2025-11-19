@@ -21,6 +21,8 @@ const PublicProfilePage: React.FC = () => {
   const [caseItemsList, setCaseItemsList] = useState<any[]>([]);
  // State для переключения между категориями инвентаря
  const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
+  // State для сохранения изначальных счетчиков
+  const [totalCounts, setTotalCounts] = useState<{ inventory: number; caseItems: number } | null>(null);
   // Определяем текущую страницу в зависимости от активного таба
   const currentPage = activeInventoryTab === 'active' ? activePage : openedPage;
 
@@ -34,6 +36,16 @@ const PublicProfilePage: React.FC = () => {
 
   // State для отслеживания, нужно ли загружать больше данных
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // Сохраняем изначальные счетчики при первой загрузке
+  React.useEffect(() => {
+    if (profileData?.user && !totalCounts) {
+      setTotalCounts({
+        inventory: profileData.user.inventoryPagination?.total || 0,
+        caseItems: profileData.user.caseItemsPagination?.total || 0
+      });
+    }
+  }, [profileData, totalCounts]);
 
   // Сбрасываем данные при переключении табов
   React.useEffect(() => {
@@ -576,7 +588,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   {t('public_profile.items_tab')}
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.inventoryPagination?.total || getActiveInventory().length}</span>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{totalCounts?.inventory || user.inventoryPagination?.total || getActiveInventory().length}</span>
                 </button>
 
                 <button
@@ -596,7 +608,7 @@ const PublicProfilePage: React.FC = () => {
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   {t('public_profile.opened_cases_tab')}
-                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{user.totalCasesOpened || 0}</span>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{totalCounts?.caseItems || user.caseItemsPagination?.total || 0}</span>
                 </button>
               </div>
 
