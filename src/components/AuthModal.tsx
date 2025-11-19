@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -138,7 +139,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Preload video */}
       <video ref={videoRef} className="hidden" preload="auto">
@@ -399,24 +400,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                         </motion.div>
                       )}
 
-                      {/* Features preview */}
-                      <div className="grid grid-cols-3 gap-3 mb-5">
-                        <div className="text-center p-3 bg-cyan-500/10 border border-cyan-400/30 rounded-xl hover:bg-cyan-500/20 transition-colors">
-                          <div className="text-cyan-400 text-xl mb-1.5 flex justify-center">
-                            <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6" />
-                          </div>
-                          <div className="text-xs text-cyan-300 font-semibold">{t('auth.bonuses')}</div>
-                        </div>
-                        <div className="text-center p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl hover:bg-blue-500/20 transition-colors">
-                          <div className="text-blue-400 text-xl mb-1.5">🎁</div>
-                          <div className="text-xs text-blue-300 font-semibold">{t('auth.cases')}</div>
-                        </div>
-                        <div className="text-center p-3 bg-lime-500/10 border border-lime-400/30 rounded-xl hover:bg-lime-500/20 transition-colors">
-                          <div className="text-lime-400 text-xl mb-1.5">⭐</div>
-                          <div className="text-xs text-lime-300 font-semibold">{t('auth.prizes')}</div>
-                        </div>
-                      </div>
-
                       <button
                         type="submit"
                         disabled={isRegisterLoading || isLoginLoading}
@@ -453,7 +436,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
           </div>
         </motion.div>
       </AnimatePresence>
-    </>
+    </>,
+    document.body
   );
 };
 

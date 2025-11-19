@@ -32,6 +32,10 @@ interface HeaderProps {
   notification?: any;
   setNotification?: React.Dispatch<React.SetStateAction<any>>;
   user?: any;
+  authModalOpen?: boolean;
+  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  authModalTab?: 'login' | 'register';
+  setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -39,7 +43,11 @@ const Header: React.FC<HeaderProps> = ({
   recentCaseOpenings = [],
   notification,
   setNotification,
-  user
+  user,
+  authModalOpen,
+  setAuthModalOpen,
+  authModalTab,
+  setAuthModalTab
 }) => {
   const [openNotifications, setOpenNotifications] = useState<boolean>(false);
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
@@ -145,6 +153,10 @@ const Header: React.FC<HeaderProps> = ({
             openSidebar={openSidebar}
             setOpenSidebar={setOpenSidebar}
             user={user}
+            authModalOpen={authModalOpen}
+            setAuthModalOpen={setAuthModalOpen}
+            authModalTab={authModalTab}
+            setAuthModalTab={setAuthModalTab}
           />
         </div>
       </div>

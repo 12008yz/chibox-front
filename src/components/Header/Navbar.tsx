@@ -16,6 +16,10 @@ interface NavbarProps {
   openSidebar: boolean;
   setOpenSidebar: (open: boolean) => void;
   user?: any;
+  authModalOpen?: boolean;
+  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  authModalTab?: 'login' | 'register';
+  setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -23,7 +27,11 @@ const Navbar: React.FC<NavbarProps> = ({
   setOpenNotifications,
   openSidebar,
   setOpenSidebar,
-  user
+  user,
+  authModalOpen,
+  setAuthModalOpen,
+  authModalTab,
+  setAuthModalTab
 }) => {
   const { t } = useTranslation();
 
@@ -144,6 +152,10 @@ const Navbar: React.FC<NavbarProps> = ({
               openNotifications={openNotifications}
               setOpenNotifications={setOpenNotifications}
               user={user}
+              authModalOpen={authModalOpen}
+              setAuthModalOpen={setAuthModalOpen}
+              authModalTab={authModalTab}
+              setAuthModalTab={setAuthModalTab}
             />
           </div>
         </div>
