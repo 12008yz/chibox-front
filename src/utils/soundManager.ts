@@ -15,7 +15,7 @@ class SoundManager {
     upgrade: '/sounds/upgrade.mp3',
     notification: '/sounds/notifications.mp3',
     openCase: '/sounds/openCase fromInvintory.mp3',
-    slotSpin: '/sounds/slot.mp3',
+    slotSpin: '/sounds/zvuk_slot.wav',
     slotWin: '/sounds/slot win.mp3',
     slotLose: '/sounds/slot loose.mp3',
     gameOver: '/sounds/gameOver.mp3',

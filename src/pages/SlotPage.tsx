@@ -472,10 +472,6 @@ const SlotPage: React.FC = () => {
             {auth.user && slotStatusData?.data && (
               <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
-                    📋 Информация о подписке
-                  </h3>
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
                       <div className="text-gray-400 text-sm font-medium mb-2">Ваш уровень</div>
