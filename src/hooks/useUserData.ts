@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppDispatch } from '../store/hooks';
 import { updateUser } from '../features/auth/authSlice';
 import { useGetCurrentUserQuery } from '../features/auth/authApi';
@@ -13,6 +13,7 @@ export const useUserData = (options: {
 } = {}) => {
   const { autoRefresh = false, refetchOnMount = true } = options;
   const dispatch = useAppDispatch();
+  const lastUserIdRef = useRef<string | null>(null);
 
   const {
     data: currentUserData,
@@ -26,11 +27,16 @@ export const useUserData = (options: {
   });
 
   // Обновляем данные пользователя в store при получении новых данных
+  // Используем ref для предотвращения бесконечного цикла
   useEffect(() => {
     if (currentUserData?.success && currentUserData.user) {
-      dispatch(updateUser(currentUserData.user));
+      // Обновляем только если данные действительно изменились
+      if (lastUserIdRef.current !== currentUserData.user.id) {
+        lastUserIdRef.current = currentUserData.user.id;
+        dispatch(updateUser(currentUserData.user));
+      }
     }
-  }, [currentUserData, dispatch]);
+  }, [currentUserData?.success, currentUserData?.user?.id, dispatch]);
 
   return {
     userData: currentUserData?.user,

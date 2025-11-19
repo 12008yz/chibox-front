@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUpdateUserProfileMutation } from '../../../../features/user/userApi';
 import { validateUsername, suggestAlternativeUsername } from '../../../../utils/profanityFilter';
@@ -28,10 +28,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateUserProfileMutation();
 
-  const [tradeUrl, setTradeUrl] = useState('');
-  const [newUsername, setNewUsername] = useState('');
+  const [tradeUrl, setTradeUrl] = useState(() => user?.steam_trade_url || '');
+  const [newUsername, setNewUsername] = useState(() => user?.username || '');
   const [usernameError, setUsernameError] = useState('');
   const [isFetchingTradeUrl, setIsFetchingTradeUrl] = useState(false);
+  const prevIsOpenRef = useRef(false);
 
   // Блокировка скролла при открытии модального окна
   useEffect(() => {
@@ -47,15 +48,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     };
   }, [isOpen]);
 
-  // Синхронизируем данные с пользователем
+  // Синхронизируем данные с пользователем ТОЛЬКО при открытии модального окна (переход false -> true)
   useEffect(() => {
-    if (user?.steam_trade_url) {
-      setTradeUrl(user.steam_trade_url);
+    if (isOpen && !prevIsOpenRef.current) {
+      // Окно только что открылось
+      setTradeUrl(user?.steam_trade_url || '');
+      setNewUsername(user?.username || '');
     }
-    if (user?.username) {
-      setNewUsername(user.username);
-    }
-  }, [user?.steam_trade_url, user?.username]);
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // Обработчик изменения имени пользователя с валидацией
   const handleUsernameChange = (newValue: string) => {
