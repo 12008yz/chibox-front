@@ -308,7 +308,7 @@ const UpgradeAnimationComponent: React.FC<{
         if (upgradeResult.upgrade_success) {
           soundManager.play('win');
         } else {
-          soundManager.play('horrorLose');
+          soundManager.play('looseUpgrade');
         }
       }, 3000); // 3 секунды вращения
 

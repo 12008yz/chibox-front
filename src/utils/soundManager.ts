@@ -22,6 +22,7 @@ class SoundManager {
     win: '/sounds/torzhestvo.mp3',
     lose: '/sounds/losing-lose.mp3',
     horrorLose: '/sounds/horror-loose.mp3',
+    looseUpgrade: '/sounds/loose_upgrade.wav',
     process: '/sounds/PPP.mp3',
     endProcess: '/sounds/end PPP.mp3',
     change: '/sounds/+-.mp3',
