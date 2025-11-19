@@ -135,7 +135,8 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
     <div className={`relative w-80 h-96 overflow-hidden rounded-2xl border-2 transition-all duration-500
       border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.3)]
       ${isLastReel && isSlowingDown ? 'scale-[1.02]' : 'scale-100'}
-      bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900`}>
+      bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900`}
+      style={{ contain: 'layout style paint' }}>
 
       {/* Внутренняя подсветка */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5 pointer-events-none rounded-2xl"></div>
@@ -165,7 +166,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               className={`h-40 w-full border-b border-gray-700/30 ${getRarityColor(item.rarity)}
                 flex items-center justify-center relative
                 transition-all duration-300
-                ${isSpinning ? 'blur-[1px]' : 'blur-0'}`}
+                ${isSpinning ? '' : ''}`}
               style={{
                 willChange: isSpinning ? 'transform' : 'auto'
               }}
@@ -187,7 +188,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
               {/* Название внизу с улучшенным стилем */}
               <div className="absolute bottom-2 left-2 right-2 text-center">
-                <div className="text-xs text-white font-medium bg-black/80 backdrop-blur-sm rounded-lg px-2 py-1 truncate border border-white/10 shadow-lg">
+                <div className="text-xs text-white font-medium bg-black/80  rounded-lg px-2 py-1 truncate border border-white/10 shadow-lg">
                   {item.name.length > 18 ? `${item.name.substring(0, 18)}...` : item.name}
                 </div>
               </div>
@@ -228,39 +229,27 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       {/* Нижний градиент для размытия */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none z-10"></div>
 
-      {/* Эффект победы - элегантные золотые лучи */}
+      {/* Оптимизированный эффект дыма при победе */}
       {showWinEffect && isWinning && (
-        <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
-          {/* Золотые лучи из центра */}
-          {[...Array(6)].map((_, i) => (
+        <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden" style={{ contain: 'layout style paint' }}>
+          {/* Уменьшенное количество облаков дыма - 4 штуки вместо 18 */}
+          {[...Array(4)].map((_, i) => (
             <div
-              key={i}
-              className="absolute left-1/2 top-1/2 w-1 bg-gradient-to-t from-yellow-400/60 via-yellow-300/40 to-transparent"
+              key={`smoke-${i}`}
+              className="absolute rounded-full opacity-0"
               style={{
-                height: '200%',
-                transformOrigin: 'center bottom',
-                transform: `translate(-50%, -50%) rotate(${i * 60}deg)`,
-                animation: 'rayPulse 2s ease-in-out infinite',
-                animationDelay: `${i * 0.1}s`
+                left: `${15 + i * 23}%`,
+                bottom: '-10%',
+                width: '110px',
+                height: '110px',
+                background: `radial-gradient(circle, rgba(200, 200, 200, 0.35) 0%, transparent 65%)`,
+                filter: 'blur(10px)',
+                animation: `smokeRise 3s ease-out forwards`,
+                animationDelay: `${i * 0.2}s`,
+                willChange: 'transform, opacity'
               }}
             />
           ))}
-
-          {/* Центральное свечение */}
-          <div className="absolute left-1/2 top-1/2 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl animate-pulse"
-               style={{ transform: 'translate(-50%, -50%)' }} />
-
-          {/* Волновые круги */}
-          <div className="absolute left-1/2 top-1/2 w-20 h-20 border-2 border-yellow-400/40 rounded-full"
-               style={{
-                 transform: 'translate(-50%, -50%)',
-                 animation: 'ripple 2s ease-out infinite'
-               }} />
-          <div className="absolute left-1/2 top-1/2 w-20 h-20 border-2 border-yellow-400/40 rounded-full"
-               style={{
-                 transform: 'translate(-50%, -50%)',
-                 animation: 'ripple 2s ease-out infinite 1s'
-               }} />
         </div>
       )}
     </div>
@@ -433,32 +422,29 @@ const SlotPage: React.FC = () => {
 
         {/* Игровая область */}
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gray-900/40 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50 shadow-2xl">
+          <div className="bg-gray-900/80 rounded-3xl p-8 border border-gray-700/50 shadow-2xl">
 
             {/* Игровое поле */}
             <div className="bg-gradient-to-b from-gray-950/50 to-gray-900/50 rounded-2xl p-8 mb-8 border border-gray-800/50 relative overflow-hidden">
-              {/* Декоративные элементы */}
-              <div className="absolute top-0 left-1/4 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
 
-              {/* Общий эффект победы для всей игровой области */}
+              {/* Оптимизированный общий эффект дыма для всей игровой области */}
               {!isSpinning && isWinning && (
-                <div className="absolute inset-0 pointer-events-none z-50">
-                  {/* Золотое свечение по краям */}
-                  <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_60px_rgba(250,204,21,0.3)] border-2 border-yellow-400/30"></div>
-
-                  {/* Конфетти падающее сверху */}
-                  {[...Array(12)].map((_, i) => (
+                <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden" style={{ contain: 'layout style paint' }}>
+                  {/* Уменьшенное количество облаков дыма - 6 штук вместо 31 */}
+                  {[...Array(6)].map((_, i) => (
                     <div
-                      key={i}
-                      className="absolute w-3 h-3 rounded-sm"
+                      key={`global-smoke-${i}`}
+                      className="absolute rounded-full opacity-0"
                       style={{
-                        left: `${10 + i * 7}%`,
-                        top: '-10%',
-                        background: i % 3 === 0 ? '#fbbf24' : i % 3 === 1 ? '#fb923c' : '#fcd34d',
-                        animation: `fall ${2 + Math.random()}s linear infinite`,
-                        animationDelay: `${i * 0.1}s`,
-                        transform: `rotate(${Math.random() * 360}deg)`
+                        left: `${10 + i * 15}%`,
+                        bottom: '-15%',
+                        width: '140px',
+                        height: '140px',
+                        background: `radial-gradient(circle, rgba(210, 210, 210, 0.3) 0%, transparent 65%)`,
+                        filter: 'blur(12px)',
+                        animation: `smokeRise 3.5s ease-out forwards`,
+                        animationDelay: `${i * 0.15}s`,
+                        willChange: 'transform, opacity'
                       }}
                     />
                   ))}
@@ -483,7 +469,7 @@ const SlotPage: React.FC = () => {
 
             {/* Улучшенная информация о подписке */}
             {auth.user && slotStatusData?.data && (
-              <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-gray-700/50">
+              <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6">
                     📋 Информация о подписке
@@ -524,7 +510,7 @@ const SlotPage: React.FC = () => {
 
                   {/* Бесплатные попытки */}
                   {slotStatusData.data.free_attempts_remaining > 0 && (
-                    <div className="mt-6 p-5 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/50 rounded-2xl backdrop-blur-sm">
+                    <div className="mt-6 p-5 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/50 rounded-2xl ">
                       <div className="text-green-300 font-bold text-lg mb-2">
                         🎁 Бесплатные попытки: {slotStatusData.data.free_attempts_remaining} из 2
                       </div>
@@ -583,7 +569,7 @@ const SlotPage: React.FC = () => {
               {!canPlay && auth.user && (
                 <>
                   {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
-                    <div className="mt-6 p-5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/50 rounded-2xl text-red-300 max-w-sm mx-auto backdrop-blur-sm">
+                    <div className="mt-6 p-5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/50 rounded-2xl text-red-300 max-w-sm mx-auto ">
                       <div className="font-bold text-lg">💎 Требуется статус</div>
                       <div className="text-sm mt-2">Оформите статус для игры в слот</div>
                     </div>
@@ -592,13 +578,13 @@ const SlotPage: React.FC = () => {
               )}
 
               {!auth.user && (
-                <div className="mt-6 p-5 bg-gradient-to-r from-yellow-900/30 to-amber-900/30 border border-yellow-500/50 rounded-2xl text-yellow-300 max-w-sm mx-auto backdrop-blur-sm">
+                <div className="mt-6 p-5 bg-gradient-to-r from-yellow-900/30 to-amber-900/30 border border-yellow-500/50 rounded-2xl text-yellow-300 max-w-sm mx-auto ">
                   <div className="font-bold text-lg">{t('slots.please_login')}</div>
                 </div>
               )}
 
               {displayItems.length === 0 && (
-                <div className="mt-6 p-5 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/50 rounded-2xl text-blue-300 max-w-sm mx-auto backdrop-blur-sm">
+                <div className="mt-6 p-5 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/50 rounded-2xl text-blue-300 max-w-sm mx-auto ">
                   <div className="font-bold text-lg">{t('slots.loading_items_status')}</div>
                 </div>
               )}
@@ -617,24 +603,21 @@ const SlotPage: React.FC = () => {
           }
         }
 
-        @keyframes rayPulse {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.8; }
-        }
-
-        @keyframes ripple {
-          0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
-        }
-
-        @keyframes fall {
+        @keyframes smokeRise {
           0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
+            transform: translateY(0) scale(0.8);
+            opacity: 0;
+          }
+          20% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 0.6;
+            transform: translateY(-250px) scale(1.3);
           }
           100% {
-            transform: translateY(600px) rotate(360deg);
-            opacity: 0.3;
+            transform: translateY(-450px) scale(1.8);
+            opacity: 0;
           }
         }
       `}</style>
