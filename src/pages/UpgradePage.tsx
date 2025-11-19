@@ -259,17 +259,24 @@ const UpgradeAnimationComponent: React.FC<{
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, delay: number}>>([]);
 
   React.useEffect(() => {
     // Плавный скролл вверх при начале анимации
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Генерируем частицы для подготовки
+    const prepareParticles = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 0.5
+    }));
+    setParticles(prepareParticles);
+
     // Начинаем анимацию
     const timer1 = setTimeout(() => {
       setPhase('spinning');
-      // Увеличиваем рулетку во время вращения
-      setScale(1.5);
 
       // Воспроизводим звук апгрейда в момент начала вращения
       soundManager.play('upgrade');
@@ -293,7 +300,7 @@ const UpgradeAnimationComponent: React.FC<{
       }
 
       // Добавляем полные обороты и инвертируем угол (так как рулетка крутится против часовой стрелки)
-      const fullRotations = 1080; // 3 полных оборота
+      const fullRotations = 1440; // 4 полных оборота для большей драматичности
       // Инвертируем угол, чтобы указатель корректно указывал на нужную зону
       setFinalRotation(fullRotations - targetAngle);
 
@@ -301,19 +308,25 @@ const UpgradeAnimationComponent: React.FC<{
       const timer2 = setTimeout(() => {
         setPhase('showing_result');
         setShowResult(true);
-        // Возвращаем рулетку к нормальному размеру
-        setScale(1);
 
         // Воспроизводим звук результата
         if (upgradeResult.upgrade_success) {
           soundManager.play('win');
+          // Генерируем праздничные частицы при успехе
+          const successParticles = Array.from({ length: 24 }, (_, i) => ({
+            id: i + 100,
+            x: 50 + Math.cos((i / 24) * Math.PI * 2) * 40 + (Math.random() - 0.5) * 10,
+            y: 50 + Math.sin((i / 24) * Math.PI * 2) * 40 + (Math.random() - 0.5) * 10,
+            delay: i * 0.02
+          }));
+          setParticles(successParticles);
         } else {
           soundManager.play('looseUpgrade');
         }
-      }, 3000); // 3 секунды вращения
+      }, 3500); // 3.5 секунды вращения
 
       return () => clearTimeout(timer2);
-    }, 500); // 0.5 секунды подготовки
+    }, 600); // 0.6 секунды подготовки
 
     return () => clearTimeout(timer1);
   }, [upgradeResult]);
@@ -329,38 +342,142 @@ const UpgradeAnimationComponent: React.FC<{
     }
   };
 
+  const successChance = upgradeResult.data.success_chance;
+  const isSuccess = upgradeResult.upgrade_success;
+
   return (
-    <div className="text-center py-8">
+    <div className="text-center py-8 relative">
+      {/* Фоновое свечение */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
+        {phase === 'preparing' && (
+          <div className="w-96 h-96 bg-gradient-radial from-purple-500/20 via-transparent to-transparent rounded-full animate-pulse" />
+        )}
+        {phase === 'spinning' && (
+          <div className="w-[500px] h-[500px] bg-gradient-radial from-cyan-500/30 via-purple-500/20 to-transparent rounded-full animate-spin-slow" />
+        )}
+        {phase === 'showing_result' && (
+          <div className={`w-[600px] h-[600px] rounded-full animate-ping-slow ${
+            isSuccess ? 'bg-gradient-radial from-emerald-500/30 to-transparent' : 'bg-gradient-radial from-rose-500/30 to-transparent'
+          }`} />
+        )}
+      </div>
+
+      {/* Частицы */}
+      {phase === 'preparing' && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map(p => (
+            <div
+              key={p.id}
+              className="absolute w-1 h-1 bg-purple-400 rounded-full opacity-0 animate-float-particle"
+              style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                animationDelay: `${p.delay}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {phase === 'showing_result' && isSuccess && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map(p => (
+            <div
+              key={p.id}
+              className="absolute w-2 h-2 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full opacity-0 animate-burst-particle"
+              style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                animationDelay: `${p.delay}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Главная анимация */}
-      <div className="relative mt-16 mb-16 flex justify-center">
-        <div className="relative">
-          {/* Указатель */}
+      <div className="relative mt-20 mb-20 flex justify-center z-10">
+        <div className="relative w-[320px] h-[320px] flex items-center justify-center">
+          {/* Внешнее кольцо с пульсацией */}
+          <div className={`absolute inset-0 rounded-full border-2 transition-all duration-1000 ${
+            phase === 'preparing' ? 'border-purple-500/40 scale-95 opacity-0' :
+            phase === 'spinning' ? 'border-cyan-500/50 scale-100 opacity-100 animate-pulse-ring-simple' :
+            isSuccess ? 'border-emerald-500/60 scale-105 opacity-100' : 'border-rose-500/60 scale-105 opacity-100'
+          }`} />
+
+          {/* Указатель с эффектом свечения */}
           <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
-            <div className="w-0 h-0 border-l-6 border-r-6 border-b-8 border-l-transparent border-r-transparent border-b-slate-300 drop-shadow-lg"></div>
+            <div className="relative">
+              <div className={`w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent transition-all duration-500 ${
+                phase === 'preparing' ? 'border-t-purple-400/80' :
+                phase === 'spinning' ? 'border-t-cyan-400 drop-shadow-glow-cyan animate-bounce-subtle' :
+                isSuccess ? 'border-t-emerald-400 drop-shadow-glow-emerald' : 'border-t-rose-400 drop-shadow-glow-rose'
+              }`} />
+              {phase === 'spinning' && (
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-6 bg-cyan-400/30 rounded-full blur-sm animate-ping" />
+              )}
+            </div>
           </div>
 
           {/* Основная рулетка */}
           <div
-            className="w-60 h-60 rounded-full border-4 border-slate-600/50 relative overflow-hidden shadow-2xl backdrop-blur-sm"
+            className={`w-72 h-72 rounded-full relative overflow-hidden transition-all duration-700 ${
+              phase === 'preparing' ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+            }`}
             style={{
               background: `conic-gradient(
-                #059669 0% ${upgradeResult.data.success_chance}%,
-                #64748b ${upgradeResult.data.success_chance}% 100%
+                from 0deg,
+                #10b981 0% ${successChance}%,
+                #475569 ${successChance}% 100%
               )`,
               transform: phase === 'spinning' || phase === 'showing_result'
-                ? `rotate(${finalRotation}deg) scale(${scale})`
-                : `rotate(0deg) scale(${scale})`,
+                ? `rotate(${finalRotation}deg)`
+                : 'rotate(0deg)',
               transition: phase === 'spinning'
-                ? 'transform 3s cubic-bezier(0.05, 0.5, 0.3, 0.95)'
-                : 'transform 0.5s ease-out'
+                ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99)'
+                : 'all 0.7s ease-out',
+              boxShadow: phase === 'spinning'
+                ? '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+                : phase === 'showing_result'
+                  ? isSuccess
+                    ? '0 0 80px rgba(16, 185, 129, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+                    : '0 0 80px rgba(244, 63, 94, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+                  : '0 0 40px rgba(139, 92, 246, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.3)'
             }}
           >
+            {/* Градиентный оверлей */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/20 pointer-events-none" />
+
+            {/* Деления на рулетке */}
+            {Array.from({ length: 36 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute top-0 left-1/2 w-[1px] h-3 bg-white/20 origin-top"
+                style={{
+                  transform: `rotate(${i * 10}deg) translateX(-0.5px)`
+                }}
+              />
+            ))}
+
             {/* Центральный элемент */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20">
-              <div className="w-full h-full rounded-full flex items-center justify-center bg-slate-800/90 border border-slate-500">
-                <div className="text-slate-200 font-medium text-center">
-                  <div className="text-lg">{upgradeResult.data.success_chance}%</div>
-                  <div className="text-xs text-slate-400">шанс</div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24">
+              <div className={`w-full h-full rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
+                phase === 'preparing' ? 'bg-slate-900/95 border-purple-500/50' :
+                phase === 'spinning' ? 'bg-slate-900/95 border-cyan-500/70 shadow-lg shadow-cyan-500/30' :
+                isSuccess ? 'bg-emerald-950/95 border-emerald-500/70 shadow-lg shadow-emerald-500/30' :
+                'bg-rose-950/95 border-rose-500/70 shadow-lg shadow-rose-500/30'
+              }`}>
+                <div className="text-center">
+                  <div className={`text-2xl font-bold transition-all duration-500 ${
+                    phase === 'preparing' ? 'text-purple-300' :
+                    phase === 'spinning' ? 'text-cyan-300' :
+                    isSuccess ? 'text-emerald-300' : 'text-rose-300'
+                  }`}>{successChance}%</div>
+                  <div className={`text-xs transition-all duration-500 ${
+                    phase === 'preparing' ? 'text-purple-400/70' :
+                    phase === 'spinning' ? 'text-cyan-400/70' :
+                    isSuccess ? 'text-emerald-400/70' : 'text-rose-400/70'
+                  }`}>шанс</div>
                 </div>
               </div>
             </div>
@@ -369,10 +486,10 @@ const UpgradeAnimationComponent: React.FC<{
           {/* Результат - показываем только после завершения анимации */}
           {showResult && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-              <div className={`text-4xl font-light animate-bounce ${
-                upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400'
+              <div className={`text-7xl font-bold animate-scale-in ${
+                isSuccess ? 'text-emerald-400 drop-shadow-glow-emerald' : 'text-rose-400 drop-shadow-glow-rose'
               }`}>
-                {upgradeResult.upgrade_success ? '✓' : '✕'}
+                {isSuccess ? '✓' : '✕'}
               </div>
             </div>
           )}
@@ -380,17 +497,20 @@ const UpgradeAnimationComponent: React.FC<{
       </div>
 
       {/* Текст состояния */}
-      <div className="mb-6">
-        <h2 className={`text-3xl font-light mb-3 transition-all duration-700 ${
-          phase === 'showing_result'
-            ? (upgradeResult.upgrade_success ? 'text-emerald-400' : 'text-rose-400')
-            : 'text-slate-200'
+      <div className="mb-8 relative z-10">
+        <h2 className={`text-4xl font-bold mb-4 transition-all duration-700 ${
+          phase === 'preparing' ? 'text-purple-300 opacity-0 translate-y-4' :
+          phase === 'spinning' ? 'text-cyan-300 opacity-100 translate-y-0' :
+          isSuccess ? 'text-emerald-400 opacity-100 translate-y-0 drop-shadow-glow-emerald' :
+          'text-rose-400 opacity-100 translate-y-0 drop-shadow-glow-rose'
         }`}>
           {getPhaseTitle()}
         </h2>
-        <p className="text-slate-400 text-lg font-light">
+        <p className={`text-slate-300 text-lg transition-all duration-700 ${
+          phase === 'preparing' ? 'opacity-0' : 'opacity-100'
+        }`}>
           {phase === 'showing_result'
-            ? (upgradeResult.upgrade_success
+            ? (isSuccess
                 ? 'Ваш предмет успешно улучшен'
                 : 'Попытка улучшения не удалась')
             : 'Пожалуйста, подождите...'
@@ -400,22 +520,22 @@ const UpgradeAnimationComponent: React.FC<{
 
       {/* Результат - показываем только после завершения анимации */}
       {showResult && (
-        <div className={`rounded-xl p-6 border backdrop-blur-md transition-all duration-1000 ${
-          upgradeResult.upgrade_success
-            ? 'bg-emerald-900/20 border-emerald-500/30'
-            : 'bg-rose-900/20 border-rose-500/30'
-        }`}>
-          <div className="text-slate-200">
-            <div className="text-xl font-light mb-3">
-              {upgradeResult.upgrade_success ? 'Улучшение успешно' : 'Улучшение не удалось'}
+        <div className={`max-w-md mx-auto rounded-2xl p-8 border-2 backdrop-blur-md transition-all duration-1000 relative z-10 ${
+          isSuccess
+            ? 'bg-gradient-to-br from-emerald-950/40 to-emerald-900/20 border-emerald-500/40 shadow-2xl shadow-emerald-500/20'
+            : 'bg-gradient-to-br from-rose-950/40 to-rose-900/20 border-rose-500/40 shadow-2xl shadow-rose-500/20'
+        } animate-fade-in-up`}>
+          <div className="text-slate-100">
+            <div className="text-2xl font-bold mb-4">
+              {isSuccess ? 'Улучшение успешно' : 'Улучшение не удалось'}
             </div>
-            {upgradeResult.upgrade_success && upgradeResult.data.result_item && (
-              <div className="text-lg mb-2 text-slate-300">
-                Получен: <span className="font-medium text-emerald-400">{upgradeResult.data.result_item.name}</span>
+            {isSuccess && upgradeResult.data.result_item && (
+              <div className="text-lg mb-3 text-slate-200">
+                Получен: <span className="font-bold text-emerald-300">{upgradeResult.data.result_item.name}</span>
               </div>
             )}
-            <div className="text-slate-400 font-light mb-4">
-              {upgradeResult.upgrade_success
+            <div className="text-slate-300 mb-6">
+              {isSuccess
                 ? 'Ваши предметы были успешно трансформированы'
                 : 'Предметы были утрачены в процессе улучшения'
               }
@@ -425,10 +545,10 @@ const UpgradeAnimationComponent: React.FC<{
             <div className="text-center">
               <button
                 onClick={() => onAnimationComplete()}
-                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                  upgradeResult.upgrade_success
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    : 'bg-rose-600 hover:bg-rose-700 text-white'
+                className={`px-8 py-3 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                  isSuccess
+                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50'
+                    : 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50'
                 }`}
               >
                 Продолжить
@@ -675,7 +795,7 @@ const UpgradePage: React.FC = () => {
     data: upgradeOptions,
     isLoading: isLoadingOptions,
   } = useGetUpgradeOptionsQuery(selectedInventoryIds, {
-    skip: selectedInventoryIds.length === 0
+    skip: selectedInventoryIds.length === 0 || showAnimation || isProcessingUpgrade
   });
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
@@ -961,12 +1081,17 @@ const UpgradePage: React.FC = () => {
         );
       }
 
-      // Сбрасываем выбор и обновляем данные после завершения анимации
+      // ИСПРАВЛЕНО: Сначала очищаем выбор, ПОТОМ обновляем данные
+      // Это предотвращает попытку запроса опций для уже удаленных предметов
       setSelectedItemIds([]);
       setSelectedInventoryIds([]);
       setSelectedTargetItem('');
       setUpgradeResult(null);
-      refetchItems();
+
+      // Небольшая задержка перед обновлением, чтобы состояние успело обновиться
+      setTimeout(() => {
+        refetchItems();
+      }, 100);
     }
   };
 
