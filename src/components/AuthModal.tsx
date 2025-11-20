@@ -220,8 +220,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                   >
                     {/* Logo */}
                     <div className="text-center mb-8">
-                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/30">
-                        <span className="text-white font-bold text-2xl">CB</span>
+                      <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain" />
                       </div>
                       <h2 className="text-2xl font-bold text-white mb-2">
                         {t('auth.welcome')}
@@ -315,8 +315,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                   >
                     {/* Logo */}
                     <div className="text-center mb-8">
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/30">
-                        <span className="text-white font-bold text-2xl">CB</span>
+                      <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain" />
                       </div>
                       <h2 className="text-2xl font-bold text-white mb-2">
                         {t('auth.join')}
