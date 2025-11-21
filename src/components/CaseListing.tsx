@@ -80,7 +80,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
       <Title title={name} />
       {description && <div className="text-gray-300 mb-8">{description}</div>}
 
-      <div className="flex flex-col md:flex-row items-center justify-center w-full gap-8 md:flex-wrap">
+      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap">
         {cases && cases.length > 0 ? (
           cases.map((caseItem, index) => {
             if (caseItem.id) {

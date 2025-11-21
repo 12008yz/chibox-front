@@ -153,27 +153,29 @@ const Avatar: React.FC<AvatarProps> = ({
                 <div
                     onClick={onClick}
                     style={{ cursor: onClick ? 'pointer' : 'default' }}
-                    className={onClick ? 'hover:opacity-80 transition-opacity' : ''}
+                    className={`${onClick ? 'hover:opacity-80 transition-opacity' : ''} relative`}
                 >
                     {!loaded && <LoadingSkeleton />}
-                    <div className="relative">
-                        <img
-                            src={getImageSrc()}
-                            alt="avatar"
-                            className={`${sizeClasses} rounded-full object-cover border-2 aspect-square ${loaded ? '' : 'hidden'}`}
-                            style={{ borderColor: getLevelColor() }}
-                            onLoad={handleImageLoad}
-                            onError={handleImageError}
-                        />
-                        {showLevel && (
-                            <div
-                                className={`absolute rounded-full text-xs font-semibold min-w-[20px] h-5 flex justify-center items-center text-white ${LevelSize} ${DivPosition}`}
-                                style={{ backgroundColor: getLevelColor() }}
-                            >
-                                {level}
-                            </div>
-                        )}
-                    </div>
+                    {loaded && (
+                        <>
+                            <img
+                                src={getImageSrc()}
+                                alt="avatar"
+                                className={`${sizeClasses} rounded-full object-cover border-2`}
+                                style={{ borderColor: getLevelColor() }}
+                                onLoad={handleImageLoad}
+                                onError={handleImageError}
+                            />
+                            {showLevel && (
+                                <div
+                                    className={`absolute rounded-full text-xs font-semibold min-w-[20px] h-5 flex justify-center items-center text-white ${LevelSize} ${DivPosition}`}
+                                    style={{ backgroundColor: getLevelColor() }}
+                                >
+                                    {level}
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             )}
         </div>

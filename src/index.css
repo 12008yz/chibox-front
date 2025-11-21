@@ -532,22 +532,11 @@
 
 .gaming-avatar-wrapper {
   @apply relative flex-shrink-0;
-  width: 28px;
-  height: 28px;
-}
-
-@media (min-width: 768px) {
-  .gaming-avatar-wrapper {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-@media (min-width: 1280px) {
-  .gaming-avatar-wrapper {
-    width: 40px;
-    height: 40px;
-  }
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gaming-avatar-border {

@@ -99,7 +99,6 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Баланс */}
       <div id="onboarding-balance" className="gaming-balance-container">
         <div className="flex items-center space-x-1 lg:space-x-2">
-          <img src="/images/chiCoin.png" alt="ChiCoin" className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 animate-pulse" />
           <div className="flex flex-col">
             <div className="gaming-balance-value text-[10px] sm:text-xs lg:text-sm xl:text-base">
               <Monetary value={user?.balance ?? 0} />
@@ -168,7 +167,6 @@ const RightContent: React.FC<RightContentProps> = ({
               id={user.id || user.username}
               size="small"
             />
-            <div className="gaming-avatar-border"></div>
           </div>
           <div className="hidden xl:flex flex-col min-w-[80px]">
             <span className="gaming-username truncate max-w-[120px]">{user.username}</span>

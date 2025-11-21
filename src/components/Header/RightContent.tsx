@@ -147,7 +147,6 @@ const RightContent: React.FC<RightContentProps> = ({
               id={user.id || user.username}
               size="small"
             />
-            <div className="gaming-avatar-border"></div>
           </div>
           <div className="hidden md:flex flex-col">
             <span className="gaming-username">{user.username}</span>
