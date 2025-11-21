@@ -64,13 +64,13 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="flex flex-col w-full md:w-64 items-center rounded transition-transform duration-300 hover:scale-105 cursor-pointer"
+      className="flex flex-col w-64 items-center rounded transition-transform duration-300 hover:scale-105 cursor-pointer"
       style={{ willChange: 'transform' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {!loaded && (
-        <div className="flex w-full h-32 md:h-64 items-center justify-center">
+        <div className="flex w-full h-64 items-center justify-center">
           <div className="spinner" />
         </div>
       )}
@@ -79,7 +79,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         <img
           src={caseImageUrl}
           alt={title}
-          className={`w-full h-32 md:h-64 object-contain relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'case-hover-glow' : ''}`}
+          className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'case-hover-glow' : ''}`}
           onLoad={() => setLoaded(true)}
           onError={() => {
             if (!imageError) {
@@ -89,9 +89,9 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         />
       </div>
 
-      <div className="flex flex-col gap-1 md:gap-2 p-2 md:p-4 items-center">
-        <div className="font-bold text-sm md:text-lg text-white text-center">{translateCaseName(title)}</div>
-        <div className="font-medium text-sm md:text-md text-green-400">
+      <div className="flex flex-col gap-2 p-4 items-center">
+        <div className="font-bold text-lg text-white text-center">{translateCaseName(title)}</div>
+        <div className="font-medium text-md text-green-400">
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
               {title.toLowerCase().includes('premium') || title.toLowerCase().includes('премиум')
@@ -141,7 +141,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
               console.log('=== КОНЕЦ ОБРАБОТКИ КНОПКИ ИГРАТЬ ===');
             }}
             disabled={!isAuthenticated}
-            className={`mt-1 md:mt-2 px-2 md:px-4 py-1 md:py-2 rounded transition-colors text-xs md:text-sm font-medium ${
+            className={`mt-2 px-4 py-2 rounded transition-colors text-sm font-medium ${
               isAuthenticated
                 ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
