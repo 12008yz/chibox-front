@@ -59,9 +59,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   // Конфигурация статусов
   const statusConfig = {
-    1: { name: t('homepage.status_tier_1'), icon: <img src="/images/status.png" alt="Статус" className="w-16 h-16 object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 2 },
-    2: { name: t('homepage.status_tier_2'), icon: <img src="/images/status+.png" alt="Статус+" className="w-16 h-16 object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 3 },
-    3: { name: t('homepage.status_tier_3'), icon: <img src="/images/status++.png" alt="Статус++" className="w-16 h-16 object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 5 }
+    1: { name: t('homepage.status_tier_1'), icon: <img src="/images/status.png" alt="Статус" className="w-full h-full object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 2 },
+    2: { name: t('homepage.status_tier_2'), icon: <img src="/images/status+.png" alt="Статус+" className="w-full h-full object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 3 },
+    3: { name: t('homepage.status_tier_3'), icon: <img src="/images/status++.png" alt="Статус++" className="w-full h-full object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 5 }
   };
 
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
@@ -75,7 +75,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
       description: `${attemptsCount} ${t('modals.daily_attempts')} | Выиграй бонусный кейс`,
-      icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-16 h-16 object-contain"/>,
+      icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
       action: () => onPlayTicTacToe?.()
@@ -84,7 +84,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'safe-cracker',
       name: 'Взлом сейфа',
       description: `${attemptsCount} ${t('modals.daily_attempts')} | Подбери код и получи награду`,
-      icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-16 h-16 object-contain"/>,
+      icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
       action: () => onPlaySafeCracker?.()
@@ -93,7 +93,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'slots',
       name: t('slots.title'),
       description: `Испытай удачу в слоте`,
-      icon: <img src="/images/status3.png" alt="Слот-машина" className="w-16 h-16 object-contain"/>,
+      icon: <img src="/images/status3.png" alt="Слот-машина" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
       action: () => navigate('/slot')
@@ -102,7 +102,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
-      icon: <img src="/images/status4.png" alt="Обмен предметов" className="w-16 h-16 object-contain"/>,
+      icon: <img src="/images/status4.png" alt="Обмен предметов" className="w-full h-full object-contain"/>,
       color: '',
       available: subscriptionTier >= 1,
       action: () => navigate('/exchange')
@@ -153,37 +153,37 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none z-50">
       <Title title={name} />
 
-      <div className="text-center mb-8">
-        <p className="text-gray-400 text-lg">{description}</p>
+      <div className="text-center mb-4 md:mb-8">
+        <p className="text-gray-400 text-sm md:text-lg">{description}</p>
       </div>
 
       {/* Информация о текущем статусе */}
-      <div className="w-full max-w-5xl mb-8">
-        <div className={`relative bg-gradient-to-br ${currentStatus.color} p-6 rounded-2xl border border-white/20 shadow-2xl overflow-hidden`}>
+      <div className="w-full max-w-5xl mb-6 md:mb-8">
+        <div className={`relative bg-gradient-to-br ${currentStatus.color} p-4 md:p-6 rounded-xl md:rounded-2xl border border-white/20 shadow-2xl overflow-hidden`}>
           {/* Фоновые декорации */}
           <div className="absolute inset-0 bg-black/30"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+          <div className="hidden md:block absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="hidden md:block absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-4 mb-4 md:mb-0">
-              <div className="flex items-center justify-center">{currentStatus.icon}</div>
-              <div>
-                <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between w-full">
+            <div className="flex items-center space-x-2 md:space-x-4 mb-3 md:mb-0 w-full md:w-auto">
+              <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 flex-shrink-0">
+                {currentStatus.icon}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl md:text-3xl font-bold text-white flex items-center gap-1 md:gap-2">
                   {currentStatus.name}
-                  <IoSparkles className="text-yellow-300" />
+                  <IoSparkles className="text-yellow-300 text-sm md:text-base" />
                 </h2>
-                <p className="text-white/80 text-lg">+{currentStatus.bonus}% {t('common.bonus_keyword')}</p>
-                <p className="text-white/60">{formatDaysI18n(daysLeft, t)}</p>
+                <p className="text-white/80 text-sm md:text-lg">+{currentStatus.bonus}% {t('common.bonus_keyword')}</p>
+                <p className="text-white/60 text-xs md:text-base">{formatDaysI18n(daysLeft, t)}</p>
               </div>
             </div>
 
-            <div className="text-center md:text-right">
-              <div className="text-white/80 text-sm mb-1">{t('time.days')}</div>
-              <div className="text-4xl font-bold text-white">{daysLeft}</div>
+            <div className="text-left md:text-right w-full md:w-auto flex flex-col items-start md:items-end">
               <button
                 onClick={() => setIsDepositModalOpen(true)}
-                className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300"
+                className="mt-2 px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 w-full md:w-auto"
               >
                 {t('profile.purchase_button')}
               </button>
@@ -193,19 +193,19 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       </div>
 
       {/* Навигационные вкладки */}
-      <div className="flex space-x-1 mb-8 bg-gray-800/60 p-1 rounded-xl">
+      <div className="flex space-x-1 mb-6 md:mb-8 bg-gray-800/60 p-1 rounded-xl">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+            className={`flex items-center gap-1 md:gap-2 px-3 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-all duration-300 ${
               activeTab === tab.id
                 ? 'bg-white text-gray-900 shadow-lg status-tab-active'
                 : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
             }`}
           >
-            {tab.icon}
-            <span>{tab.name}</span>
+            <span className="text-sm md:text-base">{tab.icon}</span>
+            <span className="hidden sm:inline">{tab.name}</span>
           </button>
         ))}
       </div>
@@ -213,12 +213,12 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       {/* Контент вкладок */}
       <div className="w-full max-w-5xl">
         {activeTab === 'activities' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {bonusActivities.map((activity) => (
               <div
                 key={activity.id}
                 onClick={activity.available ? activity.action : undefined}
-                className={`group relative bg-gray-900/60 border border-gray-700/50 rounded-xl p-6 status-card-hover activity-glow cursor-pointer ${
+                className={`group relative bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-3 md:p-6 status-card-hover activity-glow cursor-pointer ${
                   activity.available
                     ? 'hover:border-gray-600/70'
                     : 'opacity-50 cursor-not-allowed'
@@ -235,20 +235,22 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                 )}
 
                 <div className="relative z-10 text-center">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br ${activity.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    {activity.icon}
+                  <div className={`inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br ${activity.color} mb-2 md:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className="w-10 h-10 md:w-14 md:h-14 flex items-center justify-center">
+                      {activity.icon}
+                    </div>
                   </div>
 
-                  <h3 className="text-white font-bold text-lg mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300">
+                  <h3 className="text-white font-bold text-sm md:text-lg mb-1 md:mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300">
                     {activity.name}
                   </h3>
 
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
                     {activity.description}
                   </p>
 
                   {activity.cooldown && (
-                    <div className="mt-3 text-xs text-yellow-400">
+                    <div className="mt-2 md:mt-3 text-xs text-yellow-400">
                       {t('cases.available_in')}: {activity.cooldown}{t('common.minutes_short')}
                     </div>
                   )}
@@ -262,103 +264,103 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
         )}
 
         {activeTab === 'stats' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-6">
             {userStats.map((stat, index) => (
-              <div key={index} className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6 text-center hover:border-gray-600/70 transition-all duration-300">
-                <div className="flex justify-center mb-3">
-                  <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center">
+              <div key={index} className="bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-3 md:p-6 text-center hover:border-gray-600/70 transition-all duration-300">
+                <div className="flex justify-center mb-2 md:mb-3">
+                  <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-gray-800/50 flex items-center justify-center text-sm md:text-base">
                     {stat.icon}
                   </div>
                 </div>
-                <div className={`text-2xl font-bold ${stat.color} mb-1`}>
+                <div className={`text-lg md:text-2xl font-bold ${stat.color} mb-1`}>
                   {stat.value}
                 </div>
-                <div className="text-gray-400 text-sm">{stat.label}</div>
+                <div className="text-gray-400 text-xs md:text-sm">{stat.label}</div>
               </div>
             ))}
           </div>
         )}
 
         {activeTab === 'benefits' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <FaFire className="text-orange-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+            <div className="bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-4 md:p-6">
+              <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <FaFire className="text-orange-400 text-sm md:text-base" />
                 {t('auth.bonuses')}
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('modals.drop_chance_bonus')}</span>
-                  <span className="text-green-400 font-bold">+{currentStatus.bonus}%</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.drop_chance_bonus')}</span>
+                  <span className="text-green-400 font-bold text-sm md:text-base">+{currentStatus.bonus}%</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('cases.daily_case')}</span>
-                  <span className="text-blue-400 font-bold">1 {t('modals.case_per_day')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('cases.daily_case')}</span>
+                  <span className="text-blue-400 font-bold text-sm md:text-base">1 {t('modals.case_per_day')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('modals.tic_tac_toe_attempts')}</span>
-                  <span className="text-purple-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.tic_tac_toe_attempts')}</span>
+                  <span className="text-purple-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('modals.safe_cracker_attempts')}</span>
-                  <span className="text-yellow-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.safe_cracker_attempts')}</span>
+                  <span className="text-yellow-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('modals.slots_attempts')}</span>
-                  <span className="text-cyan-400 font-bold">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.slots_attempts')}</span>
+                  <span className="text-cyan-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300">{t('modals.item_withdrawal')}</span>
-                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <span className="text-green-400 text-sm">✓</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.item_withdrawal')}</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <span className="text-green-400 text-xs md:text-sm">✓</span>
                   </div>
                 </div>
                 {subscriptionTier === 3 && (
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-300">{t('modals.no_case_duplicates')}</span>
-                    <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                      <span className="text-purple-400 text-sm">✓</span>
+                    <span className="text-gray-300 text-xs md:text-base">{t('modals.no_case_duplicates')}</span>
+                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <span className="text-purple-400 text-xs md:text-sm">✓</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <MdTrendingUp className="text-green-400" />
+            <div className="bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-4 md:p-6">
+              <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <MdTrendingUp className="text-green-400 text-sm md:text-base" />
                 {t('modals.all_bonuses_access')}
               </h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <span className="text-green-400">✓</span>
+              <div className="space-y-2 md:space-y-3">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <span className="text-green-400 text-xs md:text-base">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('tic_tac_toe.title')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('tic_tac_toe.title')}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <span className="text-yellow-400">✓</span>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <span className="text-yellow-400 text-xs md:text-base">✓</span>
                   </div>
-                  <span className="text-gray-300">Взлом сейфа</span>
+                  <span className="text-gray-300 text-xs md:text-base">Взлом сейфа</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                    <span className="text-cyan-400">✓</span>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                    <span className="text-cyan-400 text-xs md:text-base">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('slots.title')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('slots.title')}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <span className="text-blue-400">✓</span>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <span className="text-blue-400 text-xs md:text-base">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('exchange.title')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('exchange.title')}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <span className="text-purple-400">✓</span>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <span className="text-purple-400 text-xs md:text-base">✓</span>
                   </div>
-                  <span className="text-gray-300">{t('modals.item_withdrawal')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('modals.item_withdrawal')}</span>
                 </div>
               </div>
             </div>

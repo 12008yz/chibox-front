@@ -489,8 +489,8 @@ const HomePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Живые дропы - полная ширина экрана */}
-          <div className="mt-12">
+          {/* Живые дропы - полная ширина экрана, скрыт на мобильных */}
+          <div className="hidden md:block mt-12">
             <LiveDrops />
           </div>
         </div>

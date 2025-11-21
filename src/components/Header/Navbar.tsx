@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({
       <nav
         className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
           isScrolled
-            ? 'bg-[#0a0e1a]/95 backdrop-blur-lg shadow-lg shadow-black/20'
+            ? 'bg-gradient-to-b from-[#0a0e1a] to-transparent lg:bg-[#0a0e1a]/95 lg:backdrop-blur-lg lg:shadow-lg lg:shadow-black/20'
             : 'bg-gradient-to-b from-[#0a0e1a] to-transparent'
         }`}
       >

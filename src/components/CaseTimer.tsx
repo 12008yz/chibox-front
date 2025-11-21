@@ -83,14 +83,14 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
   }
 
   return (
-    <div ref={containerRef} className={`inline-flex flex-col items-center space-y-1 px-4 py-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 ${className}`}>
-      <div className="flex items-center space-x-2">
+    <div ref={containerRef} className={`inline-flex flex-col items-center space-y-1 px-3 md:px-4 py-2 md:py-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 ${className}`}>
+      <div className="hidden md:flex items-center space-x-2">
         <div className="w-2 h-2 bg-orange-500 rounded-full pulse-dot" />
         <span className="text-orange-400 text-xs font-medium uppercase tracking-wide">
           {t('common.next_case')}
         </span>
       </div>
-      <span className="text-white text-base font-mono font-bold">{timeLeft}</span>
+      <span className="text-white text-sm md:text-base font-mono font-bold">{timeLeft}</span>
     </div>
   );
 };
