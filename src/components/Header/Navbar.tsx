@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSell } from "react-icons/md";
-// import { SlPlane } from "react-icons/sl";
 import { GiUpgrade } from 'react-icons/gi';
-// import { TbCat } from "react-icons/tb";
 import { FaDice } from "react-icons/fa";
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { IoMdTrophy } from 'react-icons/io';
+import { ImConnection } from "react-icons/im";
 import { HiSparkles } from 'react-icons/hi';
 import RightContent from "./Navbar/RightContent";
 
@@ -20,6 +20,7 @@ interface NavbarProps {
   setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   authModalTab?: 'login' | 'register';
   setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
+  onlineUsers?: number;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -31,136 +32,222 @@ const Navbar: React.FC<NavbarProps> = ({
   authModalOpen,
   setAuthModalOpen,
   authModalTab,
-  setAuthModalTab
+  setAuthModalTab,
+  onlineUsers = 0
 }) => {
   const { t } = useTranslation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setOpenSidebar(!openSidebar);
+  // Отслеживание скролла для изменения стиля навбара
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const links = [
     {
       to: "/exchange",
-      icon: <MdOutlineSell className="text-xl" />,
+      icon: <MdOutlineSell className="text-lg" />,
       label: t('header.exchange_items'),
-      color: "from-pink-500 to-violet-500"
     },
     {
       to: "/upgrade",
-      icon: <GiUpgrade className="text-xl" />,
+      icon: <GiUpgrade className="text-lg" />,
       label: t('header.upgrade'),
-      color: "from-cyan-500 to-blue-500"
     },
     {
       to: "/slot",
-      icon: <FaDice className="text-xl" />,
+      icon: <FaDice className="text-lg" />,
       label: t('header.slot'),
-      color: "from-green-400 to-emerald-500"
     },
     {
       to: "/leaderboard",
+      icon: <IoMdTrophy className="text-lg" />,
       label: t('header.leaderboard_table'),
-      color: "from-yellow-400 to-orange-500"
     }
   ];
 
   return (
-    <div className="w-full relative z-[9999]" style={{ background: 'transparent' }}>
-      <nav className="modern-navbar group w-full" style={{ background: 'transparent' }}>
-        <div className="relative flex items-center justify-between w-full min-h-[64px] px-8 py-4" style={{ background: 'transparent' }}>
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={toggleSidebar}
-              className="mobile-menu-btn group"
-            >
-              <FaBars className="text-xl text-white transition-transform group-hover:rotate-90" />
-              <div className="btn-glow"></div>
-            </button>
-          </div>
+    <>
+      {/* Основной навбар */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+          isScrolled
+            ? 'bg-[#0a0e1a]/95 backdrop-blur-lg shadow-lg shadow-black/20'
+            : 'bg-gradient-to-b from-[#0a0e1a] to-transparent'
+        }`}
+      >
+        <div className="max-w-[1920px] mx-auto">
+          {/* Контейнер навбара */}
+          <div className="flex items-center justify-between px-4 lg:px-8 h-16 lg:h-20">
 
-          {/* Logo and Desktop Navigation */}
-          <div className="hidden md:flex items-center flex-1">
-            {/* Logo */}
-            <Link to="/" className="gaming-logo group mr-8">
-              <div className="logo-container">
+            {/* Левая часть - Лого */}
+            <Link
+              to="/"
+              className="flex items-center gap-3 group relative z-10"
+            >
+              <div className="relative">
                 <img
                   src="/images/logo.png"
                   alt="ChiBox Logo"
-                  className="w-12 h-12 object-contain transition-transform group-hover:scale-110"
+                  className="w-10 h-10 lg:w-12 lg:h-12 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]"
                   onError={(e) => {
                     e.currentTarget.src = '/vite.svg';
                   }}
                 />
-                <div className="logo-glow"></div>
               </div>
-              <div className="logo-text">
-                <div className="font-bold text-xl text-white gaming-font">
-                  Chi<span className="text-cyan-400">Box</span>
-                </div>
-                <div className="text-xs text-cyan-300/70 tracking-widest uppercase flex items-center gap-1">
+              <div className="hidden sm:flex flex-col">
+                <span className="text-xl lg:text-2xl font-bold text-white tracking-tight">
+                  Chi<span className="text-orange-400">Box</span>
+                </span>
+                <div className="text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
-                  <HiSparkles className="logo-star text-cyan-400" />
+                  <HiSparkles className="text-orange-400 animate-spin-slow" />
                 </div>
               </div>
             </Link>
 
-            {/* Navigation Links */}
-            <div className="flex items-center gap-2">
+            {/* Центр - Навигационные ссылки (Desktop) */}
+            <div className="hidden lg:flex items-center gap-1">
               {links.map((link, index) => (
                 <Link
                   key={index}
                   to={link.to}
-                  id={link.to === '/slot' ? 'onboarding-slot-button' : undefined}
-                  className="gaming-nav-item group"
+                  className="group relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                 >
-                  <div className="nav-item-content">
-                    <div className="nav-icon">
-                      {link.icon}
-                    </div>
-                    <span className="nav-label gaming-font">{link.label}</span>
-                  </div>
-                  <div className={`nav-item-glow bg-gradient-to-r ${link.color}`}></div>
-                  <div className="nav-item-border"></div>
+                  {/* Фоновый эффект при наведении */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"></div>
+
+                  {/* Нижняя граница при наведении */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-3/4 transition-all duration-300"></div>
+
+                  <span className="relative z-10 text-orange-400 group-hover:scale-110 transition-transform duration-200">
+                    {link.icon}
+                  </span>
+                  <span className="relative z-10 font-medium text-sm whitespace-nowrap">
+                    {link.label}
+                  </span>
                 </Link>
               ))}
             </div>
-          </div>
 
-          {/* Mobile Logo */}
-          <div className="md:hidden flex items-center flex-1">
-            <Link to="/" className="mobile-logo group">
-              <img
-                src="/vite.svg"
-                alt="ChiBox Logo"
-                className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
-                onError={(e) => {
-                  e.currentTarget.src = '/vite.svg';
-                }}
-              />
-              <div className="font-bold text-lg text-white ml-2 flex items-center gap-1">
-                Chi<span className="text-cyan-400">Box</span>
-                <HiSparkles className="logo-star-mobile text-cyan-400" />
+            {/* Правая часть - Онлайн счетчик и авторизация */}
+            <div className="flex items-center gap-3 lg:gap-6">
+
+              {/* Онлайн пользователи (Desktop) */}
+              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
+                <ImConnection className="text-green-400 animate-pulse" />
+                <span className="text-sm text-gray-300 font-medium">
+                  <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> {t('header.online') || 'Online'}
+                </span>
               </div>
-            </Link>
-          </div>
 
-          {/* Right Content - User Actions */}
-          <div className="flex-shrink-0">
-            <RightContent
-              openNotifications={openNotifications}
-              setOpenNotifications={setOpenNotifications}
-              user={user}
-              authModalOpen={authModalOpen}
-              setAuthModalOpen={setAuthModalOpen}
-              authModalTab={authModalTab}
-              setAuthModalTab={setAuthModalTab}
-            />
+              {/* RightContent - Уведомления и профиль */}
+              <div className="hidden lg:block">
+                <RightContent
+                  openNotifications={openNotifications}
+                  setOpenNotifications={setOpenNotifications}
+                  user={user}
+                  authModalOpen={authModalOpen}
+                  setAuthModalOpen={setAuthModalOpen}
+                  authModalTab={authModalTab}
+                  setAuthModalTab={setAuthModalTab}
+                />
+              </div>
+
+              {/* Мобильное меню (Mobile) */}
+              <button
+                onClick={toggleMobileMenu}
+                className="lg:hidden p-2 text-gray-300 hover:text-white transition-colors"
+              >
+                {mobileMenuOpen ? (
+                  <FaTimes className="text-2xl" />
+                ) : (
+                  <FaBars className="text-2xl" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
-    </div>
+
+      {/* Мобильное меню */}
+      <div
+        className={`fixed inset-0 z-[99] lg:hidden transition-all duration-300 ${
+          mobileMenuOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Затемнение */}
+        <div
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={toggleMobileMenu}
+        ></div>
+
+        {/* Меню */}
+        <div
+          className={`absolute top-16 left-0 right-0 bg-[#0a0e1a] border-b border-gray-800 shadow-2xl transition-transform duration-300 ${
+            mobileMenuOpen ? 'translate-y-0' : '-translate-y-full'
+          }`}
+        >
+          <div className="px-4 py-6 space-y-4">
+
+            {/* Навигационные ссылки */}
+            <div className="space-y-2">
+              {links.map((link, index) => (
+                <Link
+                  key={index}
+                  to={link.to}
+                  onClick={toggleMobileMenu}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
+                >
+                  <span className="text-orange-400">
+                    {link.icon}
+                  </span>
+                  <span className="text-white font-medium">
+                    {link.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Онлайн счетчик (Mobile) */}
+            <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
+              <ImConnection className="text-green-400 animate-pulse" />
+              <span className="text-sm text-gray-300 font-medium">
+                <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> {t('header.online') || 'Online'}
+              </span>
+            </div>
+
+            {/* RightContent для мобильных */}
+            <div className="pt-4 border-t border-gray-700/30">
+              <RightContent
+                openNotifications={openNotifications}
+                setOpenNotifications={setOpenNotifications}
+                user={user}
+                authModalOpen={authModalOpen}
+                setAuthModalOpen={setAuthModalOpen}
+                authModalTab={authModalTab}
+                setAuthModalTab={setAuthModalTab}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Spacer для контента под фиксированным навбаром */}
+      <div className="h-16 lg:h-20"></div>
+    </>
   );
 };
 
