@@ -63,7 +63,8 @@
     "market": "Маркет",
     "coin_flip": "Монетка",
     "crash": "Краш",
-    "upgrade": "Апгрейд"
+    "upgrade": "Апгрейд",
+    "online": "онлайн"
   },
   "auth": {
     "login_title": "Вход в аккаунт",

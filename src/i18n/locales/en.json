@@ -61,7 +61,8 @@
     "market": "Market",
     "coin_flip": "Coin Flip",
     "crash": "Crash",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "online": "online"
   },
   "auth": {
     "login_title": "Sign In",

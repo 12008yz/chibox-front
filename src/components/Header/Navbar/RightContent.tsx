@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
-import { FaRegBell, FaBell, FaCoins, FaSignOutAlt, FaPlus } from "react-icons/fa";
+import { FaRegBell, FaBell, FaCoins, FaPlus } from "react-icons/fa";
 import { RiVipCrownFill } from "react-icons/ri";
 // import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../../store/hooks";
-import { useLogoutMutation } from "../../../features/auth/authApi";
-import { performFullLogout } from "../../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
@@ -36,8 +33,6 @@ const RightContent: React.FC<RightContentProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
@@ -49,17 +44,6 @@ const RightContent: React.FC<RightContentProps> = ({
   });
 
   const notificationCount = unreadCountData?.data?.count || 0;
-
-  const handleLogout = async () => {
-    try {
-      await logoutApi().unwrap();
-    } catch (error) {
-      console.log('Logout API error (continuing with logout):', error);
-    } finally {
-      performFullLogout(dispatch);
-      navigate('/');
-    }
-  };
 
   const handleProfileClick = () => {
     navigate('/profile');
@@ -106,19 +90,21 @@ const RightContent: React.FC<RightContentProps> = ({
   }
 
   return (
-    <div className="flex items-center space-x-4 relative overflow-visible">
-      {/* Бонус Safe Cracker */}
-      <SafeCrackerButton />
+    <div className="flex items-center gap-2 xl:gap-4 relative overflow-visible">
+      {/* Бонус Safe Cracker - скрываем на маленьких экранах */}
+      <div className="hidden xl:block">
+        <SafeCrackerButton />
+      </div>
 
       {/* Баланс */}
       <div id="onboarding-balance" className="gaming-balance-container">
         <div className="flex items-center space-x-2">
-          <FaCoins className="text-yellow-400 text-xl animate-pulse mr-3" />
+          <FaCoins className="text-yellow-400 text-base lg:text-xl animate-pulse mr-1 lg:mr-3" />
           <div className="flex flex-col">
-            <div className="gaming-balance-value">
+            <div className="gaming-balance-value text-sm lg:text-base">
               <Monetary value={user?.balance ?? 0} />
             </div>
-            <div className="gaming-balance-label">{t('header.balance')}</div>
+            <div className="gaming-balance-label text-xs">{t('header.balance')}</div>
           </div>
           <button
             id="onboarding-deposit-button"
@@ -128,7 +114,7 @@ const RightContent: React.FC<RightContentProps> = ({
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
           >
-            <FaPlus className="text-sm group-hover:scale-110 transition-transform duration-200" />
+            <FaPlus className="text-xs lg:text-sm group-hover:scale-110 transition-transform duration-200" />
           </button>
         </div>
       </div>
@@ -141,9 +127,9 @@ const RightContent: React.FC<RightContentProps> = ({
         >
           <div className="relative">
             {notificationCount > 0 ? (
-              <FaBell className="gaming-notification-icon gaming-notification-active" />
+              <FaBell className="gaming-notification-icon gaming-notification-active text-base lg:text-lg" />
             ) : (
-              <FaRegBell className="gaming-notification-icon" />
+              <FaRegBell className="gaming-notification-icon text-base lg:text-lg" />
             )}
             {notificationCount > 0 && (
               <div className="gaming-notification-badge">
@@ -164,15 +150,17 @@ const RightContent: React.FC<RightContentProps> = ({
         )}
       </div>
 
-      {/* Переключатель языков */}
-      <LanguageSwitcher />
+      {/* Переключатель языков - скрываем на средних экранах */}
+      <div className="hidden lg:block">
+        <LanguageSwitcher />
+      </div>
 
       {/* Профиль пользователя */}
       <div
-        className="gaming-profile-container"
+        className="gaming-profile-container cursor-pointer"
         onClick={handleProfileClick}
       >
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2 lg:gap-3">
           <div className="gaming-avatar-wrapper">
             <Avatar
               image={user.avatar_url}
@@ -182,25 +170,15 @@ const RightContent: React.FC<RightContentProps> = ({
             />
             <div className="gaming-avatar-border"></div>
           </div>
-          <div className="hidden md:flex flex-col">
-            <span className="gaming-username">{user.username}</span>
+          <div className="hidden lg:flex flex-col min-w-[80px]">
+            <span className="gaming-username truncate max-w-[120px]">{user.username}</span>
             <div className="flex items-center space-x-1">
-              <RiVipCrownFill className="text-yellow-400 text-xs" />
-              <span className="gaming-level">LVL {user.level || 1}</span>
+              <RiVipCrownFill className="text-yellow-400 text-xs flex-shrink-0" />
+              <span className="gaming-level whitespace-nowrap">LVL {user.level || 1}</span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Кнопка выхода */}
-      <button
-        onClick={handleLogout}
-        disabled={isLoggingOut}
-        className="gaming-logout-button"
-        title={t('header.sign_out')}
-      >
-        <FaSignOutAlt className="text-lg" />
-      </button>
 
       {/* Deposit Modal */}
       <DepositModal

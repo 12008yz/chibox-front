@@ -7,6 +7,10 @@ import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { setSoundsEnabled } from '../../../../store/slices/uiSlice';
 import { soundManager } from '../../../../utils/soundManager';
+import { useLogoutMutation } from '../../../../features/auth/authApi';
+import { performFullLogout } from '../../../../utils/authUtils';
+import { useNavigate } from 'react-router-dom';
+import { FaSignOutAlt } from 'react-icons/fa';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -25,8 +29,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateUserProfileMutation();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   const [tradeUrl, setTradeUrl] = useState(() => user?.steam_trade_url || '');
   const [newUsername, setNewUsername] = useState(() => user?.username || '');
@@ -216,6 +222,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const resetForm = () => {
     // Form reset logic (if needed in the future)
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+    } catch (error) {
+      console.log('Logout API error (continuing with logout):', error);
+    } finally {
+      performFullLogout(dispatch);
+      onClose();
+      navigate('/');
+    }
   };
 
   if (!isOpen) return null;
@@ -510,6 +528,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </button>
             </div>
+          </div>
+
+          {/* Logout Button */}
+          <div className="pt-4 border-t border-gray-700/30">
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full flex items-center justify-center gap-3 p-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg text-red-400 hover:text-red-300 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaSignOutAlt className="text-lg" />
+              <span>{isLoggingOut ? t('header.signing_out') : t('header.sign_out')}</span>
+            </button>
           </div>
         </div>
 

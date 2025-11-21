@@ -385,10 +385,12 @@
 
 /* Gaming Balance Container - упрощено */
 .gaming-balance-container {
-  @apply px-4 py-2 rounded-lg;
+  @apply px-2 lg:px-4 py-1.5 lg:py-2 rounded-lg;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
   @apply border border-green-500/30;
   transition: transform var(--animation-duration) ease;
+  flex-shrink: 0;
+  min-width: fit-content;
 }
 
 @media (min-width: 769px) {
@@ -406,22 +408,25 @@
 }
 
 .gaming-balance-value {
-  @apply text-green-400 font-bold text-sm;
+  @apply text-green-400 font-bold text-xs lg:text-sm;
+  white-space: nowrap;
 }
 
 .gaming-balance-label {
   @apply text-green-300 text-xs font-medium;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 /* Gaming Balance Add Button */
 .gaming-balance-add-button {
-  @apply w-8 h-8 rounded-full flex items-center justify-center;
+  @apply w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
   @apply border border-green-500/40;
   color: rgb(34, 197, 94);
   transition: all var(--animation-duration) ease;
+  flex-shrink: 0;
 }
 
 @media (min-width: 769px) {
@@ -439,12 +444,17 @@
 
 /* Gaming Notification Button */
 .gaming-notification-button {
-  @apply relative p-3 rounded-lg;
+  @apply relative p-2 lg:p-3 rounded-lg;
   background: rgba(99, 102, 241, 0.1);
   @apply border border-indigo-500/30;
   position: relative;
   overflow: visible;
   transition: all var(--animation-duration) ease;
+  flex-shrink: 0;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 769px) {
@@ -502,10 +512,11 @@
 
 /* Gaming Profile Container */
 .gaming-profile-container {
-  @apply cursor-pointer p-2 rounded-lg;
+  @apply cursor-pointer p-1.5 lg:p-2 rounded-lg;
   background: rgba(139, 92, 246, 0.1);
   @apply border border-purple-500/30;
   transition: all var(--animation-duration) ease;
+  flex-shrink: 0;
 }
 
 @media (min-width: 769px) {
@@ -520,7 +531,16 @@
 }
 
 .gaming-avatar-wrapper {
-  @apply relative;
+  @apply relative flex-shrink-0;
+  width: 32px;
+  height: 32px;
+}
+
+@media (min-width: 1024px) {
+  .gaming-avatar-wrapper {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .gaming-avatar-border {
@@ -528,7 +548,10 @@
 }
 
 .gaming-username {
-  @apply text-white font-semibold text-sm;
+  @apply text-white font-semibold text-xs lg:text-sm;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gaming-level {
@@ -539,11 +562,16 @@
 
 /* Gaming Logout Button */
 .gaming-logout-button {
-  @apply p-3 rounded-lg;
+  @apply p-2 lg:p-3 rounded-lg;
   @apply text-gray-400 hover:text-red-400;
   background: rgba(239, 68, 68, 0.1);
   @apply border border-red-500/30;
   transition: all var(--animation-duration) ease;
+  flex-shrink: 0;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 769px) {
