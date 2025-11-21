@@ -170,6 +170,24 @@
     transition-duration: 0.15s !important; /* Быстрые переходы вместо анимаций */
   }
 
+  /* ИСКЛЮЧЕНИЕ: Разрешаем анимации для upgrade рулетки */
+  .upgrade-wheel-animation,
+  .upgrade-wheel-animation *,
+  .upgrade-wheel-animation *::before,
+  .upgrade-wheel-animation *::after {
+    animation-duration: revert !important;
+    animation-iteration-count: revert !important;
+    transition-duration: revert !important;
+    animation: revert !important;
+    transform: revert !important;
+  }
+
+  /* Принудительное включение transform анимации для рулетки */
+  .upgrade-wheel-animation [style*="transform"] {
+    transform: revert !important;
+    transition: revert !important;
+  }
+
   /* Отключаем backdrop-filter на мобильных */
   .modern-header,
   .modern-navbar,

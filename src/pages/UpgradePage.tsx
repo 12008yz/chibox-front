@@ -58,18 +58,19 @@ const SelectedItemsDisplay: React.FC<{
     return 'text-red-400';
   };
 
+  // Скрываем на мобильных и планшетах если не идёт анимация
   if (selectedItems.length === 0 && !targetItem) {
     return (
-      <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-8 mb-8 h-[520px]">
+      <div className="hidden lg:block bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 min-h-[300px] sm:min-h-[400px] md:h-[520px]">
         <div className="text-center h-full flex items-center justify-center">
           <div>
-            <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center animate-pulse">
+              <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
-            <p className="text-gray-400 text-lg mb-2">Выберите предметы для улучшения</p>
-            <p className="text-gray-500 text-sm">Сначала выберите до 10 предметов снизу, затем целевой предмет</p>
+            <p className="text-gray-400 text-base sm:text-lg md:text-xl mb-2 px-4">Выберите предметы для улучшения</p>
+            <p className="text-gray-500 text-xs sm:text-sm px-4">Сначала выберите до 10 предметов снизу, затем целевой предмет</p>
           </div>
         </div>
       </div>
@@ -77,7 +78,7 @@ const SelectedItemsDisplay: React.FC<{
   }
 
   return (
-    <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-6 mb-8 h-[520px] overflow-hidden">
+    <div className={`bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-6 sm:mb-8 min-h-[400px] sm:min-h-[450px] md:h-[520px] overflow-hidden ${!showAnimation ? 'hidden lg:block' : ''}`}
       {showAnimation && upgradeResult ? (
         <UpgradeAnimationComponent
           upgradeResult={upgradeResult}
@@ -86,24 +87,24 @@ const SelectedItemsDisplay: React.FC<{
       ) : (
         // Обычное отображение выбранных предметов
         <div className="h-full flex flex-col">
-          <h2 className="text-xl font-bold text-white mb-6 text-center flex-shrink-0">Выбранные предметы для улучшения</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sm:mb-6 text-center flex-shrink-0">Выбранные предметы для улучшения</h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 flex-1 min-h-0">
             {/* Исходные предметы */}
             <div className="lg:col-span-1 flex flex-col min-h-0">
-              <h3 className="text-lg font-semibold text-cyan-400 mb-4 flex-shrink-0">
+              <h3 className="text-base sm:text-lg font-semibold text-cyan-400 mb-3 sm:mb-4 flex-shrink-0">
                 Ваши предметы ({selectedItems.length}/10)
               </h3>
-              <div className="space-y-3 overflow-y-auto flex-1 pr-2">
+              <div className="space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2 max-h-[200px] sm:max-h-[250px] lg:max-h-none">
                 {selectedItems.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className="bg-black/30 backdrop-blur-sm rounded-lg p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                    className="bg-black/30 backdrop-blur-sm rounded-lg p-2 sm:p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 active:scale-95 cursor-pointer group"
                     onClick={() => onRemoveSourceItem && onRemoveSourceItem(item.id)}
                     title="Кликните для удаления"
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className="relative w-16 h-16 bg-black/20 rounded-lg overflow-hidden">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
                         <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20`}></div>
                         {!imageError[item.id] ? (
                           <img
@@ -116,14 +117,14 @@ const SelectedItemsDisplay: React.FC<{
                           <PlaceholderImage className="w-full h-full" />
                         )}
                         {/* Иконка удаления */}
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-4 h-4 sm:w-5 sm:h-5 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="text-white font-medium text-sm truncate">{item.name}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-white font-medium text-xs sm:text-sm truncate">{item.name}</div>
                         <div className="text-cyan-300 text-xs">
                           <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
                         </div>
@@ -132,38 +133,38 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 bg-cyan-500/10 backdrop-blur-sm rounded-lg border border-cyan-500/30 flex-shrink-0">
-                <div className="text-cyan-300 text-sm">
+              <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-cyan-500/10 backdrop-blur-sm rounded-lg border border-cyan-500/30 flex-shrink-0">
+                <div className="text-cyan-300 text-xs sm:text-sm">
                   Общая стоимость: <span className="font-bold"><Monetary value={totalValue} /></span>
                 </div>
               </div>
             </div>
 
             {/* Кнопка улучшения */}
-            <div className="lg:col-span-1 flex flex-col items-center justify-center min-h-0">
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <div className="lg:col-span-1 flex flex-col items-center justify-center min-h-0 py-4 sm:py-6">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd"/>
                   </svg>
                 </div>
                 {upgradeChance > 0 && (
-                  <div className="mb-4">
-                    <div className={`text-2xl font-bold ${getChanceColor(upgradeChance)}`}>
+                  <div className="mb-3 sm:mb-4">
+                    <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${getChanceColor(upgradeChance)} animate-pulse`}>
                       {upgradeChance}%
                     </div>
-                    <div className="text-gray-400 text-sm">Шанс успеха</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Шанс успеха</div>
                   </div>
                 )}
                 <button
                   onClick={onUpgrade}
                   disabled={!canUpgrade || isUpgrading}
-                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-8 rounded-lg font-semibold text-lg transition-all duration-200 disabled:cursor-not-allowed"
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-2.5 px-6 sm:py-3 sm:px-8 md:py-3.5 md:px-10 rounded-lg font-semibold text-sm sm:text-base md:text-lg transition-all duration-200 disabled:cursor-not-allowed active:scale-95 shadow-lg hover:shadow-xl"
                 >
                   {isUpgrading ? (
                     <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Улучшение...
+                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                      <span className="text-xs sm:text-sm md:text-base">Улучшение...</span>
                     </div>
                   ) : (
                     'УЛУЧШИТЬ'
@@ -174,16 +175,16 @@ const SelectedItemsDisplay: React.FC<{
 
             {/* Целевой предмет */}
             <div className="lg:col-span-1 flex flex-col min-h-0">
-              <h3 className="text-lg font-semibold text-purple-400 mb-4 flex-shrink-0">Целевой предмет</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-purple-400 mb-3 sm:mb-4 flex-shrink-0">Целевой предмет</h3>
               <div className="overflow-y-auto flex-1 pr-2">
               {targetItem ? (
                 <div
-                  className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 cursor-pointer group"
+                  className="bg-black/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 active:scale-95 cursor-pointer group"
                   onClick={() => onRemoveTargetItem && onRemoveTargetItem()}
                   title="Кликните для отмены выбора"
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="relative w-20 h-20 bg-black/20 rounded-lg overflow-hidden">
+                  <div className="flex items-center space-x-3 sm:space-x-4">
+                    <div className="relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
                       <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(targetItem.rarity)} opacity-20`}></div>
                       {!imageError[targetItem.id] ? (
                         <img
@@ -196,15 +197,15 @@ const SelectedItemsDisplay: React.FC<{
                         <PlaceholderImage className="w-full h-full" />
                       )}
                       {/* Иконка удаления */}
-                      <div className="absolute top-1 right-1 w-6 h-6 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       </div>
                     </div>
-                    <div className="flex-1">
-                      <div className="text-white font-semibold mb-2">{targetItem.name}</div>
-                      <div className="space-y-1 text-sm">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-semibold text-sm sm:text-base mb-2 truncate">{targetItem.name}</div>
+                      <div className="space-y-1 text-xs sm:text-sm">
                         <div className="flex justify-between">
                           <span className="text-purple-300">Стоимость:</span>
                           <span className="text-purple-300 font-semibold">
@@ -222,9 +223,9 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 </div>
               ) : (
-                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-gray-600/30 h-32 flex items-center justify-center">
+                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-gray-600/30 h-24 sm:h-32 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-gray-400 text-sm">Не выбран</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Не выбран</div>
                     <div className="text-gray-500 text-xs">Выберите целевой предмет</div>
                   </div>
                 </div>
@@ -346,17 +347,17 @@ const UpgradeAnimationComponent: React.FC<{
   const isSuccess = upgradeResult.upgrade_success;
 
   return (
-    <div className="text-center py-8 relative">
+    <div className="text-center py-4 sm:py-6 md:py-8 relative px-2 sm:px-4 upgrade-wheel-animation">
       {/* Фоновое свечение */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
         {phase === 'preparing' && (
-          <div className="w-96 h-96 bg-gradient-radial from-purple-500/20 via-transparent to-transparent rounded-full animate-pulse" />
+          <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-radial from-purple-500/20 via-transparent to-transparent rounded-full animate-pulse" />
         )}
         {phase === 'spinning' && (
-          <div className="w-[500px] h-[500px] bg-gradient-radial from-cyan-500/30 via-purple-500/20 to-transparent rounded-full animate-spin-slow" />
+          <div className="w-80 h-80 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] bg-gradient-radial from-cyan-500/30 via-purple-500/20 to-transparent rounded-full animate-spin-slow" />
         )}
         {phase === 'showing_result' && (
-          <div className={`w-[600px] h-[600px] rounded-full animate-ping-slow ${
+          <div className={`w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] rounded-full animate-ping-slow ${
             isSuccess ? 'bg-gradient-radial from-emerald-500/30 to-transparent' : 'bg-gradient-radial from-rose-500/30 to-transparent'
           }`} />
         )}
@@ -396,8 +397,8 @@ const UpgradeAnimationComponent: React.FC<{
       )}
 
       {/* Главная анимация */}
-      <div className="relative mt-20 mb-20 flex justify-center z-10">
-        <div className="relative w-[320px] h-[320px] flex items-center justify-center">
+      <div className="relative mt-8 sm:mt-12 md:mt-20 mb-8 sm:mb-12 md:mb-20 flex justify-center z-10">
+        <div className="relative w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] flex items-center justify-center">
           {/* Внешнее кольцо с пульсацией */}
           <div className={`absolute inset-0 rounded-full border-2 transition-all duration-1000 ${
             phase === 'preparing' ? 'border-purple-500/40 scale-95 opacity-0' :
@@ -406,22 +407,22 @@ const UpgradeAnimationComponent: React.FC<{
           }`} />
 
           {/* Указатель с эффектом свечения */}
-          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="absolute -top-4 sm:-top-5 md:-top-6 left-1/2 transform -translate-x-1/2 z-30">
             <div className="relative">
-              <div className={`w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent transition-all duration-500 ${
+              <div className={`w-0 h-0 border-l-[8px] sm:border-l-[10px] md:border-l-[12px] border-r-[8px] sm:border-r-[10px] md:border-r-[12px] border-t-[14px] sm:border-t-[17px] md:border-t-[20px] border-l-transparent border-r-transparent transition-all duration-500 ${
                 phase === 'preparing' ? 'border-t-purple-400/80' :
                 phase === 'spinning' ? 'border-t-cyan-400 drop-shadow-glow-cyan animate-bounce-subtle' :
                 isSuccess ? 'border-t-emerald-400 drop-shadow-glow-emerald' : 'border-t-rose-400 drop-shadow-glow-rose'
               }`} />
               {phase === 'spinning' && (
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-6 bg-cyan-400/30 rounded-full blur-sm animate-ping" />
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-cyan-400/30 rounded-full blur-sm animate-ping" />
               )}
             </div>
           </div>
 
           {/* Основная рулетка */}
           <div
-            className={`w-72 h-72 rounded-full relative overflow-hidden transition-all duration-700 ${
+            className={`w-44 h-44 sm:w-56 sm:h-56 md:w-72 md:h-72 rounded-full relative overflow-hidden transition-all duration-700 ${
               phase === 'preparing' ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
             }`}
             style={{
@@ -431,18 +432,21 @@ const UpgradeAnimationComponent: React.FC<{
                 #475569 ${successChance}% 100%
               )`,
               transform: phase === 'spinning' || phase === 'showing_result'
-                ? `rotate(${finalRotation}deg)`
-                : 'rotate(0deg)',
+                ? `rotate(${finalRotation}deg) translateZ(0)`
+                : 'rotate(0deg) translateZ(0)',
               transition: phase === 'spinning'
                 ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99)'
                 : 'all 0.7s ease-out',
               boxShadow: phase === 'spinning'
-                ? '0 0 60px rgba(6, 182, 212, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+                ? '0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.3)'
                 : phase === 'showing_result'
                   ? isSuccess
-                    ? '0 0 80px rgba(16, 185, 129, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.3)'
-                    : '0 0 80px rgba(244, 63, 94, 0.5), inset 0 0 40px rgba(0, 0, 0, 0.3)'
-                  : '0 0 40px rgba(139, 92, 246, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+                    ? '0 0 60px rgba(16, 185, 129, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.3)'
+                    : '0 0 60px rgba(244, 63, 94, 0.5), inset 0 0 30px rgba(0, 0, 0, 0.3)'
+                  : '0 0 30px rgba(139, 92, 246, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.3)',
+              willChange: phase === 'spinning' ? 'transform' : 'auto',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
             }}
           >
             {/* Градиентный оверлей */}
@@ -452,7 +456,7 @@ const UpgradeAnimationComponent: React.FC<{
             {Array.from({ length: 36 }).map((_, i) => (
               <div
                 key={i}
-                className="absolute top-0 left-1/2 w-[1px] h-3 bg-white/20 origin-top"
+                className="absolute top-0 left-1/2 w-[1px] h-2 sm:h-2.5 md:h-3 bg-white/20 origin-top"
                 style={{
                   transform: `rotate(${i * 10}deg) translateX(-0.5px)`
                 }}
@@ -460,7 +464,7 @@ const UpgradeAnimationComponent: React.FC<{
             ))}
 
             {/* Центральный элемент */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
               <div className={`w-full h-full rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
                 phase === 'preparing' ? 'bg-slate-900/95 border-purple-500/50' :
                 phase === 'spinning' ? 'bg-slate-900/95 border-cyan-500/70 shadow-lg shadow-cyan-500/30' :
@@ -468,12 +472,12 @@ const UpgradeAnimationComponent: React.FC<{
                 'bg-rose-950/95 border-rose-500/70 shadow-lg shadow-rose-500/30'
               }`}>
                 <div className="text-center">
-                  <div className={`text-2xl font-bold transition-all duration-500 ${
+                  <div className={`text-lg sm:text-xl md:text-2xl font-bold transition-all duration-500 ${
                     phase === 'preparing' ? 'text-purple-300' :
                     phase === 'spinning' ? 'text-cyan-300' :
                     isSuccess ? 'text-emerald-300' : 'text-rose-300'
                   }`}>{successChance}%</div>
-                  <div className={`text-xs transition-all duration-500 ${
+                  <div className={`text-[10px] sm:text-xs transition-all duration-500 ${
                     phase === 'preparing' ? 'text-purple-400/70' :
                     phase === 'spinning' ? 'text-cyan-400/70' :
                     isSuccess ? 'text-emerald-400/70' : 'text-rose-400/70'
@@ -486,7 +490,7 @@ const UpgradeAnimationComponent: React.FC<{
           {/* Результат - показываем только после завершения анимации */}
           {showResult && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-              <div className={`text-7xl font-bold animate-scale-in ${
+              <div className={`text-5xl sm:text-6xl md:text-7xl font-bold animate-scale-in ${
                 isSuccess ? 'text-emerald-400 drop-shadow-glow-emerald' : 'text-rose-400 drop-shadow-glow-rose'
               }`}>
                 {isSuccess ? '✓' : '✕'}
@@ -497,8 +501,8 @@ const UpgradeAnimationComponent: React.FC<{
       </div>
 
       {/* Текст состояния */}
-      <div className="mb-8 relative z-10">
-        <h2 className={`text-4xl font-bold mb-4 transition-all duration-700 ${
+      <div className="mb-4 sm:mb-6 md:mb-8 relative z-10">
+        <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 transition-all duration-700 ${
           phase === 'preparing' ? 'text-purple-300 opacity-0 translate-y-4' :
           phase === 'spinning' ? 'text-cyan-300 opacity-100 translate-y-0' :
           isSuccess ? 'text-emerald-400 opacity-100 translate-y-0 drop-shadow-glow-emerald' :
@@ -506,7 +510,7 @@ const UpgradeAnimationComponent: React.FC<{
         }`}>
           {getPhaseTitle()}
         </h2>
-        <p className={`text-slate-300 text-lg transition-all duration-700 ${
+        <p className={`text-slate-300 text-sm sm:text-base md:text-lg transition-all duration-700 px-4 ${
           phase === 'preparing' ? 'opacity-0' : 'opacity-100'
         }`}>
           {phase === 'showing_result'
@@ -520,21 +524,21 @@ const UpgradeAnimationComponent: React.FC<{
 
       {/* Результат - показываем только после завершения анимации */}
       {showResult && (
-        <div className={`max-w-md mx-auto rounded-2xl p-8 border-2 backdrop-blur-md transition-all duration-1000 relative z-10 ${
+        <div className={`max-w-xs sm:max-w-sm md:max-w-md mx-auto rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 backdrop-blur-md transition-all duration-1000 relative z-10 ${
           isSuccess
             ? 'bg-gradient-to-br from-emerald-950/40 to-emerald-900/20 border-emerald-500/40 shadow-2xl shadow-emerald-500/20'
             : 'bg-gradient-to-br from-rose-950/40 to-rose-900/20 border-rose-500/40 shadow-2xl shadow-rose-500/20'
         } animate-fade-in-up`}>
           <div className="text-slate-100">
-            <div className="text-2xl font-bold mb-4">
+            <div className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
               {isSuccess ? 'Улучшение успешно' : 'Улучшение не удалось'}
             </div>
             {isSuccess && upgradeResult.data.result_item && (
-              <div className="text-lg mb-3 text-slate-200">
+              <div className="text-base sm:text-lg mb-2 sm:mb-3 text-slate-200">
                 Получен: <span className="font-bold text-emerald-300">{upgradeResult.data.result_item.name}</span>
               </div>
             )}
-            <div className="text-slate-300 mb-6">
+            <div className="text-slate-300 text-sm sm:text-base mb-4 sm:mb-6">
               {isSuccess
                 ? 'Ваши предметы были успешно трансформированы'
                 : 'Предметы были утрачены в процессе улучшения'
@@ -545,7 +549,7 @@ const UpgradeAnimationComponent: React.FC<{
             <div className="text-center">
               <button
                 onClick={() => onAnimationComplete()}
-                className={`px-8 py-3 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+                className={`px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                   isSuccess
                     ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50'
                     : 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50'
@@ -585,9 +589,9 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-xl p-3 border transition-all duration-300 ${
+      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
         canInteract
-          ? 'cursor-pointer hover:brightness-110 hover:shadow-xl'
+          ? 'cursor-pointer hover:brightness-110 hover:shadow-xl active:scale-95'
           : 'cursor-not-allowed opacity-50'
       } ${
         isSelected
@@ -600,7 +604,7 @@ const SourceItemCard: React.FC<{
     >
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '80px' }}>
+        <div className="relative mb-1.5 sm:mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '60px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
@@ -614,7 +618,7 @@ const SourceItemCard: React.FC<{
           )}
 
           {/* Количество предметов */}
-          <div className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-xs font-bold z-20 ${
+          <div className={`absolute top-0.5 left-0.5 sm:top-1 sm:left-1 px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-bold z-20 ${
             !canInteract && selectedCount === 0
               ? 'bg-red-800/80 text-red-200'
               : 'bg-black/80 text-white'
@@ -624,8 +628,8 @@ const SourceItemCard: React.FC<{
 
           {/* Индикатор блокировки (только если нельзя взаимодействовать и ничего не выбрано) */}
           {!canInteract && selectedCount === 0 && (
-            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-red-800/80 text-red-200 text-xs font-bold z-20">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 px-1 sm:px-1.5 py-0.5 rounded bg-red-800/80 text-red-200 text-[10px] sm:text-xs font-bold z-20">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
               </svg>
             </div>
@@ -633,8 +637,8 @@ const SourceItemCard: React.FC<{
 
           {/* Индикатор возможности удаления */}
           {selectedCount > 0 && (
-            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-cyan-800/80 text-cyan-200 text-xs font-bold z-20" title="Кликните для удаления">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 px-1 sm:px-1.5 py-0.5 rounded bg-cyan-800/80 text-cyan-200 text-[10px] sm:text-xs font-bold z-20" title="Кликните для удаления">
+              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </div>
@@ -643,27 +647,27 @@ const SourceItemCard: React.FC<{
           {/* Индикатор выбора */}
           {selectedCount > 0 && (
             <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
-              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{selectedCount}</span>
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-cyan-400 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-[10px] sm:text-xs font-bold">{selectedCount}</span>
               </div>
             </div>
           )}
         </div>
 
-        <div className="space-y-1">
-          <h3 className="text-white font-semibold text-xs truncate" title={item.name}>
+        <div className="space-y-0.5 sm:space-y-1">
+          <h3 className="text-white font-semibold text-[10px] sm:text-xs leading-tight truncate" title={item.name}>
             {item.name}
           </h3>
 
           {item.weapon_type && (
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 text-[9px] sm:text-xs truncate">
               {item.weapon_type}
             </p>
           )}
 
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-cyan-300">{t('upgrade.item_value')}</span>
-            <span className="text-cyan-300 font-semibold">
+          <div className="flex justify-between items-center text-[10px] sm:text-xs">
+            <span className="text-cyan-300 truncate">{t('upgrade.item_value')}</span>
+            <span className="text-cyan-300 font-semibold ml-1">
               <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
             </span>
           </div>
@@ -690,7 +694,7 @@ const TargetItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-xl p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl ${
+      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl active:scale-95 ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'
@@ -699,7 +703,7 @@ const TargetItemCard: React.FC<{
     >
       <div className="relative">
         {/* Изображение предмета */}
-        <div className="relative mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '80px' }}>
+        <div className="relative mb-1.5 sm:mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '60px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
@@ -713,17 +717,15 @@ const TargetItemCard: React.FC<{
           )}
 
           {/* Шанс успеха */}
-          <div className={`absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/80 ${getChanceColor(item.upgrade_chance)} text-xs font-bold z-20`}>
+          <div className={`absolute top-0.5 right-0.5 sm:top-1 sm:right-1 px-1 sm:px-1.5 py-0.5 rounded bg-black/80 ${getChanceColor(item.upgrade_chance)} text-[10px] sm:text-xs font-bold z-20 shadow-lg`}>
             {item.upgrade_chance}%
           </div>
-
-          {/* Убираем отображение бонуса за количество */}
 
           {/* Индикатор выбора с возможностью отмены */}
           {isSelected && (
             <div className="absolute inset-0 bg-cyan-400/20 rounded-lg z-15 flex items-center justify-center">
-              <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center" title="Кликните для отмены выбора">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-cyan-400 rounded-full flex items-center justify-center shadow-lg" title="Кликните для отмены выбора">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -731,35 +733,35 @@ const TargetItemCard: React.FC<{
           )}
         </div>
 
-        <div className="space-y-1">
-          <h3 className="text-white font-semibold text-xs truncate" title={item.name}>
+        <div className="space-y-0.5 sm:space-y-1">
+          <h3 className="text-white font-semibold text-[10px] sm:text-xs leading-tight truncate" title={item.name}>
             {item.name}
           </h3>
 
           {item.weapon_type && (
-            <p className="text-gray-400 text-xs">
+            <p className="text-gray-400 text-[9px] sm:text-xs truncate">
               {item.weapon_type}
             </p>
           )}
 
-          <div className="space-y-1">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-cyan-300">{t('upgrade.target_value')}</span>
-              <span className="text-cyan-300 font-semibold">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="flex justify-between items-center text-[10px] sm:text-xs">
+              <span className="text-cyan-300 truncate">{t('upgrade.target_value')}</span>
+              <span className="text-cyan-300 font-semibold ml-1">
                 <Monetary value={typeof item.price === 'string' ? parseFloat(item.price) : item.price} />
               </span>
             </div>
 
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-purple-300">{t('upgrade.success_chance')}</span>
-              <span className={`font-semibold ${getChanceColor(item.upgrade_chance)}`}>
+            <div className="flex justify-between items-center text-[10px] sm:text-xs">
+              <span className="text-purple-300 truncate">{t('upgrade.success_chance')}</span>
+              <span className={`font-semibold ml-1 ${getChanceColor(item.upgrade_chance)}`}>
                 {item.upgrade_chance}%
               </span>
             </div>
 
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-gray-400">{t('upgrade.price_ratio')}</span>
-              <span className="text-gray-400">
+            <div className="flex justify-between items-center text-[10px] sm:text-xs">
+              <span className="text-gray-400 truncate">{t('upgrade.price_ratio')}</span>
+              <span className="text-gray-400 ml-1">
                 x{item.price_ratio}
               </span>
             </div>
@@ -1112,37 +1114,37 @@ const UpgradePage: React.FC = () => {
       {/* Затемняющий оверлей */}
       <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80 -z-40"></div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
         {/* Заголовок */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <div className="text-center mb-4 sm:mb-6 md:mb-8">
+          <div className="inline-flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white">{t('upgrade.title')}</h1>
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{t('upgrade.title')}</h1>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd"/>
               </svg>
             </div>
           </div>
-          <p className="text-gray-400 text-lg">{t('upgrade.subtitle')}</p>
+          <p className="text-gray-400 text-sm sm:text-base md:text-lg px-4">{t('upgrade.subtitle')}</p>
         </div>
 
         {/* НОВОЕ: Предупреждения и информация */}
-        <div className="mb-6 space-y-3">
+        <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3">
           {/* Предупреждение о минимальной стоимости */}
           {totalSelectedPrice > 0 && totalSelectedPrice < 5 && (
-            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 backdrop-blur-sm">
-              <div className="flex items-start space-x-3">
-                <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
                 <div>
-                  <h3 className="text-red-300 font-semibold mb-1">Слишком низкая стоимость</h3>
-                  <p className="text-red-200 text-sm">
+                  <h3 className="text-red-300 font-semibold text-sm sm:text-base mb-1">Слишком низкая стоимость</h3>
+                  <p className="text-red-200 text-xs sm:text-sm">
                     Минимальная общая стоимость для улучшения - 5 chiCoins. Текущая: <span className="font-bold">{totalSelectedPrice.toFixed(2)} chiCoins</span>.
                     Выберите более дорогие предметы или добавьте еще.
                   </p>
@@ -1169,38 +1171,38 @@ const UpgradePage: React.FC = () => {
         />
 
         {/* Панель управления */}
-        <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-6 mb-8">
+        <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
 
           {/* Поиск и кнопки */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('upgrade.search_placeholder')}
-              className="bg-black/50 backdrop-blur-sm border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="bg-black/50 backdrop-blur-sm border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
             />
 
             <button
               onClick={handleClearSelection}
               disabled={selectedInventoryIds.length === 0}
-              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-3 px-4 rounded-lg transition-colors disabled:cursor-not-allowed"
+              className="bg-red-600 hover:bg-red-700 active:scale-95 disabled:bg-gray-600 text-white py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 rounded-lg text-sm sm:text-base transition-all disabled:cursor-not-allowed shadow-lg"
             >
               Сбросить выбор ({selectedInventoryIds.length})
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Выбор исходных предметов */}
-          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-6 border border-purple-800/30">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-white mb-2">
+          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-2">
                 {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
               </h2>
               {selectedInventoryIds.length >= 10 && (
-                <div className="text-yellow-400 text-sm flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <div className="text-yellow-400 text-xs sm:text-sm flex items-center">
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   Достигнут лимит предметов (10/10)
@@ -1209,32 +1211,32 @@ const UpgradePage: React.FC = () => {
             </div>
 
             {isLoadingItems ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
-                <span className="ml-3 text-gray-400">{t('upgrade.loading_items')}</span>
+              <div className="flex items-center justify-center py-8 sm:py-10 md:py-12">
+                <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-cyan-500"></div>
+                <span className="ml-2 sm:ml-3 text-gray-400 text-sm sm:text-base">{t('upgrade.loading_items')}</span>
               </div>
             ) : itemsError ? (
-              <div className="text-center py-12">
-                <p className="text-red-400 mb-4">{t('upgrade.error_loading_items')}</p>
+              <div className="text-center py-8 sm:py-10 md:py-12">
+                <p className="text-red-400 text-sm sm:text-base mb-3 sm:mb-4">{t('upgrade.error_loading_items')}</p>
                 <button
                   onClick={() => refetchItems()}
-                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+                  className="bg-purple-600 hover:bg-purple-700 active:scale-95 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base transition-all shadow-lg"
                 >
                   {t('upgrade.try_again')}
                 </button>
               </div>
             ) : filteredItems.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto mb-4 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-8 sm:py-10 md:py-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-cyan-500/20 rounded-full flex items-center justify-center animate-pulse">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 </div>
-                <p className="text-gray-400 text-lg mb-2">{t('upgrade.no_items_available')}</p>
-                <p className="text-gray-500 text-sm">{t('upgrade.open_cases_to_upgrade')}</p>
+                <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-2">{t('upgrade.no_items_available')}</p>
+                <p className="text-gray-500 text-xs sm:text-sm">{t('upgrade.open_cases_to_upgrade')}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3 max-h-72 sm:max-h-80 md:max-h-96 overflow-y-auto">
                 {filteredItems.map((itemGroup) => (
                   <SourceItemCard
                     key={itemGroup.item.id}
@@ -1250,33 +1252,33 @@ const UpgradePage: React.FC = () => {
           </div>
 
           {/* Выбор целевого предмета */}
-          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-6 border border-purple-800/30">
-            <h2 className="text-xl font-bold text-white mb-6">
+          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-4 sm:mb-6">
               {t('upgrade.step_2_title')}
             </h2>
 
             {selectedItemIds.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-8 sm:py-10 md:py-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center animate-pulse">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                   </svg>
                 </div>
-                <p className="text-gray-400">Сначала выберите предметы для улучшения</p>
+                <p className="text-gray-400 text-sm sm:text-base px-4">Сначала выберите предметы для улучшения</p>
               </div>
             ) : isLoadingOptions ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-                <span className="ml-3 text-gray-400">{t('upgrade.loading_options')}</span>
+              <div className="flex items-center justify-center py-8 sm:py-10 md:py-12">
+                <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-purple-500"></div>
+                <span className="ml-2 sm:ml-3 text-gray-400 text-sm sm:text-base">{t('upgrade.loading_options')}</span>
               </div>
             ) : upgradeOptions?.data?.upgrade_options.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-400">{t('upgrade.no_upgrade_options')}</p>
-                <p className="text-gray-500 text-sm mt-2">Попробуйте выбрать другие предметы или увеличьте их количество</p>
+              <div className="text-center py-8 sm:py-10 md:py-12">
+                <p className="text-gray-400 text-sm sm:text-base px-4">{t('upgrade.no_upgrade_options')}</p>
+                <p className="text-gray-500 text-xs sm:text-sm mt-2 px-4">Попробуйте выбрать другие предметы или увеличьте их количество</p>
               </div>
             ) : (
               <div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3 max-h-72 sm:max-h-80 md:max-h-96 overflow-y-auto">
                   {upgradeOptions?.data?.upgrade_options.map((item) => (
                     <TargetItemCard
                       key={item.id}
