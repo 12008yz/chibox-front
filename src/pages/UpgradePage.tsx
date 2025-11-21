@@ -361,39 +361,6 @@ const UpgradeAnimationComponent: React.FC<{
         )}
       </div>
 
-      {/* Частицы */}
-      {phase === 'preparing' && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {particles.map(p => (
-            <div
-              key={p.id}
-              className="absolute w-1 h-1 bg-purple-400 rounded-full opacity-0 animate-float-particle"
-              style={{
-                left: `${p.x}%`,
-                top: `${p.y}%`,
-                animationDelay: `${p.delay}s`
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {phase === 'showing_result' && isSuccess && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {particles.map(p => (
-            <div
-              key={p.id}
-              className="absolute w-2 h-2 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full opacity-0 animate-burst-particle"
-              style={{
-                left: `${p.x}%`,
-                top: `${p.y}%`,
-                animationDelay: `${p.delay}s`
-              }}
-            />
-          ))}
-        </div>
-      )}
-
       {/* Главная анимация */}
       <div className="relative mt-8 sm:mt-12 md:mt-20 mb-8 sm:mb-12 md:mb-20 flex justify-center z-10">
         <div className="relative w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] flex items-center justify-center">
@@ -1303,7 +1270,7 @@ const UpgradePage: React.FC = () => {
 
             {selectedItemIds.length === 0 ? (
               <div className="text-center py-8 sm:py-10 md:py-12">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center animate-pulse">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
                   </svg>
