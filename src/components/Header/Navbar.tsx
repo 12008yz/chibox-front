@@ -80,11 +80,12 @@ const Navbar: React.FC<NavbarProps> = ({
     <>
       {/* Основной навбар */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-[100] transition-[background-color,box-shadow] duration-300 will-change-[background-color] ${
           isScrolled
-            ? 'bg-gradient-to-b from-[#0a0e1a] to-transparent lg:bg-[#0a0e1a]/95 lg:backdrop-blur-lg lg:shadow-lg lg:shadow-black/20'
+            ? 'bg-gradient-to-b from-[#0a0e1a] to-transparent lg:bg-[#0a0e1a]/98 lg:shadow-lg lg:shadow-black/20'
             : 'bg-gradient-to-b from-[#0a0e1a] to-transparent'
         }`}
+        style={{ transform: 'translateZ(0)', contain: 'layout style paint' }}
       >
         <div className="max-w-[1920px] mx-auto">
           {/* Контейнер навбара */}
@@ -190,7 +191,7 @@ const Navbar: React.FC<NavbarProps> = ({
       >
         {/* Затемнение */}
         <div
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/90"
           onClick={toggleMobileMenu}
         ></div>
 

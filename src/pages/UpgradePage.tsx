@@ -702,7 +702,7 @@ const TargetItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl active:scale-95 ${
+      className={`bg-gradient-to-br from-[#1a1426]/95 to-[#0f0a1b]/95 rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 cursor-pointer hover:brightness-110 hover:shadow-xl active:scale-95 ${
         isSelected
           ? 'border-cyan-400 shadow-lg shadow-cyan-500/20'
           : 'border-purple-800/30 hover:border-purple-600/50 hover:shadow-purple-500/20'

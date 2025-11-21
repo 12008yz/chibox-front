@@ -360,7 +360,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         >
           <div className="relative">
             {/* Свечение вокруг стрелки */}
-            <div className="absolute inset-0 blur-xl bg-cyan-400 opacity-60 animate-pulse"></div>
+            <div className="absolute inset-0 bg-cyan-400 opacity-40 animate-pulse"></div>
             {/* Основная стрелка */}
             <FaArrowDown className="relative text-cyan-400 text-6xl drop-shadow-[0_0_20px_rgba(34,211,238,1)] filter brightness-150" />
           </div>

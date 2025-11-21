@@ -75,7 +75,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       <div
         ref={achievementsRef}
         data-achievements-section
-        className={`relative bg-black/40 backdrop-blur-md rounded-xl border transition-all duration-300 overflow-visible shadow-lg ${
+        className={`relative bg-black/50 rounded-xl border transition-all duration-300 overflow-visible shadow-lg ${
           isAchievementsExpanded
             ? 'border-red-500/50 shadow-lg shadow-red-500/20 z-[100]'
             : 'border-white/10 hover:border-red-500/30 z-10'
@@ -126,7 +126,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       </div>
 
       {/* Expandable Content */}
-      <div className={`absolute top-full left-0 right-0 bg-black/70 backdrop-blur-md border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
+      <div className={`absolute top-full left-0 right-0 bg-black/80 border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
         isAchievementsExpanded
           ? 'max-h-[600px] opacity-100 transform scale-y-100'
           : 'max-h-0 opacity-0 transform scale-y-95 pointer-events-none'

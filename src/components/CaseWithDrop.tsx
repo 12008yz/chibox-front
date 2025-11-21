@@ -134,7 +134,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
       </div>
 
       {/* Dropped Item Info (appears on hover) */}
-      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-500/30">
+      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 bg-black/95 rounded-lg p-2 border border-gray-500/30">
         <h6 className="text-white text-xs font-bold mb-2 truncate" title={droppedItem.item.name}>
           {droppedItem.item.name}
         </h6>

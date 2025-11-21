@@ -59,7 +59,7 @@ const ItemCard: React.FC<{
   };
 
   return (
-    <div className="backdrop-blur-md bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 rounded-xl p-2 md:p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
+    <div className="bg-gradient-to-br from-[#1a1426]/95 to-[#0f0a1b]/95 rounded-xl p-2 md:p-4 border border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/20">
       <div className="relative">
         {/* Изображение предмета */}
         <div className="relative mb-2 md:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
@@ -80,7 +80,7 @@ const ItemCard: React.FC<{
           </div>
           {/* Количество предметов */}
           {count > 1 && (
-            <div className="absolute top-1 md:top-2 left-1 md:left-2 px-1 md:px-2 py-0.5 md:py-1 rounded-md backdrop-blur-sm bg-black/80 text-white text-[10px] md:text-xs font-bold z-20">
+            <div className="absolute top-1 md:top-2 left-1 md:left-2 px-1 md:px-2 py-0.5 md:py-1 rounded-md bg-black/90 text-white text-[10px] md:text-xs font-bold z-20">
               x{count}
             </div>
           )}
@@ -384,7 +384,7 @@ const ExchangePage: React.FC = () => {
 
       <div className="relative z-10 container mx-auto px-2 md:px-4 py-4 md:py-8">
         {/* Простой игровой заголовок */}
-        <div className="text-center mb-4 md:mb-8 backdrop-blur-sm bg-black/20 rounded-xl p-3 md:p-6">
+        <div className="text-center mb-4 md:mb-8 bg-black/30 rounded-xl p-3 md:p-6">
           <div className="inline-flex items-center space-x-2 md:space-x-3 mb-2 md:mb-4">
             <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -403,7 +403,7 @@ const ExchangePage: React.FC = () => {
         </div>
 
         {/* Игровая панель управления */}
-        <div className="backdrop-blur-md bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 rounded-xl border border-purple-500/30 p-3 md:p-6 mb-4 md:mb-8">
+        <div className="bg-gradient-to-r from-[#1a1426]/90 to-[#2a1a3a]/90 rounded-xl border border-purple-500/30 p-3 md:p-6 mb-4 md:mb-8">
           {/* Статистика игрока */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-4 md:mb-6">
             <div className="rounded-lg p-2 md:p-4 border border-green-500/50">
@@ -450,7 +450,7 @@ const ExchangePage: React.FC = () => {
 
           {/* Переключатель режимов */}
           <div className="flex justify-center mb-4 md:mb-6">
-            <div className="backdrop-blur-sm bg-black/60 rounded-lg p-1 md:p-2 border border-gray-700">
+            <div className="bg-black/70 rounded-lg p-1 md:p-2 border border-gray-700">
               <div className="flex space-x-1 md:space-x-2">
                 <button
                   onClick={() => setSelectedTab('sell')}
@@ -484,7 +484,7 @@ const ExchangePage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('exchange.search_placeholder')}
-                className="w-full backdrop-blur-sm bg-black/60 border border-gray-600 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+                className="w-full bg-black/70 border border-gray-600 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
               />
             </div>
             <div>
@@ -506,7 +506,7 @@ const ExchangePage: React.FC = () => {
 
 
         {/* Инвентарь */}
-        <div className="backdrop-blur-md bg-[#1a1426]/80 rounded-xl p-3 md:p-6 border border-purple-800/30">
+        <div className="bg-[#1a1426]/90 rounded-xl p-3 md:p-6 border border-purple-800/30">
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-base md:text-xl font-bold text-white">
               {selectedTab === 'sell' ? t('exchange.items_for_sale') : t('exchange.items_for_exchange')}
@@ -533,7 +533,7 @@ const ExchangePage: React.FC = () => {
             </div>
           ) : groupedAndFilteredItems.length === 0 ? (
             <div className="text-center py-8 md:py-12">
-              <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-3 md:mb-4 backdrop-blur-sm bg-purple-500/30 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-3 md:mb-4 bg-purple-500/40 rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 md:w-12 md:h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>

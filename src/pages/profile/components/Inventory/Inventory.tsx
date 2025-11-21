@@ -48,7 +48,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
 
   return (
-    <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
+    <div className="bg-black/50 rounded-xl p-6 border border-white/10 shadow-lg">
       <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
         <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
           <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -67,7 +67,7 @@ const Inventory: React.FC<InventoryProps> = ({
       />
 
       {/* Tab Description */}
-      <div className="mb-4 p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10">
+      <div className="mb-4 p-3 bg-black/40 rounded-lg border border-white/10">
         <p className="text-sm text-gray-300">
           {activeInventoryTab === 'active' && t('profile.inventory_descriptions.active')}
           {activeInventoryTab === 'opened' && t('profile.inventory_descriptions.opened')}

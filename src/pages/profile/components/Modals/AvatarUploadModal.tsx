@@ -170,7 +170,7 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80"
       onClick={handleBackdropClick}
     >
       <div className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">

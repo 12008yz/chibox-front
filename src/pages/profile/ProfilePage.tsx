@@ -299,7 +299,7 @@ const ProfilePage: React.FC = () => {
               onClick={() => {
                 setIsDepositModalOpen(true);
               }}
-              className="w-full bg-gradient-to-br from-purple-500/80 to-indigo-600/80 backdrop-blur-md hover:from-purple-600/90 hover:to-indigo-700/90 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-purple-400/50"
+              className="w-full bg-gradient-to-br from-purple-500/85 to-indigo-600/85 hover:from-purple-600/95 hover:to-indigo-700/95 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-purple-400/50"
             >
               {t('profile.purchase_button')}
             </button>

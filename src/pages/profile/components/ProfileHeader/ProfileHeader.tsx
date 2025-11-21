@@ -17,11 +17,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
   return (
-    <div className="relative bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-white/10 overflow-hidden shadow-xl">
+    <div className="relative bg-black/50 rounded-2xl p-8 border border-white/10 overflow-hidden shadow-xl">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-green-500 to-blue-500 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-green-500 to-blue-500 rounded-full transform -translate-x-1/2 translate-y-1/2"></div>
       </div>
 
       {/* Action Buttons */}
@@ -30,7 +30,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         <button
           onClick={onSettingsClick}
           data-no-click-sound="true"
-          className="p-2 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg transition-colors border border-white/20 hover:border-white/30"
+          className="p-2 bg-black/50 hover:bg-black/70 rounded-lg transition-colors border border-white/20 hover:border-white/30"
           title={t('profile.profile_settings_title')}
         >
           <svg className="w-5 h-5 text-gray-300 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
 
         {/* Balance and Level Progress */}
         <div className="flex-1 space-y-4">
-          <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+          <div className="bg-black/40 rounded-xl p-4 border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-400 text-sm">{t('common.balance')}</span>
               <span className="text-2xl font-bold text-green-400">
@@ -104,7 +104,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
           </div>
 
           {/* Level Progress */}
-          <div className="bg-black/30 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+          <div className="bg-black/40 rounded-xl p-4 border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-gray-400 text-sm">{t('profile.level_progress')}</span>

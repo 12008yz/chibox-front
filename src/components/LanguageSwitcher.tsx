@@ -102,7 +102,7 @@ const LanguageSwitcher: React.FC = () => {
   const dropdownPortal = isOpen && createPortal(
     <div
       ref={dropdownRef}
-      className="fixed w-48 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-[10000] max-h-64 overflow-y-auto backdrop-blur-sm"
+      className="fixed w-48 bg-gray-800/95 border border-gray-600 rounded-lg shadow-xl z-[10000] max-h-64 overflow-y-auto"
       style={{
         top: `${dropdownPosition.top}px`,
         right: `${dropdownPosition.right}px`,

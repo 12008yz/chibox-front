@@ -107,7 +107,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
 
   return (
     <div className="absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
-      <div className="bg-gray-900/95 backdrop-blur-sm border border-gray-600/50 rounded-lg p-3 mx-2 shadow-xl max-w-full">
+      <div className="bg-gray-900/98 border border-gray-600/50 rounded-lg p-3 mx-2 shadow-xl max-w-full">
         {!showConfirm ? (
           <>
             <div className="text-center mb-2">

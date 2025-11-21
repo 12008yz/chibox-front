@@ -56,7 +56,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, content, position = 'bottom
 
   const tooltipElement = isVisible ? (
     <div
-      className="fixed bg-gray-900 text-white text-sm rounded-lg py-3 px-4 shadow-2xl border border-gray-600 min-w-[260px] max-w-sm backdrop-blur-sm"
+      className="fixed bg-gray-900/95 text-white text-sm rounded-lg py-3 px-4 shadow-2xl border border-gray-600 min-w-[260px] max-w-sm"
       style={{
         top: tooltipPosition.top,
         left: tooltipPosition.left,
@@ -69,7 +69,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, content, position = 'bottom
       {/* Стрелочка для tooltip */}
       <div
         className={`absolute w-0 h-0 border-4 ${
-          position === 'bottom' 
+          position === 'bottom'
             ? 'border-b-gray-900 border-l-transparent border-r-transparent border-t-transparent -top-2 left-1/2 transform -translate-x-1/2'
             : position === 'top'
             ? 'border-t-gray-900 border-l-transparent border-r-transparent border-b-transparent -bottom-2 left-1/2 transform -translate-x-1/2'

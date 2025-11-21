@@ -140,7 +140,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
             <div className="relative">
               {/* Эффект свечения кнопки */}
               {isGlowing && (
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg blur-md opacity-50 animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg opacity-30 animate-pulse" />
               )}
               <button
                 onClick={handleOpenBonusGame}
@@ -163,7 +163,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
         {/* Прогресс бар для времени */}
         {!isAvailable && timeLeft && bonusStatus?.time_until_next_seconds && (
           <div className="mt-4 relative">
-            <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm">
+            <div className="w-full bg-gray-700/70 rounded-full h-3 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-blue-500 via-purple-500 to-yellow-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden"
                 style={{ width: `${progressPercentage}%` }}

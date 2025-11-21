@@ -64,7 +64,7 @@
 /* CSS переменные для динамического управления производительности */
 :root {
   --animation-duration: 0.3s;
-  --enable-backdrop-filter: blur(5px);
+  --enable-backdrop-filter: none;
   --enable-animations: 1;
 }
 
