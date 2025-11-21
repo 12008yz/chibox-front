@@ -61,10 +61,10 @@ const SelectedItemsDisplay: React.FC<{
   // Скрываем на мобильных и планшетах если не идёт анимация
   if (selectedItems.length === 0 && !targetItem) {
     return (
-      <div className="hidden lg:block bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 min-h-[300px] sm:min-h-[400px] md:h-[520px]">
+      <div className="hidden lg:block bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 min-h-[300px] sm:min-h-[400px] md:h-[520px]">
         <div className="text-center h-full flex items-center justify-center">
           <div>
-            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center animate-pulse">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-purple-500/20 rounded-full flex items-center justify-center">
               <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -78,7 +78,7 @@ const SelectedItemsDisplay: React.FC<{
   }
 
   return (
-    <div className={`bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-6 sm:mb-8 min-h-[400px] sm:min-h-[450px] md:h-[520px] overflow-hidden ${!showAnimation ? 'hidden lg:block' : ''}`}
+    <div className={`bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-6 sm:mb-8 min-h-[400px] sm:min-h-[450px] md:h-[520px] overflow-hidden ${showAnimation ? '' : 'hidden lg:block'}`}>
       {showAnimation && upgradeResult ? (
         <UpgradeAnimationComponent
           upgradeResult={upgradeResult}
@@ -99,7 +99,7 @@ const SelectedItemsDisplay: React.FC<{
                 {selectedItems.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className="bg-black/30 backdrop-blur-sm rounded-lg p-2 sm:p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/40 active:scale-95 cursor-pointer group"
+                    className="bg-black/50 rounded-lg p-2 sm:p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/60 active:scale-95 cursor-pointer group"
                     onClick={() => onRemoveSourceItem && onRemoveSourceItem(item.id)}
                     title="Кликните для удаления"
                   >
@@ -133,7 +133,7 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 ))}
               </div>
-              <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-cyan-500/10 backdrop-blur-sm rounded-lg border border-cyan-500/30 flex-shrink-0">
+              <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30 flex-shrink-0">
                 <div className="text-cyan-300 text-xs sm:text-sm">
                   Общая стоимость: <span className="font-bold"><Monetary value={totalValue} /></span>
                 </div>
@@ -143,14 +143,14 @@ const SelectedItemsDisplay: React.FC<{
             {/* Кнопка улучшения */}
             <div className="lg:col-span-1 flex flex-col items-center justify-center min-h-0 py-4 sm:py-6">
               <div className="text-center mb-4 sm:mb-6">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/50 animate-pulse">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd"/>
                   </svg>
                 </div>
                 {upgradeChance > 0 && (
                   <div className="mb-3 sm:mb-4">
-                    <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${getChanceColor(upgradeChance)} animate-pulse`}>
+                    <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${getChanceColor(upgradeChance)}`}>
                       {upgradeChance}%
                     </div>
                     <div className="text-gray-400 text-xs sm:text-sm">Шанс успеха</div>
@@ -179,7 +179,7 @@ const SelectedItemsDisplay: React.FC<{
               <div className="overflow-y-auto flex-1 pr-2">
               {targetItem ? (
                 <div
-                  className="bg-black/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/40 active:scale-95 cursor-pointer group"
+                  className="bg-black/50 rounded-lg p-3 sm:p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/60 active:scale-95 cursor-pointer group"
                   onClick={() => onRemoveTargetItem && onRemoveTargetItem()}
                   title="Кликните для отмены выбора"
                 >
@@ -223,7 +223,7 @@ const SelectedItemsDisplay: React.FC<{
                   </div>
                 </div>
               ) : (
-                <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4 border border-gray-600/30 h-24 sm:h-32 flex items-center justify-center">
+                <div className="bg-black/50 rounded-lg p-4 border border-gray-600/30 h-24 sm:h-32 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-gray-400 text-xs sm:text-sm">Не выбран</div>
                     <div className="text-gray-500 text-xs">Выберите целевой предмет</div>
@@ -266,8 +266,8 @@ const UpgradeAnimationComponent: React.FC<{
     // Плавный скролл вверх при начале анимации
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Генерируем частицы для подготовки
-    const prepareParticles = Array.from({ length: 12 }, (_, i) => ({
+    // Генерируем частицы для подготовки (уменьшено для производительности)
+    const prepareParticles = Array.from({ length: 6 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -302,8 +302,14 @@ const UpgradeAnimationComponent: React.FC<{
 
       // Добавляем полные обороты и инвертируем угол (так как рулетка крутится против часовой стрелки)
       const fullRotations = 1440; // 4 полных оборота для большей драматичности
-      // Инвертируем угол, чтобы указатель корректно указывал на нужную зону
-      setFinalRotation(fullRotations - targetAngle);
+      const finalAngle = fullRotations - targetAngle;
+
+      // Важно: устанавливаем rotation с небольшой задержкой, чтобы браузер успел зарегистрировать начальное состояние
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setFinalRotation(finalAngle);
+        }, 50);
+      });
 
       // Показываем результат после вращения
       const timer2 = setTimeout(() => {
@@ -313,14 +319,6 @@ const UpgradeAnimationComponent: React.FC<{
         // Воспроизводим звук результата
         if (upgradeResult.upgrade_success) {
           soundManager.play('win');
-          // Генерируем праздничные частицы при успехе
-          const successParticles = Array.from({ length: 24 }, (_, i) => ({
-            id: i + 100,
-            x: 50 + Math.cos((i / 24) * Math.PI * 2) * 40 + (Math.random() - 0.5) * 10,
-            y: 50 + Math.sin((i / 24) * Math.PI * 2) * 40 + (Math.random() - 0.5) * 10,
-            delay: i * 0.02
-          }));
-          setParticles(successParticles);
         } else {
           soundManager.play('looseUpgrade');
         }
@@ -351,10 +349,10 @@ const UpgradeAnimationComponent: React.FC<{
       {/* Фоновое свечение */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
         {phase === 'preparing' && (
-          <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-radial from-purple-500/20 via-transparent to-transparent rounded-full animate-pulse" />
+          <div className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-radial from-purple-500/20 via-transparent to-transparent rounded-full" />
         )}
         {phase === 'spinning' && (
-          <div className="w-80 h-80 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] bg-gradient-radial from-cyan-500/30 via-purple-500/20 to-transparent rounded-full animate-spin-slow" />
+          <div className="w-80 h-80 sm:w-96 sm:h-96 md:w-[500px] md:h-[500px] bg-gradient-radial from-cyan-500/30 via-purple-500/20 to-transparent rounded-full" />
         )}
         {phase === 'showing_result' && (
           <div className={`w-96 h-96 sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] rounded-full animate-ping-slow ${
@@ -402,7 +400,7 @@ const UpgradeAnimationComponent: React.FC<{
           {/* Внешнее кольцо с пульсацией */}
           <div className={`absolute inset-0 rounded-full border-2 transition-all duration-1000 ${
             phase === 'preparing' ? 'border-purple-500/40 scale-95 opacity-0' :
-            phase === 'spinning' ? 'border-cyan-500/50 scale-100 opacity-100 animate-pulse-ring-simple' :
+            phase === 'spinning' ? 'border-cyan-500/50 scale-100 opacity-100' :
             isSuccess ? 'border-emerald-500/60 scale-105 opacity-100' : 'border-rose-500/60 scale-105 opacity-100'
           }`} />
 
@@ -415,14 +413,14 @@ const UpgradeAnimationComponent: React.FC<{
                 isSuccess ? 'border-t-emerald-400 drop-shadow-glow-emerald' : 'border-t-rose-400 drop-shadow-glow-rose'
               }`} />
               {phase === 'spinning' && (
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-cyan-400/30 rounded-full blur-sm animate-ping" />
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-cyan-400/30 rounded-full animate-ping" />
               )}
             </div>
           </div>
 
           {/* Основная рулетка */}
           <div
-            className={`w-44 h-44 sm:w-56 sm:h-56 md:w-72 md:h-72 rounded-full relative overflow-hidden transition-all duration-700 ${
+            className={`w-44 h-44 sm:w-56 sm:h-56 md:w-72 md:h-72 rounded-full relative overflow-hidden ${
               phase === 'preparing' ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
             }`}
             style={{
@@ -432,10 +430,16 @@ const UpgradeAnimationComponent: React.FC<{
                 #475569 ${successChance}% 100%
               )`,
               transform: phase === 'spinning' || phase === 'showing_result'
-                ? `rotate(${finalRotation}deg) translateZ(0)`
-                : 'rotate(0deg) translateZ(0)',
+                ? `rotate(${finalRotation}deg) translate3d(0, 0, 0)`
+                : 'rotate(0deg) translate3d(0, 0, 0)',
+              WebkitTransform: phase === 'spinning' || phase === 'showing_result'
+                ? `rotate(${finalRotation}deg) translate3d(0, 0, 0)`
+                : 'rotate(0deg) translate3d(0, 0, 0)',
               transition: phase === 'spinning'
-                ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99)'
+                ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99), -webkit-transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99)'
+                : 'all 0.7s ease-out',
+              WebkitTransition: phase === 'spinning'
+                ? '-webkit-transform 3.5s cubic-bezier(0.17, 0.67, 0.35, 0.99)'
                 : 'all 0.7s ease-out',
               boxShadow: phase === 'spinning'
                 ? '0 0 40px rgba(6, 182, 212, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.3)'
@@ -447,18 +451,22 @@ const UpgradeAnimationComponent: React.FC<{
               willChange: phase === 'spinning' ? 'transform' : 'auto',
               backfaceVisibility: 'hidden',
               WebkitBackfaceVisibility: 'hidden',
+              perspective: 1000,
+              WebkitPerspective: 1000,
+              transformStyle: 'preserve-3d',
+              WebkitTransformStyle: 'preserve-3d',
             }}
           >
             {/* Градиентный оверлей */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/20 pointer-events-none" />
 
-            {/* Деления на рулетке */}
-            {Array.from({ length: 36 }).map((_, i) => (
+            {/* Деления на рулетке (уменьшено для производительности) */}
+            {Array.from({ length: 24 }).map((_, i) => (
               <div
                 key={i}
                 className="absolute top-0 left-1/2 w-[1px] h-2 sm:h-2.5 md:h-3 bg-white/20 origin-top"
                 style={{
-                  transform: `rotate(${i * 10}deg) translateX(-0.5px)`
+                  transform: `rotate(${i * 15}deg) translateX(-0.5px)`
                 }}
               />
             ))}
@@ -524,7 +532,7 @@ const UpgradeAnimationComponent: React.FC<{
 
       {/* Результат - показываем только после завершения анимации */}
       {showResult && (
-        <div className={`max-w-xs sm:max-w-sm md:max-w-md mx-auto rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 backdrop-blur-md transition-all duration-1000 relative z-10 ${
+        <div className={`max-w-xs sm:max-w-sm md:max-w-md mx-auto rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 transition-all duration-1000 relative z-10 ${
           isSuccess
             ? 'bg-gradient-to-br from-emerald-950/40 to-emerald-900/20 border-emerald-500/40 shadow-2xl shadow-emerald-500/20'
             : 'bg-gradient-to-br from-rose-950/40 to-rose-900/20 border-rose-500/40 shadow-2xl shadow-rose-500/20'
@@ -589,7 +597,7 @@ const SourceItemCard: React.FC<{
 
   return (
     <div
-      className={`bg-gradient-to-br from-[#1a1426]/90 to-[#0f0a1b]/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
+      className={`bg-gradient-to-br from-[#1a1426] to-[#0f0a1b] rounded-lg sm:rounded-xl p-2 sm:p-3 border transition-all duration-300 ${
         canInteract
           ? 'cursor-pointer hover:brightness-110 hover:shadow-xl active:scale-95'
           : 'cursor-not-allowed opacity-50'
@@ -1137,7 +1145,7 @@ const UpgradePage: React.FC = () => {
         <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3">
           {/* Предупреждение о минимальной стоимости */}
           {totalSelectedPrice > 0 && totalSelectedPrice < 5 && (
-            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
+            <div className="bg-red-900/50 border border-red-500/50 rounded-lg p-3 sm:p-4">
               <div className="flex items-start space-x-2 sm:space-x-3">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1171,7 +1179,7 @@ const UpgradePage: React.FC = () => {
         />
 
         {/* Панель управления */}
-        <div className="bg-gradient-to-r from-[#1a1426]/80 to-[#2a1a3a]/80 backdrop-blur-md rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
+        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
 
           {/* Поиск и кнопки */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -1180,7 +1188,7 @@ const UpgradePage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('upgrade.search_placeholder')}
-              className="bg-black/50 backdrop-blur-sm border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+              className="bg-black/60 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
             />
 
             <button
@@ -1191,11 +1199,47 @@ const UpgradePage: React.FC = () => {
               Сбросить выбор ({selectedInventoryIds.length})
             </button>
           </div>
+
+          {/* Кнопка улучшения для мобильных устройств */}
+          <div className="lg:hidden mt-4">
+            {selectedInventoryIds.length > 0 && selectedTargetItem && (
+              <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="text-cyan-300 text-sm">Выбрано предметов: {selectedInventoryIds.length}/10</div>
+                    <div className="text-purple-300 text-sm">Общая стоимость: <Monetary value={totalSelectedPrice} /></div>
+                  </div>
+                  {upgradeChance > 0 && (
+                    <div className="text-center">
+                      <div className={`text-2xl font-bold ${upgradeChance >= 40 ? 'text-green-400' : upgradeChance >= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        {upgradeChance}%
+                      </div>
+                      <div className="text-gray-400 text-xs">Шанс</div>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handlePerformUpgrade}
+                  disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
+                  className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-lg font-semibold text-base transition-all duration-200 disabled:cursor-not-allowed active:scale-95 shadow-lg hover:shadow-xl"
+                >
+                  {isUpgrading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      <span>Улучшение...</span>
+                    </div>
+                  ) : (
+                    'УЛУЧШИТЬ'
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Выбор исходных предметов */}
-          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
+          <div className="bg-[#1a1426] rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
             <div className="mb-4 sm:mb-6">
               <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-2">
                 {t('upgrade.step_1_title')} ({selectedInventoryIds.length}/10)
@@ -1227,7 +1271,7 @@ const UpgradePage: React.FC = () => {
               </div>
             ) : filteredItems.length === 0 ? (
               <div className="text-center py-8 sm:py-10 md:py-12">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-cyan-500/20 rounded-full flex items-center justify-center animate-pulse">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-cyan-500/20 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
@@ -1252,7 +1296,7 @@ const UpgradePage: React.FC = () => {
           </div>
 
           {/* Выбор целевого предмета */}
-          <div className="bg-[#1a1426]/80 backdrop-blur-md rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
+          <div className="bg-[#1a1426] rounded-xl p-3 sm:p-4 md:p-6 border border-purple-800/30">
             <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-4 sm:mb-6">
               {t('upgrade.step_2_title')}
             </h2>
