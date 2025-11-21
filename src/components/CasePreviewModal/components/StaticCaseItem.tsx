@@ -11,8 +11,8 @@ export const StaticCaseItem = memo(({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className={`bg-gray-800 rounded-lg p-2 border-2 relative hover:scale-105 transition-transform duration-200 ${getRarityColor(item.rarity)} ${item.isExcluded ? 'opacity-50 grayscale' : ''}`}>
-      <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+    <div className={`bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative hover:scale-105 transition-transform duration-200 ${getRarityColor(item.rarity)} ${item.isExcluded ? 'opacity-50 grayscale' : ''}`}>
+      <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
         {item.image_url && !imageError ? (
           <img
             src={item.image_url}
@@ -45,7 +45,7 @@ export const StaticCaseItem = memo(({
         )}
       </div>
 
-      <div className="text-center">
+      <div className="text-center hidden md:block">
         <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
             style={{
               display: '-webkit-box',

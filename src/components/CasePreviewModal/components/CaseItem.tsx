@@ -52,7 +52,7 @@ export const CaseItem = memo(({
 
   // Предвычисляем все классы CSS с мемоизацией
   const itemClasses = useMemo(() => {
-    const baseClasses = `item-container bg-gray-800 rounded-lg p-2 border-2 relative ${getRarityColor(item.rarity)}`;
+    const baseClasses = `item-container bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative ${getRarityColor(item.rarity)}`;
     const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
     const highlightClasses = isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
     const betweenClasses = isBetweenItems ? 'ring-4 ring-orange-500 z-10 border-orange-500 shadow-2xl shadow-orange-500/50' : '';
@@ -151,9 +151,9 @@ export const CaseItem = memo(({
     >
       {shouldRenderSimplified ? (
         // Упрощенная версия для элементов вне области видимости
-        <div className="aspect-square mb-2 bg-gray-900 rounded" style={{ minHeight: '150px' }} />
+        <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded" style={{ minHeight: '150px' }} />
       ) : (
-        <div className="aspect-square mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+        <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
           {item.image_url && !imageError ? (
             <LazyLoadImage
               src={item.image_url}
@@ -285,7 +285,7 @@ export const CaseItem = memo(({
       )}
 
       {!shouldRenderSimplified && (
-        <div className="text-center">
+        <div className="text-center hidden md:block">
           <h3 className="text-white font-semibold text-sm mb-1 overflow-hidden"
               style={{
                 display: '-webkit-box',

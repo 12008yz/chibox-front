@@ -10,16 +10,16 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
   t
 }) => {
   return (
-    <div className="flex justify-between items-center p-6 border-b border-gray-700">
-      <div className="flex items-center space-x-4">
+    <div className="flex justify-between items-center p-3 sm:p-4 md:p-6 border-b border-gray-700">
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
         <img
           src={caseImageUrl}
           alt={caseData.name}
-          className="w-16 h-16 object-cover rounded"
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-cover rounded flex-shrink-0"
         />
-        <div>
-          <h2 className="text-2xl font-bold text-white">{caseData.name}</h2>
-          <p className="text-green-400 font-semibold">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base sm:text-xl md:text-2xl font-bold text-white truncate">{caseData.name}</h2>
+          <p className="text-green-400 font-semibold text-sm sm:text-base">
             {fixedPrices ? (
               <span className="text-yellow-400 font-bold">
                 {caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум')
