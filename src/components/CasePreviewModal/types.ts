@@ -54,7 +54,6 @@ export interface ModalFooterProps {
   statusData: any;
   statusLoading: boolean;
   fixedPrices: boolean;
-  paymentMethod: 'balance' | 'bank_card';
   userData: any;
   caseData: CaseTemplate;
   isProcessing: boolean;
@@ -65,7 +64,6 @@ export interface ModalFooterProps {
   handleBuyCase: () => void;
   handleOpenCase: (caseId?: string, inventoryItemId?: string) => void;
   getCasePrice: (caseData: CaseTemplate) => number;
-  checkBalanceSufficient: (price: number) => boolean;
   t: (key: string, options?: any) => string;
 }
 

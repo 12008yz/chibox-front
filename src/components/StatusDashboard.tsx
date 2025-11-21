@@ -150,7 +150,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none z-50">
+    <div className="flex flex-col items-center justify-center w-full max-w-full md:max-w-none px-4 md:px-0 z-50">
       <Title title={name} />
 
       <div className="text-center mb-4 md:mb-8">

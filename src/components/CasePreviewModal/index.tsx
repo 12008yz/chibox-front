@@ -1,4 +1,4 @@
-export { default } from '../CasePreviewModal';
+export { default } from './CasePreviewModal';
 export type { CasePreviewModalProps } from './types';
 export { CaseItem } from './components/CaseItem';
 export { StaticCaseItem } from './components/StaticCaseItem';
