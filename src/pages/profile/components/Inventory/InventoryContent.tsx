@@ -192,7 +192,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
         filteredInventory.map((inventoryItem) => (
           <div
             key={inventoryItem.id}
-            className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105 relative group ${
+            className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-colors duration-200 relative group ${
               activeTab !== 'active' ? 'opacity-75' : ''
             }`}
           >

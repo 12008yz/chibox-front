@@ -63,11 +63,11 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
   const itemImageUrl = getItemImageUrl(droppedItem.item.image_url, droppedItem.item.name);
 
   return (
-    <div className="group relative bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-500 cursor-pointer overflow-hidden">
+    <div className="group relative bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-colors duration-200 cursor-pointer overflow-hidden">
       {/* Case Container */}
       <div className="relative w-full aspect-square rounded-lg mb-3 flex items-center justify-center">
         {/* Case Image */}
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg p-1 transition-all duration-500 group-hover:-translate-y-20 group-hover:opacity-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg p-1 transition-all duration-300 group-hover:-translate-y-8 group-hover:opacity-0">
           {caseImageUrl ? (
             <img
               src={caseImageUrl}
@@ -88,7 +88,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
         </div>
 
         {/* Dropped Item Image (appears on hover) */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(droppedItem.item.rarity)} rounded-lg p-1 transition-all duration-500 opacity-0 translate-y-20 group-hover:opacity-100 group-hover:translate-y-0`}>
+        <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(droppedItem.item.rarity)} rounded-lg p-1 transition-all duration-300 opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0`}>
           <img
             src={itemImageUrl}
             alt={droppedItem.item.name}
@@ -105,17 +105,10 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
             </svg>
           </div>
         </div>
-
-        {/* Sparkle effect on hover */}
-        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-          <div className="absolute bottom-3 left-3 w-1 h-1 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-1/2 left-2 w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
-        </div>
       </div>
 
       {/* Case Info (always visible) */}
-      <div className="transition-all duration-300 group-hover:opacity-70">
+      <div className="transition-opacity duration-200 group-hover:opacity-70">
         <h5 className="text-white text-xs font-medium mb-1 truncate" title={caseName}>
           {caseName}
         </h5>
@@ -141,7 +134,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
       </div>
 
       {/* Dropped Item Info (appears on hover) */}
-      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-200 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-500/30">
+      <div className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-500/30">
         <h6 className="text-white text-xs font-bold mb-2 truncate" title={droppedItem.item.name}>
           {droppedItem.item.name}
         </h6>

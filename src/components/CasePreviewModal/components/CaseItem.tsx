@@ -77,11 +77,7 @@ export const CaseItem = memo(({
     switch (animationPhase) {
       case 'spinning':
       case 'speeding-up':
-        // Легкий blur эффект при быстром вращении
-        if (!isCurrentSliderPosition && !isWinningItemStopped) {
-          styles.filter = 'blur(1px)';
-          styles.transition = 'filter 0.15s ease-out';
-        }
+        // Эффекты отключены для лучшей производительности
         break;
       case 'fake-slowing':
         // Пульсация во время fake slowdown

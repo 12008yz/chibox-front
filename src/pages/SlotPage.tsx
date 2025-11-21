@@ -204,7 +204,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
                   : item.rarity === 'exotic' ? 'bg-pink-500 shadow-pink-500/50'
                   : 'bg-gray-400 shadow-gray-400/50'
                 }`}>
-                  <div className="absolute inset-0 rounded-full animate-ping opacity-30"></div>
                 </div>
               </div>
 
@@ -220,7 +219,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
            style={{ top: 'calc(50% - 20px)', transform: 'translateY(-50%)' }}>
         <div className="absolute left-1/2 top-1/2 w-3 h-3 rounded-full border-2 border-yellow-400 bg-yellow-400/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]"
              style={{ transform: 'translate(-50%, -50%)' }}>
-          <div className="absolute inset-0 rounded-full bg-yellow-400 animate-pulse"></div>
         </div>
       </div>
 
@@ -229,29 +227,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       {/* Нижний градиент для размытия */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none z-10"></div>
 
-      {/* Оптимизированный эффект дыма при победе */}
-      {showWinEffect && isWinning && (
-        <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden" style={{ contain: 'layout style paint' }}>
-          {/* Уменьшенное количество облаков дыма - 4 штуки вместо 18 */}
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={`smoke-${i}`}
-              className="absolute rounded-full opacity-0"
-              style={{
-                left: `${15 + i * 23}%`,
-                bottom: '-10%',
-                width: '110px',
-                height: '110px',
-                background: `radial-gradient(circle, rgba(200, 200, 200, 0.35) 0%, transparent 65%)`,
-                filter: 'blur(10px)',
-                animation: `smokeRise 3s ease-out forwards`,
-                animationDelay: `${i * 0.2}s`,
-                willChange: 'transform, opacity'
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
@@ -410,7 +385,7 @@ const SlotPage: React.FC = () => {
         {/* Улучшенный заголовок */}
         <div className="text-center mb-10">
           <div className="inline-block">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 animate-pulse flex items-center justify-center gap-4">
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 flex items-center justify-center gap-4">
               <img src="/images/status3.png" alt="Slot" className="w-16 h-16 object-contain" />
               {t('slots.title')}
             </h1>
@@ -427,30 +402,6 @@ const SlotPage: React.FC = () => {
 
             {/* Игровое поле */}
             <div className="bg-gradient-to-b from-gray-950/50 to-gray-900/50 rounded-2xl p-8 mb-8 border border-gray-800/50 relative overflow-hidden">
-
-              {/* Оптимизированный общий эффект дыма для всей игровой области */}
-              {!isSpinning && isWinning && (
-                <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden" style={{ contain: 'layout style paint' }}>
-                  {/* Уменьшенное количество облаков дыма - 6 штук вместо 31 */}
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={`global-smoke-${i}`}
-                      className="absolute rounded-full opacity-0"
-                      style={{
-                        left: `${10 + i * 15}%`,
-                        bottom: '-15%',
-                        width: '140px',
-                        height: '140px',
-                        background: `radial-gradient(circle, rgba(210, 210, 210, 0.3) 0%, transparent 65%)`,
-                        filter: 'blur(12px)',
-                        animation: `smokeRise 3.5s ease-out forwards`,
-                        animationDelay: `${i * 0.15}s`,
-                        willChange: 'transform, opacity'
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
 
               <div className="flex justify-center gap-8 mb-4 relative z-10">
                 {[0, 1, 2].map((reelIndex) => (
@@ -542,11 +493,6 @@ const SlotPage: React.FC = () => {
                     : 'bg-gray-700 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {/* Анимированный фон для активной кнопки */}
-                {canPlay && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 animate-[shimmer_2s_infinite]"></div>
-                )}
-
                 <span className="relative z-10">
                   {isLoading || isSpinning ? (
                     <span className="flex items-center gap-3 justify-center">
@@ -590,34 +536,7 @@ const SlotPage: React.FC = () => {
         </div>
       </div>
 
-      <style>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%) skewX(-12deg);
-          }
-          100% {
-            transform: translateX(200%) skewX(-12deg);
-          }
-        }
 
-        @keyframes smokeRise {
-          0% {
-            transform: translateY(0) scale(0.8);
-            opacity: 0;
-          }
-          20% {
-            opacity: 0.5;
-          }
-          50% {
-            opacity: 0.6;
-            transform: translateY(-250px) scale(1.3);
-          }
-          100% {
-            transform: translateY(-450px) scale(1.8);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 };
