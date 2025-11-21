@@ -101,7 +101,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <div
                     key={caseItem.id}
                     id={isFirstCase ? 'onboarding-cases' : undefined}
-                    className="transition-transform hover:scale-105 cursor-pointer"
+                    className="transition-transform duration-300 hover:scale-105 cursor-pointer"
+                    style={{ willChange: 'transform' }}
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
                       if (!(e.target as HTMLElement).closest('button')) {
@@ -130,7 +131,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
                     id={isFirstCase ? 'onboarding-cases' : undefined}
-                    className="transition-transform hover:scale-105"
+                    className="transition-transform duration-300 hover:scale-105"
+                    style={{ willChange: 'transform' }}
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >
                     <Case

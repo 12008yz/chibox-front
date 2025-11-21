@@ -206,7 +206,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   };
 
   const getCellStyle = (index: number) => {
-    const baseStyle = "w-24 h-24 border-4 border-gray-600 bg-gradient-to-br from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 transition-all duration-300 flex items-center justify-center text-3xl font-bold cursor-pointer rounded-lg shadow-lg transform hover:scale-105";
+    const baseStyle = "w-24 h-24 border-4 border-gray-600 bg-gradient-to-br from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 transition-colors duration-200 flex items-center justify-center text-3xl font-bold cursor-pointer rounded-lg shadow-lg";
 
     if (!game || !game.game_state) {
       return baseStyle + " cursor-not-allowed opacity-90";
@@ -221,7 +221,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     }
 
     if (selectedCell === index) {
-      return baseStyle + " bg-gradient-to-br from-blue-600 to-blue-700 scale-95";
+      return baseStyle + " from-blue-600 to-blue-700";
     }
 
     if (animatingCells.includes(index)) {
@@ -258,7 +258,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
   return (
     <div
       data-no-click-sound
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm"
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
       style={{ zIndex: 9999 }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {

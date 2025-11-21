@@ -36,10 +36,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   // Используем can_play с бэкенда, который уже учитывает и бесплатные попытки, и подписку
   const canPlay = !isSpinning && !isLoading && status?.can_play;
 
-  // Анимация вращения барабанов
+  // Анимация вращения барабанов (оптимизирована для снижения нагрузки на GPU)
   const spinDrums = async (finalCode: number[]) => {
     const spinDuration = 3000; // 3 секунды
-    const spinInterval = 50; // Обновление каждые 50ms
+    const spinInterval = 100; // Обновление каждые 100ms (снижено с 50ms для оптимизации)
     const totalSteps = spinDuration / spinInterval;
     let currentStep = 0;
 
@@ -206,12 +206,12 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Backdrop - убран backdrop-blur для оптимизации GPU */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/90"
         onClick={onClose}
       />
 
@@ -290,19 +290,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
           {/* Визуализация сейфа */}
           <div className="mb-6 flex justify-center px-4">
-            <motion.div
-              className="relative w-full max-w-[500px]"
-              animate={isSpinning ? {
-                x: [0, -2, 2, -2, 2, 0],
-                y: [0, -1, 1, -1, 1, 0],
-                rotate: [0, -0.5, 0.5, -0.5, 0.5, 0],
-                transition: {
-                  duration: 0.3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              } : {}}
-            >
+            <div className={`relative w-full max-w-[500px] ${isSpinning ? 'safe-shake' : ''}`}>
               {/* Изображение сейфа */}
               <img
                 src="/images/bonus-safe.png"
@@ -315,28 +303,9 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
               {/* Цифры в пустых блоках сейфа */}
               <div className="absolute top-[19%] min-[340px]:top-[20%] min-[425px]:top-[21%] sm:top-[22%] left-1/2 transform -translate-x-1/2 flex gap-[2.4%] w-[46%]">
                 {displayCode.map((digit, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ y: 0, x: 0, rotate: 0 }}
-                    animate={isSpinning ? {
-                      y: [0, -5, 5, -5, 5, 0],
-                      x: [0, -1, 1, -1, 1, 0],
-                      rotate: [0, -1, 1, -1, 1, 0],
-                      transition: {
-                        duration: 0.15,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }
-                    } : {
-                      y: 0,
-                      x: 0,
-                      rotate: 0,
-                      transition: {
-                        duration: 0.2,
-                        ease: "easeOut"
-                      }
-                    }}
-                    className="relative flex-1"
+                    className={`relative flex-1 ${isSpinning ? 'digit-spin' : ''}`}
                   >
                     <div className="w-full aspect-[1.2/1] flex items-center justify-center">
                       <span className="font-bold text-black font-mono drop-shadow-lg" style={{ fontSize: 'clamp(0.5rem, 8vw, 3rem)' }}>
@@ -352,7 +321,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                         )}
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
@@ -457,7 +426,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           </div>
 
           {/* Блок с загаданными числами */}

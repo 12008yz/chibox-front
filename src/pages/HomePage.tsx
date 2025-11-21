@@ -116,10 +116,6 @@ const HomePage: React.FC = () => {
     navigate('/login');
   };
 
-
-
-
-
   // Мутации для покупки и открытия кейсов
   const [buyCase] = useBuyCaseMutation();
   const [openCase] = useOpenCaseMutation();
@@ -128,8 +124,6 @@ const HomePage: React.FC = () => {
   const { data: ticTacToeData, refetch: refetchTicTacToe } = useGetCurrentTicTacToeGameQuery(undefined, {
     skip: !userData?.id, // Пропускаем запрос если пользователь не авторизован
   });
-
-
 
   // Проверяем, нужно ли показать модальное окно регистрации
   useEffect(() => {
@@ -149,7 +143,6 @@ const HomePage: React.FC = () => {
       navigate('/', { replace: true, state: {} });
     }
   }, [location.state, navigate]);
-
 
 
   const handleCloseRegistrationModal = () => {
@@ -295,15 +288,9 @@ const HomePage: React.FC = () => {
     }
   };
 
-
-
-
-
   if (casesError) {
     console.error('Ошибка загрузки кейсов:', casesError);
   }
-
-
 
   // Принудительное обновление данных при маунте
   useEffect(() => {

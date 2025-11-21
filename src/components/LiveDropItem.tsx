@@ -55,9 +55,8 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
         className={`
           relative w-40 h-44 rounded-lg border-2 p-4
           ${drop.isHighlighted ? 'border-yellow-400 shadow-yellow-400/40 bg-yellow-400/10 shadow-lg' : rarityColor}
-          transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer
+          transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer
           ${isHighValue ? 'animate-pulse' : ''}
-          backdrop-blur-sm
         `}
         style={{
           margin: '4px', // Добавляем отступ чтобы shadow и border не обрезались
@@ -65,7 +64,8 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           maxWidth: '160px',
           minHeight: '176px',
           maxHeight: '176px',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          willChange: 'transform'
         }}
       >
         {/* Спец эффекты для редких предметов */}

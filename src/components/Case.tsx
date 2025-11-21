@@ -64,7 +64,8 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="flex flex-col w-64 items-center rounded transition-all hover:scale-105 cursor-pointer"
+      className="flex flex-col w-64 items-center rounded transition-transform duration-300 hover:scale-105 cursor-pointer"
+      style={{ willChange: 'transform' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -75,13 +76,12 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       )}
 
       <div className="relative w-full flex items-center justify-center">
-        {/* Радиальное свечение - только при наведении */}
+        {/* Упрощенное свечение без blur для снижения нагрузки на GPU */}
         {isHovered && (
           <div
-            className="absolute inset-0 -ml-4"
+            className="absolute inset-0 -ml-4 opacity-30"
             style={{
-              background: 'radial-gradient(circle at center, rgba(120, 180, 255, 0.7) 0%, rgba(80, 140, 255, 0.45) 25%, rgba(60, 120, 255, 0.25) 45%, transparent 70%)',
-              filter: 'blur(25px)',
+              background: 'radial-gradient(circle at center, rgba(120, 180, 255, 0.5) 0%, transparent 60%)',
               pointerEvents: 'none',
               transform: 'scale(1.2)'
             }}
