@@ -98,7 +98,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
         {statusTiers.map((tier, index) => (
           <div
             key={index}
-            className={`group relative bg-gray-900/30 backdrop-blur-sm border rounded-xl p-6 transition-all duration-300 hover:transform hover:scale-105 cursor-pointer ${
+            className={`group relative bg-gray-900/40 border rounded-xl p-6 transition-all duration-300 hover:transform hover:scale-105 cursor-pointer ${
               tier.popular
                 ? 'border-purple-500/50 hover:border-purple-400/70 ring-2 ring-purple-500/20'
                 : 'border-gray-700/50 hover:border-gray-600/70'

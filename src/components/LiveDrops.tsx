@@ -72,12 +72,12 @@ const LiveDrops: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-black/30 backdrop-blur-sm py-6">
+      <div className="w-full bg-black/40 py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-gray-500 rounded-full pulse-dot"></div>
               <span className="text-sm text-gray-400">{t('live_drops.loading_drops')}</span>
             </div>
           </div>
@@ -86,7 +86,7 @@ const LiveDrops: React.FC = () => {
         {/* Горизонтальная загрузка */}
         <div className="flex gap-6 overflow-hidden px-6 py-2">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex-shrink-0 bg-white/5 backdrop-blur-sm rounded-lg p-4 animate-pulse" style={{ width: '160px', height: '176px', margin: '4px' }}>
+            <div key={i} className="flex-shrink-0 bg-white/5 rounded-lg p-4 skeleton-loading" style={{ width: '160px', height: '176px', margin: '4px' }}>
               <div className="w-8 h-8 bg-gray-600 rounded-full mx-auto mb-3"></div>
               <div className="w-20 h-20 bg-gray-600 rounded-lg mx-auto mb-2"></div>
               <div className="h-3 bg-gray-600 rounded w-full mb-1"></div>
@@ -101,7 +101,7 @@ const LiveDrops: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-black/30 backdrop-blur-sm py-6">
+    <div className="w-full bg-black/40 py-6">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
@@ -109,7 +109,7 @@ const LiveDrops: React.FC = () => {
             <div
               className={`w-2 h-2 rounded-full ${
                 isConnected
-                  ? 'bg-green-500 animate-pulse'
+                  ? 'bg-green-500 pulse-dot'
                   : 'bg-red-500'
               }`}
             ></div>
@@ -135,8 +135,8 @@ const LiveDrops: React.FC = () => {
       ) : (
         <div className="relative overflow-hidden py-2">
           {/* Градиентные края для эффекта затухания */}
-          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/30 to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/30 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-black/40 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-black/40 to-transparent z-10 pointer-events-none"></div>
 
           {/* Горизонтальный скролл контейнер */}
           <div

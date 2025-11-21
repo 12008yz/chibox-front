@@ -161,7 +161,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       <div className="w-full max-w-5xl mb-8">
         <div className={`relative bg-gradient-to-br ${currentStatus.color} p-6 rounded-2xl border border-white/20 shadow-2xl overflow-hidden`}>
           {/* Фоновые декорации */}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-black/30"></div>
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
 
@@ -183,7 +183,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               <div className="text-4xl font-bold text-white">{daysLeft}</div>
               <button
                 onClick={() => setIsDepositModalOpen(true)}
-                className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
+                className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300"
               >
                 {t('profile.purchase_button')}
               </button>
@@ -193,7 +193,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       </div>
 
       {/* Навигационные вкладки */}
-      <div className="flex space-x-1 mb-8 bg-gray-800/50 p-1 rounded-xl backdrop-blur-sm">
+      <div className="flex space-x-1 mb-8 bg-gray-800/60 p-1 rounded-xl">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -218,7 +218,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               <div
                 key={activity.id}
                 onClick={activity.available ? activity.action : undefined}
-                className={`group relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 status-card-hover activity-glow cursor-pointer ${
+                className={`group relative bg-gray-900/60 border border-gray-700/50 rounded-xl p-6 status-card-hover activity-glow cursor-pointer ${
                   activity.available
                     ? 'hover:border-gray-600/70'
                     : 'opacity-50 cursor-not-allowed'
@@ -264,7 +264,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
         {activeTab === 'stats' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {userStats.map((stat, index) => (
-              <div key={index} className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 text-center hover:border-gray-600/70 transition-all duration-300">
+              <div key={index} className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6 text-center hover:border-gray-600/70 transition-all duration-300">
                 <div className="flex justify-center mb-3">
                   <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center">
                     {stat.icon}
@@ -281,7 +281,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
         {activeTab === 'benefits' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
+            <div className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <FaFire className="text-orange-400" />
                 {t('auth.bonuses')}
@@ -324,7 +324,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               </div>
             </div>
 
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6">
+            <div className="bg-gray-900/60 border border-gray-700/50 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <MdTrendingUp className="text-green-400" />
                 {t('modals.all_bonuses_access')}

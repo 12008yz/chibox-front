@@ -76,22 +76,10 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       )}
 
       <div className="relative w-full flex items-center justify-center">
-        {/* Упрощенное свечение без blur для снижения нагрузки на GPU */}
-        {isHovered && (
-          <div
-            className="absolute inset-0 -ml-4 opacity-30"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(120, 180, 255, 0.5) 0%, transparent 60%)',
-              pointerEvents: 'none',
-              transform: 'scale(1.2)'
-            }}
-          />
-        )}
-
         <img
           src={caseImageUrl}
           alt={title}
-          className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 relative z-10 ${loaded ? '' : 'hidden'}`}
+          className={`w-1/2 md:w-full h-32 md:h-64 object-cover -ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'case-hover-glow' : ''}`}
           onLoad={() => setLoaded(true)}
           onError={() => {
             if (!imageError) {

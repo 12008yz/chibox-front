@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface CaseTimerProps {
@@ -10,6 +10,24 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
   const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isAvailable, setIsAvailable] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Intersection Observer для остановки обновлений когда компонент не виден
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!nextAvailableTime) {
@@ -21,15 +39,6 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
       const now = new Date().getTime();
       const targetTime = new Date(nextAvailableTime).getTime();
       const difference = targetTime - now;
-
-      // Логирование для отладки
-      // console.log('CaseTimer updateTimer:', {
-      //   nextAvailableTime,
-      //   now: new Date(now),
-      //   targetTime: new Date(targetTime),
-      //   difference,
-      //   isAvailable: difference <= 0
-      // });
 
       if (difference <= 0) {
         setIsAvailable(true);
@@ -53,26 +62,30 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
     };
 
     updateTimer();
-    const interval = setInterval(updateTimer, 1000);
+
+    // Обновляем таймер только если компонент виден
+    const interval = setInterval(() => {
+      if (isVisible) {
+        updateTimer();
+      }
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [nextAvailableTime]);
+  }, [nextAvailableTime, isVisible, t]);
 
   if (isAvailable) {
     return (
-      <div className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30 ${className}`}>
-        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+      <div ref={containerRef} className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30 ${className}`}>
+        <div className="w-2 h-2 bg-green-500 rounded-full pulse-dot" />
         <span className="text-green-400 text-sm font-medium">{t('common.cases_available')}</span>
       </div>
     );
   }
 
-
-
   return (
-    <div className={`inline-flex flex-col items-center space-y-1 px-4 py-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 ${className}`}>
+    <div ref={containerRef} className={`inline-flex flex-col items-center space-y-1 px-4 py-3 rounded-lg bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 ${className}`}>
       <div className="flex items-center space-x-2">
-        <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+        <div className="w-2 h-2 bg-orange-500 rounded-full pulse-dot" />
         <span className="text-orange-400 text-xs font-medium uppercase tracking-wide">
           {t('common.next_case')}
         </span>
