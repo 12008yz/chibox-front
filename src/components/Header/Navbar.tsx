@@ -88,28 +88,28 @@ const Navbar: React.FC<NavbarProps> = ({
       >
         <div className="max-w-[1920px] mx-auto">
           {/* Контейнер навбара */}
-          <div className="flex items-center justify-between px-4 lg:px-8 h-16 lg:h-20">
+          <div className="flex items-center justify-between px-2 md:px-4 lg:px-6 xl:px-8 h-16 lg:h-20">
 
             {/* Левая часть - Лого */}
             <Link
               to="/"
-              className="flex items-center gap-3 group relative z-10"
+              className="flex items-center gap-2 lg:gap-3 group relative z-10 flex-shrink-0"
             >
               <div className="relative">
                 <img
                   src="/images/logo.png"
                   alt="ChiBox Logo"
-                  className="w-10 h-10 lg:w-12 lg:h-12 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]"
+                  className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]"
                   onError={(e) => {
                     e.currentTarget.src = '/vite.svg';
                   }}
                 />
               </div>
               <div className="hidden sm:flex flex-col">
-                <span className="text-xl lg:text-2xl font-bold text-white tracking-tight">
+                <span className="text-lg md:text-xl xl:text-2xl font-bold text-white tracking-tight">
                   Chi<span className="text-orange-400">Box</span>
                 </span>
-                <div className="text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
+                <div className="text-[10px] md:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
                   <HiSparkles className="text-orange-400 animate-spin-slow" />
                 </div>
@@ -122,7 +122,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link
                   key={index}
                   to={link.to}
-                  className="group relative flex items-center gap-2 px-5 py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
+                  className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                 >
                   {/* Фоновый эффект при наведении */}
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"></div>
@@ -130,10 +130,10 @@ const Navbar: React.FC<NavbarProps> = ({
                   {/* Нижняя граница при наведении */}
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-3/4 transition-all duration-300"></div>
 
-                  <span className="relative z-10 text-orange-400 group-hover:scale-110 transition-transform duration-200">
+                  <span className="relative z-10 text-orange-400 group-hover:scale-110 transition-transform duration-200 text-sm xl:text-base">
                     {link.icon}
                   </span>
-                  <span className="relative z-10 font-medium text-sm whitespace-nowrap">
+                  <span className="relative z-10 font-medium text-xs xl:text-sm whitespace-nowrap">
                     {link.label}
                   </span>
                 </Link>
@@ -144,10 +144,10 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-3 lg:gap-6">
 
               {/* Онлайн пользователи (Desktop) */}
-              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
-                <ImConnection className="text-green-400 animate-pulse" />
-                <span className="text-sm text-gray-300 font-medium">
-                  <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> {t('header.online') || 'Online'}
+              <div className="hidden md:flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
+                <ImConnection className="text-green-400 animate-pulse text-sm lg:text-base" />
+                <span className="text-xs lg:text-sm text-gray-300 font-medium">
+                  <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> <span className="hidden xl:inline">{t('header.online') || 'Online'}</span>
                 </span>
               </div>
 
@@ -225,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
               <ImConnection className="text-green-400 animate-pulse" />
               <span className="text-sm text-gray-300 font-medium">
-                <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> {t('header.online') || 'Online'}
+                <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span>
               </span>
             </div>
 

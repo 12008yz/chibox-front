@@ -2,15 +2,31 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
+const RussianFlag = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" className="w-6 h-4">
+    <g fillRule="evenodd" strokeWidth="1pt">
+      <path fill="#fff" d="M0 0h640v480H0z"/>
+      <path fill="#0039a6" d="M0 160h640v320H0z"/>
+      <path fill="#d52b1e" d="M0 320h640v160H0z"/>
+    </g>
+  </svg>
+);
+
+const AmericanFlag = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" className="w-6 h-4">
+    <path fill="#bd3d44" d="M0 0h640v480H0"/>
+    <path stroke="#fff" strokeWidth="37" d="M0 55.3h640M0 129h640M0 203h640M0 277h640M0 351h640M0 425h640"/>
+    <path fill="#192f5d" d="M0 0h364.8v258.5H0"/>
+    <marker id="a" markerHeight="30" markerWidth="30">
+      <path fill="#fff" d="m14 0 9 27L0 10h28L5 27z"/>
+    </marker>
+    <path fill="none" markerMid="url(#a)" d="m0 0 16 11h61 61 61 61 60L47 37h61 61 60 61L16 63h61 61 61 61 60L47 89h61 61 60 61L16 115h61 61 61 61 60L47 141h61 61 60 61L16 166h61 61 61 61 60L47 192h61 61 60 61L16 218h61 61 61 61 60L0 0"/>
+  </svg>
+);
+
 const languages = [
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'ru', name: 'Русский', flag: <RussianFlag /> },
+  { code: 'en', name: 'English', flag: <AmericanFlag /> },
 ];
 
 const LanguageSwitcher: React.FC = () => {
@@ -104,7 +120,7 @@ const LanguageSwitcher: React.FC = () => {
             currentLanguage.code === language.code ? 'bg-gray-700 text-cyan-400' : ''
           }`}
         >
-          <span>{language.flag}</span>
+          <div className="flex items-center">{language.flag}</div>
           <span className="text-sm">{language.name}</span>
           {currentLanguage.code === language.code && (
             <span className="ml-auto text-cyan-400">✓</span>
@@ -121,10 +137,9 @@ const LanguageSwitcher: React.FC = () => {
         <button
           ref={buttonRef}
           onClick={toggleDropdown}
-          className="flex items-center gap-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
+          className="flex items-center gap-2 px-2 lg:px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
         >
-          <span>{currentLanguage.flag}</span>
-          <span className="hidden md:inline text-sm">{currentLanguage.name}</span>
+          <div className="flex items-center">{currentLanguage.flag}</div>
           <svg
             className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             fill="currentColor"

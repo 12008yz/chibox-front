@@ -385,7 +385,7 @@
 
 /* Gaming Balance Container - упрощено */
 .gaming-balance-container {
-  @apply px-2 lg:px-4 py-1.5 lg:py-2 rounded-lg;
+  @apply px-1 sm:px-2 lg:px-4 py-1 sm:py-1.5 lg:py-2 rounded-lg;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
   @apply border border-green-500/30;
   transition: transform var(--animation-duration) ease;
@@ -421,7 +421,7 @@
 
 /* Gaming Balance Add Button */
 .gaming-balance-add-button {
-  @apply w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center;
+  @apply w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center;
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
   @apply border border-green-500/40;
   color: rgb(34, 197, 94);
@@ -444,14 +444,14 @@
 
 /* Gaming Notification Button */
 .gaming-notification-button {
-  @apply relative p-2 lg:p-3 rounded-lg;
+  @apply relative p-1.5 md:p-2 xl:p-3 rounded-lg;
   background: rgba(99, 102, 241, 0.1);
   @apply border border-indigo-500/30;
   position: relative;
   overflow: visible;
   transition: all var(--animation-duration) ease;
   flex-shrink: 0;
-  min-width: 40px;
+  min-width: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +512,7 @@
 
 /* Gaming Profile Container */
 .gaming-profile-container {
-  @apply cursor-pointer p-1.5 lg:p-2 rounded-lg;
+  @apply cursor-pointer p-1 md:p-1.5 xl:p-2 rounded-lg;
   background: rgba(139, 92, 246, 0.1);
   @apply border border-purple-500/30;
   transition: all var(--animation-duration) ease;
@@ -532,11 +532,18 @@
 
 .gaming-avatar-wrapper {
   @apply relative flex-shrink-0;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
+  .gaming-avatar-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (min-width: 1280px) {
   .gaming-avatar-wrapper {
     width: 40px;
     height: 40px;

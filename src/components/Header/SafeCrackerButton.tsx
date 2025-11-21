@@ -25,7 +25,7 @@ const SafeCrackerButton = () => {
         onClick={() => setShowSafeCrackerGame(true)}
         disabled={!canPlay}
         className={`
-          relative gaming-button flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300
+          relative gaming-button flex items-center gap-2 px-2 xl:px-4 py-2 rounded-lg font-medium transition-all duration-300
           ${canPlay
             ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg hover:shadow-yellow-500/50'
             : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
@@ -43,8 +43,8 @@ const SafeCrackerButton = () => {
             : 'Нет доступных попыток'
         }
       >
-        <FaLock className={`text-lg ${canPlay ? 'animate-pulse' : ''}`} />
-        <span className="hidden lg:inline">Safe Cracker</span>
+        <FaLock className={`text-base xl:text-lg ${canPlay ? 'animate-pulse' : ''}`} />
+        <span className="hidden 2xl:inline">Safe Cracker</span>
       </button>
 
       <SafeCrackerGame

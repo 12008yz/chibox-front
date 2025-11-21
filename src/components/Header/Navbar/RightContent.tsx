@@ -90,21 +90,21 @@ const RightContent: React.FC<RightContentProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-2 xl:gap-4 relative overflow-visible">
-      {/* Бонус Safe Cracker - скрываем на маленьких экранах */}
-      <div className="hidden xl:block">
+    <div className="flex items-center gap-1 md:gap-2 xl:gap-3 2xl:gap-4 relative overflow-visible">
+      {/* Бонус Safe Cracker - скрываем на средних экранах */}
+      <div className="hidden 2xl:block">
         <SafeCrackerButton />
       </div>
 
       {/* Баланс */}
       <div id="onboarding-balance" className="gaming-balance-container">
-        <div className="flex items-center space-x-2">
-          <FaCoins className="text-yellow-400 text-base lg:text-xl animate-pulse mr-1 lg:mr-3" />
+        <div className="flex items-center space-x-1 lg:space-x-2">
+          <img src="/images/chiCoin.png" alt="ChiCoin" className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 animate-pulse" />
           <div className="flex flex-col">
-            <div className="gaming-balance-value text-sm lg:text-base">
+            <div className="gaming-balance-value text-[10px] sm:text-xs lg:text-sm xl:text-base">
               <Monetary value={user?.balance ?? 0} />
             </div>
-            <div className="gaming-balance-label text-xs">{t('header.balance')}</div>
+            <div className="gaming-balance-label text-xs hidden xl:block">{t('header.balance')}</div>
           </div>
           <button
             id="onboarding-deposit-button"
@@ -114,7 +114,7 @@ const RightContent: React.FC<RightContentProps> = ({
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
           >
-            <FaPlus className="text-xs lg:text-sm group-hover:scale-110 transition-transform duration-200" />
+            <FaPlus className="text-[8px] sm:text-xs lg:text-sm group-hover:scale-110 transition-transform duration-200" />
           </button>
         </div>
       </div>
@@ -127,9 +127,9 @@ const RightContent: React.FC<RightContentProps> = ({
         >
           <div className="relative">
             {notificationCount > 0 ? (
-              <FaBell className="gaming-notification-icon gaming-notification-active text-base lg:text-lg" />
+              <FaBell className="gaming-notification-icon gaming-notification-active text-sm lg:text-base xl:text-lg" />
             ) : (
-              <FaRegBell className="gaming-notification-icon text-base lg:text-lg" />
+              <FaRegBell className="gaming-notification-icon text-sm lg:text-base xl:text-lg" />
             )}
             {notificationCount > 0 && (
               <div className="gaming-notification-badge">
@@ -150,17 +150,17 @@ const RightContent: React.FC<RightContentProps> = ({
         )}
       </div>
 
-      {/* Переключатель языков - скрываем на средних экранах */}
-      <div className="hidden lg:block">
+      {/* Переключатель языков - скрываем на маленьких и средних экранах */}
+      <div className="hidden md:block">
         <LanguageSwitcher />
       </div>
 
       {/* Профиль пользователя */}
       <div
-        className="gaming-profile-container cursor-pointer"
+        className="gaming-profile-container cursor-pointer flex-shrink-0"
         onClick={handleProfileClick}
       >
-        <div className="flex items-center gap-2 lg:gap-3">
+        <div className="flex items-center gap-1 md:gap-2 xl:gap-3">
           <div className="gaming-avatar-wrapper">
             <Avatar
               image={user.avatar_url}
@@ -170,7 +170,7 @@ const RightContent: React.FC<RightContentProps> = ({
             />
             <div className="gaming-avatar-border"></div>
           </div>
-          <div className="hidden lg:flex flex-col min-w-[80px]">
+          <div className="hidden xl:flex flex-col min-w-[80px]">
             <span className="gaming-username truncate max-w-[120px]">{user.username}</span>
             <div className="flex items-center space-x-1">
               <RiVipCrownFill className="text-yellow-400 text-xs flex-shrink-0" />
