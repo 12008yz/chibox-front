@@ -258,9 +258,9 @@ const MobileUpgradeAnimation: React.FC<{
   onAnimationComplete: () => void;
 }> = ({ upgradeResult, onAnimationComplete }) => {
   const [phase, setPhase] = useState<'prepare' | 'aiming' | 'shooting' | 'impact' | 'result'>('prepare');
-  const [bulletPosition, setBulletPosition] = useState({ x: 50, y: 100 });
+  const [bulletPosition, setBulletPosition] = useState({ x: 50, y: 50 });
   const [hitPosition, setHitPosition] = useState({ x: 50, y: 50 });
-  const [targetPosition, setTargetPosition] = useState({ x: 50, y: 50 }); // Позиция движущейся мишени
+  const [crosshairPosition, setCrosshairPosition] = useState({ x: 50, y: 50 }); // Позиция прицела
   const [impactParticles, setImpactParticles] = useState<Array<{id: number, angle: number, delay: number}>>([]);
 
   const successChance = upgradeResult.data.success_chance;
@@ -269,12 +269,12 @@ const MobileUpgradeAnimation: React.FC<{
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Анимация движения мишени во время прицеливания
-    let targetInterval: NodeJS.Timeout | null = null;
-    let targetMovementTime = 0;
-    const targetSpeed = 0.02; // Скорость движения мишени
+    // Анимация движения прицела во время прицеливания
+    let crosshairInterval: NodeJS.Timeout | null = null;
+    let crosshairMovementTime = 0;
+    const crosshairSpeed = 0.02; // Скорость движения прицела
 
-    // Вычисляем точку попадания
+    // Вычисляем точку попадания на статичной мишени
     const targetRadius = 50; // радиус мишени в процентах от центра
     let hitX: number, hitY: number;
 
@@ -300,36 +300,29 @@ const MobileUpgradeAnimation: React.FC<{
     const timer1 = setTimeout(() => {
       setPhase('aiming');
 
-      // Запускаем движение мишени
-      targetInterval = setInterval(() => {
-        targetMovementTime += targetSpeed;
-        // Мишень двигается по синусоиде по горизонтали
-        const offsetX = Math.sin(targetMovementTime * Math.PI * 2) * 20; // ±20% от центра
-        // Небольшое вертикальное покачивание
-        const offsetY = Math.sin(targetMovementTime * Math.PI * 3) * 8; // ±8% от центра
-        setTargetPosition({
+      // Запускаем хаотичное движение прицела по всей области мишени
+      crosshairInterval = setInterval(() => {
+        crosshairMovementTime += crosshairSpeed;
+        // Прицел двигается хаотично по мишени (комбинация синусоид)
+        const offsetX = Math.sin(crosshairMovementTime * Math.PI * 2) * 25 + Math.cos(crosshairMovementTime * Math.PI * 1.5) * 15;
+        const offsetY = Math.sin(crosshairMovementTime * Math.PI * 2.3) * 25 + Math.cos(crosshairMovementTime * Math.PI * 1.7) * 15;
+        setCrosshairPosition({
           x: 50 + offsetX,
           y: 50 + offsetY
         });
       }, 16); // ~60fps
     }, 800);
 
-    // Фаза 2: Остановка мишени и подготовка к выстрелу (за 0.2s до выстрела)
+    // Фаза 2: Остановка прицела на точке попадания и подготовка к выстрелу (за 0.2s до выстрела)
     const timerStop = setTimeout(() => {
-      if (targetInterval) {
-        clearInterval(targetInterval);
-        targetInterval = null;
+      if (crosshairInterval) {
+        clearInterval(crosshairInterval);
+        crosshairInterval = null;
       }
-      // Фиксируем позицию мишени для выстрела
-      const finalTargetX = 50 + Math.sin(targetMovementTime * Math.PI * 2) * 20;
-      const finalTargetY = 50 + Math.sin(targetMovementTime * Math.PI * 3) * 8;
-      setTargetPosition({ x: finalTargetX, y: finalTargetY });
-
-      // Корректируем точку попадания относительно текущей позиции мишени
-      setHitPosition({
-        x: finalTargetX + (hitX - 50),
-        y: finalTargetY + (hitY - 50)
-      });
+      // Фиксируем прицел на точке попадания с плавной анимацией
+      setCrosshairPosition({ x: hitX, y: hitY });
+      // Устанавливаем начальную позицию пули в точку попадания
+      setBulletPosition({ x: hitX, y: hitY });
     }, 2100);
 
     // Фаза 3: Выстрел (2.3s)
@@ -337,13 +330,8 @@ const MobileUpgradeAnimation: React.FC<{
       setPhase('shooting');
       soundManager.play('upgrade');
 
-      // Пуля летит к скорректированной позиции
-      const finalTargetX = 50 + Math.sin(targetMovementTime * Math.PI * 2) * 20;
-      const finalTargetY = 50 + Math.sin(targetMovementTime * Math.PI * 3) * 8;
-      setBulletPosition({
-        x: finalTargetX + (hitX - 50),
-        y: finalTargetY + (hitY - 50)
-      });
+      // Пуля летит из позиции прицела к точке попадания на мишени
+      setBulletPosition({ x: hitX, y: hitY });
     }, 2300);
 
     // Фаза 3: Попадание (0.6s после выстрела)
@@ -371,7 +359,7 @@ const MobileUpgradeAnimation: React.FC<{
     }, 4100);
 
     return () => {
-      if (targetInterval) clearInterval(targetInterval);
+      if (crosshairInterval) clearInterval(crosshairInterval);
       clearTimeout(timer1);
       clearTimeout(timerStop);
       clearTimeout(timer2);
@@ -411,18 +399,10 @@ const MobileUpgradeAnimation: React.FC<{
             </div>
           </div>
 
-          {/* Контейнер для движущейся мишени */}
+          {/* Контейнер для статичной мишени */}
           <div className="relative w-64 h-64 mx-auto overflow-visible">
-            {/* Мишень с анимацией движения */}
-            <div
-              className="absolute w-full h-full transition-all"
-              style={{
-                left: `${targetPosition.x - 50}%`,
-                top: `${targetPosition.y - 50}%`,
-                transitionDuration: phase === 'aiming' ? '0ms' : '200ms',
-                transitionTimingFunction: 'linear'
-              }}
-            >
+            {/* Мишень (статична в центре) */}
+            <div className="absolute w-full h-full">
               {/* Фоновое свечение */}
               <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
                 phase === 'impact'
@@ -434,31 +414,41 @@ const MobileUpgradeAnimation: React.FC<{
 
               {/* Мишень - внешний круг (зона промаха) */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-red-900/40 to-red-950/60 border-4 border-red-700/50 shadow-2xl">
-              {/* Кольца мишени */}
-              <div className="absolute inset-[15%] rounded-full border-2 border-red-600/30" />
-              <div className="absolute inset-[30%] rounded-full border-2 border-red-500/30" />
+                {/* Кольца мишени */}
+                <div className="absolute inset-[15%] rounded-full border-2 border-red-600/30" />
+                <div className="absolute inset-[30%] rounded-full border-2 border-red-500/30" />
 
-              {/* Центральная зона успеха (бычий глаз) */}
-              <div
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-green-400/50 to-green-600/60 border-4 border-green-500 shadow-lg shadow-green-500/40"
-                style={{
-                  width: `${successChance}%`,
-                  height: `${successChance}%`,
-                  maxWidth: '100%',
-                  maxHeight: '100%'
-                }}
-              >
-                {/* Внутренний блик */}
-                <div className="absolute top-[20%] left-[20%] w-[30%] h-[30%] rounded-full bg-green-300/40 blur-sm" />
+                {/* Центральная зона успеха (бычий глаз) */}
+                <div
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-green-400/50 to-green-600/60 border-4 border-green-500 shadow-lg shadow-green-500/40"
+                  style={{
+                    width: `${successChance}%`,
+                    height: `${successChance}%`,
+                    maxWidth: '100%',
+                    maxHeight: '100%'
+                  }}
+                >
+                  {/* Внутренний блик */}
+                  <div className="absolute top-[20%] left-[20%] w-[30%] h-[30%] rounded-full bg-green-300/40 blur-sm" />
+                </div>
+
+                {/* Центральная точка */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-lg" />
               </div>
-
-              {/* Центральная точка */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-lg" />
             </div>
 
-            {/* Прицел (только во время прицеливания) */}
-            {phase === 'aiming' && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-pulse">
+            {/* Прицел (двигается по мишени во время прицеливания) */}
+            {(phase === 'aiming' || phase === 'shooting') && (
+              <div
+                className="absolute pointer-events-none transition-all z-10"
+                style={{
+                  left: `${crosshairPosition.x}%`,
+                  top: `${crosshairPosition.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                  transitionDuration: phase === 'aiming' ? '0ms' : '200ms',
+                  transitionTimingFunction: 'ease-out'
+                }}
+              >
                 <div className="relative">
                   {/* Перекрестие */}
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -466,14 +456,17 @@ const MobileUpgradeAnimation: React.FC<{
                     <div className="w-0.5 h-12 bg-cyan-400 shadow-lg shadow-cyan-400/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                   </div>
                   {/* Круг прицела */}
-                  <div className="w-16 h-16 rounded-full border-2 border-cyan-400 shadow-lg shadow-cyan-400/50 animate-spin-slow" />
+                  <div className={`w-16 h-16 rounded-full border-2 border-cyan-400 shadow-lg shadow-cyan-400/50 ${phase === 'shooting' ? 'border-4 scale-110' : ''}`} />
                   {/* Точка в центре */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-cyan-400" />
+                  <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400 ${phase === 'shooting' ? 'w-2 h-2' : 'w-1 h-1'}`} />
+
+                  {/* Вспышка выстрела */}
+                  {phase === 'shooting' && (
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-orange-400/60 animate-ping" />
+                  )}
                 </div>
               </div>
             )}
-            </div>
-            {/* Конец движущейся мишени */}
 
             {/* Пуля */}
             {(phase === 'shooting' || phase === 'impact') && (
