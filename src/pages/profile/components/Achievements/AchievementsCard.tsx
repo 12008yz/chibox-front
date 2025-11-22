@@ -82,36 +82,36 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
         }`}
       >
         {/* Main Achievement Card */}
-        <div className="p-6 cursor-pointer" onClick={toggleAchievements}>
-        <div className="flex items-center gap-3 mb-2">
-          <div className={`w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center transition-all duration-300 ${
+        <div className="p-4 sm:p-5 lg:p-6 cursor-pointer" onClick={toggleAchievements}>
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <div className={`w-9 h-9 sm:w-10 sm:h-10 bg-red-500/20 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
             isAchievementsExpanded
               ? 'bg-red-500/30 scale-110 shadow-lg shadow-red-500/20'
               : 'hover:bg-red-500/25 hover:scale-105'
           }`}>
-            <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
             </svg>
           </div>
-          <div className="flex-1">
-            <p className="text-gray-400 text-sm">{t('profile.achievements')}</p>
-            <p className="text-xl font-bold text-white">
+          <div className="flex-1 min-w-0">
+            <p className="text-gray-400 text-xs sm:text-sm truncate">{t('profile.achievements')}</p>
+            <p className="text-lg sm:text-xl font-bold text-white">
               {completedAchievementsCount}
-              <span className="text-gray-400 text-sm">/{totalAchievements}</span>
+              <span className="text-gray-400 text-xs sm:text-sm">/{totalAchievements}</span>
             </p>
           </div>
-          <div className={`text-red-400 transition-transform duration-300 ${
+          <div className={`text-red-400 transition-transform duration-300 flex-shrink-0 ${
             isAchievementsExpanded ? 'rotate-180' : 'hover:translate-y-1'
           }`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </div>
         </div>
 
         {/* Progress Preview */}
-        <div className="mt-3">
-          <div className="w-full bg-gray-700/30 rounded-full h-2 overflow-hidden">
+        <div className="mt-2 sm:mt-3">
+          <div className="w-full bg-gray-700/30 rounded-full h-1.5 sm:h-2 overflow-hidden">
             <div
               className={`h-full bg-gradient-to-r from-red-500 via-red-600 to-red-700 transition-all duration-500 rounded-full ${
                 isAchievementsExpanded ? 'shadow-sm shadow-red-500/50' : ''
@@ -119,8 +119,8 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
               style={{ width: `${Math.round((completedAchievementsCount / totalAchievements) * 100)}%` }}
             ></div>
           </div>
-          <div className="flex justify-end text-xs text-gray-400 mt-1">
-            <span>{isAchievementsExpanded ? t('profile.achievements_collapse_hint') : t('profile.achievements_expand_hint')}</span>
+          <div className="flex justify-end text-[10px] sm:text-xs text-gray-400 mt-1">
+            <span className="truncate">{isAchievementsExpanded ? t('profile.achievements_collapse_hint') : t('profile.achievements_expand_hint')}</span>
           </div>
         </div>
       </div>
@@ -153,8 +153,8 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
               </div>
             </div>
           ) : achievementsProgress.length > 0 ? (
-            <div className="p-6 max-h-[500px] overflow-y-auto custom-scrollbar">
-              <div className="space-y-3">
+            <div className="p-3 sm:p-4 lg:p-6 max-h-[400px] sm:max-h-[500px] overflow-y-auto custom-scrollbar">
+              <div className="space-y-2 sm:space-y-3">
                 {achievementsProgress.slice(0, 4).map((achievement, index) => {
                   // Проверяем, что achievement существует
                   if (!achievement) {
@@ -169,7 +169,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                   return (
                     <div
                       key={achievement.id}
-                      className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] transform ${
+                      className={`p-3 sm:p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] transform ${
                         isCompleted
                           ? 'bg-green-500/10 border-green-500/30 shadow-sm shadow-green-500/20'
                           : 'bg-gray-700/20 border-gray-600/30 hover:border-gray-500/50'
@@ -183,10 +183,10 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                         transitionDuration: '400ms'
                       }}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 sm:gap-3">
                         {/* Achievement Icon */}
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
                             isCompleted
                               ? 'bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-500/30'
                               : 'bg-gray-600/30 border border-gray-700/50'
@@ -237,29 +237,29 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
 
                         {/* Achievement Info */}
                         <div className="flex-1 min-w-0">
-                          <div className="mb-2">
+                          <div className="mb-1 sm:mb-2">
                             <div className="flex items-center justify-between gap-2 mb-1">
-                              <h5 className="font-medium text-white text-sm leading-tight">
+                              <h5 className="font-medium text-white text-xs sm:text-sm leading-tight truncate">
                                 {achievement.name ? translateAchievement(achievement.name, 'name') : t('profile.unknown_achievement')}
                               </h5>
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-blue-400">
-                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <div className="flex items-center gap-1 text-[10px] sm:text-xs text-blue-400">
+                              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822.88-.214-.33-.403-.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 01-.613-3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
                               </svg>
-                              <span>+{achievement.bonus_percentage || '0.5'}{t('profile.drop_bonus_text')}</span>
+                              <span className="truncate">+{achievement.bonus_percentage || '0.5'}{t('profile.drop_bonus_text')}</span>
                             </div>
                           </div>
 
-                          <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                          <p className="text-[10px] sm:text-xs text-gray-400 mb-1 sm:mb-2 line-clamp-2">
                             {achievement.description ? translateAchievement(achievement.description, 'description') : t('profile.no_description')}
                           </p>
 
                           {/* Progress */}
                           {!isCompleted && (
                             <div className="space-y-1">
-                              <div className="flex justify-between text-xs text-gray-400">
-                                <span>
+                              <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
+                                <span className="truncate">
                                   {progress}/{target}
                                   {achievement.requirement_type === 'subscription_days' ? ` ${t(getDaysDeclensionKey(target))}` :
                                    achievement.requirement_type === 'cases_opened' ? t('profile.cases_suffix') :
@@ -269,9 +269,9 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                                    achievement.requirement_type === 'rare_items_found' ? t('profile.items_suffix') :
                                    achievement.requirement_type === 'premium_items_found' ? t('profile.items_suffix') : ''}
                                 </span>
-                                <span>{progressPercentage}%</span>
+                                <span className="flex-shrink-0">{progressPercentage}%</span>
                               </div>
-                              <div className="w-full bg-gray-700/50 rounded-full h-1.5">
+                              <div className="w-full bg-gray-700/50 rounded-full h-1 sm:h-1.5">
                                 <div
                                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 rounded-full"
                                   style={{ width: `${progressPercentage}%` }}
@@ -287,13 +287,13 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
               </div>
 
               {/* Кнопка "Посмотреть все достижения" */}
-              <div className="pt-4">
+              <div className="pt-3 sm:pt-4">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenModal();
                   }}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                  className="w-full py-2 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold text-sm sm:text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
                   {t('achievements.view_all', 'Посмотреть все достижения')}
                 </button>

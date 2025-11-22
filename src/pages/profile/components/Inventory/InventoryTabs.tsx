@@ -59,22 +59,23 @@ const InventoryTabs: React.FC<InventoryTabsProps> = ({ activeTab, onTabChange, c
   ];
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6 p-1 bg-black/20 rounded-lg border border-gray-700/30">
+    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6 p-1 bg-black/20 rounded-lg border border-gray-700/30">
       {tabs.map((tab) => (
         <button
           key={tab.key}
           onClick={() => onTabChange(tab.key)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+          className={`px-2 py-1.5 sm:px-3 sm:py-2 lg:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 min-w-0 ${
             activeTab === tab.key
               ? `bg-gradient-to-r ${tab.gradient} text-white shadow-lg`
               : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
           }`}
         >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             {tab.icon}
           </svg>
-          {tab.label}
-          <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">{tab.count}</span>
+          <span className="truncate hidden sm:inline">{tab.label}</span>
+          <span className="truncate sm:hidden text-[10px]">{tab.label.split(' ')[0]}</span>
+          <span className="text-[10px] sm:text-xs bg-white/20 px-1 sm:px-2 py-0.5 rounded-full flex-shrink-0">{tab.count}</span>
         </button>
       ))}
     </div>

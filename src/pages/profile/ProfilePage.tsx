@@ -264,7 +264,7 @@ const ProfilePage: React.FC = () => {
       <div className="fixed inset-0 bg-black/50 -z-40" />
 
       <ScrollToTopOnMount />
-      <div className="relative z-10 container mx-auto max-w-7xl p-4 space-y-6">
+      <div className="relative z-10 container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
         {/* Header Section */}
         <ProfileHeader
@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
         />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
           {/* Best Weapon Section */}
           <BestWeapon
@@ -292,14 +292,14 @@ const ProfilePage: React.FC = () => {
           />
 
           {/* Achievements & Quick Stats */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Purchase Button */}
             <button
               data-no-click-sound
               onClick={() => {
                 setIsDepositModalOpen(true);
               }}
-              className="w-full bg-gradient-to-br from-purple-500/85 to-indigo-600/85 hover:from-purple-600/95 hover:to-indigo-700/95 text-white font-bold text-xl py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-purple-400/50"
+              className="w-full bg-gradient-to-br from-purple-500/85 to-indigo-600/85 hover:from-purple-600/95 hover:to-indigo-700/95 text-white font-bold text-lg sm:text-xl py-6 sm:py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-purple-400/50"
             >
               {t('profile.purchase_button')}
             </button>

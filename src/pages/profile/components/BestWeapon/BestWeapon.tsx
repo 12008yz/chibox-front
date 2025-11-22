@@ -32,22 +32,22 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
 
 
   const renderEmptyState = () => (
-    <div className="text-center py-8">
-      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
-        <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+    <div className="text-center py-6 sm:py-8">
+      <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-gray-600 to-gray-800 rounded-2xl flex items-center justify-center">
+        <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
           <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
           <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
         </svg>
       </div>
-      <p className="text-gray-400 text-lg">{t('profile.inventory_empty')}</p>
-      <p className="text-gray-500 text-sm mt-2">{t('profile.open_cases_hint')}</p>
+      <p className="text-gray-400 text-base sm:text-lg">{t('profile.inventory_empty')}</p>
+      <p className="text-gray-500 text-xs sm:text-sm mt-2">{t('profile.open_cases_hint')}</p>
     </div>
   );
 
   const renderLoadingState = () => (
-    <div className="text-center py-8">
-      <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-      <p className="text-gray-400">{t('common.loading')}</p>
+    <div className="text-center py-6 sm:py-8">
+      <div className="animate-spin w-7 h-7 sm:w-8 sm:h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-3 sm:mb-4"></div>
+      <p className="text-gray-400 text-sm sm:text-base">{t('common.loading')}</p>
     </div>
   );
 
@@ -59,9 +59,9 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
     const weaponPrice = isDirectWeapon ? bestWeapon.price : (bestWeapon.item?.price || 0);
 
     return (
-      <div className="bg-black/40 rounded-xl p-6 border-2 border-white/10 hover:border-orange-500/50 transition-all duration-300">
-        <div className="flex items-center gap-6">
-          <div className="relative w-20 h-20 rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container">
+      <div className="bg-black/40 rounded-xl p-3 sm:p-4 lg:p-6 border-2 border-white/10 hover:border-orange-500/50 transition-all duration-300">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 lg:gap-6">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container flex-shrink-0">
             <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(
               weaponData?.rarity || ''
             )} opacity-20 rounded-xl`}></div>
@@ -79,25 +79,25 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
               }}
             />
             <div className="absolute inset-0 w-full h-full bg-gray-800 rounded-lg flex items-center justify-center z-10" style={{ display: 'none' }}>
-              <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
               </svg>
             </div>
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-lg font-bold text-white">
+          <div className="flex-1 text-center sm:text-left min-w-0 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 mb-2">
+              <h4 className="text-base sm:text-lg font-bold text-white truncate max-w-full">
                 {weaponData?.name || ''}
               </h4>
               {/* Бейдж редкости */}
-              <span className={`px-3 py-1 rounded-md bg-gradient-to-r ${getRarityColor(
+              <span className={`px-2 sm:px-3 py-1 rounded-md bg-gradient-to-r ${getRarityColor(
                 weaponData?.rarity || ''
-              )} text-white text-xs font-bold whitespace-nowrap`}>
+              )} text-white text-xs font-bold whitespace-nowrap flex-shrink-0`}>
                 {getRarityName(weaponData?.rarity || '', t)}
               </span>
             </div>
-            <div className="flex items-center gap-4 mb-2">
-              <span className="text-green-400 font-bold text-lg">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 mb-2">
+              <span className="text-green-400 font-bold text-base sm:text-lg">
                 <Monetary value={Number(weaponPrice)} showFraction={true} />
               </span>
               {bestWeapon.isRecord && (
@@ -106,7 +106,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
                 </span>
               )}
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-xs sm:text-sm truncate">
               {weaponData?.weapon_type ? (
                 `${t('profile.weapon_type')} ${weaponData.weapon_type || t('profile.weapon_type_default')}`
               ) : bestWeapon.acquisition_date ? (
@@ -122,14 +122,14 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
   };
 
   return (
-    <div className="lg:col-span-2 bg-black/50 rounded-xl p-6 border border-white/10 shadow-lg">
-      <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+    <div className="lg:col-span-2 bg-black/50 rounded-xl p-4 sm:p-5 lg:p-6 border border-white/10 shadow-lg">
+      <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12a3 3 0 01-2.5-1.5c-.345-.23-.614-.558-.822-.88-.214-.33-.403-.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 01-.613 3.58 2.64 2.64 0 01-.945 1.067c-.328.68-.398 1.534-.398 2.654A1 1 0 015.05 6.05 6.981 6.981 0 013 11a7 7 0 1111.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03z" clipRule="evenodd" />
           </svg>
         </div>
-        {t('public_profile.all_time_record')}
+        <span className="truncate">{t('public_profile.all_time_record')}</span>
       </h3>
 
       {(inventoryLoading && !user.inventory?.length) ?
