@@ -130,6 +130,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link
                   key={index}
                   to={link.to}
+                  id={link.to === "/slot" ? "onboarding-slot-button" : undefined}
                   className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                 >
                   {/* Фоновый эффект при наведении */}

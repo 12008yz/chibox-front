@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaArrowDown, FaTimes } from 'react-icons/fa';
+import { FaArrowDown, FaTimes, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface OnboardingStep {
   id: string;
@@ -9,6 +9,8 @@ interface OnboardingStep {
   description: string;
   position: 'top' | 'bottom' | 'left' | 'right';
   arrowDirection: 'down' | 'right' | 'up' | 'left';
+  mobileTitle?: string;
+  mobileDescription?: string;
 }
 
 interface OnboardingTourProps {
@@ -20,6 +22,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [targetPosition, setTargetPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const steps: OnboardingStep[] = [
     {
@@ -28,7 +31,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.welcome_title', '🎉 Добро пожаловать!'),
       description: t('onboarding.welcome_description', 'Поздравляем с регистрацией! Специально для вас мы подготовили приветственные бонусы на первые 2 дня. Давайте покажем все возможности!'),
       position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '🎉 Добро пожаловать!',
+      mobileDescription: 'Поздравляем! У вас есть 2 дня бонусов:\n\n✅ 2 бесплатных кейса\n✅ 2 попытки в слоты (в 16:00 МСК)\n✅ 2 попытки взлома сейфа (в 16:00 МСК)\n✅ 2 игры в крестики-нолики (в 16:00 МСК)'
     },
     {
       id: 'free_cases',
@@ -36,7 +41,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.free_cases_title', '🎁 2 Бесплатных Кейса!'),
       description: t('onboarding.free_cases_description', 'Вот ваш бесплатный кейс! У вас есть 2 попытки. Успейте открыть их!'),
       position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '🎁 Бесплатные Кейсы',
+      mobileDescription: 'Прокрутите вниз и найдите бесплатные кейсы. У вас есть 2 попытки открыть их!'
     },
     {
       id: 'slot',
@@ -44,7 +51,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.slot_title', '🎰 Слоты - 2 Попытки!'),
       description: t('onboarding.slot_description', 'Нажмите сюда, чтобы открыть слот-машину! У вас 2 бесплатные попытки. Первая доступна сразу, вторая — в 16:00 МСК. Действует 2 дня с регистрации!'),
       position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '🎰 Слоты',
+      mobileDescription: 'Откройте меню (☰ в правом верхнем углу) и нажмите "Слот". У вас 2 бесплатные попытки (вторая в 16:00 МСК)!'
     },
     {
       id: 'safe',
@@ -52,7 +61,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.safe_title', '🔐 Сейф - 2 Попытки!'),
       description: t('onboarding.safe_description', 'Здесь кнопка взлома сейфа! 2 бесплатные попытки подобрать код и получить награду. Первая попытка сейчас, вторая — в 16:00 МСК. Успейте за 2 дня!'),
       position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '🔐 Сейф',
+      mobileDescription: 'В меню (☰) справа от баланса найдите кнопку с замком 🔒. Это сейф! 2 бесплатные попытки (вторая в 16:00 МСК).'
     },
     {
       id: 'tictactoe',
@@ -60,15 +71,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.tictactoe_title', '⭕❌ Крестики-нолики - 2 Попытки!'),
       description: t('onboarding.tictactoe_description', 'Нажмите "Играть" на этом кейсе! 2 бесплатные игры в крестики-нолики. Победите компьютер и получите бонусный кейс. Первая игра сейчас, вторая — в 16:00 МСК. 2 дня!'),
       position: 'bottom',
-      arrowDirection: 'down'
-    },
-    {
-      id: 'bonus_reminder',
-      targetId: 'onboarding-balance',
-      title: t('onboarding.bonus_reminder_title', '⏰ Важно: 2 Дня!'),
-      description: t('onboarding.bonus_reminder_description', 'Все бонусы (кейсы, слоты, сейф, крестики-нолики) действуют только 2 дня с момента регистрации! Не упустите возможность, используйте все бесплатные попытки!'),
-      position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '⭕❌ Крестики-нолики',
+      mobileDescription: 'Прокрутите кейсы и найдите кейс "Крестики-нолики". Победите компьютер, чтобы получить награду! 2 игры (вторая в 16:00 МСК).'
     },
     {
       id: 'balance',
@@ -76,18 +81,32 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       title: t('onboarding.balance_title', '💎 Ваш Баланс'),
       description: t('onboarding.balance_description', 'Здесь отображается ваш баланс. После того как закончатся бесплатные бонусы, можете пополнить счёт и продолжить играть в любое время!'),
       position: 'bottom',
-      arrowDirection: 'down'
+      arrowDirection: 'down',
+      mobileTitle: '💎 Ваш Баланс',
+      mobileDescription: 'В меню (☰) вверху вы увидите свой баланс. После окончания бонусов можете пополнить его кнопкой "+".'
     }
   ];
 
+  // Определяем размер экрана
   useEffect(() => {
-    if (!isActive) return;
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!isActive || isMobile) return;
 
     const updatePosition = () => {
       const step = steps[currentStep];
       if (!step) return;
 
       const element = document.getElementById(step.targetId);
+
       if (element) {
         const rect = element.getBoundingClientRect();
         setTargetPosition({
@@ -96,6 +115,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           width: rect.width,
           height: rect.height
         });
+      } else {
+        setTimeout(updatePosition, 100);
       }
     };
 
@@ -107,7 +128,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition);
     };
-  }, [isActive, currentStep]);
+  }, [isActive, currentStep, isMobile]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -117,21 +138,141 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     }
   };
 
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const handleSkip = () => {
     onComplete();
   };
 
-  if (!isActive || !targetPosition) return null;
+  if (!isActive) return null;
 
   const step = steps[currentStep];
+
+  // Мобильная версия - простое модальное окно
+  if (isMobile) {
+    return (
+      <>
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .mobile-onboarding-modal {
+            animation: slideUp 0.3s ease-out;
+          }
+        `}</style>
+
+        <div className="fixed inset-0 z-[99999] flex items-end sm:items-center justify-center p-4 pointer-events-auto">
+          {/* Затемнение */}
+          <div
+            className="absolute inset-0 bg-black/80"
+            style={{ animation: 'fadeIn 0.2s ease-out' }}
+            onClick={handleSkip}
+          ></div>
+
+          {/* Модальное окно */}
+          <div className="mobile-onboarding-modal relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 max-w-md w-full border-2 border-cyan-400 shadow-2xl">
+            {/* Кнопка закрытия */}
+            <button
+              onClick={handleSkip}
+              className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors p-2"
+            >
+              <FaTimes className="text-xl" />
+            </button>
+
+            {/* Заголовок */}
+            <h2 className="text-white text-2xl font-bold mb-4 pr-8">
+              {step.mobileTitle || step.title}
+            </h2>
+
+            {/* Описание */}
+            <p className="text-gray-300 text-base leading-relaxed mb-6 whitespace-pre-line">
+              {step.mobileDescription || step.description}
+            </p>
+
+            {/* Прогресс */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex space-x-2">
+                {steps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-2 w-8 rounded-full transition-all ${
+                      index === currentStep
+                        ? 'bg-cyan-400 scale-110'
+                        : index < currentStep
+                        ? 'bg-cyan-600'
+                        : 'bg-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-gray-400 text-sm font-medium">
+                {currentStep + 1} / {steps.length}
+              </span>
+            </div>
+
+            {/* Кнопки навигации */}
+            <div className="flex gap-3">
+              {currentStep > 0 && (
+                <button
+                  onClick={handlePrevious}
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  <FaArrowLeft className="text-sm" />
+                  <span className="font-medium">Назад</span>
+                </button>
+              )}
+
+              <button
+                onClick={handleNext}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all shadow-lg"
+              >
+                <span>
+                  {currentStep < steps.length - 1 ? 'Далее' : 'Начать играть!'}
+                </span>
+                {currentStep < steps.length - 1 && <FaArrowRight className="text-sm" />}
+              </button>
+            </div>
+
+            {/* Подсказка */}
+            <button
+              onClick={handleSkip}
+              className="w-full mt-4 text-gray-500 hover:text-gray-300 text-sm transition-colors"
+            >
+              Пропустить обучение
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Десктопная версия - с подсветкой элементов
+  if (!targetPosition) return null;
 
   const getTooltipPosition = () => {
     if (!targetPosition) return {};
 
     const offset = 20;
     const arrowSize = 40;
-    const tooltipMaxWidth = 400; // примерная ширина подсказки
-    const tooltipHeight = 300; // примерная высота подсказки
+    const tooltipMaxWidth = 400;
+    const tooltipHeight = 300;
 
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
@@ -145,9 +286,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%)'
         };
-        // Проверяем, не выходит ли подсказка за нижнюю границу экрана
         if (position.top + tooltipHeight > viewportHeight) {
-          // Показываем сверху вместо снизу
           position.top = targetPosition.top - offset - arrowSize;
           position.transform = 'translateX(-50%) translateY(-100%)';
         }
@@ -158,9 +297,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%) translateY(-100%)'
         };
-        // Проверяем, не выходит ли подсказка за верхнюю границу экрана
         if (position.top - tooltipHeight < 0) {
-          // Показываем снизу вместо сверху
           position.top = targetPosition.top + targetPosition.height + offset + arrowSize;
           position.transform = 'translateX(-50%)';
         }
@@ -183,7 +320,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         return {};
     }
 
-    // Дополнительная проверка для горизонтального позиционирования
     if (position.left) {
       const estimatedLeft = position.transform?.includes('translateX(-50%)')
         ? position.left - tooltipMaxWidth / 2
@@ -204,8 +340,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
     const arrowSize = 40;
     const offset = 10;
-    const tooltipHeight = 300;
-    const viewportHeight = window.innerHeight;
 
     let arrowPos: any = {};
 
@@ -223,11 +357,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           left: targetPosition.left + targetPosition.width / 2,
           transform: 'translateX(-50%) rotate(180deg)'
         };
-        // Если элемент в верхней части экрана, разворачиваем стрелку вниз
-        if (targetPosition.top - tooltipHeight < 0) {
-          arrowPos.top = targetPosition.top - arrowSize - offset;
-          arrowPos.transform = 'translateX(-50%)';
-        }
         break;
       case 'right':
         arrowPos = {
@@ -253,84 +382,43 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
   return (
     <>
       <style>{`
-        @keyframes pulse-glow {
+        @keyframes simple-pulse {
           0%, 100% {
-            box-shadow: 0 0 20px 5px rgba(34, 211, 238, 0.6);
+            opacity: 1;
           }
           50% {
-            box-shadow: 0 0 30px 10px rgba(34, 211, 238, 0.9);
+            opacity: 0.7;
           }
         }
 
-        @keyframes bounce-arrow-down {
+        @keyframes bounce-simple {
           0%, 100% {
-            transform: translateY(0) translateX(-50%);
+            transform: translateY(0);
           }
           50% {
-            transform: translateY(-20px) translateX(-50%) scale(1.1);
-          }
-        }
-
-        @keyframes bounce-arrow-right {
-          0%, 100% {
-            transform: translateX(0) translateY(-50%) rotate(-90deg);
-          }
-          50% {
-            transform: translateX(-20px) translateY(-50%) rotate(-90deg) scale(1.1);
-          }
-        }
-
-        @keyframes bounce-arrow-left {
-          0%, 100% {
-            transform: translateX(0) translateY(-50%) rotate(90deg);
-          }
-          50% {
-            transform: translateX(20px) translateY(-50%) rotate(90deg) scale(1.1);
-          }
-        }
-
-        @keyframes bounce-arrow-up {
-          0%, 100% {
-            transform: translateY(0) translateX(-50%) rotate(180deg);
-          }
-          50% {
-            transform: translateY(20px) translateX(-50%) rotate(180deg) scale(1.1);
+            transform: translateY(-10px);
           }
         }
 
         .onboarding-highlight {
-          animation: pulse-glow 2s infinite;
+          animation: simple-pulse 2s infinite;
           pointer-events: none;
         }
 
-        .onboarding-arrow-down {
-          animation: bounce-arrow-down 1.5s infinite;
-        }
-
-        .onboarding-arrow-right {
-          animation: bounce-arrow-right 1.5s infinite;
-        }
-
-        .onboarding-arrow-left {
-          animation: bounce-arrow-left 1.5s infinite;
-        }
-
-        .onboarding-arrow-up {
-          animation: bounce-arrow-up 1.5s infinite;
+        .onboarding-arrow {
+          animation: bounce-simple 1.5s infinite;
         }
 
         .onboarding-tooltip {
-          animation: fadeInScale 0.3s ease-out;
+          animation: fadeIn 0.2s ease-out;
         }
 
-        @keyframes fadeInScale {
+        @keyframes fadeIn {
           from {
             opacity: 0;
-            transform: translate(-50%, 0) scale(0.9);
           }
           to {
             opacity: 1;
-            transform: translate(-50%, 0) scale(1);
           }
         }
       `}</style>
@@ -342,28 +430,22 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
         {/* Подсветка элемента */}
         <div
-          className="absolute onboarding-highlight rounded-lg border-4 border-transparent bg-transparent"
+          className="absolute onboarding-highlight rounded-lg border-2 border-cyan-400"
           style={{
-            top: targetPosition.top - 8,
-            left: targetPosition.left - 8,
-            width: targetPosition.width + 16,
-            height: targetPosition.height + 16,
-            pointerEvents: 'auto',
-            borderImage: 'linear-gradient(135deg, #22d3ee, #3b82f6, #22d3ee) 1'
+            top: targetPosition.top - 4,
+            left: targetPosition.left - 4,
+            width: targetPosition.width + 8,
+            height: targetPosition.height + 8,
+            pointerEvents: 'auto'
           }}
         />
 
         {/* Анимированная стрелка */}
         <div
-          className={`absolute onboarding-arrow-${step.arrowDirection} z-[9999]`}
+          className="absolute onboarding-arrow z-[9999]"
           style={getArrowPosition()}
         >
-          <div className="relative">
-            {/* Свечение вокруг стрелки */}
-            <div className="absolute inset-0 bg-cyan-400 opacity-40 animate-pulse"></div>
-            {/* Основная стрелка */}
-            <FaArrowDown className="relative text-cyan-400 text-6xl drop-shadow-[0_0_20px_rgba(34,211,238,1)] filter brightness-150" />
-          </div>
+          <FaArrowDown className="text-cyan-400 text-4xl" />
         </div>
 
         {/* Подсказка */}
@@ -371,7 +453,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           className="absolute onboarding-tooltip pointer-events-auto"
           style={getTooltipPosition()}
         >
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 max-w-md border-2 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.5)]">
+          <div className="bg-gray-900 rounded-xl p-6 max-w-md border border-cyan-400">
             {/* Кнопка закрытия */}
             <button
               onClick={handleSkip}
@@ -381,10 +463,14 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             </button>
 
             {/* Заголовок */}
-            <h3 className="text-white text-xl font-bold mb-3 pr-6">{step.title}</h3>
+            <h3 className="text-white text-xl font-bold mb-3 pr-6">
+              {step.title}
+            </h3>
 
             {/* Описание */}
-            <p className="text-gray-300 mb-6">{step.description}</p>
+            <p className="text-gray-300 mb-6">
+              {step.description}
+            </p>
 
             {/* Прогресс */}
             <div className="flex items-center justify-between mb-4">
@@ -392,7 +478,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
                 {steps.map((_, index) => (
                   <div
                     key={index}
-                    className={`h-2 w-8 rounded-full transition-all ${
+                    className={`h-2 w-8 rounded-full transition-colors ${
                       index === currentStep ? 'bg-cyan-400' : 'bg-gray-600'
                     }`}
                   />
@@ -413,7 +499,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
               </button>
               <button
                 onClick={handleNext}
-                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-cyan-500/50"
+                className="flex-1 px-4 py-2 rounded-lg bg-cyan-500 text-white font-semibold hover:bg-cyan-600 transition-colors"
               >
                 {currentStep < steps.length - 1 ? t('onboarding.next', 'Далее') : t('onboarding.finish', 'Завершить')}
               </button>
