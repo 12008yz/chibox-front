@@ -252,8 +252,236 @@ interface UpgradeResult {
   };
 }
 
-// Компонент анимации улучшения
-const UpgradeAnimationComponent: React.FC<{
+// Мобильная анимация улучшения (захватывающая версия с столкновением)
+const MobileUpgradeAnimation: React.FC<{
+  upgradeResult: UpgradeResult;
+  onAnimationComplete: () => void;
+}> = ({ upgradeResult, onAnimationComplete }) => {
+  const [phase, setPhase] = useState<'prepare' | 'collision' | 'explosion' | 'result'>('prepare');
+  const [particles, setParticles] = useState<Array<{id: number, angle: number, delay: number}>>([]);
+  const successChance = upgradeResult.data.success_chance;
+  const isSuccess = upgradeResult.upgrade_success;
+
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Фаза 1: Подготовка (0.5s)
+    const timer1 = setTimeout(() => {
+      setPhase('collision');
+      soundManager.play('upgrade');
+    }, 500);
+
+    // Фаза 2: Столкновение (1s)
+    const timer2 = setTimeout(() => {
+      setPhase('explosion');
+
+      // Генерируем частицы для взрыва
+      const explosionParticles = Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        angle: (360 / 12) * i,
+        delay: Math.random() * 0.1
+      }));
+      setParticles(explosionParticles);
+    }, 1500);
+
+    // Фаза 3: Результат (2.5s)
+    const timer3 = setTimeout(() => {
+      setPhase('result');
+
+      if (isSuccess) {
+        soundManager.play('win');
+      } else {
+        soundManager.play('looseUpgrade');
+      }
+    }, 2500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [upgradeResult, isSuccess]);
+
+  return (
+    <div className="text-center py-6 px-4 min-h-[500px] flex flex-col items-center justify-center">
+      {/* Фаза подготовки */}
+      {phase === 'prepare' && (
+        <div className="space-y-4 animate-fade-in">
+          <h2 className="text-2xl font-bold text-cyan-300">
+            Начинаем улучшение...
+          </h2>
+          <div className="text-gray-400">Приготовьтесь!</div>
+        </div>
+      )}
+
+      {/* Фаза столкновения и взрыва */}
+      {(phase === 'collision' || phase === 'explosion') && (
+        <div className="relative w-full max-w-md h-64 flex items-center justify-center">
+          {/* Шанс успеха в центре */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+            <div className={`text-lg font-bold ${
+              successChance >= 40 ? 'text-green-400' :
+              successChance >= 20 ? 'text-yellow-400' :
+              'text-red-400'
+            }`}>
+              {successChance}% шанс
+            </div>
+          </div>
+
+          {/* Левый предмет (исходные) */}
+          <div
+            className={`absolute left-0 w-20 h-20 bg-gradient-to-br from-cyan-500/30 to-cyan-600/30 rounded-lg border-2 border-cyan-400 flex items-center justify-center transition-all duration-1000 ${
+              phase === 'collision' ? 'translate-x-0' : 'translate-x-32 opacity-0'
+            }`}
+            style={{
+              animation: phase === 'collision' ? 'slide-from-left 1s ease-out forwards' : 'none'
+            }}
+          >
+            <div className="text-2xl">📦</div>
+          </div>
+
+          {/* Правый предмет (целевой) */}
+          <div
+            className={`absolute right-0 w-20 h-20 bg-gradient-to-br from-purple-500/30 to-purple-600/30 rounded-lg border-2 border-purple-400 flex items-center justify-center transition-all duration-1000 ${
+              phase === 'collision' ? 'translate-x-0' : '-translate-x-32 opacity-0'
+            }`}
+            style={{
+              animation: phase === 'collision' ? 'slide-from-right 1s ease-out forwards' : 'none'
+            }}
+          >
+            <div className="text-2xl">🎯</div>
+          </div>
+
+          {/* Центральная точка столкновения */}
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            {phase === 'explosion' && (
+              <>
+                {/* Главная вспышка */}
+                <div className={`w-32 h-32 rounded-full ${
+                  isSuccess
+                    ? 'bg-gradient-radial from-green-400/60 via-green-500/30 to-transparent'
+                    : 'bg-gradient-radial from-orange-400/60 via-red-500/30 to-transparent'
+                } animate-ping-fast`} />
+
+                {/* Внутреннее свечение */}
+                <div className={`absolute inset-0 w-32 h-32 rounded-full ${
+                  isSuccess
+                    ? 'bg-gradient-radial from-green-300/80 to-transparent'
+                    : 'bg-gradient-radial from-red-300/80 to-transparent'
+                } animate-pulse-slow`} />
+
+                {/* Частицы взрыва */}
+                {particles.map((particle) => (
+                  <div
+                    key={particle.id}
+                    className={`absolute w-2 h-2 rounded-full ${
+                      isSuccess ? 'bg-green-400' : 'bg-red-400'
+                    }`}
+                    style={{
+                      animation: `explode-particle 0.8s ease-out forwards`,
+                      animationDelay: `${particle.delay}s`,
+                      transform: `rotate(${particle.angle}deg) translateX(0)`,
+                      left: '50%',
+                      top: '50%',
+                      marginLeft: '-4px',
+                      marginTop: '-4px',
+                    }}
+                  />
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Текст во время столкновения */}
+          {phase === 'collision' && (
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-cyan-300 font-bold animate-pulse">
+              Сливаем предметы...
+            </div>
+          )}
+          {phase === 'explosion' && (
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-purple-300 font-bold animate-pulse">
+              Определяем результат...
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Фаза результата */}
+      {phase === 'result' && (
+        <div className="space-y-6 animate-scale-in">
+          {/* Иконка и предмет результата */}
+          <div className="relative">
+            {/* Свечение вокруг */}
+            <div className={`absolute inset-0 w-32 h-32 mx-auto rounded-full ${
+              isSuccess
+                ? 'bg-gradient-radial from-green-400/40 to-transparent animate-pulse-slow'
+                : 'bg-gradient-radial from-red-400/40 to-transparent animate-pulse-slow'
+            }`} />
+
+            {/* Основная иконка */}
+            <div className={`relative w-32 h-32 mx-auto rounded-2xl flex items-center justify-center ${
+              isSuccess
+                ? 'bg-gradient-to-br from-green-500/30 to-green-600/30 border-4 border-green-500 shadow-lg shadow-green-500/50'
+                : 'bg-gradient-to-br from-red-500/30 to-red-600/30 border-4 border-red-500 shadow-lg shadow-red-500/50'
+            }`}>
+              <div className={`text-6xl ${isSuccess ? 'animate-bounce-once' : 'animate-shake'}`}>
+                {isSuccess ? '✨' : '💥'}
+              </div>
+            </div>
+          </div>
+
+          {/* Заголовок */}
+          <h2 className={`text-3xl sm:text-4xl font-bold ${
+            isSuccess ? 'text-green-400' : 'text-red-400'
+          }`}>
+            {isSuccess ? 'УСПЕХ!' : 'НЕУДАЧА'}
+          </h2>
+
+          {/* Информация о результате */}
+          <div className={`max-w-sm mx-auto rounded-xl p-6 border-2 ${
+            isSuccess
+              ? 'bg-gradient-to-br from-green-950/60 to-green-900/30 border-green-500/50 shadow-xl'
+              : 'bg-gradient-to-br from-red-950/60 to-red-900/30 border-red-500/50 shadow-xl'
+          }`}>
+            <div className="text-xl font-bold mb-3">
+              {isSuccess ? 'Улучшение успешно!' : 'Улучшение провалилось'}
+            </div>
+
+            {isSuccess && upgradeResult.data.result_item && (
+              <div className="mb-3 p-3 bg-black/30 rounded-lg">
+                <div className="text-sm text-gray-400 mb-1">Получен предмет:</div>
+                <div className="text-lg font-bold text-green-300">
+                  {upgradeResult.data.result_item.name}
+                </div>
+              </div>
+            )}
+
+            <div className="text-gray-300 text-sm mb-4">
+              {isSuccess
+                ? '🎉 Ваши предметы успешно трансформированы!'
+                : '😢 Предметы утрачены в процессе'
+              }
+            </div>
+
+            <button
+              onClick={onAnimationComplete}
+              className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition-all transform hover:scale-105 active:scale-95 ${
+                isSuccess
+                  ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white shadow-lg shadow-green-500/30'
+                  : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-lg shadow-red-500/30'
+              }`}
+            >
+              Продолжить
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Компонент анимации улучшения (десктоп версия)
+const DesktopUpgradeAnimation: React.FC<{
   upgradeResult: UpgradeResult;
   onAnimationComplete: () => void;
 }> = ({ upgradeResult, onAnimationComplete }) => {
@@ -540,7 +768,41 @@ const UpgradeAnimationComponent: React.FC<{
   );
 };
 
+// Обертка для выбора анимации в зависимости от устройства
+const UpgradeAnimationComponent: React.FC<{
+  upgradeResult: UpgradeResult;
+  onAnimationComplete: () => void;
+}> = ({ upgradeResult, onAnimationComplete }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
 
+  React.useEffect(() => {
+    // Проверяем размер экрана
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <>
+      {isMobile ? (
+        <MobileUpgradeAnimation
+          upgradeResult={upgradeResult}
+          onAnimationComplete={onAnimationComplete}
+        />
+      ) : (
+        <DesktopUpgradeAnimation
+          upgradeResult={upgradeResult}
+          onAnimationComplete={onAnimationComplete}
+        />
+      )}
+    </>
+  );
+};
 
 // Компонент карточки предмета для выбора
 const SourceItemCard: React.FC<{
@@ -1004,11 +1266,6 @@ const UpgradePage: React.FC = () => {
       setShowAnimation(true);
 
       // Звуки теперь воспроизводятся в компоненте анимации
-
-
-
-
-
 
       // Очищаем предыдущий таймер, если есть
       if (animationTimeoutRef.current) {
