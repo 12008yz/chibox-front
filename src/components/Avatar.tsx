@@ -71,19 +71,19 @@ const Avatar: React.FC<AvatarProps> = ({
     let sizeClasses, skeletonSize;
     switch (size) {
         case 'small':
-            sizeClasses = 'w-10 h-10';
+            sizeClasses = 'w-10 h-10 aspect-square';
             skeletonSize = 40;
             break;
         case 'medium':
-            sizeClasses = 'w-12 h-12';
+            sizeClasses = 'w-12 h-12 aspect-square';
             skeletonSize = 48;
             break;
         case 'large':
-            sizeClasses = 'w-24 h-24 p-1';
+            sizeClasses = 'w-24 h-24 aspect-square p-1';
             skeletonSize = 96;
             break;
         case 'extra-large':
-            sizeClasses = 'w-36 h-36 p-1';
+            sizeClasses = 'w-36 h-36 aspect-square p-1';
             skeletonSize = 144;
             break;
     }
@@ -120,7 +120,7 @@ const Avatar: React.FC<AvatarProps> = ({
 
     const LoadingSkeleton = () => (
         <div
-            className={`${sizeClasses} rounded-full bg-gray-700 animate-pulse`}
+            className={`${sizeClasses} rounded-full bg-gray-700 animate-pulse aspect-square`}
             style={{ width: skeletonSize, height: skeletonSize }}
         />
     );
@@ -158,14 +158,18 @@ const Avatar: React.FC<AvatarProps> = ({
                     {!loaded && <LoadingSkeleton />}
                     {loaded && (
                         <>
-                            <img
-                                src={getImageSrc()}
-                                alt="avatar"
-                                className={`${sizeClasses} rounded-full object-cover border-2`}
+                            <div
+                                className={`${sizeClasses} rounded-full overflow-hidden border-2`}
                                 style={{ borderColor: getLevelColor() }}
-                                onLoad={handleImageLoad}
-                                onError={handleImageError}
-                            />
+                            >
+                                <img
+                                    src={getImageSrc()}
+                                    alt="avatar"
+                                    className="w-full h-full object-cover"
+                                    onLoad={handleImageLoad}
+                                    onError={handleImageError}
+                                />
+                            </div>
                             {showLevel && (
                                 <div
                                     className={`absolute rounded-full text-xs font-semibold min-w-[20px] h-5 flex justify-center items-center text-white ${LevelSize} ${DivPosition}`}
