@@ -9,6 +9,7 @@ import { soundManager } from './utils/soundManager';
 
 // Импорты компонентов (всегда загружаемые)
 import Header from './components/Header';
+import Footer from './components/Footer';
 import FloatingWatermark from './components/FloatingWatermark';
 import SteamLoadingPage from './components/SteamLoadingPage';
 import AuthModal from './components/AuthModal';
@@ -23,6 +24,12 @@ const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
 const ExchangePage = lazy(() => import('./pages/ExchangePage'));
 const UpgradePage = lazy(() => import('./pages/UpgradePage'));
 const SlotPage = lazy(() => import('./pages/SlotPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const ResponsibleGamingPage = lazy(() => import('./pages/ResponsibleGamingPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactsPage = lazy(() => import('./pages/ContactsPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
 
 const App: React.FC = () => {
   const auth = useAuth();
@@ -287,10 +294,19 @@ const App: React.FC = () => {
               }
             />
 
+            {/* Footer Pages */}
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/responsible-gaming" element={<ResponsibleGamingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contacts" element={<ContactsPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>
+          <Footer />
         </main>
         </div>
       </div>
