@@ -13,6 +13,7 @@ import Footer from './components/Footer';
 import FloatingWatermark from './components/FloatingWatermark';
 import SteamLoadingPage from './components/SteamLoadingPage';
 import AuthModal from './components/AuthModal';
+import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { useSocket } from './hooks/useSocket';
 
 // Lazy loading страниц
@@ -178,6 +179,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <ScrollToTopOnRoute />
       <div className="min-h-screen relative overflow-hidden">
         <FloatingWatermark />
         <div className="relative z-10">

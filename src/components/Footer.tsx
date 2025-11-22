@@ -4,7 +4,9 @@ import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
 
 const Footer = () => {
   const { t } = useTranslation();
-  const { data: statsData, isLoading } = useGetGlobalStatisticsQuery();
+  const { data: statsData, isLoading } = useGetGlobalStatisticsQuery(undefined, {
+    pollingInterval: 10000, // Обновляем каждые 10 секунд
+  });
 
   // Форматируем числа с разделителями
   const formatNumber = (num: number) => {
@@ -62,7 +64,7 @@ const Footer = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="text-center p-6 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:transform hover:scale-105"
+              className="text-center p-6 rounded-xl bg-gray-800/80 border border-gray-700/50 hover:border-orange-500/50 transition-colors duration-300"
             >
               <div className="text-3xl md:text-4xl mb-2">{stat.icon}</div>
               <div className="text-2xl md:text-3xl font-bold text-orange-400 mb-1">
@@ -81,9 +83,9 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               <img
-                src="/images/chiCoinFull.png"
-                alt="ChiCoin"
-                className="w-16 h-16 md:w-20 md:h-20 object-contain animate-pulse"
+                src="/images/logo.png"
+                alt="ChiBox Logo"
+                className="w-16 h-16 md:w-20 md:h-20 object-contain"
               />
               <div>
                 <h3 className="text-xl md:text-2xl font-bold text-orange-400">
@@ -104,7 +106,7 @@ const Footer = () => {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-gray-800 hover:bg-orange-500 flex items-center justify-center transition-all duration-300 hover:transform hover:scale-110"
+                  className="w-10 h-10 rounded-lg bg-gray-800 hover:bg-orange-500 flex items-center justify-center transition-colors duration-300"
                   aria-label={social.name}
                 >
                   <span className="text-xl">{social.icon}</span>
@@ -186,7 +188,7 @@ const Footer = () => {
             <img
               src="/images/chiCoinFull.png"
               alt="ChiCoin"
-              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-spin-slow drop-shadow-2xl"
+              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-spin-slow"
             />
             <div className="text-center md:text-left">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">

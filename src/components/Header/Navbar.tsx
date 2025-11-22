@@ -107,7 +107,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <img
                   src="/images/logo.png"
                   alt="ChiBox Logo"
-                  className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]"
+                  className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain"
                   onError={(e) => {
                     e.currentTarget.src = '/vite.svg';
                   }}

@@ -64,8 +64,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="flex flex-col w-full md:w-64 items-center rounded transition-transform duration-300 hover:scale-105 cursor-pointer"
-      style={{ willChange: 'transform' }}
+      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

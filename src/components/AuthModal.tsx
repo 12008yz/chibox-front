@@ -279,7 +279,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                       <button
                         type="submit"
                         disabled={isLoginLoading}
-                        className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-all shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-colors"
                       >
                         {isLoginLoading ? (
                           <div className="flex items-center justify-center gap-2">
@@ -403,7 +403,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                       <button
                         type="submit"
                         disabled={isRegisterLoading || isLoginLoading}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-colors"
                       >
                         {isRegisterLoading || isLoginLoading ? (
                           <div className="flex items-center justify-center gap-2">

@@ -255,6 +255,8 @@ export const userApi = baseApi.injectEndpoints({
       totalGamesPlayed: number;
     }>, void>({
       query: () => 'v1/statistics/global',
+      // Обновляем каждые 10 секунд для актуальности данных
+      keepUnusedDataFor: 10,
     }),
 
     // Получение информации о подписке

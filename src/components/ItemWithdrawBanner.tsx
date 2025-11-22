@@ -272,7 +272,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       {/* Mobile Modal */}
       {showMobileModal && isMobile && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
           onClick={closeMobileModal}
         >
           <div
