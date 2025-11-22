@@ -9,6 +9,7 @@ interface AvatarProps {
     level?: number;
     showLevel?: boolean;
     onClick?: () => void;
+    forceShowBorder?: boolean;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -19,7 +20,8 @@ const Avatar: React.FC<AvatarProps> = ({
     size,
     level = 1,
     showLevel = false,
-    onClick
+    onClick,
+    forceShowBorder = false
 }) => {
     const [loaded, setLoaded] = useState<boolean>(false);
     const [imageError, setImageError] = useState<boolean>(false);
@@ -159,7 +161,7 @@ const Avatar: React.FC<AvatarProps> = ({
                     {loaded && (
                         <>
                             <div
-                                className={`${sizeClasses} rounded-full overflow-hidden border-2 max-lg:border-0 flex items-center justify-center`}
+                                className={`${sizeClasses} rounded-full overflow-hidden border-2 ${forceShowBorder ? '' : 'max-lg:border-0'} flex items-center justify-center`}
                                 style={{ borderColor: getLevelColor() }}
                             >
                                 <img

@@ -16,13 +16,15 @@ interface PlayerProps {
   size: "small" | "medium" | "large" | "extra-large";
   direction?: "row" | "column";
   showLevel?: boolean;
+  forceShowBorder?: boolean;
 }
 
 const Player: React.FC<PlayerProps> = ({
   user,
   size,
   direction = "row",
-  showLevel = true
+  showLevel = true,
+  forceShowBorder = false
 }) => {
   const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -55,6 +57,7 @@ const Player: React.FC<PlayerProps> = ({
           size={size}
           showLevel={showLevel}
           level={user.level || 1}
+          forceShowBorder={forceShowBorder}
         />
         <span className="mt-1 sm:mt-2 font-semibold text-center text-xs sm:text-sm md:text-base">{truncateUsername(user.username)}</span>
       </div>

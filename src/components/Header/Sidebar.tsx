@@ -2,7 +2,7 @@ import { GiUpgrade } from "react-icons/gi";
 import { MdOutlineSell } from "react-icons/md";
 import { SlPlane } from "react-icons/sl";
 import { FaHome, FaExchangeAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useAppDispatch } from "../../store/hooks";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import Monetary from "../Monetary";
+import { useEffect } from "react";
 
 interface SidebarProps {
     closeSidebar: () => void;
@@ -21,7 +22,13 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const location = useLocation();
     const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+    // Закрываем sidebar при изменении маршрута
+    useEffect(() => {
+        closeSidebar();
+    }, [location.pathname]);
 
     const handleLogout = async () => {
         try {

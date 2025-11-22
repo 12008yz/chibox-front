@@ -20,6 +20,7 @@ interface RightContentProps {
   setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   authModalTab?: 'login' | 'register';
   setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
+  isMobileMenu?: boolean;
 }
 
 const RightContent: React.FC<RightContentProps> = ({
@@ -29,7 +30,8 @@ const RightContent: React.FC<RightContentProps> = ({
   authModalOpen,
   setAuthModalOpen,
   authModalTab,
-  setAuthModalTab
+  setAuthModalTab,
+  isMobileMenu = false
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -149,8 +151,8 @@ const RightContent: React.FC<RightContentProps> = ({
         )}
       </div>
 
-      {/* Переключатель языков - скрываем на маленьких и средних экранах */}
-      <div className="hidden md:block">
+      {/* Переключатель языков */}
+      <div className={isMobileMenu ? "block" : "hidden md:block"}>
         <LanguageSwitcher />
       </div>
 

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSell } from "react-icons/md";
@@ -9,6 +9,7 @@ import { IoMdTrophy } from 'react-icons/io';
 import { ImConnection } from "react-icons/im";
 import { HiSparkles } from 'react-icons/hi';
 import RightContent from "./Navbar/RightContent";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 interface NavbarProps {
   openNotifications: boolean;
@@ -36,6 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({
   onlineUsers = 0
 }) => {
   const { t } = useTranslation();
+  const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -48,6 +50,11 @@ const Navbar: React.FC<NavbarProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Закрываем мобильное меню при изменении маршрута
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -106,11 +113,11 @@ const Navbar: React.FC<NavbarProps> = ({
                   }}
                 />
               </div>
-              <div className="hidden sm:flex flex-col">
-                <span className="text-lg md:text-xl xl:text-2xl font-bold text-white tracking-tight">
+              <div className="flex flex-col">
+                <span className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-white tracking-tight">
                   Chi<span className="text-orange-400">Box</span>
                 </span>
-                <div className="text-[10px] md:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
+                <div className="text-[9px] md:text-[10px] lg:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
                   <HiSparkles className="text-orange-400 animate-spin-slow" />
                 </div>
@@ -240,6 +247,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 setAuthModalOpen={setAuthModalOpen}
                 authModalTab={authModalTab}
                 setAuthModalTab={setAuthModalTab}
+                isMobileMenu={true}
               />
             </div>
           </div>

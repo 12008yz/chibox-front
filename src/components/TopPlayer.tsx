@@ -44,7 +44,7 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
   return (
     <div className={`relative w-40 sm:w-52 md:w-64 ${rank === 1 ? '-mt-6 sm:-mt-10' : 'hidden md:block'}`}>
       <div className='relative z-50 flex flex-col items-center justify-center'>
-        <Player user={user} size="large" direction="column" showLevel={true} />
+        <Player user={user} size="large" direction="column" showLevel={true} forceShowBorder={true} />
         <div className='flex flex-col items-center gap-1 sm:gap-2'>
           <span className='text-lg sm:text-xl md:text-2xl font-bold mt-1'>
             #{rank}
