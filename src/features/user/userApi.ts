@@ -247,6 +247,16 @@ export const userApi = baseApi.injectEndpoints({
       query: () => 'v1/statistics',
     }),
 
+    // Получение глобальной статистики сайта
+    getGlobalStatistics: builder.query<ApiResponse<{
+      totalUsers: number;
+      totalCasesOpened: number;
+      totalUpgrades: number;
+      totalGamesPlayed: number;
+    }>, void>({
+      query: () => 'v1/statistics/global',
+    }),
+
     // Получение информации о подписке
     getUserSubscription: builder.query<ApiResponse<any>, void>({
       query: () => 'v1/subscription',
@@ -898,6 +908,7 @@ export const {
   // useDeleteNotificationMutation, // Удалено - дублирует экспорт из notificationsApi
   useGetUserTransactionsQuery,
   useGetUserStatisticsQuery,
+  useGetGlobalStatisticsQuery,
   useGetUserSubscriptionQuery,
   useApplyPromoCodeMutation,
   useWithdrawBalanceMutation,

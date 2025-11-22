@@ -1,14 +1,37 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { data: statsData, isLoading } = useGetGlobalStatisticsQuery();
+
+  // Форматируем числа с разделителями
+  const formatNumber = (num: number) => {
+    return num.toLocaleString('ru-RU');
+  };
 
   const stats = [
-    { icon: '📦', label: t('footer.stats.cases_opened'), value: '1,234,567' },
-    { icon: '👥', label: t('footer.stats.users'), value: '89,234' },
-    { icon: '🔄', label: t('footer.stats.upgrades'), value: '456,789' },
-    { icon: '⚔️', label: t('footer.stats.games_played'), value: '2,345,678' },
+    {
+      icon: '📦',
+      label: t('footer.stats.cases_opened'),
+      value: isLoading ? '...' : formatNumber(statsData?.data?.totalCasesOpened || 0)
+    },
+    {
+      icon: '👥',
+      label: t('footer.stats.users'),
+      value: isLoading ? '...' : formatNumber(statsData?.data?.totalUsers || 0)
+    },
+    {
+      icon: '🔄',
+      label: t('footer.stats.upgrades'),
+      value: isLoading ? '...' : formatNumber(statsData?.data?.totalUpgrades || 0)
+    },
+    {
+      icon: '⚔️',
+      label: t('footer.stats.games_played'),
+      value: isLoading ? '...' : formatNumber(statsData?.data?.totalGamesPlayed || 0)
+    },
   ];
 
   const links = {
@@ -25,10 +48,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: '📱', name: 'Telegram', url: '#' },
-    { icon: '🐦', name: 'Twitter', url: '#' },
-    { icon: '📺', name: 'YouTube', url: '#' },
-    { icon: '💬', name: 'Discord', url: '#' },
+    { icon: '📱', name: 'Telegram', url: 'https://t.me/chibox_official' },
+    { icon: '🐦', name: 'Twitter', url: 'https://twitter.com/chibox' },
+    { icon: '📺', name: 'YouTube', url: 'https://youtube.com/@chibox' },
+    { icon: '💬', name: 'Discord', url: 'https://discord.gg/chibox' },
   ];
 
   return (
@@ -58,9 +81,9 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               <img
-                src="/images/chiCoin.png"
+                src="/images/chiCoinFull.png"
                 alt="ChiCoin"
-                className="w-16 h-16 md:w-20 md:h-20 animate-pulse"
+                className="w-16 h-16 md:w-20 md:h-20 object-contain animate-pulse"
               />
               <div>
                 <h3 className="text-xl md:text-2xl font-bold text-orange-400">
@@ -161,9 +184,9 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <img
-              src="/images/chiCoin.png"
+              src="/images/chiCoinFull.png"
               alt="ChiCoin"
-              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 animate-spin-slow drop-shadow-2xl"
+              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-spin-slow drop-shadow-2xl"
             />
             <div className="text-center md:text-left">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
