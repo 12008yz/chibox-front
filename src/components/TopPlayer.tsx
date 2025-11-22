@@ -67,7 +67,7 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
       </div>
 
       {/* Простой подиум эффект */}
-      <div className="absolute top-[50px] sm:top-[60px] md:top-[70px] z-0 w-full h-16 sm:h-20 md:h-24 bg-gradient-to-t from-blue-600/30 to-transparent rounded-lg" />
+      <div className="absolute top-[30px] sm:top-[40px] md:top-[50px] z-0 w-full h-32 sm:h-36 md:h-40 bg-gradient-to-t from-blue-600/30 to-transparent rounded-lg" />
     </div>
   );
 };
