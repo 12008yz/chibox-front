@@ -32,11 +32,11 @@ const PlaceholderImage: React.FC<{
 }> = ({ className = "w-full h-full", item }) => {
   return (
     <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex flex-col items-center justify-center border border-gray-600`}>
-      <div className="text-3xl mb-3 text-gray-400">📦</div>
-      <div className="text-sm text-gray-300 font-medium px-3 text-center">
-        {item.name.length > 20 ? `${item.name.substring(0, 20)}...` : item.name}
+      <div className="text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3 text-gray-400">📦</div>
+      <div className="text-xs sm:text-sm text-gray-300 font-medium px-2 sm:px-3 text-center">
+        {item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}
       </div>
-      <div className="text-lg text-yellow-400 font-semibold mt-2">
+      <div className="text-sm sm:text-base md:text-lg text-yellow-400 font-semibold mt-1 sm:mt-2">
         <Monetary value={Number(item.price)} />
       </div>
     </div>
@@ -104,17 +104,25 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       const delayTimeout = setTimeout(() => {
         setTimeout(() => {
           setUseTransition(true);
-          const spins = 3;
-          const itemHeight = 160;
+          // Адаптивные параметры для плавной анимации
+          const isMobile = window.innerWidth < 640;
+          const isTablet = window.innerWidth >= 640 && window.innerWidth < 768;
+
+          // Меньше оборотов на мобильных для плавности
+          const spins = isMobile ? 2 : 3;
+
+          // Адаптивная высота элемента
+          const itemHeight = isMobile ? 100 : isTablet ? 120 : 160;
           const finalIndex = items.findIndex(item => item.id === finalItem.id);
-          const totalOffset = spins * items.length * itemHeight + finalIndex * itemHeight - 80;
+          const centerOffset = isMobile ? 50 : isTablet ? 60 : 80;
+          const totalOffset = spins * items.length * itemHeight + finalIndex * itemHeight - centerOffset;
 
           setCurrentOffset(-totalOffset);
 
           if (isLastReel) {
             setTimeout(() => {
               setIsSlowingDown(true);
-            }, 1200);
+            }, isMobile ? 800 : 1200);
           }
 
           setTimeout(() => {
@@ -123,7 +131,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               setShowWinEffect(true);
             }
             onSpinComplete();
-          }, isLastReel ? 2500 : 1500);
+          }, isLastReel ? (isMobile ? 2000 : 2500) : (isMobile ? 1200 : 1500));
         }, 50);
       }, delay);
 
@@ -131,55 +139,72 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
     }
   }, [isSpinning, finalItem, delay, items, onSpinComplete, isLastReel, isWinning]);
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
   return (
-    <div className={`relative w-80 h-96 overflow-hidden rounded-2xl border-2 transition-all duration-500
-      border-gray-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+    <div className={`relative w-24 h-60 sm:w-40 sm:h-72 md:w-60 md:h-80 lg:w-80 lg:h-96 overflow-hidden rounded-xl sm:rounded-2xl border sm:border-2 transition-all duration-500
+      border-gray-700/50 shadow-[0_4px_16px_rgba(0,0,0,0.3)] sm:shadow-[0_8px_32px_rgba(0,0,0,0.3)]
       ${isLastReel && isSlowingDown ? 'scale-[1.02]' : 'scale-100'}
       bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900`}
       style={{ contain: 'layout style paint' }}>
 
-      {/* Внутренняя подсветка */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5 pointer-events-none rounded-2xl"></div>
+      {/* Внутренняя подсветка - упрощенная на мобильных */}
+      <div className={`absolute inset-0 pointer-events-none rounded-xl sm:rounded-2xl ${
+        isMobile ? 'bg-white/5' : 'bg-gradient-to-b from-white/5 via-transparent to-white/5'
+      }`}></div>
 
-      {/* Боковые тени для глубины */}
-      <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/40 to-transparent pointer-events-none z-20"></div>
-      <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/40 to-transparent pointer-events-none z-20"></div>
+      {/* Боковые тени - отключены на мобильных для производительности */}
+      {!isMobile && (
+        <>
+          <div className="absolute inset-y-0 left-0 w-4 sm:w-8 bg-gradient-to-r from-black/40 to-transparent pointer-events-none z-20"></div>
+          <div className="absolute inset-y-0 right-0 w-4 sm:w-8 bg-gradient-to-l from-black/40 to-transparent pointer-events-none z-20"></div>
+        </>
+      )}
 
       <div
         ref={reelRef}
         className={`${useTransition ? 'transition-transform' : ''} ${
           isSpinning && useTransition
             ? isLastReel
-              ? 'duration-[2500ms] ease-[cubic-bezier(0.33,0,0.2,1)]'
-              : 'duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)]'
+              ? isMobile
+                ? 'duration-[2000ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]'
+                : 'duration-[2500ms] ease-[cubic-bezier(0.33,0,0.2,1)]'
+              : isMobile
+                ? 'duration-[1200ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]'
+                : 'duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)]'
             : 'duration-0'
         }`}
         style={{
-          transform: `translateY(${currentOffset}px)`,
-          willChange: isSpinning ? 'transform' : 'auto'
+          transform: `translateY(${currentOffset}px) translateZ(0)`,
+          willChange: isSpinning ? 'transform' : 'auto',
+          backfaceVisibility: 'hidden',
+          perspective: 1000
         }}
       >
-        {Array.from({ length: 5 }, (_, repeatIndex) =>
+        {Array.from({ length: isMobile ? 3 : 5 }, (_, repeatIndex) =>
           items.map((item) => (
             <div
               key={`${repeatIndex}-${item.id}`}
-              className={`h-40 w-full border-b border-gray-700/30 ${getRarityColor(item.rarity)}
-                flex items-center justify-center relative
-                transition-all duration-300
-                ${isSpinning ? '' : ''}`}
+              className={`h-25 sm:h-30 md:h-32 lg:h-40 w-full border-b border-gray-700/30 ${getRarityColor(item.rarity)}
+                flex items-center justify-center relative`}
               style={{
-                willChange: isSpinning ? 'transform' : 'auto'
+                willChange: isSpinning ? 'transform' : 'auto',
+                transform: 'translateZ(0)'
               }}
             >
               {/* Изображение или заглушка */}
-              <div className="relative w-full h-full p-3 flex items-center justify-center">
+              <div className="relative w-full h-full p-1.5 sm:p-2 md:p-3 flex items-center justify-center">
                 {!imageErrors.has(item.id) ? (
                   <img
                     src={getItemImageUrl(item.image_url, item.name)}
                     alt={item.name}
-                    className="max-w-full max-h-full object-contain transition-all duration-300"
+                    className="max-w-full max-h-full object-contain"
                     onError={() => handleImageError(item.id)}
-                    style={{ willChange: 'auto' }}
+                    style={{
+                      willChange: 'auto',
+                      transform: 'translateZ(0)'
+                    }}
+                    loading="lazy"
                   />
                 ) : (
                   <PlaceholderImage className="w-full h-full" item={item} />
@@ -187,22 +212,22 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               </div>
 
               {/* Название внизу с улучшенным стилем */}
-              <div className="absolute bottom-2 left-2 right-2 text-center">
-                <div className="text-xs text-white font-medium bg-black/80  rounded-lg px-2 py-1 truncate border border-white/10 shadow-lg">
-                  {item.name.length > 18 ? `${item.name.substring(0, 18)}...` : item.name}
+              <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 right-1 sm:right-2 text-center">
+                <div className="text-[0.5rem] sm:text-xs text-white font-medium bg-black/80 rounded px-1 sm:px-2 py-0.5 sm:py-1 truncate border border-white/10 shadow-lg">
+                  {item.name.length > 12 ? `${item.name.substring(0, 12)}...` : item.name}
                 </div>
               </div>
 
               {/* Индикатор редкости с улучшенным дизайном */}
-              <div className="absolute top-2 right-2">
-                <div className={`w-3 h-3 rounded-full shadow-lg ${
-                  item.rarity === 'covert' || item.rarity === 'contraband' ? 'bg-red-500 shadow-red-500/50'
-                  : item.rarity === 'classified' ? 'bg-purple-500 shadow-purple-500/50'
-                  : item.rarity === 'restricted' ? 'bg-blue-500 shadow-blue-500/50'
-                  : item.rarity === 'milspec' ? 'bg-green-500 shadow-green-500/50'
-                  : item.rarity === 'industrial' ? 'bg-yellow-500 shadow-yellow-500/50'
-                  : item.rarity === 'exotic' ? 'bg-pink-500 shadow-pink-500/50'
-                  : 'bg-gray-400 shadow-gray-400/50'
+              <div className="absolute top-1 sm:top-2 right-1 sm:right-2">
+                <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
+                  item.rarity === 'covert' || item.rarity === 'contraband' ? 'bg-red-500'
+                  : item.rarity === 'classified' ? 'bg-purple-500'
+                  : item.rarity === 'restricted' ? 'bg-blue-500'
+                  : item.rarity === 'milspec' ? 'bg-green-500'
+                  : item.rarity === 'industrial' ? 'bg-yellow-500'
+                  : item.rarity === 'exotic' ? 'bg-pink-500'
+                  : 'bg-gray-400'
                 }`}>
                 </div>
               </div>
@@ -215,17 +240,17 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       </div>
 
       {/* Центральный указатель с улучшенным дизайном */}
-      <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent pointer-events-none z-30 shadow-[0_0_10px_rgba(250,204,21,0.5)]"
-           style={{ top: 'calc(50% - 20px)', transform: 'translateY(-50%)' }}>
-        <div className="absolute left-1/2 top-1/2 w-3 h-3 rounded-full border-2 border-yellow-400 bg-yellow-400/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]"
-             style={{ transform: 'translate(-50%, -50%)' }}>
+      <div className="absolute left-0 right-0 h-[1px] sm:h-[2px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent pointer-events-none z-30"
+           style={{ top: 'calc(50% - 12px)', transform: 'translateY(-50%) translateZ(0)' }}>
+        <div className="absolute left-1/2 top-1/2 w-2 h-2 sm:w-3 sm:h-3 rounded-full border border-yellow-400 sm:border-2 bg-yellow-400/20"
+             style={{ transform: 'translate(-50%, -50%) translateZ(0)' }}>
         </div>
       </div>
 
       {/* Верхний градиент для размытия */}
-      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-gray-900 to-transparent pointer-events-none z-10"></div>
+      <div className="absolute top-0 left-0 right-0 h-16 sm:h-20 md:h-24 bg-gradient-to-b from-gray-900 to-transparent pointer-events-none z-10"></div>
       {/* Нижний градиент для размытия */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none z-10"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none z-10"></div>
 
     </div>
   );
