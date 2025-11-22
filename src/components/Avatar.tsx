@@ -79,11 +79,11 @@ const Avatar: React.FC<AvatarProps> = ({
             skeletonSize = 48;
             break;
         case 'large':
-            sizeClasses = 'w-24 h-24 aspect-square p-1';
+            sizeClasses = 'w-24 h-24 aspect-square';
             skeletonSize = 96;
             break;
         case 'extra-large':
-            sizeClasses = 'w-36 h-36 aspect-square p-1';
+            sizeClasses = 'w-36 h-36 aspect-square';
             skeletonSize = 144;
             break;
     }
@@ -159,7 +159,7 @@ const Avatar: React.FC<AvatarProps> = ({
                     {loaded && (
                         <>
                             <div
-                                className={`${sizeClasses} rounded-full overflow-hidden border-2`}
+                                className={`${sizeClasses} rounded-full overflow-hidden border-2 max-lg:border-0 flex items-center justify-center`}
                                 style={{ borderColor: getLevelColor() }}
                             >
                                 <img

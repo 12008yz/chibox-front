@@ -75,7 +75,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       <div
         ref={achievementsRef}
         data-achievements-section
-        className={`relative bg-black/50 rounded-xl border transition-all duration-300 overflow-visible shadow-lg ${
+        className={`relative bg-black/90 lg:bg-black/50 rounded-xl border transition-all duration-300 overflow-visible shadow-lg ${
           isAchievementsExpanded
             ? 'border-red-500/50 shadow-lg shadow-red-500/20 z-[100]'
             : 'border-white/10 hover:border-red-500/30 z-10'
@@ -126,7 +126,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       </div>
 
       {/* Expandable Content */}
-      <div className={`absolute top-full left-0 right-0 bg-black/80 border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
+      <div className={`absolute top-full left-0 right-0 bg-black/95 lg:bg-black/80 border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
         isAchievementsExpanded
           ? 'max-h-[600px] opacity-100 transform scale-y-100'
           : 'max-h-0 opacity-0 transform scale-y-95 pointer-events-none'
@@ -171,8 +171,8 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                       key={achievement.id}
                       className={`p-3 sm:p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] transform ${
                         isCompleted
-                          ? 'bg-green-500/10 border-green-500/30 shadow-sm shadow-green-500/20'
-                          : 'bg-gray-700/20 border-gray-600/30 hover:border-gray-500/50'
+                          ? 'bg-green-500/20 lg:bg-green-500/10 border-green-500/30 shadow-sm shadow-green-500/20'
+                          : 'bg-gray-700/50 lg:bg-gray-700/20 border-gray-600/30 hover:border-gray-500/50'
                       } ${
                         isAchievementsExpanded
                           ? 'translate-y-0 opacity-100 scale-100'

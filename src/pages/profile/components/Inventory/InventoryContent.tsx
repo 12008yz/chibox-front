@@ -158,7 +158,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
   );
 
   const renderInventoryGrid = () => (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
       {activeTab === 'opened' ? (
         // Специальный рендеринг для открытых кейсов с анимацией
         filteredInventory.map((inventoryItem) => {
@@ -243,18 +243,9 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                 <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                   {inventoryItem.item.name}
                 </h5>
-                <p className="text-green-400 text-sm font-bold">
+                <p className={`text-green-400 text-sm font-bold ${activeTab === 'active' && inventoryItem.status === 'inventory' ? 'mb-12 lg:mb-0' : ''}`}>
                   <Monetary value={Number(inventoryItem.item.price)} showFraction={true} />
                 </p>
-                {/* Acquisition info */}
-                <div className="mt-2 text-xs text-gray-400">
-                  <p>{t('profile.acquired_date')} {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                  <p className="capitalize">{t('profile.source')} {
-                    inventoryItem.source === 'case' ? t('profile.sources.case') :
-                    inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
-                    inventoryItem.source
-                  }</p>
-                </div>
 
                 {/* Withdraw Banner - показывается только для активных предметов */}
                 {activeTab === 'active' && inventoryItem.status === 'inventory' && (
@@ -380,15 +371,6 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                         </button>
                       </div>
                     )}
-                    {/* Acquisition info */}
-                    <div className="mt-2 text-xs text-gray-400">
-                      <p>{t('profile.acquired_date')} {new Date((inventoryItem as any).acquisition_date).toLocaleDateString()}</p>
-                      <p className="capitalize">{t('profile.source')} {
-                        inventoryItem.source === 'case' ? t('profile.sources.case') :
-                        inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
-                        inventoryItem.source
-                      }</p>
-                    </div>
                   </>
                 );
               })()

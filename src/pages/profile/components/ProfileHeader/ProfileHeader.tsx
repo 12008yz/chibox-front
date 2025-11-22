@@ -44,11 +44,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           <div className="relative group flex-shrink-0">
             <div
-              className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 p-0.5 cursor-pointer transition-all hover:scale-105 overflow-hidden"
+              className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 max-lg:bg-none p-0.5 max-lg:p-0 cursor-pointer transition-all hover:scale-105 overflow-hidden"
               onClick={() => setIsAvatarModalOpen(true)}
               title={t('profile.change_avatar') || 'Изменить аватар'}
             >
-              <div className="w-full h-full rounded-2xl overflow-hidden">
+              <div className="w-full h-full rounded-2xl overflow-hidden flex items-center justify-center">
                 <Avatar
                   image={user.avatar_url}
                   steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}

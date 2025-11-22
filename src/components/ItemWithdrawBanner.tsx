@@ -25,10 +25,10 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [withdrawItem] = useWithdrawItemMutation();
 
-  // Определяем мобильное устройство
+  // Определяем мобильное устройство (включая планшеты)
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -241,14 +241,14 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   return (
     <>
       {/* Desktop: Overlay при hover */}
-      <div className="hidden md:block absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
+      <div className="hidden lg:block absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
         <div className="bg-gray-900/98 border border-gray-600/50 rounded-lg p-3 mx-2 shadow-xl max-w-full">
           {withdrawContent}
         </div>
       </div>
 
-      {/* Mobile: Кнопка для открытия модального окна */}
-      <div className="md:hidden absolute bottom-2 left-2 right-2 z-20">
+      {/* Mobile & Tablet: Кнопка для открытия модального окна */}
+      <div className="lg:hidden absolute bottom-2 left-2 right-2 z-20">
         <button
           onClick={handleMobileClick}
           className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-1.5 px-2 rounded-lg text-[10px] transition-all duration-200 flex items-center justify-center gap-1 shadow-lg"
