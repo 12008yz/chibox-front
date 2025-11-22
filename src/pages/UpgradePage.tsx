@@ -252,40 +252,115 @@ interface UpgradeResult {
   };
 }
 
-// Мобильная анимация улучшения (захватывающая версия с столкновением)
+// Мобильная анимация улучшения (стрельба по мишени)
 const MobileUpgradeAnimation: React.FC<{
   upgradeResult: UpgradeResult;
   onAnimationComplete: () => void;
 }> = ({ upgradeResult, onAnimationComplete }) => {
-  const [phase, setPhase] = useState<'prepare' | 'collision' | 'explosion' | 'result'>('prepare');
-  const [particles, setParticles] = useState<Array<{id: number, angle: number, delay: number}>>([]);
+  const [phase, setPhase] = useState<'prepare' | 'aiming' | 'shooting' | 'impact' | 'result'>('prepare');
+  const [bulletPosition, setBulletPosition] = useState({ x: 50, y: 100 });
+  const [hitPosition, setHitPosition] = useState({ x: 50, y: 50 });
+  const [targetPosition, setTargetPosition] = useState({ x: 50, y: 50 }); // Позиция движущейся мишени
+  const [impactParticles, setImpactParticles] = useState<Array<{id: number, angle: number, delay: number}>>([]);
+
   const successChance = upgradeResult.data.success_chance;
   const isSuccess = upgradeResult.upgrade_success;
 
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Фаза 1: Подготовка (0.5s)
+    // Анимация движения мишени во время прицеливания
+    let targetInterval: NodeJS.Timeout | null = null;
+    let targetMovementTime = 0;
+    const targetSpeed = 0.02; // Скорость движения мишени
+
+    // Вычисляем точку попадания
+    const targetRadius = 50; // радиус мишени в процентах от центра
+    let hitX: number, hitY: number;
+
+    if (isSuccess) {
+      // УСПЕХ - попадаем в центральную зону (бычий глаз)
+      const successRadius = targetRadius * (successChance / 100);
+      const randomAngle = Math.random() * 2 * Math.PI;
+      const randomDistance = Math.random() * successRadius * 0.6; // 60% от зоны успеха для визуального эффекта
+      hitX = 50 + randomDistance * Math.cos(randomAngle);
+      hitY = 50 + randomDistance * Math.sin(randomAngle);
+    } else {
+      // НЕУДАЧА - попадаем за пределы центральной зоны
+      const successRadius = targetRadius * (successChance / 100);
+      const randomAngle = Math.random() * 2 * Math.PI;
+      const randomDistance = successRadius + Math.random() * (targetRadius - successRadius);
+      hitX = 50 + randomDistance * Math.cos(randomAngle);
+      hitY = 50 + randomDistance * Math.sin(randomAngle);
+    }
+
+    setHitPosition({ x: hitX, y: hitY });
+
+    // Фаза 1: Подготовка (0.8s)
     const timer1 = setTimeout(() => {
-      setPhase('collision');
-      soundManager.play('upgrade');
-    }, 500);
+      setPhase('aiming');
 
-    // Фаза 2: Столкновение (1s)
+      // Запускаем движение мишени
+      targetInterval = setInterval(() => {
+        targetMovementTime += targetSpeed;
+        // Мишень двигается по синусоиде по горизонтали
+        const offsetX = Math.sin(targetMovementTime * Math.PI * 2) * 20; // ±20% от центра
+        // Небольшое вертикальное покачивание
+        const offsetY = Math.sin(targetMovementTime * Math.PI * 3) * 8; // ±8% от центра
+        setTargetPosition({
+          x: 50 + offsetX,
+          y: 50 + offsetY
+        });
+      }, 16); // ~60fps
+    }, 800);
+
+    // Фаза 2: Остановка мишени и подготовка к выстрелу (за 0.2s до выстрела)
+    const timerStop = setTimeout(() => {
+      if (targetInterval) {
+        clearInterval(targetInterval);
+        targetInterval = null;
+      }
+      // Фиксируем позицию мишени для выстрела
+      const finalTargetX = 50 + Math.sin(targetMovementTime * Math.PI * 2) * 20;
+      const finalTargetY = 50 + Math.sin(targetMovementTime * Math.PI * 3) * 8;
+      setTargetPosition({ x: finalTargetX, y: finalTargetY });
+
+      // Корректируем точку попадания относительно текущей позиции мишени
+      setHitPosition({
+        x: finalTargetX + (hitX - 50),
+        y: finalTargetY + (hitY - 50)
+      });
+    }, 2100);
+
+    // Фаза 3: Выстрел (2.3s)
     const timer2 = setTimeout(() => {
-      setPhase('explosion');
+      setPhase('shooting');
+      soundManager.play('upgrade');
 
-      // Генерируем частицы для взрыва
-      const explosionParticles = Array.from({ length: 12 }, (_, i) => ({
-        id: i,
-        angle: (360 / 12) * i,
-        delay: Math.random() * 0.1
-      }));
-      setParticles(explosionParticles);
-    }, 1500);
+      // Пуля летит к скорректированной позиции
+      const finalTargetX = 50 + Math.sin(targetMovementTime * Math.PI * 2) * 20;
+      const finalTargetY = 50 + Math.sin(targetMovementTime * Math.PI * 3) * 8;
+      setBulletPosition({
+        x: finalTargetX + (hitX - 50),
+        y: finalTargetY + (hitY - 50)
+      });
+    }, 2300);
 
-    // Фаза 3: Результат (2.5s)
+    // Фаза 3: Попадание (0.6s после выстрела)
     const timer3 = setTimeout(() => {
+      setPhase('impact');
+
+      // Генерируем частицы попадания
+      const particles = Array.from({ length: 16 }, (_, i) => ({
+        id: i,
+        angle: (360 / 16) * i,
+        delay: Math.random() * 0.05
+      }));
+      setImpactParticles(particles);
+    }, 2900);
+
+    // Фаза 4: Результат (1.2s после попадания)
+    const timer4 = setTimeout(() => {
       setPhase('result');
 
       if (isSuccess) {
@@ -293,14 +368,17 @@ const MobileUpgradeAnimation: React.FC<{
       } else {
         soundManager.play('looseUpgrade');
       }
-    }, 2500);
+    }, 4100);
 
     return () => {
+      if (targetInterval) clearInterval(targetInterval);
       clearTimeout(timer1);
+      clearTimeout(timerStop);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timer4);
     };
-  }, [upgradeResult, isSuccess]);
+  }, [upgradeResult, isSuccess, successChance]);
 
   return (
     <div className="text-center py-6 px-4 min-h-[500px] flex flex-col items-center justify-center">
@@ -308,108 +386,166 @@ const MobileUpgradeAnimation: React.FC<{
       {phase === 'prepare' && (
         <div className="space-y-4 animate-fade-in">
           <h2 className="text-2xl font-bold text-cyan-300">
-            Начинаем улучшение...
+            Подготовка к улучшению...
           </h2>
-          <div className="text-gray-400">Приготовьтесь!</div>
+          <div className="text-gray-400">Заряжаем оружие... 🎯</div>
         </div>
       )}
 
-      {/* Фаза столкновения и взрыва */}
-      {(phase === 'collision' || phase === 'explosion') && (
-        <div className="relative w-full max-w-md h-64 flex items-center justify-center">
-          {/* Шанс успеха в центре */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+      {/* Фазы прицеливания, выстрела и попадания */}
+      {(phase === 'aiming' || phase === 'shooting' || phase === 'impact') && (
+        <div className="relative w-full max-w-md mx-auto">
+          {/* Заголовок с шансом */}
+          <div className="mb-4 text-center">
             <div className={`text-lg font-bold ${
               successChance >= 40 ? 'text-green-400' :
               successChance >= 20 ? 'text-yellow-400' :
               'text-red-400'
             }`}>
-              {successChance}% шанс
+              Цель: {successChance}% зона
+            </div>
+            <div className="text-sm text-gray-400 mt-1">
+              {phase === 'aiming' && '🎯 Прицеливаемся...'}
+              {phase === 'shooting' && '💥 Огонь!'}
+              {phase === 'impact' && '⚡ Попадание!'}
             </div>
           </div>
 
-          {/* Левый предмет (исходные) */}
-          <div
-            className={`absolute left-0 w-20 h-20 bg-gradient-to-br from-cyan-500/30 to-cyan-600/30 rounded-lg border-2 border-cyan-400 flex items-center justify-center transition-all duration-1000 ${
-              phase === 'collision' ? 'translate-x-0' : 'translate-x-32 opacity-0'
-            }`}
-            style={{
-              animation: phase === 'collision' ? 'slide-from-left 1s ease-out forwards' : 'none'
-            }}
-          >
-            <div className="text-2xl">📦</div>
-          </div>
+          {/* Контейнер для движущейся мишени */}
+          <div className="relative w-64 h-64 mx-auto overflow-visible">
+            {/* Мишень с анимацией движения */}
+            <div
+              className="absolute w-full h-full transition-all"
+              style={{
+                left: `${targetPosition.x - 50}%`,
+                top: `${targetPosition.y - 50}%`,
+                transitionDuration: phase === 'aiming' ? '0ms' : '200ms',
+                transitionTimingFunction: 'linear'
+              }}
+            >
+              {/* Фоновое свечение */}
+              <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                phase === 'impact'
+                  ? isSuccess
+                    ? 'bg-gradient-radial from-green-400/30 to-transparent animate-pulse'
+                    : 'bg-gradient-radial from-red-400/30 to-transparent animate-pulse'
+                  : 'bg-gradient-radial from-purple-500/20 to-transparent'
+              }`} />
 
-          {/* Правый предмет (целевой) */}
-          <div
-            className={`absolute right-0 w-20 h-20 bg-gradient-to-br from-purple-500/30 to-purple-600/30 rounded-lg border-2 border-purple-400 flex items-center justify-center transition-all duration-1000 ${
-              phase === 'collision' ? 'translate-x-0' : '-translate-x-32 opacity-0'
-            }`}
-            style={{
-              animation: phase === 'collision' ? 'slide-from-right 1s ease-out forwards' : 'none'
-            }}
-          >
-            <div className="text-2xl">🎯</div>
-          </div>
+              {/* Мишень - внешний круг (зона промаха) */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-red-900/40 to-red-950/60 border-4 border-red-700/50 shadow-2xl">
+              {/* Кольца мишени */}
+              <div className="absolute inset-[15%] rounded-full border-2 border-red-600/30" />
+              <div className="absolute inset-[30%] rounded-full border-2 border-red-500/30" />
 
-          {/* Центральная точка столкновения */}
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            {phase === 'explosion' && (
-              <>
-                {/* Главная вспышка */}
-                <div className={`w-32 h-32 rounded-full ${
+              {/* Центральная зона успеха (бычий глаз) */}
+              <div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-green-400/50 to-green-600/60 border-4 border-green-500 shadow-lg shadow-green-500/40"
+                style={{
+                  width: `${successChance}%`,
+                  height: `${successChance}%`,
+                  maxWidth: '100%',
+                  maxHeight: '100%'
+                }}
+              >
+                {/* Внутренний блик */}
+                <div className="absolute top-[20%] left-[20%] w-[30%] h-[30%] rounded-full bg-green-300/40 blur-sm" />
+              </div>
+
+              {/* Центральная точка */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-lg" />
+            </div>
+
+            {/* Прицел (только во время прицеливания) */}
+            {phase === 'aiming' && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-pulse">
+                <div className="relative">
+                  {/* Перекрестие */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-12 h-0.5 bg-cyan-400 shadow-lg shadow-cyan-400/50" style={{ marginTop: '-1px' }} />
+                    <div className="w-0.5 h-12 bg-cyan-400 shadow-lg shadow-cyan-400/50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  {/* Круг прицела */}
+                  <div className="w-16 h-16 rounded-full border-2 border-cyan-400 shadow-lg shadow-cyan-400/50 animate-spin-slow" />
+                  {/* Точка в центре */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-cyan-400" />
+                </div>
+              </div>
+            )}
+            </div>
+            {/* Конец движущейся мишени */}
+
+            {/* Пуля */}
+            {(phase === 'shooting' || phase === 'impact') && (
+              <div
+                className="absolute w-3 h-3 rounded-full bg-yellow-400 shadow-lg shadow-yellow-400/80 transition-all z-20"
+                style={{
+                  left: `${bulletPosition.x}%`,
+                  top: `${bulletPosition.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                  transitionDuration: phase === 'shooting' ? '600ms' : '0ms',
+                  transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}
+              >
+                {/* Трассирующий след */}
+                {phase === 'shooting' && (
+                  <div className="absolute inset-0 rounded-full bg-yellow-300/60 animate-ping" />
+                )}
+              </div>
+            )}
+
+            {/* Отметка попадания */}
+            {phase === 'impact' && (
+              <div
+                className="absolute z-30"
+                style={{
+                  left: `${hitPosition.x}%`,
+                  top: `${hitPosition.y}%`,
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >
+                {/* Вспышка попадания */}
+                <div className={`absolute inset-0 w-20 h-20 rounded-full -ml-10 -mt-10 ${
                   isSuccess
-                    ? 'bg-gradient-radial from-green-400/60 via-green-500/30 to-transparent'
-                    : 'bg-gradient-radial from-orange-400/60 via-red-500/30 to-transparent'
+                    ? 'bg-gradient-radial from-green-400/80 via-green-500/40 to-transparent'
+                    : 'bg-gradient-radial from-orange-400/80 via-red-500/40 to-transparent'
                 } animate-ping-fast`} />
 
-                {/* Внутреннее свечение */}
-                <div className={`absolute inset-0 w-32 h-32 rounded-full ${
-                  isSuccess
-                    ? 'bg-gradient-radial from-green-300/80 to-transparent'
-                    : 'bg-gradient-radial from-red-300/80 to-transparent'
-                } animate-pulse-slow`} />
+                {/* Отверстие от пули */}
+                <div className={`relative w-6 h-6 rounded-full border-4 ${
+                  isSuccess ? 'border-green-400 bg-green-900/60' : 'border-red-400 bg-red-900/60'
+                } shadow-xl`}>
+                  <div className="absolute inset-0 rounded-full bg-black/40" />
+                </div>
 
-                {/* Частицы взрыва */}
-                {particles.map((particle) => (
+                {/* Частицы разлёта */}
+                {impactParticles.map((particle) => (
                   <div
                     key={particle.id}
-                    className={`absolute w-2 h-2 rounded-full ${
+                    className={`absolute w-1.5 h-1.5 rounded-full ${
                       isSuccess ? 'bg-green-400' : 'bg-red-400'
                     }`}
                     style={{
-                      animation: `explode-particle 0.8s ease-out forwards`,
+                      animation: `explode-particle 0.6s ease-out forwards`,
                       animationDelay: `${particle.delay}s`,
                       transform: `rotate(${particle.angle}deg) translateX(0)`,
                       left: '50%',
                       top: '50%',
-                      marginLeft: '-4px',
-                      marginTop: '-4px',
+                      marginLeft: '-3px',
+                      marginTop: '-3px',
                     }}
                   />
                 ))}
-              </>
+              </div>
             )}
           </div>
-
-          {/* Текст во время столкновения */}
-          {phase === 'collision' && (
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-cyan-300 font-bold animate-pulse">
-              Сливаем предметы...
-            </div>
-          )}
-          {phase === 'explosion' && (
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-purple-300 font-bold animate-pulse">
-              Определяем результат...
-            </div>
-          )}
         </div>
       )}
 
       {/* Фаза результата */}
       {phase === 'result' && (
         <div className="space-y-6 animate-scale-in">
-          {/* Иконка и предмет результата */}
+          {/* Иконка результата */}
           <div className="relative">
             {/* Свечение вокруг */}
             <div className={`absolute inset-0 w-32 h-32 mx-auto rounded-full ${
@@ -425,7 +561,7 @@ const MobileUpgradeAnimation: React.FC<{
                 : 'bg-gradient-to-br from-red-500/30 to-red-600/30 border-4 border-red-500 shadow-lg shadow-red-500/50'
             }`}>
               <div className={`text-6xl ${isSuccess ? 'animate-bounce-once' : 'animate-shake'}`}>
-                {isSuccess ? '✨' : '💥'}
+                {isSuccess ? '🎯' : '💥'}
               </div>
             </div>
           </div>
@@ -434,7 +570,7 @@ const MobileUpgradeAnimation: React.FC<{
           <h2 className={`text-3xl sm:text-4xl font-bold ${
             isSuccess ? 'text-green-400' : 'text-red-400'
           }`}>
-            {isSuccess ? 'УСПЕХ!' : 'НЕУДАЧА'}
+            {isSuccess ? 'ТОЧНОЕ ПОПАДАНИЕ!' : 'ПРОМАХ!'}
           </h2>
 
           {/* Информация о результате */}
@@ -458,8 +594,8 @@ const MobileUpgradeAnimation: React.FC<{
 
             <div className="text-gray-300 text-sm mb-4">
               {isSuccess
-                ? '🎉 Ваши предметы успешно трансформированы!'
-                : '😢 Предметы утрачены в процессе'
+                ? '🎉 Вы попали в цель! Предметы улучшены!'
+                : '😢 Вы промахнулись. Предметы утрачены.'
               }
             </div>
 
