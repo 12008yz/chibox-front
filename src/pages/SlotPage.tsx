@@ -32,11 +32,11 @@ const PlaceholderImage: React.FC<{
 }> = ({ className = "w-full h-full", item }) => {
   return (
     <div className={`${className} bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg flex flex-col items-center justify-center border border-gray-600`}>
-      <div className="text-xl sm:text-2xl md:text-3xl mb-2 sm:mb-3 text-gray-400">📦</div>
-      <div className="text-xs sm:text-sm text-gray-300 font-medium px-2 sm:px-3 text-center">
+      <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1 sm:mb-2 md:mb-3 text-gray-400">📦</div>
+      <div className="text-[0.6rem] sm:text-xs md:text-sm text-gray-300 font-medium px-1 sm:px-2 md:px-3 text-center">
         {item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}
       </div>
-      <div className="text-sm sm:text-base md:text-lg text-yellow-400 font-semibold mt-1 sm:mt-2">
+      <div className="text-xs sm:text-sm md:text-base lg:text-lg text-yellow-400 font-semibold mt-0.5 sm:mt-1 md:mt-2">
         <Monetary value={Number(item.price)} />
       </div>
     </div>
@@ -213,7 +213,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
               {/* Название внизу с улучшенным стилем */}
               <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 right-1 sm:right-2 text-center">
-                <div className="text-[0.5rem] sm:text-xs text-white font-medium bg-black/80 rounded px-1 sm:px-2 py-0.5 sm:py-1 truncate border border-white/10 shadow-lg">
+                <div className="text-[0.6rem] sm:text-xs text-white font-medium bg-black/80 rounded px-1 sm:px-2 py-0.5 sm:py-1 truncate border border-white/10 shadow-lg">
                   {item.name.length > 12 ? `${item.name.substring(0, 12)}...` : item.name}
                 </div>
               </div>
@@ -365,11 +365,11 @@ const SlotPage: React.FC = () => {
 
   if (isLoadingItems) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-600 border-t-white mx-auto mb-4"></div>
-          <div className="text-white text-lg font-medium">{t('slots.loading_items')}</div>
-          <div className="text-gray-400 text-sm mt-2">{t('slots.preparing_game')}</div>
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-2 border-gray-600 border-t-white mx-auto mb-4"></div>
+          <div className="text-white text-base sm:text-lg font-medium">{t('slots.loading_items')}</div>
+          <div className="text-gray-400 text-xs sm:text-sm mt-2">{t('slots.preparing_game')}</div>
         </div>
       </div>
     );
@@ -377,13 +377,13 @@ const SlotPage: React.FC = () => {
 
   if (itemsError || !slotItemsData?.success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-        <div className="text-center bg-gray-800 rounded-lg p-6 border border-red-400/50 max-w-md">
-          <div className="text-red-400 text-xl font-semibold mb-3">{t('slots.loading_error')}</div>
-          <div className="text-gray-300 mb-4">{t('slots.failed_to_load')}</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4">
+        <div className="text-center bg-gray-800 rounded-lg p-5 sm:p-6 border border-red-400/50 max-w-md w-full">
+          <div className="text-red-400 text-lg sm:text-xl font-semibold mb-3">{t('slots.loading_error')}</div>
+          <div className="text-gray-300 text-sm sm:text-base mb-4">{t('slots.failed_to_load')}</div>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors border border-gray-600"
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm sm:text-base rounded transition-colors border border-gray-600"
           >
             {t('slots.reload')}
           </button>
@@ -406,29 +406,29 @@ const SlotPage: React.FC = () => {
       />
       <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 -z-40" />
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Улучшенный заголовок */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-6 sm:mb-10">
           <div className="inline-block">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 flex items-center justify-center gap-4">
-              <img src="/images/status3.png" alt="Slot" className="w-16 h-16 object-contain" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2 flex items-center justify-center gap-2 sm:gap-4">
+              <img src="/images/status3.png" alt="Slot" className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain" />
               {t('slots.title')}
             </h1>
             <div className="h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full"></div>
           </div>
-          <div className="text-gray-300 text-lg mb-4 mt-4 font-light">
+          <div className="text-gray-300 text-sm sm:text-base md:text-lg mb-4 mt-4 font-light px-4">
             {t('slots.description')}
           </div>
         </div>
 
         {/* Игровая область */}
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gray-900/80 rounded-3xl p-8 border border-gray-700/50 shadow-2xl">
+          <div className="bg-gray-900/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-700/50 shadow-2xl">
 
             {/* Игровое поле */}
-            <div className="bg-gradient-to-b from-gray-950/50 to-gray-900/50 rounded-2xl p-8 mb-8 border border-gray-800/50 relative overflow-hidden">
+            <div className="bg-gradient-to-b from-gray-950/50 to-gray-900/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 border border-gray-800/50 relative overflow-hidden">
 
-              <div className="flex justify-center gap-8 mb-4 relative z-10">
+              <div className="flex justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-4 relative z-10">
                 {[0, 1, 2].map((reelIndex) => (
                   <Reel
                     key={reelIndex}
@@ -446,52 +446,52 @@ const SlotPage: React.FC = () => {
 
             {/* Улучшенная информация о подписке */}
             {auth.user && slotStatusData?.data && (
-              <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50">
+              <div className="mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50">
                 <div className="text-center">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
-                      <div className="text-gray-400 text-sm font-medium mb-2">Ваш уровень</div>
-                      <div className={`text-xl font-bold transition-all duration-300 ${
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-4 sm:p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
+                      <div className="text-gray-400 text-xs sm:text-sm font-medium mb-2">Ваш уровень</div>
+                      <div className={`text-lg sm:text-xl font-bold transition-all duration-300 ${
                         slotStatusData.data.hasSubscription ? 'text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]' : 'text-red-400'
                       }`}>
                         {slotStatusData.data.subscriptionName}
                       </div>
                     </div>
 
-                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
-                      <div className="text-gray-400 text-sm font-medium mb-2">Спины сегодня</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-4 sm:p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
+                      <div className="text-gray-400 text-xs sm:text-sm font-medium mb-2">Спины сегодня</div>
+                      <div className="text-lg sm:text-xl font-bold text-white">
                         {slotStatusData.data.used} / {slotStatusData.data.limit}
                       </div>
-                      <div className="text-sm text-gray-500 mt-1">
+                      <div className="text-xs sm:text-sm text-gray-500 mt-1">
                         Осталось: <span className="text-blue-400 font-semibold">{slotStatusData.data.remaining}</span>
                       </div>
                     </div>
 
-                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
-                      <div className="text-gray-400 text-sm font-medium mb-2">Сброс лимита через</div>
-                      <div className="text-base text-white font-medium">
+                    <div className="group bg-gradient-to-br from-gray-800/60 to-gray-900/60 rounded-xl p-4 sm:p-5 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 hover:scale-105">
+                      <div className="text-gray-400 text-xs sm:text-sm font-medium mb-2">Сброс лимита через</div>
+                      <div className="text-sm sm:text-base text-white font-medium">
                         <CountdownTimer
                           targetTime={slotStatusData.data.nextResetTime}
                           className="text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)]"
                           onComplete={handleTimerComplete}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Заходите каждый день</div>
+                      <div className="text-[0.65rem] sm:text-xs text-gray-500 mt-1">Заходите каждый день</div>
                     </div>
                   </div>
 
                   {/* Бесплатные попытки */}
                   {slotStatusData.data.free_attempts_remaining > 0 && (
-                    <div className="mt-6 p-5 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/50 rounded-2xl ">
-                      <div className="text-green-300 font-bold text-lg mb-2">
+                    <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/50 rounded-2xl ">
+                      <div className="text-green-300 font-bold text-base sm:text-lg mb-2">
                         🎁 Бесплатные попытки: {slotStatusData.data.free_attempts_remaining} из 2
                       </div>
-                      <div className="text-sm text-green-200">
+                      <div className="text-xs sm:text-sm text-green-200">
                         {slotStatusData.data.free_attempts_info.reason}
                       </div>
                       {slotStatusData.data.free_attempts_info.next_available && (
-                        <div className="text-xs text-green-300 mt-2">
+                        <div className="text-[0.65rem] sm:text-xs text-green-300 mt-2">
                           Следующая попытка доступна: {new Date(slotStatusData.data.free_attempts_info.next_available).toLocaleString('ru-RU', {
                             day: '2-digit',
                             month: '2-digit',
@@ -512,7 +512,7 @@ const SlotPage: React.FC = () => {
               <button
                 onClick={handleSpin}
                 disabled={!canPlay}
-                className={`group relative px-12 py-4 rounded-2xl font-bold text-xl transition-all duration-300 overflow-hidden ${
+                className={`group relative px-8 sm:px-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 overflow-hidden ${
                   canPlay
                     ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 hover:from-blue-500 hover:via-blue-400 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] transform hover:scale-110 active:scale-95'
                     : 'bg-gray-700 text-gray-400 cursor-not-allowed'
@@ -520,8 +520,8 @@ const SlotPage: React.FC = () => {
               >
                 <span className="relative z-10">
                   {isLoading || isSpinning ? (
-                    <span className="flex items-center gap-3 justify-center">
-                      <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
+                    <span className="flex items-center gap-2 sm:gap-3 justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-3 border-white border-t-transparent"></div>
                       <span>{t('slots.spinning')}</span>
                     </span>
                   ) : (
@@ -537,23 +537,23 @@ const SlotPage: React.FC = () => {
               {!canPlay && auth.user && (
                 <>
                   {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
-                    <div className="mt-6 p-5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/50 rounded-2xl text-red-300 max-w-sm mx-auto ">
-                      <div className="font-bold text-lg">💎 Требуется статус</div>
-                      <div className="text-sm mt-2">Оформите статус для игры в слот</div>
+                    <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/50 rounded-xl sm:rounded-2xl text-red-300 max-w-sm mx-auto ">
+                      <div className="font-bold text-base sm:text-lg">💎 Требуется статус</div>
+                      <div className="text-xs sm:text-sm mt-2">Оформите статус для игры в слот</div>
                     </div>
                   )}
                 </>
               )}
 
               {!auth.user && (
-                <div className="mt-6 p-5 bg-gradient-to-r from-yellow-900/30 to-amber-900/30 border border-yellow-500/50 rounded-2xl text-yellow-300 max-w-sm mx-auto ">
-                  <div className="font-bold text-lg">{t('slots.please_login')}</div>
+                <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-yellow-900/30 to-amber-900/30 border border-yellow-500/50 rounded-xl sm:rounded-2xl text-yellow-300 max-w-sm mx-auto ">
+                  <div className="font-bold text-base sm:text-lg">{t('slots.please_login')}</div>
                 </div>
               )}
 
               {displayItems.length === 0 && (
-                <div className="mt-6 p-5 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/50 rounded-2xl text-blue-300 max-w-sm mx-auto ">
-                  <div className="font-bold text-lg">{t('slots.loading_items_status')}</div>
+                <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/50 rounded-xl sm:rounded-2xl text-blue-300 max-w-sm mx-auto ">
+                  <div className="font-bold text-base sm:text-lg">{t('slots.loading_items_status')}</div>
                 </div>
               )}
             </div>

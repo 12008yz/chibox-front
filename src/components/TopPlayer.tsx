@@ -42,16 +42,16 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
   };
 
   return (
-    <div className={`relative w-64 ${rank === 1 ? '-mt-10' : 'hidden md:block'}`}>
+    <div className={`relative w-40 sm:w-52 md:w-64 ${rank === 1 ? '-mt-6 sm:-mt-10' : 'hidden md:block'}`}>
       <div className='relative z-50 flex flex-col items-center justify-center'>
         <Player user={user} size="large" direction="column" showLevel={true} />
-        <div className='flex flex-col items-center gap-2'>
-          <span className='text-2xl font-bold mt-1'>
+        <div className='flex flex-col items-center gap-1 sm:gap-2'>
+          <span className='text-lg sm:text-xl md:text-2xl font-bold mt-1'>
             #{rank}
           </span>
         </div>
-        <div className="flex flex-col items-center gap-1 mt-6">
-          <div className="text-gray-400">
+        <div className="flex flex-col items-center gap-1 mt-3 sm:mt-4 md:mt-6">
+          <div className="text-gray-400 text-sm sm:text-base">
             {leaderboardType === 'most_expensive_item' ? (
               <Monetary value={getScore()} />
             ) : (
@@ -59,7 +59,7 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
             )}
           </div>
           {leaderboardType === 'most_expensive_item' && user.most_expensive_item_name && (
-            <span className="text-xs text-gray-400 text-center px-2 max-w-[200px] truncate">
+            <span className="text-[0.65rem] sm:text-xs text-gray-400 text-center px-2 max-w-[150px] sm:max-w-[200px] truncate">
               {user.most_expensive_item_name}
             </span>
           )}
@@ -67,7 +67,7 @@ const TopPlayer: React.FC<TopPlayerProps> = ({ user, rank, leaderboardType }) =>
       </div>
 
       {/* Простой подиум эффект */}
-      <div className="absolute top-[70px] z-0 w-full h-24 bg-gradient-to-t from-blue-600/30 to-transparent rounded-lg" />
+      <div className="absolute top-[50px] sm:top-[60px] md:top-[70px] z-0 w-full h-16 sm:h-20 md:h-24 bg-gradient-to-t from-blue-600/30 to-transparent rounded-lg" />
     </div>
   );
 };

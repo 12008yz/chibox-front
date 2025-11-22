@@ -149,37 +149,37 @@ const LeaderboardPage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none mx-auto">
           <Title title={t('leaderboard_page.title')} />
 
           {/* Описание текущей вкладки */}
           {currentTab && (
-            <div className="text-center mb-8">
+            <div className="text-center mb-6 sm:mb-8">
               <div className="flex justify-center mb-2">
-                <img src={currentTab.icon} alt={currentTab.name} className="w-16 h-16 object-contain" />
+                <img src={currentTab.icon} alt={currentTab.name} className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
               </div>
-              <p className="text-gray-400">{currentTab.description}</p>
+              <p className="text-gray-400 text-sm sm:text-base px-4">{currentTab.description}</p>
             </div>
           )}
 
           {/* Вкладки */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 w-full max-w-2xl">
+          <div className="flex flex-wrap justify-center gap-2 mb-6 sm:mb-8 w-full max-w-2xl px-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={`
-                  relative px-6 py-3 rounded-lg font-medium transition-all duration-300 flex-1 min-w-[140px]
+                  relative px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-300 flex-1 min-w-[100px] sm:min-w-[120px] md:min-w-[140px]
                   ${activeTab === tab.id
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg transform scale-105'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
                   }
                 `}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <img src={tab.icon} alt={tab.name} className="w-8 h-8 object-contain" />
-                  <span className="text-sm">{tab.name}</span>
+                <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                  <img src={tab.icon} alt={tab.name} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
+                  <span className="text-[0.65rem] sm:text-xs md:text-sm">{tab.name}</span>
                 </div>
                 {activeTab === tab.id && (
                   <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 opacity-20 animate-pulse"></div>
@@ -189,18 +189,18 @@ const LeaderboardPage: React.FC = () => {
           </div>
 
           {error ? (
-            <div className="text-red-500 text-center bg-red-500/10 p-4 rounded-lg">
+            <div className="text-red-500 text-center bg-red-500/10 p-3 sm:p-4 rounded-lg text-sm sm:text-base">
               {error}
             </div>
           ) : loading ? (
-            <div className="flex justify-center items-center h-64">
+            <div className="flex justify-center items-center h-48 sm:h-64">
               <div className="spinner" />
-              <span className="ml-4">{t('leaderboard_page.loading_data')}</span>
+              <span className="ml-3 sm:ml-4 text-sm sm:text-base">{t('leaderboard_page.loading_data')}</span>
             </div>
           ) : leaderboardData && leaderboardData.leaderboard.length > 0 ? (
             <>
               {/* Топ-3 игрока */}
-              <div className="flex gap-14 my-16">
+              <div className="flex gap-4 sm:gap-8 md:gap-14 my-8 sm:my-12 md:my-16">
                 {leaderboardData.leaderboard[1] && (
                   <TopPlayer
                     key={leaderboardData.leaderboard[1].user_id}
@@ -257,13 +257,13 @@ const LeaderboardPage: React.FC = () => {
                   <table className="min-w-full divide-y divide-gray-500">
                     <thead className="bg-[#19172d]">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[0.65rem] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {t('leaderboard_page.rank')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[0.65rem] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {t('leaderboard_page.player')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[0.65rem] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {getScoreLabel()}
                         </th>
                       </tr>
@@ -271,10 +271,10 @@ const LeaderboardPage: React.FC = () => {
                     <tbody className="divide-y divide-[#19172d]">
                       {leaderboardData.leaderboard.slice(3).map((user: User, index: number) => (
                         <tr key={user.user_id} className="hover:bg-gray-800/50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap text-white font-medium">
+                          <td className="px-2 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-white font-medium text-xs sm:text-sm md:text-base">
                             #{index + 4}
                           </td>
-                          <td className="flex p-4 items-center gap-2">
+                          <td className="flex p-2 sm:p-3 md:p-4 items-center gap-1 sm:gap-2">
                             <Player
                               user={{
                                 id: user.user_id,
@@ -287,12 +287,12 @@ const LeaderboardPage: React.FC = () => {
                               size="small"
                             />
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-white">
+                          <td className="px-2 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-white text-xs sm:text-sm md:text-base">
                             {leaderboardData.type === 'most_expensive_item' ? (
                               <div className="flex flex-col">
                                 <Monetary value={getScoreValue(user)} />
                                 {user.most_expensive_item_name && (
-                                  <span className="text-xs text-gray-400 truncate max-w-[200px]">
+                                  <span className="text-[0.65rem] sm:text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
                                     {user.most_expensive_item_name}
                                   </span>
                                 )}
@@ -311,7 +311,7 @@ const LeaderboardPage: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className="text-gray-400 text-center py-8 bg-gray-900/30 rounded-lg">
+            <div className="text-gray-400 text-center py-6 sm:py-8 bg-gray-900/30 rounded-lg text-sm sm:text-base">
               {t('leaderboard_page.no_data')}
             </div>
           )}
