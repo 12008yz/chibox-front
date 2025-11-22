@@ -39,9 +39,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         </button>
       </div>
 
-      <div className="relative flex flex-col gap-4 sm:gap-6 lg:gap-8">
+      <div className="relative flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 lg:items-center">
         {/* User Avatar and Basic Info */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-4 sm:gap-6 lg:flex-shrink-0">
           <div className="relative group flex-shrink-0">
             <div
               className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 max-lg:bg-none p-0.5 max-lg:p-0 cursor-pointer transition-all hover:scale-105 overflow-hidden"
@@ -95,8 +95,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         </div>
 
         {/* Balance and Level Progress */}
-        <div className="space-y-3 sm:space-y-4">
-          <div className="bg-black/40 rounded-xl p-3 sm:p-4 border border-white/10">
+        <div className="space-y-3 sm:space-y-4 lg:flex-1 lg:flex lg:flex-col">
+          <div className="bg-black/40 rounded-xl p-3 sm:p-4 border border-white/10 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
             <div className="flex items-center justify-between mb-2">
               <span className="text-gray-400 text-xs sm:text-sm">{t('common.balance')}</span>
               <span className="text-lg sm:text-xl lg:text-2xl font-bold text-green-400">
@@ -106,10 +106,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
           </div>
 
           {/* Level Progress */}
-          <div className="bg-black/40 rounded-xl p-3 sm:p-4 border border-white/10">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1 sm:gap-2">
-                <span className="text-gray-400 text-xs sm:text-sm">{t('profile.level_progress')}</span>
+          <div className="bg-black/40 rounded-xl p-3 sm:p-4 border border-white/10 lg:flex-1 lg:flex lg:flex-col lg:justify-center">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-gray-400 text-xs sm:text-sm">{t('profile.level_progress')}</span>
                 <Tooltip
                   content={
                     <div className="space-y-2">
@@ -149,20 +150,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
                 >
                   <div className="w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center cursor-help hover:bg-gray-500 transition-colors">
                     <span className="text-xs text-white font-bold">?</span>
-                  </div>
-                </Tooltip>
+                    </div>
+                  </Tooltip>
+                </div>
+                <span className="text-xs sm:text-sm text-gray-300">{progressPercentage}%</span>
               </div>
-              <span className="text-xs sm:text-sm text-gray-300">{progressPercentage}%</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 rounded-full"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-[10px] sm:text-xs text-gray-400 mt-1">
-              <span>{xpInCurrentLevel.toLocaleString()}/{xpToNextLevel.toLocaleString()} XP</span>
-              <span>{t('profile.level_text')} {user.level}/{t('profile.level_max')}</span>
+              <div className="w-full bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-[10px] sm:text-xs text-gray-400 mt-1">
+                <span>{xpInCurrentLevel.toLocaleString()}/{xpToNextLevel.toLocaleString()} XP</span>
+                <span>{t('profile.level_text')} {user.level}/{t('profile.level_max')}</span>
+              </div>
             </div>
           </div>
         </div>

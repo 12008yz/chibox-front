@@ -158,7 +158,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
   );
 
   const renderInventoryGrid = () => (
-    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
       {activeTab === 'opened' ? (
         // Специальный рендеринг для открытых кейсов с анимацией
         filteredInventory.map((inventoryItem) => {
@@ -243,7 +243,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                 <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                   {inventoryItem.item.name}
                 </h5>
-                <p className={`text-green-400 text-sm font-bold ${activeTab === 'active' && inventoryItem.status === 'inventory' ? 'mb-12 lg:mb-0' : ''}`}>
+                <p className="text-green-400 text-sm font-bold mb-0">
                   <Monetary value={Number(inventoryItem.item.price)} showFraction={true} />
                 </p>
 

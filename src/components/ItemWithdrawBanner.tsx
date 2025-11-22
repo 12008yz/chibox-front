@@ -241,24 +241,33 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   return (
     <>
       {/* Desktop: Overlay при hover */}
-      <div className="hidden lg:block absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
-        <div className="bg-gray-900/98 border border-gray-600/50 rounded-lg p-3 mx-2 shadow-xl max-w-full">
+      <div className="hidden lg:flex absolute inset-0 bg-black/80 rounded-xl items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
+        <div className="bg-gray-900/98 border border-gray-600/50 rounded-lg p-3 mx-2 shadow-xl max-w-full w-full">
           {withdrawContent}
         </div>
       </div>
 
       {/* Mobile & Tablet: Кнопка для открытия модального окна */}
-      <div className="lg:hidden absolute bottom-2 left-2 right-2 z-20">
-        <button
-          onClick={handleMobileClick}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-1.5 px-2 rounded-lg text-[10px] transition-all duration-200 flex items-center justify-center gap-1 shadow-lg"
-        >
-          <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
-          <span className="truncate">Вывести</span>
-        </button>
-      </div>
+      {canWithdraw && (
+        <div className="lg:hidden absolute bottom-2 left-2 right-2 z-20">
+          <button
+            onClick={handleMobileClick}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-1.5 px-2 rounded-lg text-[10px] transition-all duration-200 flex items-center justify-center gap-1 shadow-lg"
+          >
+            <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            <span className="truncate">Вывести</span>
+          </button>
+        </div>
+      )}
+      {!canWithdraw && !withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription && (
+        <div className="lg:hidden absolute bottom-2 left-2 right-2 z-20">
+          <div className="w-full bg-gray-700/90 text-gray-300 font-medium py-1.5 px-2 rounded-lg text-[9px] text-center shadow-lg">
+            {t('profile.item_withdraw.subscription_required')}
+          </div>
+        </div>
+      )}
 
       {/* Mobile Modal */}
       {showMobileModal && isMobile && (
