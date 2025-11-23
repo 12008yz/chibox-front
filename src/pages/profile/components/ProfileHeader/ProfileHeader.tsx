@@ -5,6 +5,7 @@ import Tooltip from '../../../../components/Tooltip';
 import { calculateLevelProgress } from '../../utils/profileUtils';
 import Monetary from '../../../../components/Monetary';
 import AvatarUploadModal from '../Modals/AvatarUploadModal';
+import { getBackendImageUrl } from '../../../../utils/steamImageUtils';
 
 interface ProfileHeaderProps {
   user: any;
@@ -174,7 +175,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
       <AvatarUploadModal
         isOpen={isAvatarModalOpen}
         onClose={() => setIsAvatarModalOpen(false)}
-        currentAvatar={user.avatar_url ? `${import.meta.env.VITE_API_URL}${user.avatar_url}` : undefined}
+        currentAvatar={user.avatar_url ? (getBackendImageUrl(user.avatar_url) || undefined) : undefined}
         steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
         userId={user.id}
       />

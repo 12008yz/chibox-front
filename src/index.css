@@ -1696,3 +1696,35 @@ html::-webkit-scrollbar-thumb,
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
+
+/* Case hover effects - оптимизировано для производительности */
+.case-item-wrapper {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.case-item-wrapper:hover {
+  transform: scale(1.05);
+  will-change: transform;
+}
+
+.case-item-wrapper:hover .case-image {
+  filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.6))
+          drop-shadow(0 0 30px rgba(96, 165, 250, 0.4))
+          drop-shadow(0 0 45px rgba(96, 165, 250, 0.2));
+}
+
+.case-image {
+  transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Отключаем hover-эффекты на мобильных устройствах для экономии ресурсов */
+@media (max-width: 768px) {
+  .case-item-wrapper:hover {
+    transform: scale(1.03);
+  }
+
+  .case-item-wrapper:hover .case-image {
+    filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5));
+  }
+}

@@ -5,7 +5,7 @@ import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
 const Footer = () => {
   const { t } = useTranslation();
   const { data: statsData, isLoading } = useGetGlobalStatisticsQuery(undefined, {
-    pollingInterval: 10000, // Обновляем каждые 10 секунд
+    pollingInterval: 300000, // Обновляем каждые 5 минут
   });
 
   // Отладка: выводим данные статистики в консоль
@@ -238,7 +238,7 @@ const Footer = () => {
               className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain animate-spin-slow"
             />
             <div className="text-center md:text-left">
-              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-orange-400">
                 {t('footer.chi_coin_title')}
               </h3>
               <p className="text-gray-400 text-sm md:text-base max-w-md">

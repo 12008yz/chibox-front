@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useUploadAvatarMutation, useDeleteAvatarMutation } from '../../../../features/user/userApi';
@@ -24,7 +24,22 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
   const [deleteAvatar, { isLoading: isDeleting }] = useDeleteAvatarMutation();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Сброс состояния при открытии модального окна
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Avatar Modal Debug:', {
+        currentAvatar,
+        steamAvatar,
+        userId
+      });
+      setImageError(false);
+      setPreviewUrl(null);
+      setSelectedFile(null);
+    }
+  }, [isOpen, currentAvatar, steamAvatar, userId]);
 
   if (!isOpen) return null;
 
@@ -194,11 +209,33 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
           <div className="flex justify-center mb-4">
             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 bg-gray-800">
               {previewUrl ? (
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-              ) : currentAvatar ? (
-                <img src={currentAvatar} alt="Current avatar" className="w-full h-full object-cover" />
-              ) : steamAvatar ? (
-                <img src={steamAvatar} alt="Steam avatar" className="w-full h-full object-cover" />
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (currentAvatar && !imageError) ? (
+                <img
+                  src={currentAvatar}
+                  alt={t('profile.current_avatar') || 'Текущий аватар'}
+                  className="w-full h-full object-cover"
+                  onError={() => {
+                    console.error('Failed to load current avatar:', currentAvatar);
+                    setImageError(true);
+                  }}
+                  onLoad={() => console.log('Current avatar loaded successfully:', currentAvatar)}
+                />
+              ) : (steamAvatar && !imageError) ? (
+                <img
+                  src={steamAvatar}
+                  alt={t('profile.steam_avatar') || 'Steam аватар'}
+                  className="w-full h-full object-cover"
+                  onError={() => {
+                    console.error('Failed to load steam avatar:', steamAvatar);
+                    setImageError(true);
+                  }}
+                  onLoad={() => console.log('Steam avatar loaded successfully:', steamAvatar)}
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl text-gray-500">
                   {userId.charAt(0).toUpperCase()}

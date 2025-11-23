@@ -64,7 +64,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
+      className="case-item-wrapper flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -78,7 +78,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         <img
           src={caseImageUrl}
           alt={title}
-          className={`w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'} ${isHovered ? 'case-hover-glow' : ''}`}
+          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
           onError={() => {
             if (!imageError) {
