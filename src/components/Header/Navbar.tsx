@@ -119,7 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 </span>
                 <div className="text-[9px] md:text-[10px] lg:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
-                  <HiSparkles className="text-orange-400 animate-spin-slow" />
+                  <HiSparkles className="text-orange-400 animate-spin-fast" />
                 </div>
               </div>
             </Link>

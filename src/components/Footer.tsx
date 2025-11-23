@@ -8,6 +8,9 @@ const Footer = () => {
     pollingInterval: 10000, // Обновляем каждые 10 секунд
   });
 
+  // Отладка: выводим данные статистики в консоль
+  console.log('Footer Statistics Data:', statsData);
+
   // Форматируем числа с разделителями
   const formatNumber = (num: number) => {
     return num.toLocaleString('ru-RU');
@@ -228,7 +231,7 @@ const Footer = () => {
           }
         }
         .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
+          animation: spin-slow 15s linear infinite;
         }
       `}</style>
     </footer>

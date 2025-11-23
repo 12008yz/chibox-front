@@ -17,7 +17,8 @@ export default {
         'scale-in': 'scale-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
         'ping-slow': 'ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-        'spin-slow': 'spin-slow 20s linear infinite',
+        'spin-slow': 'spin-slow 15s linear infinite',
+        'spin-fast': 'spin-slow 4s linear infinite',
       },
       dropShadow: {
         'glow-cyan': [
