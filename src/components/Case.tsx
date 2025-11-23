@@ -100,7 +100,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             </span>
           ) : (
             parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
-              <span>{t('common.daily')}</span>
+              <span className="text-sm md:text-base lg:text-lg">{t('common.daily')}</span>
             ) : (
               <Monetary value={parseFloat(price)} />
             )
