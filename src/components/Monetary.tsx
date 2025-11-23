@@ -26,7 +26,7 @@ const Monetary: React.FC<MonetaryProps> = ({
     xs: 'w-3 h-3',
     sm: 'w-4 h-4',
     md: 'w-5 h-5',
-    lg: 'w-6 h-6'
+    lg: 'w-6 h-6 md:w-7 md:h-7 lg:w-7 lg:h-7'
   };
 
   const sizePixels = {
@@ -35,7 +35,7 @@ const Monetary: React.FC<MonetaryProps> = ({
     xs: 12,
     sm: 16,
     md: 20,
-    lg: 24
+    lg: 28
   };
 
   const size = sizePixels[iconSize];

@@ -229,7 +229,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           {/* Цена */}
           <div className="flex items-center justify-center">
             <span className="text-sm font-bold text-green-400">
-              <Monetary value={drop.item.price} iconSize="xs" />
+              <Monetary value={drop.item.price} iconSize="xxxs" />
             </span>
           </div>
         </div>

@@ -133,11 +133,11 @@ const LeaderboardPage: React.FC = () => {
   const currentTab = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
+    <div className="text-white relative min-h-screen bg-[#0a0a0f]">
       <ScrollToTopOnMount />
 
       {/* Фон */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 bg-[#0a0a0f]">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <img
           src={BACKGROUNDS.leaderboard}
           alt=""

@@ -90,19 +90,19 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
       <div className="flex flex-col gap-2 p-2 md:p-4 items-center">
         <div className="font-bold text-sm md:text-lg text-white text-center">{translateCaseName(title)}</div>
-        <div className="font-medium text-xs md:text-md text-green-400">
+        <div className="font-medium text-sm md:text-lg lg:text-xl text-green-400">
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
               {title.toLowerCase().includes('premium') || title.toLowerCase().includes('премиум')
-                ? <Monetary value={499} />
-                : <Monetary value={99} />
+                ? <Monetary value={499} iconSize="lg" />
+                : <Monetary value={99} iconSize="lg" />
               }
             </span>
           ) : (
             parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
               <span className="text-sm md:text-base lg:text-lg">{t('common.daily')}</span>
             ) : (
-              <Monetary value={parseFloat(price)} />
+              <Monetary value={parseFloat(price)} iconSize="lg" />
             )
           )}
         </div>
