@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { FaTimes, FaWallet } from 'react-icons/fa';
@@ -12,6 +12,7 @@ interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: 'balance' | 'subscription';
+  initialSelectedSubscription?: number;
 }
 
 type PaymentMethod = {
@@ -23,7 +24,7 @@ type PaymentMethod = {
   type: 'sbp' | 'card' | 'crypto' | 'other';
 };
 
-const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance' }) => {
+const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance', initialSelectedSubscription }) => {
   const { } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
@@ -32,7 +33,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   const [amount, setAmount] = useState<string>('100');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
-  const [selectedSubscription, setSelectedSubscription] = useState<number | null>(null);
+  const [selectedSubscription, setSelectedSubscription] = useState<number | null>(initialSelectedSubscription || null);
 
   const [topUpBalance, { isLoading: isTopUpLoading }] = useTopUpBalanceMutation();
   const [applyPromo] = useApplyPromoCodeMutation();
@@ -40,6 +41,13 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const { data: subscriptionTiersData } = useGetSubscriptionTiersQuery();
   const subscriptionTiers = subscriptionTiersData?.data || [];
+
+  // Обновляем selectedSubscription при изменении initialSelectedSubscription
+  useEffect(() => {
+    if (initialSelectedSubscription !== undefined) {
+      setSelectedSubscription(initialSelectedSubscription);
+    }
+  }, [initialSelectedSubscription]);
 
   // Robokassa Logo Component
   const RobokassaLogo = () => (

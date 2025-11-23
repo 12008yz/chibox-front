@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Title from './Title';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatDaysI18n } from '../utils/declension';
+import DepositModal from './DepositModal';
 
 interface StatusTier {
   name: string;
@@ -15,6 +15,7 @@ interface StatusTier {
   badge: string;
   features: string[];
   popular?: boolean;
+  id: number;
 }
 
 interface AppFeaturesProps {
@@ -24,8 +25,11 @@ interface AppFeaturesProps {
 
 const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
   const { t } = useTranslation();
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [selectedTierId, setSelectedTierId] = useState<number | undefined>(undefined);
   const statusTiers: StatusTier[] = [
     {
+      id: 1,
       name: 'Статус',
       price: 1811,
       days: 30,
@@ -45,6 +49,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       ]
     },
     {
+      id: 2,
       name: 'Статус+',
       price: 3666,
       days: 30,
@@ -65,6 +70,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       popular: true
     },
     {
+      id: 3,
       name: 'Статус++',
       price: 7580,
       days: 30,
@@ -157,8 +163,11 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               </div>
 
               {/* Кнопка покупки */}
-              <Link
-                to="/profile"
+              <button
+                onClick={() => {
+                  setSelectedTierId(tier.id);
+                  setIsDepositModalOpen(true);
+                }}
                 className={`block w-full text-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
                   tier.popular
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'
@@ -166,7 +175,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                 }`}
               >
                 Купить статус
-              </Link>
+              </button>
             </div>
 
             {/* Свечение */}
@@ -174,6 +183,16 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
           </div>
         ))}
       </div>
+
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => {
+          setIsDepositModalOpen(false);
+          setSelectedTierId(undefined);
+        }}
+        initialTab="subscription"
+        initialSelectedSubscription={selectedTierId}
+      />
     </div>
   );
 };
