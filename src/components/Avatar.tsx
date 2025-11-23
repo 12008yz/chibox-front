@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getBackendImageUrl } from "../utils/steamImageUtils";
 
 interface AvatarProps {
     image?: string;
@@ -49,6 +50,10 @@ const Avatar: React.FC<AvatarProps> = ({
         const getImageSource = () => {
             // Приоритет: пользовательское изображение > Steam аватар > fallback
             if (image) {
+                // Если это относительный путь, преобразуем в полный URL
+                if (image.startsWith('/')) {
+                    return getBackendImageUrl(image) || image;
+                }
                 return image;
             }
             if (steamAvatar) {
@@ -130,6 +135,10 @@ const Avatar: React.FC<AvatarProps> = ({
     const getImageSrc = () => {
         // Приоритет: загруженное изображение > Steam аватар > fallback
         if (image && !imageError) {
+            // Если это относительный путь, преобразуем в полный URL
+            if (image.startsWith('/')) {
+                return getBackendImageUrl(image) || image;
+            }
             return image;
         }
         if (steamAvatar && !imageError) {

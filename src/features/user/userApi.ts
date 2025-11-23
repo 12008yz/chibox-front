@@ -880,6 +880,19 @@ export const userApi = baseApi.injectEndpoints({
         // Не устанавливаем Content-Type - браузер автоматически установит multipart/form-data с boundary для FormData
       }),
       invalidatesTags: ['User'],
+      // Обновляем данные пользователя в authSlice после успешной загрузки
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success && data.data?.avatar_url) {
+            // Импортируем updateUser action из authSlice
+            const { updateUser } = await import('../auth/authSlice');
+            dispatch(updateUser({ avatar_url: data.data.avatar_url }));
+          }
+        } catch (error) {
+          console.error('Error updating avatar in authSlice:', error);
+        }
+      },
     }),
 
     // Удаление аватара
@@ -889,6 +902,17 @@ export const userApi = baseApi.injectEndpoints({
         method: 'DELETE',
       }),
       invalidatesTags: ['User'],
+      // Обновляем данные пользователя в authSlice после успешного удаления
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Импортируем updateUser action из authSlice
+          const { updateUser } = await import('../auth/authSlice');
+          dispatch(updateUser({ avatar_url: undefined }));
+        } catch (error) {
+          console.error('Error updating avatar in authSlice after delete:', error);
+        }
+      },
     }),
   }),
 });
