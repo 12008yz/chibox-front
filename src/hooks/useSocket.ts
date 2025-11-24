@@ -65,9 +65,11 @@ const createGlobalSocket = () => {
     : 'http://localhost:3000';
 
   globalSocket = io(serverUrl, {
-    transports: ['websocket', 'polling'],
+    transports: ['polling', 'websocket'],
     timeout: 20000,
     forceNew: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
   });
 
   // Обработчик успешного подключения
