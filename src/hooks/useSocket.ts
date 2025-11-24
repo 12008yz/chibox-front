@@ -61,7 +61,7 @@ const createGlobalSocket = () => {
   }
 
   const serverUrl = process.env.NODE_ENV === 'production'
-    ? 'https://your-domain.com'
+    ? 'https://chibox-game.ru'
     : 'http://localhost:3000';
 
   globalSocket = io(serverUrl, {
