@@ -7,7 +7,7 @@ class SoundManager {
   private audioContext: AudioContext | null = null;
   private unlocked: boolean = false;
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
-  private minPlayInterval: number = 350; // Минимальная задержка между воспроизведениями в мс
+  private minPlayInterval: number = 500; // Минимальная задержка между воспроизведениями в мс
 
   // Загружаем звуки
   private soundPaths = {
@@ -92,9 +92,9 @@ class SoundManager {
     };
 
     // Добавляем слушатели на различные события
-    document.addEventListener('click', unlockAudio, { once: false });
-    document.addEventListener('touchstart', unlockAudio, { once: false });
-    document.addEventListener('keydown', unlockAudio, { once: false });
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
   }
 
   // Предзагрузка всех звуков
