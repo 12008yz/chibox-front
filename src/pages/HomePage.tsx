@@ -272,14 +272,6 @@ const HomePage: React.FC = () => {
     } catch (error: any) {
       console.error('Ошибка при покупке и открытии кейса:', error);
 
-      // Показываем пользователю более понятное сообщение об ошибке
-      let errorMessage = t('homepage.buy_case_error');
-      if (error?.data?.message) {
-        errorMessage = error.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-
       // Показываем toast уведомление вместо alert
       // toast уведомления обрабатываются в CasePreviewModal
 

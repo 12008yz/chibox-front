@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
-import { FaRegBell, FaBell, FaCoins, FaPlus } from "react-icons/fa";
+import { FaRegBell, FaBell, FaPlus } from "react-icons/fa";
 import { RiVipCrownFill } from "react-icons/ri";
 // import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
@@ -27,9 +27,7 @@ const RightContent: React.FC<RightContentProps> = ({
   openNotifications,
   setOpenNotifications,
   user,
-  authModalOpen,
   setAuthModalOpen,
-  authModalTab,
   setAuthModalTab,
   isMobileMenu = false
 }) => {

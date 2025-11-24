@@ -58,19 +58,6 @@ const getRarityColor = (rarity: string) => {
   }
 };
 
-// Получаем цвет свечения для редкости
-const getRarityGlow = (rarity: string) => {
-  switch (rarity?.toLowerCase()) {
-    case 'covert':
-    case 'contraband': return 'shadow-[0_0_20px_rgba(239,68,68,0.3)]';
-    case 'classified': return 'shadow-[0_0_20px_rgba(168,85,247,0.3)]';
-    case 'restricted': return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
-    case 'milspec': return 'shadow-[0_0_20px_rgba(34,197,94,0.3)]';
-    case 'industrial': return 'shadow-[0_0_20px_rgba(234,179,8,0.3)]';
-    case 'exotic': return 'shadow-[0_0_20px_rgba(236,72,153,0.3)]';
-    default: return 'shadow-[0_0_10px_rgba(107,114,128,0.2)]';
-  }
-};
 
 interface ReelProps {
   items: SlotItem[];
@@ -87,7 +74,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [useTransition, setUseTransition] = useState(false);
   const [isSlowingDown, setIsSlowingDown] = useState(false);
-  const [showWinEffect, setShowWinEffect] = useState(false);
   const reelRef = useRef<HTMLDivElement>(null);
 
   const handleImageError = (itemId: string) => {
@@ -99,7 +85,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
       setUseTransition(false);
       setCurrentOffset(0);
       setIsSlowingDown(false);
-      setShowWinEffect(false);
 
       const delayTimeout = setTimeout(() => {
         setTimeout(() => {
@@ -127,9 +112,6 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
 
           setTimeout(() => {
             setIsSlowingDown(false);
-            if (isWinning && isLastReel) {
-              setShowWinEffect(true);
-            }
             onSpinComplete();
           }, isLastReel ? (isMobile ? 2000 : 2500) : (isMobile ? 1200 : 1500));
         }, 50);

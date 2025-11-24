@@ -9,7 +9,6 @@ import { IoMdTrophy } from 'react-icons/io';
 import { ImConnection } from "react-icons/im";
 import { HiSparkles } from 'react-icons/hi';
 import RightContent from "./Navbar/RightContent";
-import LanguageSwitcher from "../LanguageSwitcher";
 
 interface NavbarProps {
   openNotifications: boolean;
@@ -27,8 +26,6 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({
   openNotifications,
   setOpenNotifications,
-  openSidebar,
-  setOpenSidebar,
   user,
   authModalOpen,
   setAuthModalOpen,

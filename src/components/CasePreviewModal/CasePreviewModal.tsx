@@ -65,11 +65,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
   }, [statusData]);
 
-  // Проверяем, достаточно ли средств на балансе
-  const checkBalanceSufficient = useCallback((price: number): boolean => {
-    return (userData?.balance || 0) >= price;
-  }, [userData]);
-
   // Проверяем авторизацию пользователя
   useEffect(() => {
     if (isOpen && !userData) {
@@ -678,7 +673,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           statusData={statusData}
           statusLoading={statusLoading}
           fixedPrices={fixedPrices}
-          paymentMethod={paymentMethod}
           userData={userData}
           caseData={caseData}
           isProcessing={isProcessing}
@@ -689,7 +683,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           handleBuyCase={handleBuyCase}
           handleOpenCase={handleOpenCase}
           getCasePrice={getCasePrice}
-          checkBalanceSufficient={checkBalanceSufficient}
           t={t}
         />
       </div>

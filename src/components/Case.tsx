@@ -28,7 +28,6 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
   };
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   // // Логирование для отладки
   // console.log(`Case "${title}":`, {
@@ -64,9 +63,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="case-item-wrapper flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
     >
       {!loaded && (
         <div className="flex w-full h-64 items-center justify-center">
@@ -78,7 +75,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         <img
           src={caseImageUrl}
           alt={title}
-          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
           onError={() => {
             if (!imageError) {

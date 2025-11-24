@@ -617,20 +617,10 @@ const DesktopUpgradeAnimation: React.FC<{
   const [phase, setPhase] = useState<'preparing' | 'spinning' | 'showing_result'>('preparing');
   const [finalRotation, setFinalRotation] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, delay: number}>>([]);
 
   React.useEffect(() => {
     // Плавный скролл вверх при начале анимации
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Генерируем частицы для подготовки (уменьшено для производительности)
-    const prepareParticles = Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 0.5
-    }));
-    setParticles(prepareParticles);
 
     // Начинаем анимацию
     const timer1 = setTimeout(() => {
