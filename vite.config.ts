@@ -3,10 +3,17 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Анализатор размера бандла (установите: npm install -D rollup-plugin-visualizer)
+    // import { visualizer } from 'rollup-plugin-visualizer'
+    // visualizer({ open: true, filename: 'dist/stats.html' })
+  ],
   build: {
+    // Оптимизация производительности
     rollupOptions: {
       output: {
+        // Разделение кода на чанки для лучшего кэширования
         manualChunks: (id) => {
           // React core
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
@@ -44,12 +51,31 @@ export default defineConfig({
           if (id.includes('node_modules/matter-js')) {
             return 'physics-vendor';
           }
-        }
+        },
+        // Оптимизация имён файлов для кэширования
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name?.split('.');
+          const ext = info?.[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext || '')) {
+            return `assets/images/[name]-[hash][extname]`;
+          } else if (/woff|woff2|eot|ttf|otf/i.test(ext || '')) {
+            return `assets/fonts/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
       }
     },
     target: 'es2015',
     minify: 'esbuild',
-    chunkSizeWarningLimit: 600
+    chunkSizeWarningLimit: 600,
+    // Сжатие
+    cssCodeSplit: true,
+    // Source maps для production (опционально)
+    sourcemap: false,
+    // Очистка dist перед сборкой
+    emptyOutDir: true,
   },
   server: {
     host: '0.0.0.0',
@@ -62,6 +88,12 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom']
-  }
+    include: ['react', 'react-dom'],
+    // Кэширование зависимостей
+    force: false,
+  },
+  // Кэширование
+  cacheDir: 'node_modules/.vite',
+  // Публичный путь
+  base: '/',
 })
