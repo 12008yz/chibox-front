@@ -40,28 +40,12 @@ const Monetary: React.FC<MonetaryProps> = ({
 
   const size = sizePixels[iconSize];
 
-  if (currency === 'chicoins') {
-    return (
-      <span className="inline-flex items-center gap-1">
-        <span className="font-semibold">{formattedValue}</span>
-        <img
-          src="../../public/images/chiCoin.png"
-          alt="chicoins"
-          width={size}
-          height={size}
-          className={`${sizeClasses[iconSize]} inline-block object-contain`}
-          style={{ maxWidth: `${size}px`, maxHeight: `${size}px` }}
-        />
-      </span>
-    );
-  }
-
   return (
     <span className="inline-flex items-center gap-1">
       <span className="font-semibold">{formattedValue}</span>
       <img
         src="/images/chiCoin.png"
-        alt={currency}
+        alt={currency === 'chicoins' ? 'chicoins' : currency}
         width={size}
         height={size}
         className={`${sizeClasses[iconSize]} inline-block object-contain`}

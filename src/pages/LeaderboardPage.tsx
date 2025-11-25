@@ -7,7 +7,7 @@ import TopPlayer from '../components/TopPlayer';
 import Player from '../components/Player';
 import Monetary from '../components/Monetary';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
-import { BACKGROUNDS } from '../utils/config';
+import { BACKGROUNDS, API_URL } from '../utils/config';
 
 interface User {
   user_id: string;
@@ -77,7 +77,7 @@ const LeaderboardPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/v1/leaderboard?type=${type}&limit=10`, {
+      const response = await fetch(`${API_URL}/v1/leaderboard?type=${type}&limit=10`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${token}`,
