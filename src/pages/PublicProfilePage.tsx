@@ -58,8 +58,17 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   // Обновляем списки при получении новых данных
   React.useEffect(() => {
     if (profileData?.user) {
+      console.log('📊 PublicProfile - Data received:', {
+        activeTab: activeInventoryTab,
+        inventoryCount: profileData.user.inventory?.length || 0,
+        caseItemsCount: profileData.user.caseItems?.length || 0,
+        sampleInventory: profileData.user.inventory?.[0],
+        sampleCaseItem: profileData.user.caseItems?.[0]
+      });
+
       if (activeInventoryTab === 'active') {
         if (activePage === 1) {
+          console.log('📦 Setting inventory items:', profileData.user.inventory?.length);
           setInventoryItems(profileData.user.inventory || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -67,11 +76,13 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.inventory || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
+            console.log('📦 Adding new inventory items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
       } else {
         if (openedPage === 1) {
+          console.log('🎁 Setting case items:', profileData.user.caseItems?.length);
           setCaseItemsList(profileData.user.caseItems || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -79,6 +90,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.caseItems || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
+            console.log('🎁 Adding new case items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
@@ -624,9 +636,10 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
                   filteredInventory.map((inventoryItem: any) => {
-                    const caseTemplate = inventoryItem.case_template_id
-                      ? getCaseTemplateById(inventoryItem.case_template_id)
-                      : null;
+                    // Используем case_template напрямую из ответа, если доступен
+                    // Или ищем через getCaseTemplateById, если нужно
+                    const caseTemplate = inventoryItem.case_template ||
+                      (inventoryItem.case_template_id ? getCaseTemplateById(inventoryItem.case_template_id) : null);
 
                     return (
                       <CaseWithDrop
