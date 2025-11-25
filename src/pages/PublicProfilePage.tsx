@@ -82,6 +82,22 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
         caseItemsPagination: profileData.user.caseItemsPagination
       });
 
+      // Детальный вывод каждого предмета в инвентаре
+      console.log('🔍 [PUBLIC INVENTORY] Детальная информация о каждом предмете:');
+      profileData.user.inventory?.forEach((item, index) => {
+        console.log(`Предмет ${index + 1}:`, {
+          id: item.id,
+          item_type: item.item_type,
+          status: item.status,
+          source: item.source,
+          acquisition_date: item.acquisition_date,
+          case_template_id: item.case_template_id,
+          case_template: item.case_template,
+          item_data: item.item,
+          полный_объект: item
+        });
+      });
+
       if (activeInventoryTab === 'active') {
         if (activePage === 1) {
           console.log('📦 Setting inventory items:', profileData.user.inventory?.length);

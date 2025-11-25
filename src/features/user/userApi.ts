@@ -550,7 +550,8 @@ export const userApi = baseApi.injectEndpoints({
           maxDailyStreak?: number;
           inventory: Array<{
             id: string;
-            item: {
+            item_type?: string;
+            item?: {
               id: string;
               name: string;
               rarity: string;
@@ -559,10 +560,21 @@ export const userApi = baseApi.injectEndpoints({
               skin_name?: string;
               image_url?: string;
             };
+            case_template?: {
+              id: string;
+              name: string;
+              description?: string;
+              image_url?: string;
+              price?: string;
+            };
             source?: string;
             status?: string;
             acquisition_date?: string;
             case_template_id?: string;
+            item_id?: string;
+            case_id?: string;
+            transaction_date?: string;
+            expires_at?: string;
           }>;
           inventoryPagination?: {
             total: number;
@@ -573,7 +585,8 @@ export const userApi = baseApi.injectEndpoints({
           };
           caseItems?: Array<{
             id: string;
-            item: {
+            item_type?: string;
+            item?: {
               id: string;
               name: string;
               rarity: string;
@@ -582,10 +595,21 @@ export const userApi = baseApi.injectEndpoints({
               skin_name?: string;
               image_url?: string;
             };
+            case_template?: {
+              id: string;
+              name: string;
+              description?: string;
+              image_url?: string;
+              price?: string;
+            };
             source?: string;
             status?: string;
             acquisition_date?: string;
             case_template_id?: string;
+            item_id?: string;
+            case_id?: string;
+            transaction_date?: string;
+            expires_at?: string;
           }>;
           caseItemsPagination?: {
             total: number;
