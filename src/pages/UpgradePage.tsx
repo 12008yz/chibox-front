@@ -1488,10 +1488,21 @@ const UpgradePage: React.FC = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          imageRendering: 'auto',
+          WebkitPrintColorAdjust: 'exact',
+          colorScheme: 'only light',
         }}
       />
-      {/* Затемняющий оверлей */}
-      <div className="fixed inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80 -z-40"></div>
+      {/* Затемняющий оверлей - с точными значениями для консистентности */}
+      <div
+        className="fixed inset-0 -z-40"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)',
+          WebkitPrintColorAdjust: 'exact',
+          printColorAdjust: 'exact',
+          forcedColorAdjust: 'none',
+        }}
+      ></div>
 
       <div className="relative z-10 container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
         {/* Заголовок */}

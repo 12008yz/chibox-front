@@ -1,4 +1,13 @@
 export const strikeAnimationStyles = `
+  /* ПРИНУДИТЕЛЬНОЕ ОТКЛЮЧЕНИЕ БРАУЗЕРНЫХ ФИЛЬТРОВ ДЛЯ АНИМАЦИЙ */
+  .case-preview-modal,
+  .case-preview-modal * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    forced-color-adjust: none !important;
+    color-scheme: only light !important;
+  }
+
   /* ОПТИМИЗИРОВАННЫЕ АНИМАЦИИ - используем только transform и opacity для GPU acceleration */
 
   @-webkit-keyframes item-glow-pulse {

@@ -281,11 +281,22 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
           backgroundImage: 'url(/images/public_profile.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'auto',
+          WebkitPrintColorAdjust: 'exact',
+          colorScheme: 'only light',
         }}
       />
       {/* Затемняющий overlay */}
-      <div className="fixed inset-0 bg-black/50 -z-40" />
+      <div
+        className="fixed inset-0 -z-40"
+        style={{
+          background: 'rgba(0, 0, 0, 0.5)',
+          WebkitPrintColorAdjust: 'exact',
+          printColorAdjust: 'exact',
+          forcedColorAdjust: 'none',
+        }}
+      />
 
       <ScrollToTopOnMount />
       <div className="relative z-10 container mx-auto max-w-7xl p-2 sm:p-4 lg:p-4 space-y-4 sm:space-y-6">

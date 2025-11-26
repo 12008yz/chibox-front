@@ -384,10 +384,21 @@ const SlotPage: React.FC = () => {
           backgroundImage: 'url(/images/slot1.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'auto',
+          WebkitPrintColorAdjust: 'exact',
+          colorScheme: 'only light',
         }}
       />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 -z-40" />
+      <div
+        className="fixed inset-0 -z-40"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.6) 100%)',
+          WebkitPrintColorAdjust: 'exact',
+          printColorAdjust: 'exact',
+          forcedColorAdjust: 'none',
+        }}
+      />
 
       <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Улучшенный заголовок */}

@@ -262,11 +262,22 @@ const ProfilePage: React.FC = () => {
           backgroundImage: 'url(/images/profile.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'auto',
+          WebkitPrintColorAdjust: 'exact',
+          colorScheme: 'only light',
         }}
       />
       {/* Затемняющий overlay */}
-      <div className="fixed inset-0 bg-black/50 -z-40" />
+      <div
+        className="fixed inset-0 -z-40"
+        style={{
+          background: 'rgba(0, 0, 0, 0.5)',
+          WebkitPrintColorAdjust: 'exact',
+          printColorAdjust: 'exact',
+          forcedColorAdjust: 'none',
+        }}
+      />
 
       <ScrollToTopOnMount />
       <div className="relative z-10 container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">

@@ -61,11 +61,73 @@
   --color-dark-900: #151225;
 }
 
+/* ПРИНУДИТЕЛЬНОЕ УПРАВЛЕНИЕ ЦВЕТОВОЙ СХЕМОЙ */
+/* Отключаем влияние системных настроек темы и браузерных фильтров */
+:root {
+  color-scheme: only light !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  forced-color-adjust: none !important;
+}
+
+html {
+  color-scheme: only light !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  forced-color-adjust: none !important;
+}
+
+body {
+  color-scheme: only light !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  forced-color-adjust: none !important;
+}
+
+/* Отключаем ночной режим и фильтры Яндекс Браузера */
+html, body, #root {
+  filter: none !important;
+  -webkit-filter: none !important;
+  -moz-filter: none !important;
+  -ms-filter: none !important;
+  -o-filter: none !important;
+}
+
+/* Принудительно устанавливаем тёмный фон */
+html, body {
+  background-color: #151225 !important;
+  background: #151225 !important;
+}
+
+#root {
+  background-color: #151225 !important;
+  background: #151225 !important;
+}
+
+/* Блокируем медиа-запросы темы для основного контента */
+@media (prefers-color-scheme: light), (prefers-color-scheme: dark) {
+  html, body, #root {
+    background-color: #151225 !important;
+    background: #151225 !important;
+    color: white !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    color-scheme: only light !important;
+    forced-color-adjust: none !important;
+  }
+}
+
 /* CSS переменные для динамического управления производительности */
 :root {
   --animation-duration: 0.3s;
-  --enable-backdrop-filter: none;
+  --enable-backdrop-filter: blur(5px);
   --enable-animations: 1;
+
+  /* Принудительные значения для одинакового отображения */
+  --base-background: #151225;
+  --overlay-opacity-light: 0.4;
+  --overlay-opacity-medium: 0.6;
+  --overlay-opacity-dark: 0.8;
 }
 
 @layer base {
