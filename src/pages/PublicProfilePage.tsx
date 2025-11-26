@@ -6,13 +6,15 @@ import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import Avatar from '../components/Avatar';
 import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
-import { getItemImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, getCaseImageUrl } from '../utils/steamImageUtils';
 import { getImageUrl } from '../utils/imageUtils';
 import Monetary from '../components/Monetary';
 
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+
+  console.log('🆔 PublicProfilePage - USER ID:', id);
 
   // State для пагинации (отдельно для каждого таба)
   const [activePage, setActivePage] = useState(1);
@@ -30,6 +32,17 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
     { userId: id || '', page: currentPage, limit: 12, tab: activeInventoryTab },
     { skip: !id }
   );
+
+  // Логируем состояние запроса
+  console.log('🌐 API запрос getPublicProfile:', {
+    userId: id,
+    currentPage,
+    tab: activeInventoryTab,
+    isLoading,
+    error,
+    hasData: !!profileData,
+    profileData: profileData
+  });
 
   // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
@@ -58,8 +71,36 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   // Обновляем списки при получении новых данных
   React.useEffect(() => {
     if (profileData?.user) {
+      console.log('📊 PublicProfile - ПОЛНЫЙ ОТВЕТ:', profileData);
+      console.log('📊 PublicProfile - Инвентарь:', {
+        activeTab: activeInventoryTab,
+        inventoryCount: profileData.user.inventory?.length || 0,
+        inventoryItems: profileData.user.inventory,
+        caseItemsCount: profileData.user.caseItems?.length || 0,
+        caseItems: profileData.user.caseItems,
+        inventoryPagination: profileData.user.inventoryPagination,
+        caseItemsPagination: profileData.user.caseItemsPagination
+      });
+
+      // Детальный вывод каждого предмета в инвентаре
+      console.log('🔍 [PUBLIC INVENTORY] Детальная информация о каждом предмете:');
+      profileData.user.inventory?.forEach((item, index) => {
+        console.log(`Предмет ${index + 1}:`, {
+          id: item.id,
+          item_type: item.item_type,
+          status: item.status,
+          source: item.source,
+          acquisition_date: item.acquisition_date,
+          case_template_id: item.case_template_id,
+          case_template: item.case_template,
+          item_data: item.item,
+          полный_объект: item
+        });
+      });
+
       if (activeInventoryTab === 'active') {
         if (activePage === 1) {
+          console.log('📦 Setting inventory items:', profileData.user.inventory?.length);
           setInventoryItems(profileData.user.inventory || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -67,11 +108,13 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.inventory || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
+            console.log('📦 Adding new inventory items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
       } else {
         if (openedPage === 1) {
+          console.log('🎁 Setting case items:', profileData.user.caseItems?.length);
           setCaseItemsList(profileData.user.caseItems || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -79,6 +122,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.caseItems || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
+            console.log('🎁 Adding new case items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
@@ -188,9 +232,16 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
 
   // Функции для фильтрации инвентаря
   const getActiveInventory = () => {
-    return inventoryItems.filter(item =>
+    const filtered = inventoryItems.filter(item =>
       item.status !== 'sold' && item.status !== 'withdrawn' && item.status !== 'used'
     );
+    console.log('🔍 getActiveInventory:', {
+      totalItems: inventoryItems.length,
+      filteredItems: filtered.length,
+      allItems: inventoryItems,
+      filtered: filtered
+    });
+    return filtered;
   };
 
   const getOpenedCases = () => {
@@ -211,6 +262,15 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   };
 
   const filteredInventory = getFilteredInventory();
+
+  // Логируем что будем рендерить
+  console.log('🎨 Рендеринг инвентаря:', {
+    activeTab: activeInventoryTab,
+    filteredInventoryLength: filteredInventory.length,
+    filteredInventory: filteredInventory,
+    inventoryItemsLength: inventoryItems.length,
+    caseItemsListLength: caseItemsList.length
+  });
 
   return (
     <div className="min-h-screen text-white relative">
@@ -624,9 +684,10 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
                   filteredInventory.map((inventoryItem: any) => {
-                    const caseTemplate = inventoryItem.case_template_id
-                      ? getCaseTemplateById(inventoryItem.case_template_id)
-                      : null;
+                    // Используем case_template напрямую из ответа, если доступен
+                    // Или ищем через getCaseTemplateById, если нужно
+                    const caseTemplate = inventoryItem.case_template ||
+                      (inventoryItem.case_template_id ? getCaseTemplateById(inventoryItem.case_template_id) : null);
 
                     return (
                       <CaseWithDrop
@@ -638,66 +699,118 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                   })
                 ) : (
                   // Обычный рендеринг для активных предметов
-                  filteredInventory.map((inventoryItem: any) => (
-                    <div
-                      key={inventoryItem.id}
-                      className="bg-black/30 rounded-lg sm:rounded-xl p-2 sm:p-3 lg:p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
-                    >
-                      <div className="relative mb-2 sm:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
-                        <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} opacity-20 rounded-lg`}></div>
-                        {inventoryItem.item.image_url ? (
-                          <img
-                            src={inventoryItem.item.image_url}
-                            alt={inventoryItem.item.name}
-                            className="absolute inset-0 w-full h-full object-contain z-10 item-image"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                              if (nextElement) nextElement.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div className="absolute inset-0 w-full h-full bg-gray-800 rounded flex items-center justify-center z-10" style={{ display: inventoryItem.item.image_url ? 'none' : 'flex' }}>
-                          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        {/* Бейдж редкости */}
-                        <div className={`absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md bg-gradient-to-r ${getRarityColor(inventoryItem.item.rarity)} text-white text-[10px] sm:text-xs font-bold z-20`}>
-                          {getRarityName(inventoryItem.item.rarity)}
-                        </div>
-                      </div>
-                      <h5 className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 truncate" title={inventoryItem.item.name}>
-                        {inventoryItem.item.name}
-                      </h5>
-                      <p className="text-green-400 text-xs sm:text-sm font-bold">
-                        <Monetary value={Number(inventoryItem.item?.price || inventoryItem.price || 0)} showFraction={true} />
-                      </p>
+                  filteredInventory.map((inventoryItem: any) => {
+                    // Проверяем, является ли это активным кейсом
+                    if (inventoryItem.item_type === 'case') {
+                      const caseTemplate = inventoryItem.case_template ||
+                        (inventoryItem.case_template_id ? getCaseTemplateById(inventoryItem.case_template_id) : null);
 
-                      {/* Дополнительная информация о предмете */}
-                      {inventoryItem.acquisition_date && (
-                        <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400 space-y-0.5">
-                          <p className="truncate">{t('public_profile.acquired')} {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
-                          {inventoryItem.source && (
-                            <p className="capitalize truncate">{t('public_profile.source')} {
-                              inventoryItem.source === 'case' ? t('profile.sources.case') :
-                              inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
-                              inventoryItem.source
-                            }</p>
-                          )}
-                          {/* Статус предмета для открытых кейсов */}
-                          {(activeInventoryTab as 'active' | 'opened') === 'opened' && inventoryItem.status && (
-                            <div className="mt-0.5 sm:mt-1 flex items-center gap-1">
-                              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${getItemStatusInfo(inventoryItem.status).color}`}></div>
-                              <span className="capitalize text-[10px] sm:text-xs truncate">
-                                {getItemStatusInfo(inventoryItem.status).text}
-                              </span>
+                      return (
+                        <div
+                          key={inventoryItem.id}
+                          className="bg-black/30 rounded-lg sm:rounded-xl p-2 sm:p-3 lg:p-4 border border-gray-600/30 hover:border-yellow-500/50 transition-all duration-300 hover:scale-105"
+                        >
+                          <div className="relative mb-2 sm:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 opacity-20 rounded-lg"></div>
+                            {caseTemplate?.image_url ? (
+                              <img
+                                src={getCaseImageUrl(caseTemplate.image_url)}
+                                alt={caseTemplate.name}
+                                className="absolute inset-0 w-full h-full object-contain z-10 item-image"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (nextElement) nextElement.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div className="absolute inset-0 w-full h-full bg-gray-800 rounded flex items-center justify-center z-10" style={{ display: caseTemplate?.image_url ? 'none' : 'flex' }}>
+                              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            {/* Бейдж "Кейс" */}
+                            <div className="absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[10px] sm:text-xs font-bold z-20">
+                              {t('profile.case_label', 'Кейс')}
+                            </div>
+                          </div>
+                          <h5 className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 truncate" title={caseTemplate?.name}>
+                            {caseTemplate?.name || t('profile.case_label', 'Кейс')}
+                          </h5>
+                          <p className="text-yellow-400 text-xs sm:text-sm font-bold">
+                            <Monetary value={Number(caseTemplate?.price || 0)} showFraction={true} />
+                          </p>
+                          {inventoryItem.acquisition_date && (
+                            <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400 space-y-0.5">
+                              <p className="truncate">{t('public_profile.acquired')} {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
                             </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  ))
+                      );
+                    }
+
+                    // Обычный рендеринг для предметов
+                    return (
+                      <div
+                        key={inventoryItem.id}
+                        className="bg-black/30 rounded-lg sm:rounded-xl p-2 sm:p-3 lg:p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-105"
+                      >
+                        <div className="relative mb-2 sm:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
+                          <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item?.rarity)} opacity-20 rounded-lg`}></div>
+                          {inventoryItem.item?.image_url ? (
+                            <img
+                              src={inventoryItem.item.image_url}
+                              alt={inventoryItem.item.name}
+                              className="absolute inset-0 w-full h-full object-contain z-10 item-image"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (nextElement) nextElement.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 w-full h-full bg-gray-800 rounded flex items-center justify-center z-10" style={{ display: inventoryItem.item?.image_url ? 'none' : 'flex' }}>
+                            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zM6.5 9.5 9 11l2.5-1.5L14 8l-4-2.5L6 8l.5 1.5z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          {/* Бейдж редкости */}
+                          <div className={`absolute top-1 right-1 sm:top-2 sm:right-2 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md bg-gradient-to-r ${getRarityColor(inventoryItem.item?.rarity)} text-white text-[10px] sm:text-xs font-bold z-20`}>
+                            {getRarityName(inventoryItem.item?.rarity || '')}
+                          </div>
+                        </div>
+                        <h5 className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 truncate" title={inventoryItem.item?.name}>
+                          {inventoryItem.item?.name}
+                        </h5>
+                        <p className="text-green-400 text-xs sm:text-sm font-bold">
+                          <Monetary value={Number(inventoryItem.item?.price || inventoryItem.price || 0)} showFraction={true} />
+                        </p>
+
+                        {/* Дополнительная информация о предмете */}
+                        {inventoryItem.acquisition_date && (
+                          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-400 space-y-0.5">
+                            <p className="truncate">{t('public_profile.acquired')} {new Date(inventoryItem.acquisition_date).toLocaleDateString()}</p>
+                            {inventoryItem.source && (
+                              <p className="capitalize truncate">{t('public_profile.source')} {
+                                inventoryItem.source === 'case' ? t('profile.sources.case') :
+                                inventoryItem.source === 'purchase' ? t('profile.sources.purchase') :
+                                inventoryItem.source
+                              }</p>
+                            )}
+                            {/* Статус предмета для открытых кейсов */}
+                            {(activeInventoryTab as 'active' | 'opened') === 'opened' && inventoryItem.status && (
+                              <div className="mt-0.5 sm:mt-1 flex items-center gap-1">
+                                <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${getItemStatusInfo(inventoryItem.status).color}`}></div>
+                                <span className="capitalize text-[10px] sm:text-xs truncate">
+                                  {getItemStatusInfo(inventoryItem.status).text}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             ) : (
