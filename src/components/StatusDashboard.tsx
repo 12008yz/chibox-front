@@ -114,7 +114,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const userStats = [
     {
       label: t('profile.cases_opened'),
-      value: user.total_cases_opened || 0,
+      value: user.total_cases_opened || user.totalCasesOpened || 0,
       icon: <FaGift className="text-green-400" />,
       color: 'text-green-400'
     },

@@ -43,7 +43,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
           <div className="flex-1 min-w-0">
             <p className="text-gray-400 text-xs sm:text-sm truncate">{t('profile.cases_opened')}</p>
             <p className="text-lg sm:text-xl font-bold text-white">
-              {user.total_cases_opened || 0}
+              {user.total_cases_opened || user.totalCasesOpened || 0}
             </p>
           </div>
         </div>
