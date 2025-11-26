@@ -170,16 +170,29 @@
     transition-duration: 0.15s !important; /* Быстрые переходы вместо анимаций */
   }
 
-  /* ИСКЛЮЧЕНИЕ: Разрешаем анимации для upgrade рулетки */
+  /* ИСКЛЮЧЕНИЯ: Разрешаем анимации для важных элементов */
   .upgrade-wheel-animation,
   .upgrade-wheel-animation *,
   .upgrade-wheel-animation *::before,
-  .upgrade-wheel-animation *::after {
+  .upgrade-wheel-animation *::after,
+  .animate-spin-slow,
+  .animate-spin-fast,
+  .logo-star,
+  .item-glow-pulse,
+  .victory-glow,
+  .win-effects *,
+  .golden-spark,
+  .expanding-ring,
+  .particle-burst,
+  .light-ray {
     animation-duration: revert !important;
     animation-iteration-count: revert !important;
     transition-duration: revert !important;
     animation: revert !important;
     transform: revert !important;
+    -webkit-animation-duration: revert !important;
+    -webkit-animation-iteration-count: revert !important;
+    -webkit-transform: revert !important;
   }
 
   /* Принудительное включение transform анимации для рулетки */
@@ -209,6 +222,17 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* ИСКЛЮЧЕНИЯ для важных игровых анимаций */
+  .animate-spin-slow,
+  .animate-spin-fast,
+  .logo-star,
+  .upgrade-wheel-animation,
+  .upgrade-wheel-animation * {
+    animation-duration: revert !important;
+    animation-iteration-count: revert !important;
+    animation: revert !important;
   }
 }
 
@@ -282,17 +306,45 @@
   background: rgba(0, 255, 255, 0.1);
 }
 
-/* Logo star rotation animation */
-@keyframes rotate-star {
+/* Logo star rotation animation - WITH VENDOR PREFIXES */
+@-webkit-keyframes rotate-star {
   from {
+    -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
   to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes rotate-star {
+  from {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate-star {
+  from {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
     transform: rotate(360deg);
   }
 }
 
 .logo-star {
+  -webkit-animation: rotate-star 3s linear infinite;
+  -moz-animation: rotate-star 3s linear infinite;
   animation: rotate-star 3s linear infinite;
   display: inline-block;
 }
@@ -903,6 +955,16 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.1s !important;
+  }
+
+  /* ИСКЛЮЧЕНИЯ для важных анимаций */
+  .animate-spin-slow,
+  .animate-spin-fast,
+  .logo-star {
+    animation-duration: revert !important;
+    animation-iteration-count: revert !important;
+    animation: revert !important;
+    -webkit-animation: revert !important;
   }
 
   .animate-pulse,
@@ -1524,11 +1586,37 @@ html::-webkit-scrollbar-thumb,
   }
 }
 
-@keyframes spin-slow {
+@-webkit-keyframes spin-slow {
   from {
+    -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
   to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes spin-slow {
+  from {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
     transform: rotate(360deg);
   }
 }
@@ -1656,11 +1744,21 @@ html::-webkit-scrollbar-thumb,
 }
 
 .animate-spin-slow {
+  -webkit-animation: spin-slow 15s linear infinite;
+  -moz-animation: spin-slow 15s linear infinite;
   animation: spin-slow 15s linear infinite;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .animate-spin-fast {
+  -webkit-animation: spin-slow 4s linear infinite;
+  -moz-animation: spin-slow 4s linear infinite;
   animation: spin-slow 4s linear infinite;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .animate-ping-fast {

@@ -1,45 +1,100 @@
 export const strikeAnimationStyles = `
   /* ОПТИМИЗИРОВАННЫЕ АНИМАЦИИ - используем только transform и opacity для GPU acceleration */
 
-  @keyframes item-glow-pulse {
+  @-webkit-keyframes item-glow-pulse {
     0%, 100% {
+      -webkit-filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
       filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
       border-color: rgb(34, 197, 94);
     }
     50% {
+      -webkit-filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
       filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
       border-color: rgb(239, 68, 68);
     }
   }
 
-  @keyframes spin-blur {
+  @keyframes item-glow-pulse {
     0%, 100% {
+      -webkit-filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+      filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+      border-color: rgb(34, 197, 94);
+    }
+    50% {
+      -webkit-filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
+      filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
+      border-color: rgb(239, 68, 68);
+    }
+  }
+
+  @-webkit-keyframes spin-blur {
+    0%, 100% {
+      -webkit-filter: blur(0px);
       filter: blur(0px);
     }
     50% {
+      -webkit-filter: blur(2px);
       filter: blur(2px);
+    }
+  }
+
+  @keyframes spin-blur {
+    0%, 100% {
+      -webkit-filter: blur(0px);
+      filter: blur(0px);
+    }
+    50% {
+      -webkit-filter: blur(2px);
+      filter: blur(2px);
+    }
+  }
+
+  @-webkit-keyframes fake-slow-pulse {
+    0%, 100% {
+      -webkit-filter: brightness(1);
+      filter: brightness(1);
+    }
+    50% {
+      -webkit-filter: brightness(1.3);
+      filter: brightness(1.3);
     }
   }
 
   @keyframes fake-slow-pulse {
     0%, 100% {
+      -webkit-filter: brightness(1);
       filter: brightness(1);
     }
     50% {
+      -webkit-filter: brightness(1.3);
       filter: brightness(1.3);
+    }
+  }
+
+  @-webkit-keyframes wobble-glow {
+    0%, 100% {
+      -webkit-box-shadow: 0 0 20px rgba(251, 146, 60, 0.8), 0 0 40px rgba(251, 146, 60, 0.4);
+      box-shadow: 0 0 20px rgba(251, 146, 60, 0.8), 0 0 40px rgba(251, 146, 60, 0.4);
+    }
+    50% {
+      -webkit-box-shadow: 0 0 35px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.6);
+      box-shadow: 0 0 35px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.6);
     }
   }
 
   @keyframes wobble-glow {
     0%, 100% {
+      -webkit-box-shadow: 0 0 20px rgba(251, 146, 60, 0.8), 0 0 40px rgba(251, 146, 60, 0.4);
       box-shadow: 0 0 20px rgba(251, 146, 60, 0.8), 0 0 40px rgba(251, 146, 60, 0.4);
     }
     50% {
+      -webkit-box-shadow: 0 0 35px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.6);
       box-shadow: 0 0 35px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.6);
     }
   }
 
   .animate-wobble {
+    -webkit-animation: wobble-glow 0.5s ease-in-out infinite;
     animation: wobble-glow 0.5s ease-in-out infinite;
     will-change: box-shadow;
   }
@@ -71,6 +126,21 @@ export const strikeAnimationStyles = `
 
   /* КРУТЫЕ ЭФФЕКТЫ ПОБЕДЫ */
 
+  @-webkit-keyframes win-flash {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
   @keyframes win-flash {
     0% {
       opacity: 0;
@@ -86,60 +156,137 @@ export const strikeAnimationStyles = `
     }
   }
 
-  @keyframes win-shake {
+  @-webkit-keyframes win-shake {
     0%, 100% {
+      -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
     }
     10%, 30%, 50%, 70%, 90% {
+      -webkit-transform: translate3d(-4px, 0, 0);
       transform: translate3d(-4px, 0, 0);
     }
     20%, 40%, 60%, 80% {
+      -webkit-transform: translate3d(4px, 0, 0);
       transform: translate3d(4px, 0, 0);
     }
   }
 
-  @keyframes expanding-ring {
+  @keyframes win-shake {
+    0%, 100% {
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+      -webkit-transform: translate3d(-4px, 0, 0);
+      transform: translate3d(-4px, 0, 0);
+    }
+    20%, 40%, 60%, 80% {
+      -webkit-transform: translate3d(4px, 0, 0);
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  @-webkit-keyframes expanding-ring {
     0% {
+      -webkit-transform: scale(0.8);
       transform: scale(0.8);
       opacity: 0.8;
     }
     100% {
+      -webkit-transform: scale(2.5);
       transform: scale(2.5);
       opacity: 0;
     }
   }
 
-  @keyframes item-pop {
+  @keyframes expanding-ring {
     0% {
+      -webkit-transform: scale(0.8);
+      transform: scale(0.8);
+      opacity: 0.8;
+    }
+    100% {
+      -webkit-transform: scale(2.5);
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  @-webkit-keyframes item-pop {
+    0% {
+      -webkit-transform: scale(1);
       transform: scale(1);
     }
     30% {
+      -webkit-transform: scale(1.15);
       transform: scale(1.15);
     }
     50% {
+      -webkit-transform: scale(0.95);
       transform: scale(0.95);
     }
     70% {
+      -webkit-transform: scale(1.08);
       transform: scale(1.08);
     }
     100% {
+      -webkit-transform: scale(1.05);
       transform: scale(1.05);
     }
   }
 
-  @keyframes particle-burst {
+  @keyframes item-pop {
     0% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+    }
+    30% {
+      -webkit-transform: scale(1.15);
+      transform: scale(1.15);
+    }
+    50% {
+      -webkit-transform: scale(0.95);
+      transform: scale(0.95);
+    }
+    70% {
+      -webkit-transform: scale(1.08);
+      transform: scale(1.08);
+    }
+    100% {
+      -webkit-transform: scale(1.05);
+      transform: scale(1.05);
+    }
+  }
+
+  @-webkit-keyframes particle-burst {
+    0% {
+      -webkit-transform: translate3d(0, 0, 0) scale(1);
       transform: translate3d(0, 0, 0) scale(1);
       opacity: 1;
     }
     100% {
+      -webkit-transform: translate3d(var(--tx), var(--ty), 0) scale(0);
       transform: translate3d(var(--tx), var(--ty), 0) scale(0);
       opacity: 0;
     }
   }
 
-  @keyframes light-ray {
+  @keyframes particle-burst {
     0% {
+      -webkit-transform: translate3d(0, 0, 0) scale(1);
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      -webkit-transform: translate3d(var(--tx), var(--ty), 0) scale(0);
+      transform: translate3d(var(--tx), var(--ty), 0) scale(0);
+      opacity: 0;
+    }
+  }
+
+  @-webkit-keyframes light-ray {
+    0% {
+      -webkit-transform: rotate(0deg) scale(0);
       transform: rotate(0deg) scale(0);
       opacity: 0;
     }
@@ -147,6 +294,23 @@ export const strikeAnimationStyles = `
       opacity: 0.6;
     }
     100% {
+      -webkit-transform: rotate(180deg) scale(1.5);
+      transform: rotate(180deg) scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  @keyframes light-ray {
+    0% {
+      -webkit-transform: rotate(0deg) scale(0);
+      transform: rotate(0deg) scale(0);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.6;
+    }
+    100% {
+      -webkit-transform: rotate(180deg) scale(1.5);
       transform: rotate(180deg) scale(1.5);
       opacity: 0;
     }
@@ -158,10 +322,12 @@ export const strikeAnimationStyles = `
     background: radial-gradient(circle at center, rgba(255, 215, 0, 0.4), transparent 70%);
     pointer-events: none;
     z-index: 9998;
+    -webkit-animation: win-flash 0.6s ease-out forwards;
     animation: win-flash 0.6s ease-out forwards;
   }
 
   .win-shake {
+    -webkit-animation: win-shake 0.5s ease-in-out forwards;
     animation: win-shake 0.5s ease-in-out forwards;
   }
 
@@ -171,6 +337,7 @@ export const strikeAnimationStyles = `
     border: 3px solid;
     border-radius: 16px;
     pointer-events: none;
+    -webkit-animation: expanding-ring 1s ease-out forwards;
     animation: expanding-ring 1s ease-out forwards;
   }
 
@@ -190,6 +357,7 @@ export const strikeAnimationStyles = `
   }
 
   .item-pop-animation {
+    -webkit-animation: item-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     animation: item-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
@@ -199,6 +367,7 @@ export const strikeAnimationStyles = `
     height: 8px;
     border-radius: 50%;
     pointer-events: none;
+    -webkit-animation: particle-burst 1.2s ease-out forwards;
     animation: particle-burst 1.2s ease-out forwards;
   }
 
@@ -210,26 +379,56 @@ export const strikeAnimationStyles = `
     pointer-events: none;
     left: -50%;
     top: 50%;
+    -webkit-transform-origin: center;
     transform-origin: center;
+    -webkit-animation: light-ray 2s ease-out forwards;
     animation: light-ray 2s ease-out forwards;
   }
 
-  @keyframes golden-spark {
+  @-webkit-keyframes golden-spark {
     0% {
+      -webkit-transform: translate3d(0, 0, 0) scale(1);
       transform: translate3d(0, 0, 0) scale(1);
       opacity: 1;
     }
     100% {
+      -webkit-transform: translate3d(var(--dx), var(--dy), 0) scale(0);
       transform: translate3d(var(--dx), var(--dy), 0) scale(0);
       opacity: 0;
     }
   }
 
-  @keyframes victory-glow {
+  @keyframes golden-spark {
+    0% {
+      -webkit-transform: translate3d(0, 0, 0) scale(1);
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      -webkit-transform: translate3d(var(--dx), var(--dy), 0) scale(0);
+      transform: translate3d(var(--dx), var(--dy), 0) scale(0);
+      opacity: 0;
+    }
+  }
+
+  @-webkit-keyframes victory-glow {
     0%, 100% {
+      -webkit-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
       filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
     }
     50% {
+      -webkit-filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+    }
+  }
+
+  @keyframes victory-glow {
+    0%, 100% {
+      -webkit-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+    }
+    50% {
+      -webkit-filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
       filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
     }
   }
@@ -289,6 +488,7 @@ export const strikeAnimationStyles = `
   }
 
   .animate-item-glow {
+    -webkit-animation: item-glow-pulse 3s ease-in-out infinite;
     animation: item-glow-pulse 3s ease-in-out infinite;
     will-change: filter, border-color;
   }
@@ -318,11 +518,13 @@ export const strikeAnimationStyles = `
     background: radial-gradient(circle, #FFD700 0%, #FFA500 50%, transparent 100%);
     border-radius: 50%;
     pointer-events: none;
+    -webkit-animation: golden-spark 1s ease-out forwards;
     animation: golden-spark 1s ease-out forwards;
     will-change: transform, opacity;
   }
 
   .victory-glow {
+    -webkit-animation: victory-glow 2s ease-in-out;
     animation: victory-glow 2s ease-in-out;
     will-change: filter;
   }
@@ -330,13 +532,17 @@ export const strikeAnimationStyles = `
   /* КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ GPU */
   .gpu-layer {
     will-change: transform, opacity;
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    -webkit-perspective: 1000px;
     perspective: 1000px;
   }
 
   .no-gpu-layer {
     will-change: auto;
+    -webkit-transform: none;
     transform: none;
   }
 
@@ -355,12 +561,14 @@ export const strikeAnimationStyles = `
   .smooth-scroll {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
 
   /* Оптимизация изображений */
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;
+    -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
 `;
