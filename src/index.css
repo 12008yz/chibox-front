@@ -61,24 +61,33 @@
   --color-dark-900: #151225;
 }
 
+/* ЦВЕТОВАЯ КОНСИСТЕНТНОСТЬ ДЛЯ РАЗНЫХ МОНИТОРОВ */
+/* Принудительно используем sRGB для одинакового отображения */
+@media (color-gamut: p3) {
+  :root {
+    /* На широких цветовых гаммах используем те же sRGB цвета */
+    --color-dark-900: #151225;
+  }
+}
+
 /* ПРИНУДИТЕЛЬНОЕ УПРАВЛЕНИЕ ЦВЕТОВОЙ СХЕМОЙ */
-/* Отключаем влияние системных настроек темы и браузерных фильтров */
+/* Устанавливаем тёмную тему для консистентности на всех устройствах */
 :root {
-  color-scheme: only light !important;
+  color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
   forced-color-adjust: none !important;
 }
 
 html {
-  color-scheme: only light !important;
+  color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
   forced-color-adjust: none !important;
 }
 
 body {
-  color-scheme: only light !important;
+  color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
   forced-color-adjust: none !important;
@@ -112,7 +121,7 @@ html, body {
     color: white !important;
     filter: none !important;
     -webkit-filter: none !important;
-    color-scheme: only light !important;
+    color-scheme: dark !important;
     forced-color-adjust: none !important;
   }
 }
@@ -128,6 +137,24 @@ html, body {
   --overlay-opacity-light: 0.4;
   --overlay-opacity-medium: 0.6;
   --overlay-opacity-dark: 0.8;
+
+  /* Фоллбэк для backdrop-filter - более непрозрачный фон */
+  --fallback-bg-opacity: 0.95;
+}
+
+/* Проверка поддержки backdrop-filter */
+@supports not (backdrop-filter: blur(5px)) {
+  :root {
+    --enable-backdrop-filter: none;
+    --fallback-bg-opacity: 1;
+  }
+
+  /* Усиливаем фоны для элементов, которые используют backdrop-filter */
+  .gaming-balance-container,
+  .gaming-balance-add-button,
+  .gaming-notification-button {
+    background-color: rgba(21, 18, 37, 0.98) !important;
+  }
 }
 
 @layer base {
@@ -220,6 +247,29 @@ html, body {
 .animate-spin {
   will-change: transform;
   transform: translateZ(0);
+}
+
+/* КОНСИСТЕНТНОСТЬ РЕНДЕРИНГА НА РАЗНЫХ УСТРОЙСТВАХ */
+/* Принудительное включение аппаратного ускорения */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Стандартизация рендеринга анимаций */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Отключение адаптивной яркости на мобильных */
+@media screen and (max-width: 768px) {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 /* ПОЛНОЕ ОТКЛЮЧЕНИЕ АНИМАЦИЙ НА СЛАБЫХ УСТРОЙСТВАХ */
@@ -1886,5 +1936,70 @@ html::-webkit-scrollbar-thumb,
 
   .case-item-wrapper:hover .case-image {
     filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5));
+  }
+}
+
+/* ==========================================
+   ЗАЩИТА ОТ БРАУЗЕРНЫХ МОДИФИКАЦИЙ
+   ========================================== */
+
+/* Отключение ночного режима Яндекс.Браузера */
+html[data-ya-mode="dark"],
+body[data-ya-mode="dark"] {
+  background-color: #151225 !important;
+  background: #151225 !important;
+  filter: none !important;
+}
+
+/* Отключение режима чтения Safari */
+@media print {
+  html, body {
+    background-color: #151225 !important;
+    color: white !important;
+  }
+}
+
+/* Отключение инверсии цветов в Windows High Contrast */
+@media (prefers-contrast: high) {
+  html, body {
+    background-color: #151225 !important;
+    forced-color-adjust: none !important;
+  }
+}
+
+/* Запрет на изменение цветов расширениями браузера */
+html::before,
+body::before,
+#root::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #151225;
+  z-index: -9999;
+  pointer-events: none;
+}
+
+/* Фиксация цветовой схемы для всех состояний */
+:root,
+:root:not([data-theme]),
+:root[data-theme="dark"],
+:root[data-theme="light"] {
+  color-scheme: dark !important;
+  background-color: #151225 !important;
+}
+
+/* Отключение автоматической темы в Chrome/Edge */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: dark !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark !important;
   }
 }
