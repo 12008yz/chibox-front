@@ -6,7 +6,7 @@ import { useGetCaseTemplatesQuery } from '../features/cases/casesApi';
 import Avatar from '../components/Avatar';
 import CaseWithDrop from '../components/CaseWithDrop';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
-import { getItemImageUrl, getCaseImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { getImageUrl } from '../utils/imageUtils';
 import Monetary from '../components/Monetary';
 
@@ -557,7 +557,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container flex-shrink-0">
                   <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(bestWeapon.rarity || '')} opacity-20 rounded-lg sm:rounded-xl`}></div>
                   <img
-                    src={getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
+                    src={adaptImageSize(getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')) || getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
                     alt={bestWeapon.name || ''}
                     className="absolute inset-0 w-full h-full object-contain rounded-lg z-10 item-image"
                     onError={(e) => {
@@ -759,7 +759,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item?.rarity)} opacity-20 rounded-lg`}></div>
                           {inventoryItem.item?.image_url ? (
                             <img
-                              src={inventoryItem.item.image_url}
+                              src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                               alt={inventoryItem.item.name}
                               className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                               onError={(e) => {

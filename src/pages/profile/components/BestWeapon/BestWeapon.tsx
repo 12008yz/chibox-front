@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRarityColor, getRarityName } from '../../utils/profileUtils';
-import { getItemImageUrl } from '../../../../utils/steamImageUtils';
+import { getItemImageUrl, adaptImageSize } from '../../../../utils/steamImageUtils';
 import type { UserInventoryItem } from '../../../../types/api';
 import { isUserItem } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
@@ -66,7 +66,10 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
               weaponData?.rarity || ''
             )} opacity-20 rounded-xl`}></div>
             <img
-              src={getItemImageUrl(
+              src={adaptImageSize(getItemImageUrl(
+                weaponData?.image_url || '',
+                weaponData?.name || ''
+              )) || getItemImageUrl(
                 weaponData?.image_url || '',
                 weaponData?.name || ''
               )}

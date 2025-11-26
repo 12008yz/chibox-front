@@ -1,6 +1,6 @@
 import React from 'react';
 import type { UserInventoryItem, CaseTemplate } from '../types/api';
-import { getItemImageUrl, getCaseImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 
@@ -59,8 +59,9 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
   const caseName = caseTemplate?.name ? translateCaseName(caseTemplate.name) : rawCaseName;
   const caseImageUrl = getCaseImageUrl(caseTemplate?.image_url);
 
-  // Получаем корректный URL изображения предмета
-  const itemImageUrl = getItemImageUrl(droppedItem.item.image_url, droppedItem.item.name);
+  // Получаем корректный URL изображения предмета с адаптивным размером
+  const baseItemImageUrl = getItemImageUrl(droppedItem.item.image_url, droppedItem.item.name);
+  const itemImageUrl = adaptImageSize(baseItemImageUrl) || baseItemImageUrl;
 
   return (
     <div className="group relative bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-colors duration-200 cursor-pointer overflow-hidden">

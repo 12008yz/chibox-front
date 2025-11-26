@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import CaseWithDrop from '../../../../components/CaseWithDrop';
 import ItemWithdrawBanner from '../../../../components/ItemWithdrawBanner';
 import { getRarityColor, getRarityName } from '../../utils/profileUtils';
-import { getItemImageUrl, getCaseImageUrl } from '../../../../utils/steamImageUtils';
+import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../../../../utils/steamImageUtils';
 import { isUserItem, isUserCase, type InventoryTab } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
 import { useCancelWithdrawalMutation } from '../../../../features/user/userApi';
@@ -219,7 +219,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                 <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
                   <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} opacity-20 rounded-lg`}></div>
                   <img
-                    src={getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
+                    src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                     alt={inventoryItem.item.name}
                     className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                     onError={(e) => {
