@@ -12,7 +12,8 @@ import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
-import { Search } from 'lucide-react';
+import { Search, Zap, Target, Sparkles } from 'lucide-react';
+import { CelebrateIcon, SadIcon, ReceivedIcon, CancelIcon } from '../components/icons';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
@@ -393,10 +394,25 @@ const MobileUpgradeAnimation: React.FC<{
             }`}>
               Цель: {successChance}% зона
             </div>
-            <div className="text-sm text-gray-400 mt-1">
-              {phase === 'aiming' && '🎯 Прицеливаемся...'}
-              {phase === 'shooting' && '💥 Огонь!'}
-              {phase === 'impact' && '⚡ Попадание!'}
+            <div className="text-sm text-gray-400 mt-1 flex items-center justify-center gap-2">
+              {phase === 'aiming' && (
+                <>
+                  <Target className="w-4 h-4" />
+                  Прицеливаемся...
+                </>
+              )}
+              {phase === 'shooting' && (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Огонь!
+                </>
+              )}
+              {phase === 'impact' && (
+                <>
+                  <Zap className="w-4 h-4" />
+                  Попадание!
+                </>
+              )}
             </div>
           </div>
 
@@ -586,11 +602,18 @@ const MobileUpgradeAnimation: React.FC<{
               </div>
             )}
 
-            <div className="text-gray-300 text-sm mb-4">
-              {isSuccess
-                ? '🎉 Вы попали в цель! Предметы улучшены!'
-                : '😢 Вы промахнулись. Предметы утрачены.'
-              }
+            <div className="text-gray-300 text-sm mb-4 flex items-center justify-center gap-2">
+              {isSuccess ? (
+                <>
+                  <CelebrateIcon className="w-5 h-5" />
+                  Вы попали в цель! Предметы улучшены!
+                </>
+              ) : (
+                <>
+                  <SadIcon className="w-5 h-5" />
+                  Вы промахнулись. Предметы утрачены.
+                </>
+              )}
             </div>
 
             <button
@@ -813,10 +836,14 @@ const DesktopUpgradeAnimation: React.FC<{
           {/* Результат - показываем только после завершения анимации */}
           {showResult && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-              <div className={`text-5xl sm:text-6xl md:text-7xl font-bold animate-scale-in ${
+              <div className={`animate-scale-in ${
                 isSuccess ? 'text-emerald-400 drop-shadow-glow-emerald' : 'text-rose-400 drop-shadow-glow-rose'
               }`}>
-                {isSuccess ? '✓' : '✕'}
+                {isSuccess ? (
+                  <ReceivedIcon className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" strokeWidth={3} />
+                ) : (
+                  <CancelIcon className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" strokeWidth={3} />
+                )}
               </div>
             </div>
           )}

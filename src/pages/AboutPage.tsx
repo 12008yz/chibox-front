@@ -1,5 +1,6 @@
 import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
 import { OpponentTurnIcon, GiftIcon, GamepadIcon } from '../components/icons';
+import { Package, Users, RefreshCw, Lock, Zap } from 'lucide-react';
 
 const AboutPage = () => {
   const { data: statsData, isLoading } = useGetGlobalStatisticsQuery(undefined, {
@@ -13,17 +14,17 @@ const AboutPage = () => {
 
   const stats = [
     {
-      icon: '📦',
+      icon: <Package className="w-10 h-10 md:w-12 md:h-12 text-orange-400 mx-auto" />,
       label: 'Открыто кейсов',
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalCasesOpened || 0)
     },
     {
-      icon: '👥',
+      icon: <Users className="w-10 h-10 md:w-12 md:h-12 text-orange-400 mx-auto" />,
       label: 'Пользователей',
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalUsers || 0)
     },
     {
-      icon: '🔄',
+      icon: <RefreshCw className="w-10 h-10 md:w-12 md:h-12 text-orange-400 mx-auto" />,
       label: 'Апгрейдов',
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalUpgrades || 0)
     },
@@ -63,12 +64,18 @@ const AboutPage = () => {
             <h2 className="text-2xl font-bold mb-4 text-white">Почему выбирают ChiBox?</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-gray-800/50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2 text-orange-400">🔒 Безопасность</h3>
+                <h3 className="text-xl font-bold mb-2 text-orange-400 flex items-center gap-2">
+                  <Lock className="w-6 h-6" />
+                  Безопасность
+                </h3>
                 <p>Все транзакции защищены современными методами шифрования</p>
               </div>
 
               <div className="bg-gray-800/50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2 text-orange-400">⚡ Быстрота</h3>
+                <h3 className="text-xl font-bold mb-2 text-orange-400 flex items-center gap-2">
+                  <Zap className="w-6 h-6" />
+                  Быстрота
+                </h3>
                 <p>Мгновенное зачисление выигрышей и быстрый вывод предметов</p>
               </div>
 

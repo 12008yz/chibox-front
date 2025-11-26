@@ -1,3 +1,6 @@
+import { SearchIcon, UploadIcon } from '../components/icons';
+import { Edit, Trash2, Pause, Ban, Undo2, Users } from 'lucide-react';
+
 const PrivacyPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
@@ -216,36 +219,57 @@ const PrivacyPage = () => {
             </p>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">🔍 Право на доступ</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <SearchIcon className="w-5 h-5" />
+                  Право на доступ
+                </h3>
                 <p className="text-sm">Вы можете запросить информацию о том, какие персональные данные мы обрабатываем,
                 и получить копию этих данных.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">✏️ Право на исправление</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Edit className="w-5 h-5" />
+                  Право на исправление
+                </h3>
                 <p className="text-sm">Вы можете исправить неточные или неполные персональные данные через настройки
                 аккаунта или обратившись к нам.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">🗑️ Право на удаление («право на забвение»)</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Trash2 className="w-5 h-5" />
+                  Право на удаление («право на забвение»)
+                </h3>
                 <p className="text-sm">Вы можете запросить удаление ваших персональных данных в случаях,
                 предусмотренных законодательством.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">⏸️ Право на ограничение обработки</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Pause className="w-5 h-5" />
+                  Право на ограничение обработки
+                </h3>
                 <p className="text-sm">Вы можете ограничить обработку ваших данных в определенных ситуациях.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">📤 Право на портативность данных</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <UploadIcon className="w-5 h-5" />
+                  Право на портативность данных
+                </h3>
                 <p className="text-sm">Вы можете получить ваши данные в структурированном, машиночитаемом формате
                 и передать их другому контроллеру.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">⛔ Право на возражение</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Ban className="w-5 h-5" />
+                  Право на возражение
+                </h3>
                 <p className="text-sm">Вы можете возразить против обработки данных для целей прямого маркетинга
                 или законных интересов.</p>
               </div>
               <div className="bg-gradient-to-br from-orange-900/20 to-gray-800/30 p-4 rounded-lg border border-orange-500/20">
-                <h3 className="font-bold text-orange-300 mb-2">🔙 Право на отзыв согласия</h3>
+                <h3 className="font-bold text-orange-300 mb-2 flex items-center gap-2">
+                  <Undo2 className="w-5 h-5" />
+                  Право на отзыв согласия
+                </h3>
                 <p className="text-sm">Вы можете в любое время отозвать ранее данное согласие на обработку
                 персональных данных.</p>
               </div>
@@ -319,7 +343,10 @@ const PrivacyPage = () => {
                 </ul>
               </div>
               <div className="bg-gray-800/30 p-4 rounded-lg">
-                <h3 className="font-semibold text-orange-300 mb-2">👥 Организационные меры</h3>
+                <h3 className="font-semibold text-orange-300 mb-2 flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Организационные меры
+                </h3>
                 <ul className="list-disc ml-6 space-y-1 text-sm">
                   <li>Ограниченный доступ к персональным данным</li>
                   <li>Обучение сотрудников вопросам защиты данных</li>
