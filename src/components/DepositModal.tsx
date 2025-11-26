@@ -1025,23 +1025,23 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                                 {/* Benefits List */}
                                 <div className="space-y-1.5 mb-3">
                                   <div className="flex items-start gap-2 text-xs">
-                                    <span className="mt-0.5 text-white">✓</span>
+                                    <ReceivedIcon className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
                                     <span className="text-gray-300">
                                       Бонус <span className="font-semibold text-white">+{selectedTier.bonus_percentage}%</span> к шансу выпадения
                                     </span>
                                   </div>
                                   <div className="flex items-start gap-2 text-xs">
-                                    <span className="mt-0.5 text-white">✓</span>
+                                    <ReceivedIcon className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
                                     <span className="text-gray-300">
                                       {isPremium ? 'Предметы выпадают без дубликатов' : 'Доступ ко всем бонусам'}
                                     </span>
                                   </div>
                                   <div className="flex items-start gap-2 text-xs">
-                                    <span className="mt-0.5 text-white">✓</span>
+                                    <ReceivedIcon className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
                                     <span className="text-gray-300">VIP значок в профиле и чате</span>
                                   </div>
                                   <div className="flex items-start gap-2 text-xs">
-                                    <span className="mt-0.5 text-white">✓</span>
+                                    <ReceivedIcon className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" />
                                     <span className="text-gray-300">Приоритетная поддержка</span>
                                   </div>
                                 </div>

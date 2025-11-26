@@ -7,7 +7,7 @@ import {
 } from '../features/user/userApi';
 import { soundManager } from '../utils/soundManager';
 import { TicTacToeIcon, CancelIcon, ProcessingIcon, GamepadIcon, LostIcon } from './icons';
-import { X as XIcon } from 'lucide-react';
+import { X as XIcon, Lock } from 'lucide-react';
 
 interface TicTacToeGameProps {
   isOpen: boolean;
@@ -302,7 +302,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           <div className="text-center">
             {!hasSubscription ? (
               <>
-                <div className="text-6xl mb-6">🔒</div>
+                <div className="mb-6 flex justify-center">
+                  <Lock className="w-16 h-16 text-yellow-400" />
+                </div>
                 <p className="text-yellow-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.no_subscription_title') || 'Требуется статус'}</p>
                 <p className="text-gray-400 mb-8">
                   {currentGameData?.free_attempts_info?.reason ||

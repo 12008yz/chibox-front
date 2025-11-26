@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { HideInfoIcon } from '../components/icons';
 
 const FAQPage = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -136,8 +137,8 @@ const FAQPage = () => {
                         className="w-full p-6 text-left flex justify-between items-center gap-4"
                       >
                         <span className="font-bold text-white">{item.q}</span>
-                        <span className={`text-2xl transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-                          ▼
+                        <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                          <HideInfoIcon className="w-6 h-6 text-orange-400" />
                         </span>
                       </button>
 

@@ -76,7 +76,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
     if (!canPlay) {
       if (!hasSubscription && (status?.free_attempts_remaining || 0) === 0) {
         toast.error('Для игры в Safe Cracker требуется активный статус или бесплатные попытки!', {
-          icon: '🔒',
+          icon: <Lock className="w-5 h-5" />,
           duration: 4000,
         });
       }
@@ -236,7 +236,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
           <div className="text-center">
             <h2 className="text-2xl font-bold text-white mb-1 flex items-center justify-center gap-2">
-              <span>🔒</span>
+              <Lock className="w-7 h-7 text-yellow-400" />
               <span>ВЗЛОМАЙ СЕЙФ</span>
             </h2>
           </div>

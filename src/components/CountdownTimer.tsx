@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 
 interface CountdownTimerProps {
   targetTime: string; // ISO строка времени до которого считаем
@@ -70,8 +71,9 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
 
   if (timeLeft.isExpired) {
     return (
-      <span className={`text-green-400 ${className}`}>
-        🔄 Доступно!
+      <span className={`text-green-400 flex items-center gap-1 ${className}`}>
+        <RefreshCw className="w-4 h-4" />
+        Доступно!
       </span>
     );
   }

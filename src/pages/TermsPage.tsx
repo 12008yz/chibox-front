@@ -1,3 +1,5 @@
+import { AlertCircle, Check } from 'lucide-react';
+
 const TermsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
@@ -57,7 +59,7 @@ const TermsPage = () => {
             <h2 className="text-3xl font-bold mb-4 text-white">2. Возрастные ограничения (18+)</h2>
             <div className="bg-red-900/20 border border-red-500/30 p-5 rounded-lg">
               <div className="flex items-start gap-3 mb-3">
-                <span className="text-3xl">🔞</span>
+                <AlertCircle className="w-8 h-8 text-red-400 flex-shrink-0" />
                 <div>
                   <p className="font-bold text-red-300 text-xl mb-2">Сервис доступен только для совершеннолетних</p>
                   <p className="mb-3">
@@ -833,16 +835,31 @@ const TermsPage = () => {
               <p className="text-center text-sm mb-3">
                 <strong className="text-orange-300">Используя сервис ChiBox, вы подтверждаете, что:</strong>
               </p>
-              <ul className="text-sm space-y-1 max-w-3xl mx-auto">
-                <li>✓ Вам исполнилось 18 лет</li>
-                <li>✓ Вы ознакомились и согласны с условиями настоящего Соглашения</li>
-                <li>✓ Вы ознакомились с{' '}
-                  <a href="/privacy" className="text-orange-400 hover:underline">
-                    Политикой конфиденциальности
-                  </a>
+              <ul className="text-sm space-y-2 max-w-3xl mx-auto">
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вам исполнилось 18 лет</span>
                 </li>
-                <li>✓ Вы понимаете, что ChiBox — развлекательный сервис обмена виртуальных товаров</li>
-                <li>✓ Вы обязуетесь соблюдать правила использования платформы</li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вы ознакомились и согласны с условиями настоящего Соглашения</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вы ознакомились с{' '}
+                    <a href="/privacy" className="text-orange-400 hover:underline">
+                      Политикой конфиденциальности
+                    </a>
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вы понимаете, что ChiBox — развлекательный сервис обмена виртуальных товаров</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вы обязуетесь соблюдать правила использования платформы</span>
+                </li>
               </ul>
             </div>
 
