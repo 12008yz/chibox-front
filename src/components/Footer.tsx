@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
+import { Package, Users, RefreshCw, Swords, Clock } from 'lucide-react';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -18,22 +19,22 @@ const Footer = () => {
 
   const stats = [
     {
-      icon: '📦',
+      icon: <Package className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />,
       label: t('footer.stats.cases_opened'),
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalCasesOpened || 0)
     },
     {
-      icon: '👥',
+      icon: <Users className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />,
       label: t('footer.stats.users'),
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalUsers || 0)
     },
     {
-      icon: '🔄',
+      icon: <RefreshCw className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />,
       label: t('footer.stats.upgrades'),
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalUpgrades || 0)
     },
     {
-      icon: '⚔️',
+      icon: <Swords className="w-8 h-8 md:w-10 md:h-10 text-orange-400" />,
       label: t('footer.stats.games_played'),
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalGamesPlayed || 0)
     },
@@ -83,7 +84,7 @@ const Footer = () => {
               key={index}
               className="text-center p-6 rounded-xl bg-gray-800/80 border border-gray-700/50 hover:border-orange-500/50 transition-colors duration-300"
             >
-              <div className="text-3xl md:text-4xl mb-2">{stat.icon}</div>
+              <div className="flex justify-center mb-2">{stat.icon}</div>
               <div className="text-2xl md:text-3xl font-bold text-orange-400 mb-1">
                 {stat.value}
               </div>
@@ -216,7 +217,7 @@ const Footer = () => {
 
               <div className="mt-4 pt-4 border-t border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400">
-                  <span className="text-xl">⏰</span>
+                  <Clock className="w-5 h-5 text-orange-400" />
                   <div className="text-xs">
                     <div className="font-bold text-white">24/7</div>
                     <div>Поддержка онлайн</div>

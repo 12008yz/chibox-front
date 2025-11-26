@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { Check } from 'lucide-react';
 
 const RussianFlag = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" className="w-6 h-4">
@@ -123,7 +124,7 @@ const LanguageSwitcher: React.FC = () => {
           <div className="flex items-center">{language.flag}</div>
           <span className="text-sm">{language.name}</span>
           {currentLanguage.code === language.code && (
-            <span className="ml-auto text-cyan-400">✓</span>
+            <Check className="ml-auto w-4 h-4 text-cyan-400" />
           )}
         </button>
       ))}

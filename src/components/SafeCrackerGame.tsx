@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
 import { useAppSelector } from '../store/hooks';
 import { hasActiveSubscription } from '../utils/subscriptionUtils';
+import { PartyPopper, Frown, Gift, Check, X, Coins, RefreshCw, Clock, Lock, LockOpen } from 'lucide-react';
 
 interface SafeCrackerGameProps {
   isOpen: boolean;
@@ -136,19 +137,19 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       if (response.matches === 3) {
         soundManager.play('win');
         toast.success(response.message, {
-          icon: '🎉',
+          icon: <PartyPopper className="w-5 h-5" />,
           duration: 5000,
         });
       } else if (response.matches === 2) {
         soundManager.play('win');
         toast.success(response.message, {
-          icon: '🎊',
+          icon: <PartyPopper className="w-5 h-5" />,
           duration: 4000,
         });
       } else {
         soundManager.play('lose');
         toast(response.message, {
-          icon: '😔',
+          icon: <Frown className="w-5 h-5" />,
           duration: 3000,
         });
       }
@@ -267,7 +268,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
             <div className="mb-6">
               <div className="bg-green-900/20 border border-green-400/50 rounded-lg p-4">
                 <div className="text-green-300 font-semibold mb-2 flex items-center gap-2">
-                  <span>🎁</span>
+                  <Gift className="w-5 h-5" />
                   <span>Бесплатные попытки: {status?.free_attempts_remaining || 0} из 2</span>
                 </div>
                 <div className="text-sm text-green-200">
@@ -315,9 +316,9 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                     {showResult && userCode && (
                       <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-16 left-1/2 transform -translate-x-1/2">
                         {secretCode![index] === userCode[index] ? (
-                          <span className="text-2xl sm:text-3xl">✅</span>
+                          <Check className="w-8 h-8 sm:w-10 sm:h-10 text-green-500" />
                         ) : (
-                          <span className="text-2xl sm:text-3xl">❌</span>
+                          <X className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
                         )}
                       </div>
                     )}
@@ -341,7 +342,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   >
                     <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-3 rounded-xl shadow-2xl border-2 border-green-300">
                       <div className="text-white font-bold text-2xl sm:text-3xl md:text-4xl whitespace-nowrap flex items-center gap-2">
-                        <span>💰</span>
+                        <Coins className="w-8 h-8 sm:w-10 sm:h-10" />
                         <span>+{prizeValue}₽</span>
                       </div>
                     </div>
@@ -474,7 +475,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
             <div className="mb-6 bg-green-900/30 border-2 border-green-500/50 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <h4 className="text-green-400 text-center font-bold text-lg mb-1">🎉 Вы уже выиграли в Safe Cracker сегодня!</h4>
+                  <h4 className="text-green-400 text-center font-bold text-lg mb-1 flex items-center justify-center gap-2">
+                    <PartyPopper className="w-6 h-6" />
+                    <span>Вы уже выиграли в Safe Cracker сегодня!</span>
+                  </h4>
                   <p className="text-green-300 text-center text-sm">Следующие попытки будут доступны в 16:00 МСК.</p>
                 </div>
               </div>
@@ -492,7 +496,32 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                   : 'bg-gray-700 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {isSpinning ? '🔄 Взлом...' : isLoading ? '⏳ Загрузка...' : !hasSubscription ? '🔒 Играть' : status?.has_won ? '✅ Бонус получен' : '🔓 ВЗЛОМАТЬ СЕЙФ'}
+              {isSpinning ? (
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  Взлом...
+                </span>
+              ) : isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Загрузка...
+                </span>
+              ) : !hasSubscription ? (
+                <span className="flex items-center gap-2">
+                  <Lock className="w-5 h-5" />
+                  Играть
+                </span>
+              ) : status?.has_won ? (
+                <span className="flex items-center gap-2">
+                  <Check className="w-5 h-5" />
+                  Бонус получен
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <LockOpen className="w-5 h-5" />
+                  ВЗЛОМАТЬ СЕЙФ
+                </span>
+              )}
             </button>
           </div>
 

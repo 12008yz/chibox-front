@@ -4,6 +4,7 @@ import { useAppSelector } from '../store/hooks';
 import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUtils';
 import type { UserInventoryItem } from '../types/api';
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
 
 interface ItemWithdrawBannerProps {
   item: UserInventoryItem;
@@ -229,7 +230,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
                 disabled={isWithdrawing}
                 className="px-2 py-1.5 bg-gray-600/50 hover:bg-gray-600/70 disabled:opacity-50 text-gray-300 rounded text-[10px] transition-colors"
               >
-                ✕
+                <X className="w-3 h-3" />
               </button>
             </div>
           </div>

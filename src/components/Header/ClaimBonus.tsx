@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetBonusStatusQuery } from "../../features/user/userApi";
 import SafeCrackerGame from "../SafeCrackerGame";
+import { Dices, Clock, Sparkles, Trophy, Timer, Package, Star, Gift } from 'lucide-react';
 
 interface ClaimBonusProps {
   onClaimBonus?: () => Promise<void>;
@@ -92,8 +93,8 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
 
         <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center space-x-3">
-            <div className={`text-3xl transition-transform duration-300 ${isAvailable ? 'animate-bounce' : ''}`}>
-              {isAvailable ? '🎲' : '⏰'}
+            <div className={`transition-transform duration-300 ${isAvailable ? 'animate-bounce' : ''}`}>
+              {isAvailable ? <Dices className="w-8 h-8 text-yellow-400" /> : <Clock className="w-8 h-8 text-gray-400" />}
             </div>
             <div>
               <h3 className={`font-bold text-base transition-colors duration-300 ${
@@ -105,12 +106,13 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
               {isAvailable ? (
                 <div className="space-y-1">
                   <p className="text-green-400 text-sm font-medium flex items-center gap-1">
-                    <span className="animate-pulse">✨</span>
+                    <Sparkles className="w-4 h-4 animate-pulse" />
                     Готово к игре!
                   </p>
                   {bonusStatus?.lifetime_bonuses_claimed !== undefined && (
-                    <p className="text-yellow-400 text-xs">
-                      🏆 Сыграно: {bonusStatus.lifetime_bonuses_claimed} раз
+                    <p className="text-yellow-400 text-xs flex items-center gap-1">
+                      <Trophy className="w-3 h-3" />
+                      Сыграно: {bonusStatus.lifetime_bonuses_claimed} раз
                     </p>
                   )}
                 </div>
@@ -119,7 +121,7 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
                   <p className="text-gray-400 text-sm">
                     {timeLeft ? (
                       <span className="flex items-center gap-1">
-                        <span>⏱️</span>
+                        <Timer className="w-4 h-4" />
                         <span className="font-mono text-blue-400">{timeLeft}</span>
                       </span>
                     ) : (
@@ -127,8 +129,9 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
                     )}
                   </p>
                   {bonusStatus?.lifetime_bonuses_claimed !== undefined && (
-                    <p className="text-gray-500 text-xs">
-                      🏆 Всего сыграно: {bonusStatus.lifetime_bonuses_claimed}
+                    <p className="text-gray-500 text-xs flex items-center gap-1">
+                      <Trophy className="w-3 h-3" />
+                      Всего сыграно: {bonusStatus.lifetime_bonuses_claimed}
                     </p>
                   )}
                 </div>
@@ -153,7 +156,10 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
                     Запуск...
                   </div>
                 ) : (
-                  "🎲 Играть"
+                  <span className="flex items-center gap-1.5">
+                    <Dices className="w-4 h-4" />
+                    Играть
+                  </span>
                 )}
               </button>
             </div>
@@ -188,15 +194,15 @@ const ClaimBonus: React.FC<ClaimBonusProps> = ({
           <div className="mt-3 pt-3 border-t border-yellow-500/20">
             <div className="flex justify-center gap-4 text-xs">
               <div className="flex items-center gap-1 text-yellow-400">
-                <span>📦</span>
+                <Package className="w-4 h-4" />
                 <span>Кейсы</span>
               </div>
               <div className="flex items-center gap-1 text-green-400">
-                <span>⭐</span>
+                <Star className="w-4 h-4" />
                 <span>Статус</span>
               </div>
               <div className="flex items-center gap-1 text-blue-400">
-                <span>🎁</span>
+                <Gift className="w-4 h-4" />
                 <span>Предметы</span>
               </div>
             </div>

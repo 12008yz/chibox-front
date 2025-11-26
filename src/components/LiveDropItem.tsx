@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
 import Monetary from './Monetary';
+import { Flame, Star } from 'lucide-react';
 
 interface LiveDropItemProps {
   drop: LiveDropData;
@@ -71,16 +72,16 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
         {/* Спец эффекты для редких предметов */}
         {drop.isRare && (
           <div className="absolute -top-2 -right-2 z-20">
-            <div className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-              🔥
+            <div className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg flex items-center justify-center">
+              <Flame className="w-3.5 h-3.5" />
             </div>
           </div>
         )}
 
         {drop.isHighlighted && (
           <div className="absolute -top-2 -left-2 z-20">
-            <div className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-              ⭐
+            <div className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg flex items-center justify-center">
+              <Star className="w-3.5 h-3.5" />
             </div>
           </div>
         )}

@@ -8,6 +8,7 @@ import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
 import { ReceivedIcon, ExchangeIcon } from './icons';
+import { Lock, Crown } from 'lucide-react';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -393,7 +394,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                   {/* Info Text */}
                   <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700/30 flex items-start gap-2 sm:gap-3">
-                    <span className="text-lg sm:text-xl">🔒</span>
+                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-white mb-1 text-xs sm:text-sm">Защищенная оплата</p>
                       <p className="text-gray-400 text-xs sm:text-sm">После нажатия кнопки "Пополнить" вы будете перенаправлены на безопасную страницу оплаты</p>
@@ -521,7 +522,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                   {/* Info Text */}
                   <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 flex items-start gap-3">
-                    <span className="text-xl">🔒</span>
+                    <Lock className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-white mb-1">Защищенная оплата</p>
                       <p className="text-gray-400">После нажатия кнопки "Пополнить" вы будете перенаправлены на безопасную страницу оплаты</p>
@@ -744,7 +745,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
               {/* Info Block */}
               <div className="text-sm text-gray-300 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-lg p-3 sm:p-4 border border-gray-700/30 flex items-start gap-2 sm:gap-3">
-                <span className="text-lg sm:text-xl">👑</span>
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-white mb-1.5 text-xs sm:text-sm">Преимущества VIP статуса</p>
                   <ul className="text-gray-400 space-y-1 text-[10px] sm:text-xs">
@@ -974,7 +975,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                   {/* Info Text */}
                   <div className="text-sm text-gray-300 bg-gray-800/50 rounded-lg p-3 border border-gray-700/30 flex items-start gap-2">
-                    <span className="text-lg">👑</span>
+                    <Crown className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-white mb-1 text-sm">Преимущества VIP статуса</p>
                       <ul className="text-gray-400 space-y-0.5 text-xs">
