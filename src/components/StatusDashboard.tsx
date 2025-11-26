@@ -11,6 +11,7 @@ import Monetary from './Monetary';
 import Title from './Title';
 import AppFeatures from './AppFeatures';
 import DepositModal from './DepositModal';
+import { ReceivedIcon } from './icons';
 
 interface StatusDashboardProps {
   name: string;
@@ -312,14 +313,14 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300 text-xs md:text-base">{t('modals.item_withdrawal')}</span>
                   <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <span className="text-green-400 text-xs md:text-sm">✓</span>
+                    <ReceivedIcon className="text-green-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                 </div>
                 {subscriptionTier === 3 && (
                   <div className="flex items-center justify-between">
                     <span className="text-gray-300 text-xs md:text-base">{t('modals.no_case_duplicates')}</span>
                     <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                      <span className="text-purple-400 text-xs md:text-sm">✓</span>
+                      <ReceivedIcon className="text-purple-400 w-3 h-3 md:w-4 md:h-4" />
                     </div>
                   </div>
                 )}
@@ -334,31 +335,31 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               <div className="space-y-2 md:space-y-3">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <span className="text-green-400 text-xs md:text-base">✓</span>
+                    <ReceivedIcon className="text-green-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                   <span className="text-gray-300 text-xs md:text-base">{t('tic_tac_toe.title')}</span>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <span className="text-yellow-400 text-xs md:text-base">✓</span>
+                    <ReceivedIcon className="text-yellow-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                   <span className="text-gray-300 text-xs md:text-base">Взлом сейфа</span>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                    <span className="text-cyan-400 text-xs md:text-base">✓</span>
+                    <ReceivedIcon className="text-cyan-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                   <span className="text-gray-300 text-xs md:text-base">{t('slots.title')}</span>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <span className="text-blue-400 text-xs md:text-base">✓</span>
+                    <ReceivedIcon className="text-blue-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                   <span className="text-gray-300 text-xs md:text-base">{t('exchange.title')}</span>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <span className="text-purple-400 text-xs md:text-base">✓</span>
+                    <ReceivedIcon className="text-purple-400 w-3 h-3 md:w-4 md:h-4" />
                   </div>
                   <span className="text-gray-300 text-xs md:text-base">{t('modals.item_withdrawal')}</span>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaArrowDown, FaTimes, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { CelebrateIcon, GiftIcon, SlotsIcon, TicTacToeIcon, BalanceIcon } from './icons';
 
 interface OnboardingStep {
   id: string;
@@ -28,64 +29,85 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     {
       id: 'welcome',
       targetId: 'onboarding-balance',
-      title: t('onboarding.welcome_title', '🎉 Добро пожаловать!'),
+      title: t('onboarding.welcome_title', 'Добро пожаловать!'),
       description: t('onboarding.welcome_description', 'Поздравляем с регистрацией! Специально для вас мы подготовили приветственные бонусы на первые 2 дня. Давайте покажем все возможности!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '🎉 Добро пожаловать!',
-      mobileDescription: 'Поздравляем! У вас есть 2 дня бонусов:\n\n✅ 2 бесплатных кейса\n✅ 2 попытки в слоты (в 16:00 МСК)\n✅ 2 попытки взлома сейфа (в 16:00 МСК)\n✅ 2 игры в крестики-нолики (в 16:00 МСК)'
+      mobileTitle: 'Добро пожаловать!',
+      mobileDescription: 'Поздравляем! У вас есть 2 дня бонусов:\n\n• 2 бесплатных кейса\n• 2 попытки в слоты (в 16:00 МСК)\n• 2 попытки взлома сейфа (в 16:00 МСК)\n• 2 игры в крестики-нолики (в 16:00 МСК)'
     },
     {
       id: 'free_cases',
       targetId: 'onboarding-cases',
-      title: t('onboarding.free_cases_title', '🎁 2 Бесплатных Кейса!'),
+      title: t('onboarding.free_cases_title', '2 Бесплатных Кейса!'),
       description: t('onboarding.free_cases_description', 'Вот ваш бесплатный кейс! У вас есть 2 попытки. Успейте открыть их!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '🎁 Бесплатные Кейсы',
+      mobileTitle: 'Бесплатные Кейсы',
       mobileDescription: 'Прокрутите вниз и найдите бесплатные кейсы. У вас есть 2 попытки открыть их!'
     },
     {
       id: 'slot',
       targetId: 'onboarding-slot-button',
-      title: t('onboarding.slot_title', '🎰 Слоты - 2 Попытки!'),
+      title: t('onboarding.slot_title', 'Слоты - 2 Попытки!'),
       description: t('onboarding.slot_description', 'Нажмите сюда, чтобы открыть слот-машину! У вас 2 бесплатные попытки. Первая доступна сразу, вторая — в 16:00 МСК. Действует 2 дня с регистрации!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '🎰 Слоты',
+      mobileTitle: 'Слоты',
       mobileDescription: 'Откройте меню (☰ в правом верхнем углу) и нажмите "Слот". У вас 2 бесплатные попытки (вторая в 16:00 МСК)!'
     },
     {
       id: 'safe',
       targetId: 'onboarding-safe-button',
-      title: t('onboarding.safe_title', '🔐 Сейф - 2 Попытки!'),
+      title: t('onboarding.safe_title', 'Сейф - 2 Попытки!'),
       description: t('onboarding.safe_description', 'Здесь кнопка взлома сейфа! 2 бесплатные попытки подобрать код и получить награду. Первая попытка сейчас, вторая — в 16:00 МСК. Успейте за 2 дня!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '🔐 Сейф',
-      mobileDescription: 'В меню (☰) справа от баланса найдите кнопку с замком 🔒. Это сейф! 2 бесплатные попытки (вторая в 16:00 МСК).'
+      mobileTitle: 'Сейф',
+      mobileDescription: 'В меню (☰) справа от баланса найдите кнопку с замком. Это сейф! 2 бесплатные попытки (вторая в 16:00 МСК).'
     },
     {
       id: 'tictactoe',
       targetId: 'onboarding-tictactoe-button',
-      title: t('onboarding.tictactoe_title', '⭕❌ Крестики-нолики - 2 Попытки!'),
+      title: t('onboarding.tictactoe_title', 'Крестики-нолики - 2 Попытки!'),
       description: t('onboarding.tictactoe_description', 'Нажмите "Играть" на этом кейсе! 2 бесплатные игры в крестики-нолики. Победите компьютер и получите бонусный кейс. Первая игра сейчас, вторая — в 16:00 МСК. 2 дня!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '⭕❌ Крестики-нолики',
+      mobileTitle: 'Крестики-нолики',
       mobileDescription: 'Прокрутите кейсы и найдите кейс "Крестики-нолики". Победите компьютер, чтобы получить награду! 2 игры (вторая в 16:00 МСК).'
     },
     {
       id: 'balance',
       targetId: 'onboarding-balance',
-      title: t('onboarding.balance_title', '💎 Ваш Баланс'),
+      title: t('onboarding.balance_title', 'Ваш Баланс'),
       description: t('onboarding.balance_description', 'Здесь отображается ваш баланс. После того как закончатся бесплатные бонусы, можете пополнить счёт и продолжить играть в любое время!'),
       position: 'bottom',
       arrowDirection: 'down',
-      mobileTitle: '💎 Ваш Баланс',
+      mobileTitle: 'Ваш Баланс',
       mobileDescription: 'В меню (☰) вверху вы увидите свой баланс. После окончания бонусов можете пополнить его кнопкой "+".'
     }
   ];
+
+  // Функция для получения иконки по id шага
+  const getStepIcon = (stepId: string) => {
+    const iconClass = "inline-block mr-2";
+    switch (stepId) {
+      case 'welcome':
+        return <CelebrateIcon className={`${iconClass} w-6 h-6`} />;
+      case 'free_cases':
+        return <GiftIcon className={`${iconClass} w-6 h-6`} />;
+      case 'slot':
+        return <SlotsIcon className={`${iconClass} w-6 h-6`} />;
+      case 'safe':
+        return <span className={`${iconClass} text-2xl`}>🔐</span>;
+      case 'tictactoe':
+        return <TicTacToeIcon className={`${iconClass} w-6 h-6`} />;
+      case 'balance':
+        return <BalanceIcon className={`${iconClass} w-6 h-6`} />;
+      default:
+        return null;
+    }
+  };
 
   // Определяем размер экрана
   useEffect(() => {
@@ -197,7 +219,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             </button>
 
             {/* Заголовок */}
-            <h2 className="text-white text-2xl font-bold mb-4 pr-8">
+            <h2 className="text-white text-2xl font-bold mb-4 pr-8 flex items-center">
+              {getStepIcon(step.id)}
               {step.mobileTitle || step.title}
             </h2>
 
@@ -463,7 +486,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             </button>
 
             {/* Заголовок */}
-            <h3 className="text-white text-xl font-bold mb-3 pr-6">
+            <h3 className="text-white text-xl font-bold mb-3 pr-6 flex items-center">
+              {getStepIcon(step.id)}
               {step.title}
             </h3>
 

@@ -3,6 +3,7 @@ import {
   useGetSubscriptionCaseStatusQuery,
   useClaimSubscriptionCaseMutation
 } from '../features/subscriptions/subscriptionsApi';
+import { GiftIcon, TooLowIcon, ReceivedIcon, ProcessingIcon } from './icons';
 
 interface SubscriptionCasesClaimProps {
   className?: string;
@@ -137,8 +138,9 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
     return (
       <div className={`bg-gray-800 rounded-lg p-4 border border-gray-700 ${className}`}>
         <div className="text-center">
-          <div className="text-gray-400 mb-2">
-            🎁 Ежедневные кейсы подписки
+          <div className="text-gray-400 mb-2 flex items-center justify-center gap-2">
+            <GiftIcon className="w-5 h-5" />
+            Ежедневные кейсы подписки
           </div>
           <div className="text-sm text-gray-500">
             Для получения ежедневных кейсов необходим активный статус
@@ -154,20 +156,23 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
     <div className={`bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-lg p-4 border border-purple-500/30 ${className}`}>
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-white font-semibold mb-1 flex items-center">
-            🎁 Ежедневные кейсы
+          <div className="text-white font-semibold mb-1 flex items-center gap-2">
+            <GiftIcon className="w-5 h-5" />
+            Ежедневные кейсы
             <span className="ml-2 text-xs bg-purple-600 px-2 py-1 rounded">
               Статус {subscription_tier}
             </span>
           </div>
 
           {can_claim ? (
-            <div className="text-green-400 text-sm">
-              ✅ Кейсы доступны для получения!
+            <div className="text-green-400 text-sm flex items-center gap-1">
+              <ReceivedIcon className="w-4 h-4" />
+              Кейсы доступны для получения!
             </div>
           ) : (
-            <div className="text-yellow-400 text-sm">
-              ⏰ Следующие кейсы через: {timeRemaining}
+            <div className="text-yellow-400 text-sm flex items-center gap-1">
+              <ProcessingIcon className="w-4 h-4" />
+              Следующие кейсы через: {timeRemaining}
             </div>
           )}
         </div>
@@ -196,14 +201,16 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
 
       {/* Отображение сообщений об ошибках и успехе */}
       {errorMessage && (
-        <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 rounded text-red-300 text-sm">
-          ❌ {errorMessage}
+        <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 rounded text-red-300 text-sm flex items-center gap-2">
+          <TooLowIcon className="w-4 h-4 flex-shrink-0" />
+          {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div className="mt-3 p-2 bg-green-900/50 border border-green-500/50 rounded text-green-300 text-sm">
-          ✅ {successMessage}
+        <div className="mt-3 p-2 bg-green-900/50 border border-green-500/50 rounded text-green-300 text-sm flex items-center gap-2">
+          <ReceivedIcon className="w-4 h-4 flex-shrink-0" />
+          {successMessage}
         </div>
       )}
 

@@ -16,6 +16,7 @@ import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
 import { Coins, Star, Search } from 'lucide-react';
+import { ExchangeIcon } from '../components/icons';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -423,7 +424,7 @@ const ExchangePage: React.FC = () => {
 
             <div className="rounded-lg p-2 md:p-4 border border-purple-500/50">
               <div className="flex items-center space-x-2 md:space-x-3">
-                <div className="text-purple-400 text-xl md:text-2xl">⭐</div>
+                <ExchangeIcon className="text-purple-400 w-6 h-6 md:w-8 md:h-8 flex-shrink-0" />
                 <div>
                   <div className="text-purple-400 text-xs md:text-sm font-medium">{t('exchange.status')}</div>
                   {subscriptionData?.data?.subscription_days_left && subscriptionData.data.subscription_days_left > 0 ? (

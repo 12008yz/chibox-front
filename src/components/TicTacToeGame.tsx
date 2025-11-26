@@ -6,6 +6,8 @@ import {
   useMakeTicTacToeMoveMutation
 } from '../features/user/userApi';
 import { soundManager } from '../utils/soundManager';
+import { TicTacToeIcon, CancelIcon, ProcessingIcon, GamepadIcon, LostIcon } from './icons';
+import { X as XIcon } from 'lucide-react';
 
 interface TicTacToeGameProps {
   isOpen: boolean;
@@ -180,8 +182,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     // Если показываем результат и есть сохраненная финальная доска
     if (showResult && finalBoard) {
       const cell = finalBoard[index];
-      if (cell === 'X') return '✖️';
-      if (cell === 'O') return '⭕';
+      if (cell === 'X') return <XIcon className="w-12 h-12 text-red-400" strokeWidth={3} />;
+      if (cell === 'O') return <TicTacToeIcon className="w-12 h-12 text-blue-400" strokeWidth={3} />;
       return '';
     }
 
@@ -198,8 +200,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
 
     const cell = game.game_state.board[index];
 
-    if (cell === 'X') return '✖️';
-    if (cell === 'O') return '⭕';
+    if (cell === 'X') return <XIcon className="w-12 h-12 text-red-400" strokeWidth={3} />;
+    if (cell === 'O') return <TicTacToeIcon className="w-12 h-12 text-blue-400" strokeWidth={3} />;
     if (cell === null) return '';
 
     return '';
@@ -274,9 +276,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">{t('tic_tac_toe_game.title')}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl hover:rotate-90 transition-all duration-300"
+            className="text-gray-400 hover:text-white hover:rotate-90 transition-all duration-300"
           >
-            ✕
+            <CancelIcon className="w-6 h-6" />
           </button>
         </div>
 
@@ -402,13 +404,17 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           <div className="text-center">
             {/* Экран ожидания во время обработки результата */}
             <div className="mb-8">
-              <div className="text-6xl mb-6 animate-spin">⏳</div>
+              <div className="mb-6 flex justify-center">
+                <ProcessingIcon className="w-16 h-16 text-yellow-400 animate-spin" />
+              </div>
               <p className="text-white text-lg">{t('tic_tac_toe_game.processing_result')}</p>
             </div>
           </div>
         ) : (!game || !game.game_state) && !showResult ? (
           <div className="text-center">
-            <div className="text-6xl mb-6">🎮</div>
+            <div className="mb-6 flex justify-center">
+              <GamepadIcon className="w-16 h-16 text-blue-400" />
+            </div>
             <div className="animate-pulse">
               <p className="text-white text-lg">{t('tic_tac_toe_game.creating_game')}</p>
             </div>
@@ -437,7 +443,9 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                 <div className="bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 rounded-xl p-6">
                   {gameResult === 'lose' && (
                     <div>
-                      <div className="text-6xl mb-4">😞</div>
+                      <div className="mb-4 flex justify-center">
+                        <LostIcon className="w-16 h-16 text-red-400" />
+                      </div>
                       <h3 className="text-2xl font-bold text-red-400 mb-2">{t('tic_tac_toe_game.defeat')}</h3>
                       <p className="text-white mb-4">{t('tic_tac_toe_game.no_luck_this_time')}</p>
                       <p className="text-sm text-gray-400">{t('tic_tac_toe_game.bot_won')}</p>

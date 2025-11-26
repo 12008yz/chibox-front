@@ -1,4 +1,5 @@
 import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
+import { OpponentTurnIcon, GiftIcon, GamepadIcon } from '../components/icons';
 
 const AboutPage = () => {
   const { data: statsData, isLoading } = useGetGlobalStatisticsQuery(undefined, {
@@ -27,7 +28,7 @@ const AboutPage = () => {
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalUpgrades || 0)
     },
     {
-      icon: '⚔️',
+      icon: <OpponentTurnIcon className="w-10 h-10 md:w-12 md:h-12 text-orange-400 mx-auto" />,
       label: 'Игр сыграно',
       value: isLoading ? '...' : formatNumber(statsData?.data?.totalGamesPlayed || 0)
     },
@@ -72,12 +73,18 @@ const AboutPage = () => {
               </div>
 
               <div className="bg-gray-800/50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2 text-orange-400">🎁 Бонусы</h3>
+                <h3 className="text-xl font-bold mb-2 text-orange-400 flex items-center gap-2">
+                  <GiftIcon className="w-6 h-6" />
+                  Бонусы
+                </h3>
                 <p>Ежедневные бесплатные кейсы и щедрая система наград</p>
               </div>
 
               <div className="bg-gray-800/50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2 text-orange-400">🎮 Разнообразие</h3>
+                <h3 className="text-xl font-bold mb-2 text-orange-400 flex items-center gap-2">
+                  <GamepadIcon className="w-6 h-6" />
+                  Разнообразие
+                </h3>
                 <p>Широкий выбор кейсов и дополнительные мини-игры</p>
               </div>
             </div>
