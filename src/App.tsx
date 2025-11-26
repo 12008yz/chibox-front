@@ -14,6 +14,7 @@ import FloatingWatermark from './components/FloatingWatermark';
 import SteamLoadingPage from './components/SteamLoadingPage';
 import AuthModal from './components/AuthModal';
 import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
+import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
 
 // Lazy loading страниц
@@ -312,6 +313,7 @@ const App: React.FC = () => {
         </main>
         </div>
       </div>
+      <DiagnosticOverlay />
     </Router>
   );
 };
