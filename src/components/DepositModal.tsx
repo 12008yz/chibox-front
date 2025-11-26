@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
+import { ReceivedIcon, ExchangeIcon } from './icons';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -654,8 +655,8 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     >
                       {/* Most Popular Badge */}
                       {isPro && (
-                        <div className="absolute top-2 sm:top-3 right-2 sm:right-3 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded text-[9px] sm:text-[10px] font-bold text-white uppercase shadow-lg">
-                          ⭐ Популярный
+                        <div className="absolute top-2 sm:top-3 right-2 sm:right-3 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded text-[9px] sm:text-[10px] font-bold text-white uppercase shadow-lg flex items-center gap-1">
+                          <ExchangeIcon className="w-3 h-3" /> Популярный
                         </div>
                       )}
 
@@ -708,7 +709,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           </div>
                           <div className="bg-gray-900/60 rounded-lg p-2 sm:p-2.5 border border-gray-700/50">
                             <div className="text-[9px] sm:text-[10px] text-gray-400 mb-1">VIP чат</div>
-                            <div className="text-sm sm:text-base font-bold text-purple-400">✓</div>
+                            <div className="text-sm sm:text-base font-bold text-purple-400"><ReceivedIcon className="w-4 h-4 sm:w-5 sm:h-5" /></div>
                           </div>
                         </div>
 
@@ -716,20 +717,20 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         <div className="mt-3 pt-3 border-t border-gray-700/50">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[10px] sm:text-xs">
                             <div className="flex items-center gap-1.5 text-gray-300">
-                              <span className="text-green-400">✓</span>
+                              <span className="text-green-400"><ReceivedIcon className="w-3 h-3 sm:w-4 sm:h-4" /></span>
                               <span>VIP иконка</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-gray-300">
-                              <span className="text-green-400">✓</span>
+                              <span className="text-green-400"><ReceivedIcon className="w-3 h-3 sm:w-4 sm:h-4" /></span>
                               <span>Приоритет в поддержке</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-gray-300">
-                              <span className="text-green-400">✓</span>
+                              <span className="text-green-400"><ReceivedIcon className="w-3 h-3 sm:w-4 sm:h-4" /></span>
                               <span>Бесплатный кейс</span>
                             </div>
                             {isPremium && (
                               <div className="flex items-center gap-1.5 text-gray-300">
-                                <span className="text-green-400">✓</span>
+                                <span className="text-green-400"><ReceivedIcon className="w-3 h-3 sm:w-4 sm:h-4" /></span>
                                 <span>Без дубликатов</span>
                               </div>
                             )}
@@ -949,12 +950,12 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                                     {isPremium ? 'Без дубликатов' : 'Кейсов в день'}
                                   </div>
                                   <div className="text-base font-semibold text-white">
-                                    {isPremium ? '✓' : tier.max_daily_cases}
+                                    {isPremium ? <ReceivedIcon className="w-4 h-4" /> : tier.max_daily_cases}
                                   </div>
                                 </div>
                                 <div className="bg-gray-900/40 rounded-lg p-2">
                                   <div className="text-[10px] text-gray-400 mb-0.5">VIP чат</div>
-                                  <div className="text-base font-semibold text-white">✓</div>
+                                  <div className="text-base font-semibold text-white"><ReceivedIcon className="w-5 h-5" /></div>
                                 </div>
                               </div>
                             </div>

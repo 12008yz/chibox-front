@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 import CaseTimer from './CaseTimer';
 import { getCaseImageUrl } from '../utils/steamImageUtils';
+import { GamepadIcon } from './icons';
 
 interface CaseProps {
   title: string;
@@ -143,7 +144,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
             }`}
           >
-            🎮 {t('common.play')}
+            <GamepadIcon className="w-4 h-4 inline-block mr-1" /> {t('common.play')}
           </button>
         ) : (
           nextCaseAvailableTime && (parseFloat(price) === 0 || isNaN(parseFloat(price))) && (

@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import Monetary from '../../Monetary';
 import { CaseItemProps } from '../types';
 import { adaptImageSize } from '../../../utils/steamImageUtils';
+import { ReceivedIcon } from '../../icons';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 
 export const CaseItem = memo(({
@@ -233,7 +234,7 @@ export const CaseItem = memo(({
               {isWinningItemStopped && showStrikeThrough && (
                 <div className="absolute top-2 right-2 animate-checkmark-bounce">
                   <div className="bg-gradient-to-br from-green-400 to-green-600 text-white text-sm px-2.5 py-1 rounded-full font-bold shadow-lg border-2 border-green-300">
-                    ✓
+                    <ReceivedIcon className="w-4 h-4" />
                   </div>
                 </div>
               )}
