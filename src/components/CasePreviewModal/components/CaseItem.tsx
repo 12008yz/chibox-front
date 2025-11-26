@@ -3,6 +3,7 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useInView } from 'react-intersection-observer';
 import Monetary from '../../Monetary';
 import { CaseItemProps } from '../types';
+import { adaptImageSize } from '../../../utils/steamImageUtils';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 
 export const CaseItem = memo(({
@@ -46,6 +47,11 @@ export const CaseItem = memo(({
   const handleImageError = useCallback(() => {
     setImageError(true);
   }, []);
+
+  // Адаптируем размер изображения под устройство
+  const adaptedImageUrl = useMemo(() => {
+    return adaptImageSize(item.image_url);
+  }, [item.image_url]);
 
   // Определяем, нужно ли применять GPU acceleration
   const shouldUseGPU = isCurrentSliderPosition || isWinningItemStopped;
@@ -154,9 +160,9 @@ export const CaseItem = memo(({
         <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded" style={{ minHeight: '150px' }} />
       ) : (
         <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
-          {item.image_url && !imageError ? (
+          {adaptedImageUrl && !imageError ? (
             <LazyLoadImage
-              src={item.image_url}
+              src={adaptedImageUrl}
               alt={item.name}
               effect="opacity"
               className={`max-w-full max-h-full object-contain optimized-image ${

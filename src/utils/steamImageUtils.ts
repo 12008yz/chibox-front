@@ -125,6 +125,49 @@ export function getCaseImageUrl(imageUrl: string | null | undefined): string {
   return finalUrl + (finalUrl.includes('?') ? '&' : '?') + 'v=' + CACHE_VERSION;
 }
 
+// Функция для определения оптимального размера изображения в зависимости от устройства
+export function getOptimalImageSize(): string {
+  // Проверяем ширину экрана
+  const screenWidth = window.innerWidth;
+
+  // Для мобильных устройств (до 768px) используем меньший размер
+  if (screenWidth < 768) {
+    return '360fx360f';
+  }
+
+  // Для планшетов (768px - 1024px) используем средний размер
+  if (screenWidth < 1024) {
+    return '360fx360f';
+  }
+
+  // Для десктопа используем полный размер
+  return '512fx512f';
+}
+
+// Функция для адаптации URL изображения под размер экрана
+export function adaptImageSize(imageUrl: string | null | undefined): string | null {
+  if (!imageUrl) return null;
+
+  // Проверяем, это ли URL изображения Steam
+  if (!isSteamImageUrl(imageUrl)) {
+    return imageUrl;
+  }
+
+  const optimalSize = getOptimalImageSize();
+
+  // Заменяем существующий размер на оптимальный
+  if (imageUrl.match(/\/\d+fx\d+f/)) {
+    return imageUrl.replace(/\/\d+fx\d+f/, `/${optimalSize}`);
+  }
+
+  // Если размера нет, добавляем его перед параметрами или в конец
+  if (imageUrl.includes('?')) {
+    return imageUrl.replace(/\?/, `/${optimalSize}?`);
+  }
+
+  return `${imageUrl}/${optimalSize}`;
+}
+
 // Функция для получения дефолтного изображения предмета
 export function getDefaultItemImage(itemName?: string): string {
   // Дефолтные изображения предметов CS2

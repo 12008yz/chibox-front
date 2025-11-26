@@ -1,6 +1,7 @@
-import { memo, useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import Monetary from '../../Monetary';
 import { StaticCaseItemProps } from '../types';
+import { adaptImageSize } from '../../../utils/steamImageUtils';
 
 export const StaticCaseItem = memo(({
   item,
@@ -10,12 +11,17 @@ export const StaticCaseItem = memo(({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Адаптируем размер изображения под устройство
+  const adaptedImageUrl = useMemo(() => {
+    return adaptImageSize(item.image_url);
+  }, [item.image_url]);
+
   return (
     <div className={`bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative hover:scale-105 transition-transform duration-200 ${getRarityColor(item.rarity)} ${item.isExcluded ? 'opacity-50 grayscale' : ''}`}>
       <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
-        {item.image_url && !imageError ? (
+        {adaptedImageUrl && !imageError ? (
           <img
-            src={item.image_url}
+            src={adaptedImageUrl}
             alt={item.name}
             className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
