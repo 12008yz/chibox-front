@@ -34,6 +34,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [registerError, setRegisterError] = useState('');
 
   const [login, { isLoading: isLoginLoading }] = useLoginMutation();
@@ -52,6 +53,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
   useEffect(() => {
     setLoginError('');
     setRegisterError('');
+    setAgreeToTerms(false);
   }, [activeTab]);
 
   // Preload video when user starts typing
@@ -103,6 +105,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
 
     if (password.length < 6) {
       setRegisterError(t('auth.password_min_length'));
+      return;
+    }
+
+    if (!agreeToTerms) {
+      setRegisterError(t('auth.must_agree_terms'));
       return;
     }
 
@@ -276,6 +283,28 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                         </motion.div>
                       )}
 
+                      {/* Terms Notice for Login */}
+                      <div className="text-xs text-gray-400 text-center">
+                        {t('auth.by_logging_in')}{' '}
+                        <a
+                          href="/terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-400 hover:text-cyan-300 underline"
+                        >
+                          {t('auth.terms_of_service')}
+                        </a>
+                        {' '}{t('auth.and')}{' '}
+                        <a
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-400 hover:text-cyan-300 underline"
+                        >
+                          {t('auth.privacy_policy')}
+                        </a>
+                      </div>
+
                       <button
                         type="submit"
                         disabled={isLoginLoading}
@@ -383,6 +412,39 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
                           className="w-full bg-[#0f0d1a]/80 border border-cyan-400/20 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-cyan-400 focus:bg-[#0f0d1a] transition-all placeholder:text-gray-500"
                           placeholder={t('auth.password_placeholder')}
                         />
+                      </div>
+
+                      {/* Terms and Conditions Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="agreeToTerms"
+                          checked={agreeToTerms}
+                          onChange={(e) => setAgreeToTerms(e.target.checked)}
+                          className="mt-1 w-4 h-4 bg-[#0f0d1a]/80 border border-cyan-400/20 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        />
+                        <label htmlFor="agreeToTerms" className="text-sm text-gray-300 cursor-pointer">
+                          {t('auth.agree_to_terms')}{' '}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-400 hover:text-cyan-300 underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {t('auth.terms_of_service')}
+                          </a>
+                          {' '}{t('auth.and')}{' '}
+                          <a
+                            href="/privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-400 hover:text-cyan-300 underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {t('auth.privacy_policy')}
+                          </a>
+                        </label>
                       </div>
 
                       {registerError && (

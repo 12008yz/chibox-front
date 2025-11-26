@@ -110,7 +110,14 @@
     "registration_error": "Registration error. Please try again.",
     "try_suggestions": "Try:",
     "connecting_steam": "Connecting...",
-    "steam_login_button": "Sign in with Steam"
+    "steam_login_button": "Sign in with Steam",
+    "agree_to_terms": "I agree to the",
+    "terms_of_service": "Terms of Service",
+    "and": "and",
+    "privacy_policy": "Privacy Policy",
+    "must_agree_terms": "You must agree to the terms",
+    "by_logging_in": "By logging in, you agree to our",
+    "by_registering": "By registering, you agree to our"
   },
   "cases": {
     "title": "Cases",

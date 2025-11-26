@@ -112,7 +112,14 @@
     "registration_error": "Ошибка регистрации. Попробуйте снова.",
     "try_suggestions": "Попробуйте:",
     "connecting_steam": "Подключение...",
-    "steam_login_button": "Войти через Steam"
+    "steam_login_button": "Войти через Steam",
+    "agree_to_terms": "Я согласен с",
+    "terms_of_service": "Пользовательским соглашением",
+    "and": "и",
+    "privacy_policy": "Политикой конфиденциальности",
+    "must_agree_terms": "Вы должны согласиться с условиями",
+    "by_logging_in": "Входя в систему, вы соглашаетесь с нашими",
+    "by_registering": "Регистрируясь, вы соглашаетесь с нашими"
   },
   "cases": {
     "title": "Кейсы",
@@ -1134,3 +1141,4 @@
     "licensed": "Лицензированная платформа"
   }
 }
+
