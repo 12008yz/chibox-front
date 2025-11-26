@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import InventoryTabs from './InventoryTabs';
 import InventoryContent from './InventoryContent';
 import { useInventory } from '../../hooks/useInventory';
+import { Gamepad2, Upload, Coins } from 'lucide-react';
 
 interface InventoryProps {
   inventoryData: any[];
@@ -92,11 +93,31 @@ const Inventory: React.FC<InventoryProps> = ({
 
       {/* Tab Description */}
       <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-black/40 rounded-lg border border-white/10">
-        <p className="text-xs sm:text-sm text-gray-300">
-          {activeInventoryTab === 'active' && t('profile.inventory_descriptions.active')}
-          {activeInventoryTab === 'opened' && t('profile.inventory_descriptions.opened')}
-          {activeInventoryTab === 'withdrawn' && t('profile.inventory_descriptions.withdrawn')}
-          {activeInventoryTab === 'sold' && t('profile.inventory_descriptions.sold')}
+        <p className="text-xs sm:text-sm text-gray-300 flex items-center gap-2">
+          {activeInventoryTab === 'active' && (
+            <>
+              <Gamepad2 className="w-4 h-4 flex-shrink-0" />
+              <span>{t('profile.inventory_descriptions.active')}</span>
+            </>
+          )}
+          {activeInventoryTab === 'opened' && (
+            <>
+              <Gamepad2 className="w-4 h-4 flex-shrink-0" />
+              <span>{t('profile.inventory_descriptions.opened')}</span>
+            </>
+          )}
+          {activeInventoryTab === 'withdrawn' && (
+            <>
+              <Upload className="w-4 h-4 flex-shrink-0" />
+              <span>{t('profile.inventory_descriptions.withdrawn')}</span>
+            </>
+          )}
+          {activeInventoryTab === 'sold' && (
+            <>
+              <Coins className="w-4 h-4 flex-shrink-0" />
+              <span>{t('profile.inventory_descriptions.sold')}</span>
+            </>
+          )}
         </p>
       </div>
 

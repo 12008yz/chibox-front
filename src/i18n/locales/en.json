@@ -174,9 +174,9 @@
       "level_drop_bonus": "Leveling up increases drop bonus: +0.02% per level"
     },
     "inventory_descriptions": {
-      "active": "🎮 Your current items and unopened cases",
-      "withdrawn": "📤 Items being withdrawn: pending shipment and already sent to Steam",
-      "sold": "💰 Items sold for currency or exchanged for subscription"
+      "active": "Your current items and unopened cases",
+      "withdrawn": "Items being withdrawn: pending shipment and already sent to Steam",
+      "sold": "Items sold for currency or exchanged for subscription"
     },
     "loading_inventory": "Loading inventory...",
     "case_not_found": "Case not found in inventory",
@@ -731,7 +731,7 @@
     "completed": "Completed"
   },
   "roulette": {
-    "wheel_of_fortune": "🎰 Wheel of Fortune",
+    "wheel_of_fortune": "Wheel of Fortune",
     "spin_and_win": "Spin the wheel and win subscription days!",
     "games_per_day": "30 games per day • Recharge every 48 minutes",
     "next_game_in": "Next game in:",
@@ -782,9 +782,9 @@
     "no_status": "NONE",
     "exchange_rate": "RATE",
     "tier": "Tier {{tier}}",
-    "sell_mode": "💰 SELL",
-    "exchange_mode": "⭐ EXCHANGE",
-    "search_placeholder": "🔍 Search items...",
+    "sell_mode": "SELL",
+    "exchange_mode": "EXCHANGE",
+    "search_placeholder": "Search items...",
     "all_rarities": "All Rarities",
     "show_info": "▶ Show pricing information",
     "hide_info": "▼ Hide information",
@@ -965,7 +965,7 @@
     "bonus_available": "Bonus available"
   },
   "live_drops": {
-    "title": "🔥 Recent Drops",
+    "title": "Recent Drops",
     "player_won": "{{player}} won",
     "just_now": "just now",
     "minutes_ago": "{{minutes}} min ago",

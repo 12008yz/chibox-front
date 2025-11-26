@@ -15,6 +15,7 @@ import { getItemImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
+import { Coins, Star, Search } from 'lucide-react';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-32" }) => (
@@ -460,6 +461,7 @@ const ExchangePage: React.FC = () => {
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
+                  <Coins className="inline-block w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
                   {t('exchange.sell_mode')}
                 </button>
                 <button
@@ -470,6 +472,7 @@ const ExchangePage: React.FC = () => {
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
+                  <Star className="inline-block w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
                   {t('exchange.exchange_mode')}
                 </button>
               </div>
@@ -478,13 +481,14 @@ const ExchangePage: React.FC = () => {
 
           {/* Поиск и фильтры */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 relative">
+              <Search className="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('exchange.search_placeholder')}
-                className="w-full bg-black/70 border border-gray-600 rounded-lg px-3 py-2 md:px-4 md:py-3 text-sm md:text-base text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
+                className="w-full bg-black/70 border border-gray-600 rounded-lg pl-10 md:pl-12 pr-3 py-2 md:py-3 text-sm md:text-base text-white placeholder-gray-400 focus:border-purple-500 focus:outline-none transition-colors"
               />
             </div>
             <div>

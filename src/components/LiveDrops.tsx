@@ -3,6 +3,7 @@ import { useSocket } from '../hooks/useSocket';
 import { LiveDropData } from '../types/socket';
 import LiveDropItem from './LiveDropItem';
 import { useTranslation } from 'react-i18next';
+import { Flame } from 'lucide-react';
 
 const LiveDrops: React.FC = () => {
   const { t } = useTranslation();
@@ -75,7 +76,10 @@ const LiveDrops: React.FC = () => {
       <div className="w-full bg-black/40 py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Flame className="w-5 h-5 text-orange-500" />
+              {t('live_drops.title')}
+            </h2>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-gray-500 rounded-full pulse-dot"></div>
               <span className="text-sm text-gray-400">{t('live_drops.loading_drops')}</span>
@@ -104,7 +108,10 @@ const LiveDrops: React.FC = () => {
     <div className="w-full bg-black/40 py-6">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">{t('live_drops.title')}</h2>
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Flame className="w-5 h-5 text-orange-500" />
+            {t('live_drops.title')}
+          </h2>
           <div className="flex items-center space-x-2">
             <div
               className={`w-2 h-2 rounded-full ${

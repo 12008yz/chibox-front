@@ -12,6 +12,7 @@ import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
+import { Search } from 'lucide-react';
 
 // Создаем SVG заглушку для изображений
 const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-full h-20" }) => (
@@ -1526,13 +1527,16 @@ const UpgradePage: React.FC = () => {
 
           {/* Поиск и кнопки */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t('upgrade.search_placeholder')}
-              className="bg-black/60 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
-            />
+            <div className="relative">
+              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t('upgrade.search_placeholder')}
+                className="w-full bg-black/60 border border-gray-600 rounded-lg pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
+              />
+            </div>
 
             <button
               onClick={handleClearSelection}
