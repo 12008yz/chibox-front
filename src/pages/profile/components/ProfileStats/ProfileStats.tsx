@@ -7,6 +7,7 @@ import AchievementsCard from '../Achievements/AchievementsCard';
 interface ProfileStatsProps {
   user: any;
   availableInventoryCount: number;
+  openedCasesCount: number;
   achievementsProgressData: any;
   allAchievementsData: any;
   achievementsLoading: boolean;
@@ -15,6 +16,7 @@ interface ProfileStatsProps {
 const ProfileStats: React.FC<ProfileStatsProps> = ({
   user,
   availableInventoryCount,
+  openedCasesCount,
   achievementsProgressData,
   allAchievementsData,
   achievementsLoading
@@ -43,7 +45,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
           <div className="flex-1 min-w-0">
             <p className="text-gray-400 text-xs sm:text-sm truncate">{t('profile.cases_opened')}</p>
             <p className="text-lg sm:text-xl font-bold text-white">
-              {user.total_cases_opened || user.totalCasesOpened || 0}
+              {openedCasesCount}
             </p>
           </div>
         </div>

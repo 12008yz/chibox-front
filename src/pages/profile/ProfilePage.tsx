@@ -248,6 +248,11 @@ const ProfilePage: React.FC = () => {
     (item.item_type === 'item' || item.item_type === 'case')
   ).length;
 
+  // Подсчитываем количество открытых кейсов (все предметы из кейсов)
+  const openedCasesCount = rawInventory.filter((item: any) =>
+    item.item_type === 'item' && item.source === 'case'
+  ).length;
+
   return (
     <div className="min-h-screen text-white relative">
       {/* Фиксированный фон на весь экран */}
@@ -276,6 +281,7 @@ const ProfilePage: React.FC = () => {
         <ProfileStats
           user={user}
           availableInventoryCount={availableInventoryCount}
+          openedCasesCount={openedCasesCount}
           achievementsProgressData={achievementsProgressData}
           allAchievementsData={allAchievementsData}
           achievementsLoading={achievementsLoading}

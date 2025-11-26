@@ -17,6 +17,7 @@ interface StatusDashboardProps {
   name: string;
   description: string;
   user?: any;
+  openedCasesCount?: number;
   onPlayTicTacToe?: () => void;
   onPlaySafeCracker?: () => void;
   onOpenSlots?: () => void;
@@ -38,6 +39,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   name,
   description,
   user,
+  openedCasesCount = 0,
   onPlayTicTacToe,
   onPlaySafeCracker,
   // onOpenSlots
@@ -114,7 +116,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const userStats = [
     {
       label: t('profile.cases_opened'),
-      value: user.total_cases_opened || user.totalCasesOpened || 0,
+      value: openedCasesCount,
       icon: <FaGift className="text-green-400" />,
       color: 'text-green-400'
     },

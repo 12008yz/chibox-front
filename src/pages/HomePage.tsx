@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
-import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
+import { useGetCurrentTicTacToeGameQuery, useGetUserInventoryQuery } from '../features/user/userApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import IntroVideo from '../components/IntroVideo';
 import LiveDrops from '../components/LiveDrops';
@@ -44,6 +44,26 @@ const HomePage: React.FC = () => {
     skip: !userData?.id, // Пропускаем если пользователь не авторизован
     refetchOnMountOrArgChange: true,
   });
+
+  // Получаем инвентарь пользователя для подсчета открытых кейсов
+  const { data: inventoryData } = useGetUserInventoryQuery({
+    page: 1,
+    limit: 1000, // Увеличиваем лимит для получения всего инвентаря
+  }, {
+    skip: !userData?.id, // Пропускаем если пользователь не авторизован
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Подсчитываем количество открытых кейсов (все предметы из кейсов)
+  const rawInventory = inventoryData?.success ?
+    [
+      ...(inventoryData.data.items || []),
+      ...(inventoryData.data.cases || [])
+    ] : [];
+
+  const openedCasesCount = rawInventory.filter((item: any) =>
+    item.item_type === 'item' && item.source === 'case'
+  ).length;
 
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showIntroVideo, setShowIntroVideo] = useState(false);
@@ -475,6 +495,7 @@ const HomePage: React.FC = () => {
                 name={t('homepage.chibox_statuses')}
                 description={t('homepage.chibox_statuses_description')}
                 user={userData}
+                openedCasesCount={openedCasesCount}
                 onPlayTicTacToe={handlePlayTicTacToe}
                 onPlaySafeCracker={handlePlaySafeCracker}
               />

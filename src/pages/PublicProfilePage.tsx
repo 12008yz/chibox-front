@@ -407,7 +407,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
               <div className="min-w-0 flex-1">
                 <p className="text-gray-400 text-xs sm:text-sm truncate">{t('public_profile.cases_opened')}</p>
                 <p className="text-lg sm:text-xl font-bold text-white">
-                  {user.totalCasesOpened || user.total_cases_opened || 0}
+                  {user.totalCasesOpened || 0}
                 </p>
               </div>
             </div>
