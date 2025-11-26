@@ -11,7 +11,7 @@ import {
 import Monetary from '../components/Monetary';
 import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
-import { getItemImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { BACKGROUNDS } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
@@ -66,7 +66,7 @@ const ItemCard: React.FC<{
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
             <img
-              src={getItemImageUrl(item.image_url, item.name)}
+              src={adaptImageSize(getItemImageUrl(item.image_url, item.name)) || getItemImageUrl(item.image_url, item.name)}
               alt={item.name}
               className="absolute inset-0 w-full h-full object-contain z-10 item-image"
               onError={() => setImageError(true)}
