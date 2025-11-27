@@ -2,7 +2,7 @@ import { useAppDispatch } from '../store/hooks';
 import { loginSuccess, logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
 
-// Хук для обработки результатов авторизации
+// Хук  для обработки результатов авторизации
 export const useAuthHandlers = () => {
   const dispatch = useAppDispatch();
 
