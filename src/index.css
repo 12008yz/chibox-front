@@ -257,12 +257,10 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-/* Стандартизация рендеринга анимаций */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
+/* Стандартизация рендеринга анимаций - ВСЕГДА АКТИВНО */
+* {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Отключение адаптивной яркости на мобильных */
@@ -326,25 +324,14 @@ html, body {
   }
 }
 
-/* Отключить анимации при предпочтении пользователя */
+/* ПРИНУДИТЕЛЬНОЕ ВКЛЮЧЕНИЕ АНИМАЦИЙ - ИГНОРИРУЕМ СИСТЕМНЫЕ НАСТРОЙКИ */
+/* Все анимации работают независимо от prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
+  /* Больше НЕ отключаем анимации - все работает как обычно */
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  /* ИСКЛЮЧЕНИЯ для важных игровых анимаций */
-  .animate-spin-slow,
-  .animate-spin-fast,
-  .logo-star,
-  .upgrade-wheel-animation,
-  .upgrade-wheel-animation * {
-    animation-duration: revert !important;
-    animation-iteration-count: revert !important;
-    animation: revert !important;
+    /* Убрали отключение анимаций */
   }
 }
 
@@ -1264,11 +1251,11 @@ img.live-drop-item {
   }
 }
 
+/* Анимации для LiveDrop работают всегда */
 @media (prefers-reduced-motion: reduce) {
   .live-drop-container img,
   .live-drop-image-container img {
-    animation: none !important;
-    transition: none !important;
+    /* Оставляем анимации включенными */
   }
 }
 
