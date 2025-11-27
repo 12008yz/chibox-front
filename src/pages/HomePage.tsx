@@ -456,7 +456,7 @@ const HomePage: React.FC = () => {
                             description={t('homepage.premium_cases_description')}
                             cases={paidCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
-                            fixedPrices={true}
+                            fixedPrices={false}
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             isAuthenticated={!!userData?.id}
