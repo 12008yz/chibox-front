@@ -200,7 +200,7 @@ const LeaderboardPage: React.FC = () => {
           ) : leaderboardData && leaderboardData.leaderboard.length > 0 ? (
             <>
               {/* Топ-3 игрока */}
-              <div className="flex gap-4 sm:gap-8 md:gap-14 my-8 sm:my-12 md:my-16">
+              <div className="flex gap-2 sm:gap-4 md:gap-8 lg:gap-14 my-8 sm:my-12 md:my-16">
                 {leaderboardData.leaderboard[1] && (
                   <TopPlayer
                     key={leaderboardData.leaderboard[1].user_id}
