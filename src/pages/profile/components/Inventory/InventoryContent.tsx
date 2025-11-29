@@ -194,6 +194,8 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
             key={inventoryItem.id}
             className={`bg-black/30 rounded-xl p-4 border border-gray-600/30 hover:border-gray-400/50 transition-colors duration-200 relative group ${
               activeTab !== 'active' ? 'opacity-75' : ''
+            } ${
+              activeTab === 'active' && isUserItem(inventoryItem) && inventoryItem.status === 'inventory' ? 'pb-16 lg:pb-4' : ''
             }`}
           >
             {/* Status Badge */}
@@ -243,7 +245,8 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                 <h5 className="text-white text-xs font-medium mb-1 truncate" title={inventoryItem.item.name}>
                   {inventoryItem.item.name}
                 </h5>
-                <p className="text-green-400 text-sm font-bold mb-0">
+                {/* Цена предмета */}
+                <p className="text-green-400 text-sm font-bold mb-2">
                   <Monetary value={Number(inventoryItem.item.price)} showFraction={true} />
                 </p>
 
