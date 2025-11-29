@@ -1990,3 +1990,28 @@ body::before,
     color-scheme: dark !important;
   }
 }
+
+/* Предотвращение появления иконок браузера при наведении на изображения */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* Дополнительно для изображений кейсов и предметов */
+.item-image,
+img[alt*="кейс"],
+img[alt*="case"],
+img[alt*="Case"] {
+  -webkit-user-drag: none !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
