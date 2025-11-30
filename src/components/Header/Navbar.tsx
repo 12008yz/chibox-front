@@ -13,8 +13,6 @@ import RightContent from "./Navbar/RightContent";
 interface NavbarProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
-  openSidebar: boolean;
-  setOpenSidebar: (open: boolean) => void;
   user?: any;
   authModalOpen?: boolean;
   setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;

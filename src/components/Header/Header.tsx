@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
 import CaseOpenedNotification from "./CaseOpenedNotification";
 
 interface BasicItem {
@@ -49,7 +48,6 @@ const Header: React.FC<HeaderProps> = ({
   setAuthModalTab
 }) => {
   const [openNotifications, setOpenNotifications] = useState<boolean>(false);
-  const [openSidebar, setOpenSidebar] = useState<boolean>(false);
   const [caseNotifications, setCaseNotifications] = useState<CaseOpeningItem[]>([]);
 
   // Обработка уведомлений
@@ -86,8 +84,6 @@ const Header: React.FC<HeaderProps> = ({
       <Navbar
         openNotifications={openNotifications}
         setOpenNotifications={setOpenNotifications}
-        openSidebar={openSidebar}
-        setOpenSidebar={setOpenSidebar}
         user={user}
         authModalOpen={authModalOpen}
         setAuthModalOpen={setAuthModalOpen}
@@ -95,14 +91,6 @@ const Header: React.FC<HeaderProps> = ({
         setAuthModalTab={setAuthModalTab}
         onlineUsers={onlineUsers}
       />
-
-      {/* Sidebar */}
-      {openSidebar && (
-        <Sidebar
-          closeSidebar={() => setOpenSidebar(false)}
-          user={user}
-        />
-      )}
 
       {/* Case Notifications */}
       {caseNotifications.map((caseOpening, index) => (

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useGetSafeCrackerStatusQuery } from "../../features/user/userApi";
 import SafeCrackerGame from "../SafeCrackerGame";
-import { FaLock } from "react-icons/fa";
 import { useAppSelector } from "../../store/hooks";
 import { hasActiveSubscription } from "../../utils/subscriptionUtils";
 
@@ -25,7 +24,7 @@ const SafeCrackerButton = () => {
         onClick={() => setShowSafeCrackerGame(true)}
         disabled={!canPlay}
         className={`
-          relative gaming-button flex items-center justify-center w-10 h-10 xl:w-12 xl:h-12 rounded-lg font-medium transition-all duration-300
+          relative gaming-button flex items-center justify-center w-12 h-12 md:w-14 md:h-14 xl:w-16 xl:h-16 rounded-lg font-medium transition-all duration-300 p-0.5
           ${canPlay
             ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg hover:shadow-yellow-500/50'
             : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
@@ -43,7 +42,11 @@ const SafeCrackerButton = () => {
             : 'Нет доступных попыток'
         }
       >
-        <FaLock className={`text-base xl:text-lg ${canPlay ? 'animate-pulse' : ''}`} />
+        <img
+          src="/images/bonus-safe.png"
+          alt="Safe"
+          className={`w-full h-full object-contain ${canPlay ? 'animate-pulse' : ''}`}
+        />
       </button>
 
       <SafeCrackerGame

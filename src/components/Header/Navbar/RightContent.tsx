@@ -91,11 +91,6 @@ const RightContent: React.FC<RightContentProps> = ({
 
   return (
     <div className="flex items-center gap-1 md:gap-2 xl:gap-3 2xl:gap-4 relative overflow-visible">
-      {/* Бонус Safe Cracker - скрываем на средних экранах */}
-      <div className="hidden 2xl:block">
-        <SafeCrackerButton />
-      </div>
-
       {/* Баланс */}
       <div id="onboarding-balance" className="gaming-balance-container">
         <div className="flex items-center space-x-1 lg:space-x-2">
@@ -152,6 +147,11 @@ const RightContent: React.FC<RightContentProps> = ({
       {/* Переключатель языков */}
       <div className={isMobileMenu ? "block" : "hidden md:block"}>
         <LanguageSwitcher />
+      </div>
+
+      {/* Бонус Safe Cracker - показываем на всех размерах экрана */}
+      <div className="block">
+        <SafeCrackerButton />
       </div>
 
       {/* Профиль пользователя */}
