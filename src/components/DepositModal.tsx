@@ -137,7 +137,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       }).unwrap();
 
       if (result.success && result.data?.paymentUrl) {
-        window.open(result.data.paymentUrl, '_blank');
+        window.location.href = result.data.paymentUrl;
         toast.success('Переход к оплате...');
         onClose();
       }
@@ -171,7 +171,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
       if (result.success) {
         if (result.data?.paymentUrl) {
-          window.open(result.data.paymentUrl, '_blank');
+          window.location.href = result.data.paymentUrl;
           toast.success('Переход к оплате...');
         } else {
           toast.success('Подписка успешно активирована!');

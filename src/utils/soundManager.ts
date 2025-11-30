@@ -64,23 +64,25 @@ class SoundManager {
         });
       }
 
-      // Пробуем воспроизвести тихий звук для разблокировки
-      this.sounds.forEach((audio) => {
-        const originalVolume = audio.volume;
-        audio.volume = 0.01;
-        const playPromise = audio.play();
+      // Воспроизводим только ОДИН тихий звук для разблокировки (вместо всех)
+      // Это предотвращает одновременное воспроизведение всех звуков
+      const firstSound = this.sounds.values().next().value;
+      if (firstSound) {
+        const originalVolume = firstSound.volume;
+        firstSound.volume = 0;
+        const playPromise = firstSound.play();
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              audio.pause();
-              audio.currentTime = 0;
-              audio.volume = originalVolume;
+              firstSound.pause();
+              firstSound.currentTime = 0;
+              firstSound.volume = originalVolume;
             })
             .catch(() => {
               // Игнорируем ошибки при разблокировке
             });
         }
-      });
+      }
 
       this.unlocked = true;
       console.log('🔊 SoundManager: Звуки разблокированы через взаимодействие пользователя');

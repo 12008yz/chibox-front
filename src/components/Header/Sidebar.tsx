@@ -1,17 +1,20 @@
 import { GiUpgrade } from "react-icons/gi";
 import { MdOutlineSell } from "react-icons/md";
 import { SlPlane } from "react-icons/sl";
-import { FaHome, FaExchangeAlt } from "react-icons/fa";
+import { FaHome, FaExchangeAlt, FaLock } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { TbCat } from "react-icons/tb";
 import { BiWallet } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { performFullLogout } from "../../utils/authUtils";
 import Monetary from "../Monetary";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useGetSafeCrackerStatusQuery } from "../../features/user/userApi";
+import { hasActiveSubscription } from "../../utils/subscriptionUtils";
+import SafeCrackerGame from "../SafeCrackerGame";
 
 interface SidebarProps {
     closeSidebar: () => void;
@@ -24,6 +27,15 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
     const dispatch = useAppDispatch();
     const location = useLocation();
     const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+    const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
+
+    const currentUser = useAppSelector(state => state.auth.user);
+    const hasSubscription = hasActiveSubscription(currentUser);
+    const { data: safeCrackerStatus } = useGetSafeCrackerStatusQuery(undefined, {
+        pollingInterval: 30000,
+    });
+
+    const canPlaySafe = safeCrackerStatus?.can_play ?? false;
 
     // Закрываем sidebar при изменении маршрута
     useEffect(() => {
@@ -142,6 +154,52 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                         </div>
                     )}
 
+                    {/* Safe Cracker Game - только для мобильной и планшетной версии */}
+                    {user && (
+                        <div className="p-4 border-b border-gray-700 lg:hidden">
+                            <button
+                                onClick={() => setShowSafeCrackerGame(true)}
+                                disabled={!canPlaySafe}
+                                className={`
+                                    w-full relative flex items-center justify-between p-4 rounded-lg font-medium transition-all duration-300
+                                    ${canPlaySafe
+                                        ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg hover:shadow-yellow-500/50'
+                                        : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
+                                    }
+                                `}
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-10 h-10 flex items-center justify-center rounded-lg bg-black/20 ${canPlaySafe ? 'animate-pulse' : ''}`}>
+                                        <FaLock className="text-xl" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-semibold text-sm">Safe Cracker</p>
+                                        <p className="text-xs opacity-90">
+                                            {safeCrackerStatus?.has_won
+                                                ? 'Выиграли сегодня!'
+                                                : (safeCrackerStatus?.free_attempts_remaining || 0) > 0
+                                                ? `${safeCrackerStatus?.free_attempts_remaining} бесплатных попыток`
+                                                : (safeCrackerStatus?.remaining_attempts || 0) > 0
+                                                ? `${safeCrackerStatus?.remaining_attempts} попыток`
+                                                : !hasSubscription
+                                                ? 'Требуется VIP статус'
+                                                : 'Нет попыток'
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                                {canPlaySafe && (
+                                    <div className="flex items-center space-x-1">
+                                        <span className="text-xs font-bold">Играть</span>
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
                     {/* Навигационные ссылки */}
                     <div className="flex-1 p-4">
                         <div className="space-y-2">
@@ -199,8 +257,15 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, user }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Safe Cracker Game Modal */}
+            <SafeCrackerGame
+                isOpen={showSafeCrackerGame}
+                onClose={() => setShowSafeCrackerGame(false)}
+            />
         </div>
     );
 };
 
 export default Sidebar;
+
