@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useUploadAvatarMutation, useDeleteAvatarMutation } from '../../../../features/user/userApi';
 import { toast } from 'react-hot-toast';
+import { compressAvatar, validateImageFile } from '../../utils/imageCompression';
 
 interface AvatarUploadModalProps {
   isOpen: boolean;
@@ -43,81 +44,24 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Функция для сжатия изображения
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          // Максимальные размеры
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now(),
-                });
-                resolve(compressedFile);
-              } else {
-                reject(new Error('Compression failed'));
-              }
-            },
-            'image/jpeg',
-            0.85
-          );
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
-
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Проверка типа файла
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error(t('profile.avatar_invalid_format') || 'Недопустимый формат файла');
+    // Валидация файла
+    const validation = validateImageFile(file, 10);
+    if (!validation.valid) {
+      toast.error(validation.error || t('profile.avatar_invalid_format') || 'Недопустимый формат файла');
       return;
     }
 
     try {
-      // Сжимаем изображение если оно больше 1MB
-      let processedFile = file;
-      if (file.size > 1 * 1024 * 1024) {
-        processedFile = await compressImage(file);
-      }
+      // Всегда сжимаем изображение для оптимизации
+      toast.loading(t('profile.compressing_image') || 'Сжатие изображения...');
+      const processedFile = await compressAvatar(file);
+      toast.dismiss();
 
-      // Проверка размера после сжатия (5MB)
+      // Проверка размера после сжатия
       if (processedFile.size > 5 * 1024 * 1024) {
         toast.error(t('profile.avatar_too_large') || 'Файл слишком большой (максимум 5MB)');
         return;
@@ -131,8 +75,11 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(processedFile);
+
+      toast.success(t('profile.image_compressed') || `Изображение сжато: ${(processedFile.size / 1024).toFixed(0)} KB`);
     } catch (error) {
-      toast.error('Ошибка при обработке изображения');
+      toast.dismiss();
+      toast.error(t('profile.image_processing_error') || 'Ошибка при обработке изображения');
       console.error('Image processing error:', error);
     }
   };
@@ -292,6 +239,7 @@ const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
           <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
             <p>{t('profile.avatar_format_info') || 'Поддерживаемые форматы: JPEG, PNG, GIF, WEBP'}</p>
             <p>{t('profile.avatar_size_info') || 'Максимальный размер: 5 MB'}</p>
+            <p className="text-green-500/80">✨ {t('profile.avatar_auto_compress') || 'Изображения автоматически сжимаются до 800x800px'}</p>
           </div>
         </div>
       </div>

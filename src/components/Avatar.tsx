@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getBackendImageUrl } from "../utils/steamImageUtils";
+import { getPreferredAvatar, debugAvatarUrls } from "../utils/avatarUtils";
 
 interface AvatarProps {
     image?: string;
@@ -27,47 +27,26 @@ const Avatar: React.FC<AvatarProps> = ({
     const [loaded, setLoaded] = useState<boolean>(false);
     const [imageError, setImageError] = useState<boolean>(false);
 
-    // Генерируем fallback аватар на основе ID
-    const generateFallbackAvatar = (userId: string) => {
-        const colors = [
-            '#6366f1', '#8b5cf6', '#a855f7', '#c084fc', '#ec4899',
-            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-            '#22c55e', '#10b981', '#06b6d4', '#0ea5e9', '#3b82f6'
-        ];
-
-        const colorIndex = userId.length % colors.length;
-        const color = colors[colorIndex];
-        const letter = userId.charAt(0).toUpperCase();
-
-        return `https://ui-avatars.com/api/?name=${letter}&background=${color.replace('#', '')}&color=ffffff&size=128&font-size=0.6`;
-    };
-
     useEffect(() => {
         setLoaded(false);
         setImageError(false);
 
-        // Определяем источник изображения прямо здесь
-        const getImageSource = () => {
-            // Приоритет: пользовательское изображение > Steam аватар > fallback
-            if (image) {
-                // Если это относительный путь, преобразуем в полный URL
-                if (image.startsWith('/')) {
-                    return getBackendImageUrl(image) || image;
-                }
-                return image;
-            }
-            if (steamAvatar) {
-                return steamAvatar;
-            }
-            return generateFallbackAvatar(id);
-        };
+        // Debug информация при первой загрузке
+        if (process.env.NODE_ENV === 'development') {
+            debugAvatarUrls(image, steamAvatar, id);
+        }
 
-        // Принудительно проверяем загрузку изображения
-        const imgSrc = getImageSource();
+        // Получаем приоритетный источник аватара
+        const imgSrc = getPreferredAvatar(image, steamAvatar, id);
+
         if (imgSrc) {
             const img = new Image();
-            img.onload = () => setLoaded(true);
+            img.onload = () => {
+                console.log('✅ Avatar loaded successfully:', imgSrc);
+                setLoaded(true);
+            };
             img.onerror = () => {
+                console.error('❌ Failed to load avatar:', imgSrc);
                 setImageError(true);
                 setLoaded(true);
             };
@@ -133,18 +112,12 @@ const Avatar: React.FC<AvatarProps> = ({
     );
 
     const getImageSrc = () => {
-        // Приоритет: загруженное изображение > Steam аватар > fallback
-        if (image && !imageError) {
-            // Если это относительный путь, преобразуем в полный URL
-            if (image.startsWith('/')) {
-                return getBackendImageUrl(image) || image;
-            }
-            return image;
-        }
-        if (steamAvatar && !imageError) {
-            return steamAvatar;
-        }
-        return generateFallbackAvatar(id);
+        // Используем утилиту для получения приоритетного аватара
+        return getPreferredAvatar(
+            imageError ? null : image,
+            imageError ? null : steamAvatar,
+            id
+        );
     };
 
     const handleImageError = () => {

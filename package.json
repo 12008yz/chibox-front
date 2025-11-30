@@ -15,6 +15,7 @@
     "@types/matter-js": "^0.20.2",
     "@types/react-lazy-load-image-component": "^1.6.4",
     "@types/redux-persist": "^4.0.0",
+    "browser-image-compression": "^2.0.2",
     "caniuse-lite": "^1.0.30001753",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
