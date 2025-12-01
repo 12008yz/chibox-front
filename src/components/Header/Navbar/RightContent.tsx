@@ -90,7 +90,7 @@ const RightContent: React.FC<RightContentProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-1 md:gap-2 xl:gap-3 2xl:gap-4 relative overflow-visible">
+    <div className="flex items-center gap-1 md:gap-2 xl:gap-1.5 2xl:gap-2 relative overflow-visible">
       {/* Баланс */}
       <div id="onboarding-balance" className="gaming-balance-container">
         <div className="flex items-center space-x-1 lg:space-x-2">

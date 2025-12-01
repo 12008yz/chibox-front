@@ -239,11 +239,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999999]" onClick={() => {
+    <div className="fixed inset-0 bg-black/90 flex items-start justify-center z-[9999999] overflow-y-auto py-4 md:py-8" onClick={() => {
       onClose();
       resetForm();
     }}>
-      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-6 max-w-md w-full mx-4 my-auto border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-white">{t('profile.settings.title')}</h3>
           <button
