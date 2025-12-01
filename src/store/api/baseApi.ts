@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
 
 // Базовый URL для API (подстраивается под ваш backend)
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
 
 // Базовый query с таймаутом
 const baseQuery = fetchBaseQuery({

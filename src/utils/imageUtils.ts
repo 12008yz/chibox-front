@@ -1,5 +1,5 @@
 // Утилита для получения полного URL изображения
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
 // Убираем /api из конца, чтобы получить базовый URL сервера
 const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 

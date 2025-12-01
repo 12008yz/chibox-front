@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 const SteamLoadingPage: React.FC = () => {
   useEffect(() => {
     // Редирект на Steam auth endpoint
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
     const steamUrl = `${serverUrl}/v1/auth/steam`;
 
     console.log('SteamLoadingPage: Redirecting to Steam in 100ms...');

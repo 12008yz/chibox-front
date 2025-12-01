@@ -2,7 +2,7 @@
  * Утилиты для работы с аватарами пользователей
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
 const BACKEND_URL = API_URL.replace('/api', '');
 
 /**

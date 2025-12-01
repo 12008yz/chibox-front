@@ -159,7 +159,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
 
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru';
     console.log('Попытка привязки Steam:', {
       serverUrl,
       token: token.substring(0, 20) + '...',
