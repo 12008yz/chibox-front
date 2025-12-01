@@ -937,6 +937,34 @@ export const userApi = baseApi.injectEndpoints({
     //     }
     //   },
     // }),
+
+    // Получение списка доступных аватаров
+    getAvatars: builder.query<ApiResponse<{ avatars: Array<{ filename: string; url: string; fullUrl: string }> }>, void>({
+      query: () => 'v1/avatars',
+    }),
+
+    // Обновление аватара пользователя
+    updateAvatar: builder.mutation<ApiResponse<{ avatar_url: string; fullUrl: string }>, { avatar_url: string }>({
+      query: (body) => ({
+        url: 'v1/avatar',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['User'],
+      // Обновляем данные пользователя в authSlice после успешного обновления
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success && data.data?.avatar_url) {
+            // Импортируем updateUser action из authSlice
+            const { updateUser } = await import('../auth/authSlice');
+            dispatch(updateUser({ avatar_url: data.data.avatar_url }));
+          }
+        } catch (error) {
+          console.error('Error updating avatar in authSlice:', error);
+        }
+      },
+    }),
   }),
 });
 
@@ -1000,4 +1028,8 @@ export const {
   // DISABLED - Аватар хуки (only Steam avatars allowed)
   // useUploadAvatarMutation,
   // useDeleteAvatarMutation,
+
+  // Аватар хуки (выбор из предустановленных)
+  useGetAvatarsQuery,
+  useUpdateAvatarMutation,
 } = userApi;

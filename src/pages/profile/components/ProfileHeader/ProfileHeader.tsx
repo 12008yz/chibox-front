@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Avatar from '../../../../components/Avatar';
 import Tooltip from '../../../../components/Tooltip';
 import { calculateLevelProgress } from '../../utils/profileUtils';
 import Monetary from '../../../../components/Monetary';
+import AvatarSelectorModal from '../Modals/AvatarSelectorModal';
 // import AvatarUploadModal from '../Modals/AvatarUploadModal'; // DISABLED - only Steam avatars
 // import { getAvatarUrl } from '../../../../utils/avatarUtils'; // DISABLED - only Steam avatars
 
@@ -15,7 +16,7 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) => {
   const { t } = useTranslation();
   const { xpInCurrentLevel, xpToNextLevel, progressPercentage } = calculateLevelProgress(user);
-  // const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false); // DISABLED - only Steam avatars
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
   return (
     <div className="relative bg-black/50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/10 overflow-hidden shadow-xl">
@@ -44,20 +45,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         {/* User Avatar and Basic Info */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-4 sm:gap-6 lg:flex-shrink-0">
           <div className="relative flex-shrink-0">
-            <div
-              className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 max-lg:bg-none p-0.5 max-lg:p-0 overflow-hidden"
-            >
-              <div className="w-full h-full rounded-2xl overflow-hidden flex items-center justify-center">
-                <Avatar
-                  image={user.avatar_url}
-                  steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
-                  id={user.id}
-                  size="large"
-                  level={user.level}
-                  showLevel={false}
-                />
+            <Tooltip content={t('profile.click_to_change_avatar') || 'Нажмите, чтобы изменить аватар'}>
+              <div
+                onClick={() => setIsAvatarModalOpen(true)}
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 aspect-square rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 max-lg:bg-none p-0.5 max-lg:p-0 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+              >
+                <div className="w-full h-full rounded-2xl overflow-hidden flex items-center justify-center">
+                  <Avatar
+                    image={user.avatar_url}
+                    steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
+                    id={user.id}
+                    size="large"
+                    level={user.level}
+                    showLevel={false}
+                  />
+                </div>
               </div>
-            </div>
+            </Tooltip>
             {/* Level Badge */}
             <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full shadow-lg">
               LVL {user.level}
@@ -162,14 +166,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         </div>
       </div>
 
-      {/* Avatar Upload Modal - DISABLED (only Steam avatars allowed) */}
-      {/* <AvatarUploadModal
+      {/* Avatar Selector Modal */}
+      <AvatarSelectorModal
         isOpen={isAvatarModalOpen}
         onClose={() => setIsAvatarModalOpen(false)}
-        currentAvatar={user.avatar_url ? (getAvatarUrl(user.avatar_url) || undefined) : undefined}
-        steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
-        userId={user.id}
-      /> */}
+        currentAvatarUrl={user.avatar_url}
+      />
     </div>
   );
 };
