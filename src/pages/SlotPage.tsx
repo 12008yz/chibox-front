@@ -5,7 +5,7 @@ import { useAuth } from '../store/hooks';
 import toast from 'react-hot-toast';
 import Monetary from '../components/Monetary';
 import type { SlotItem } from '../types/api';
-import { getItemImageUrl } from '../utils/steamImageUtils';
+import { getItemImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import CountdownTimer from '../components/CountdownTimer';
 import { soundManager } from '../utils/soundManager';
 import { GiftIcon, BalanceIcon } from '../components/icons';
@@ -98,9 +98,9 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
           const spins = isMobile ? 2 : 3;
 
           // Адаптивная высота элемента
-          const itemHeight = isMobile ? 100 : isTablet ? 120 : 160;
+          const itemHeight = isMobile ? 96 : isTablet ? 112 : window.innerWidth >= 1280 ? 224 : window.innerWidth >= 1024 ? 192 : 160;
           const finalIndex = items.findIndex(item => item.id === finalItem.id);
-          const centerOffset = isMobile ? 50 : isTablet ? 60 : 80;
+          const centerOffset = isMobile ? 48 : isTablet ? 56 : window.innerWidth >= 1280 ? 112 : window.innerWidth >= 1024 ? 96 : 80;
           const totalOffset = spins * items.length * itemHeight + finalIndex * itemHeight - centerOffset;
 
           setCurrentOffset(-totalOffset);
@@ -125,7 +125,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   return (
-    <div className={`relative w-24 h-60 sm:w-40 sm:h-72 md:w-60 md:h-80 lg:w-80 lg:h-96 overflow-hidden rounded-xl sm:rounded-2xl border sm:border-2 transition-all duration-500
+    <div className={`relative w-28 h-64 sm:w-40 sm:h-80 md:w-56 md:h-96 lg:w-64 lg:h-[28rem] xl:w-72 xl:h-[32rem] overflow-hidden rounded-xl sm:rounded-2xl border sm:border-2 transition-all duration-500
       border-gray-700/50 shadow-[0_4px_16px_rgba(0,0,0,0.3)] sm:shadow-[0_8px_32px_rgba(0,0,0,0.3)]
       ${isLastReel && isSlowingDown ? 'scale-[1.02]' : 'scale-100'}
       bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900`}
@@ -168,7 +168,7 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
           items.map((item) => (
             <div
               key={`${repeatIndex}-${item.id}`}
-              className={`h-25 sm:h-30 md:h-32 lg:h-40 w-full border-b border-gray-700/30 ${getRarityColor(item.rarity)}
+              className={`h-24 sm:h-28 md:h-40 lg:h-48 xl:h-56 w-full border-b border-gray-700/30 ${getRarityColor(item.rarity)}
                 flex items-center justify-center relative`}
               style={{
                 willChange: isSpinning ? 'transform' : 'auto',
@@ -176,16 +176,17 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
               }}
             >
               {/* Изображение или заглушка */}
-              <div className="relative w-full h-full p-1.5 sm:p-2 md:p-3 flex items-center justify-center">
+              <div className="relative w-full h-full p-0.5 sm:p-1 md:p-1.5 lg:p-2 flex items-center justify-center">
                 {!imageErrors.has(item.id) ? (
                   <img
-                    src={getItemImageUrl(item.image_url, item.name)}
+                    src={adaptImageSize(getItemImageUrl(item.image_url, item.name)) || getItemImageUrl(item.image_url, item.name)}
                     alt={item.name}
-                    className="max-w-full max-h-full object-contain"
+                    className="w-full h-full object-contain"
                     onError={() => handleImageError(item.id)}
                     style={{
                       willChange: 'auto',
-                      transform: 'translateZ(0)'
+                      transform: 'translateZ(0)',
+                      imageRendering: 'crisp-edges'
                     }}
                     loading="lazy"
                   />
@@ -194,8 +195,8 @@ const Reel: React.FC<ReelProps> = ({ items, isSpinning, finalItem, delay, onSpin
                 )}
               </div>
 
-              {/* Название внизу с улучшенным стилем */}
-              <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 right-1 sm:right-2 text-center">
+              {/* Название внизу с улучшенным стилем - скрыто на больших экранах */}
+              <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 right-1 sm:right-2 text-center lg:hidden">
                 <div className="text-[0.6rem] sm:text-xs text-white font-medium bg-black/80 rounded px-1 sm:px-2 py-0.5 sm:py-1 truncate border border-white/10 shadow-lg">
                   {item.name.length > 12 ? `${item.name.substring(0, 12)}...` : item.name}
                 </div>
