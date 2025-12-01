@@ -892,52 +892,51 @@ export const userApi = baseApi.injectEndpoints({
       },
     }),
 
-    // Загрузка аватара
-    uploadAvatar: builder.mutation<
-      ApiResponse<{ avatar_url: string }>,
-      FormData
-    >({
-      query: (formData) => ({
-        url: 'v1/profile/avatar',
-        method: 'POST',
-        body: formData,
-        // Не устанавливаем Content-Type - браузер автоматически установит multipart/form-data с boundary для FormData
-      }),
-      invalidatesTags: ['User'],
-      // Обновляем данные пользователя в authSlice после успешной загрузки
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          if (data.success && data.data?.avatar_url) {
-            // Импортируем updateUser action из authSlice
-            const { updateUser } = await import('../auth/authSlice');
-            dispatch(updateUser({ avatar_url: data.data.avatar_url }));
-          }
-        } catch (error) {
-          console.error('Error updating avatar in authSlice:', error);
-        }
-      },
-    }),
+    // DISABLED - Avatar upload/delete (only Steam avatars allowed)
+    // uploadAvatar: builder.mutation<
+    //   ApiResponse<{ avatar_url: string }>,
+    //   FormData
+    // >({
+    //   query: (formData) => ({
+    //     url: 'v1/profile/avatar',
+    //     method: 'POST',
+    //     body: formData,
+    //     // Не устанавливаем Content-Type - браузер автоматически установит multipart/form-data с boundary для FormData
+    //   }),
+    //   invalidatesTags: ['User'],
+    //   // Обновляем данные пользователя в authSlice после успешной загрузки
+    //   async onQueryStarted(_, { dispatch, queryFulfilled }) {
+    //     try {
+    //       const { data } = await queryFulfilled;
+    //       if (data.success && data.data?.avatar_url) {
+    //         // Импортируем updateUser action из authSlice
+    //         const { updateUser } = await import('../auth/authSlice');
+    //         dispatch(updateUser({ avatar_url: data.data.avatar_url }));
+    //       }
+    //     } catch (error) {
+    //       console.error('Error updating avatar in authSlice:', error);
+    //     }
+    //   },
+    // }),
 
-    // Удаление аватара
-    deleteAvatar: builder.mutation<ApiResponse<null>, void>({
-      query: () => ({
-        url: 'v1/profile/avatar',
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['User'],
-      // Обновляем данные пользователя в authSlice после успешного удаления
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          // Импортируем updateUser action из authSlice
-          const { updateUser } = await import('../auth/authSlice');
-          dispatch(updateUser({ avatar_url: undefined }));
-        } catch (error) {
-          console.error('Error updating avatar in authSlice after delete:', error);
-        }
-      },
-    }),
+    // deleteAvatar: builder.mutation<ApiResponse<null>, void>({
+    //   query: () => ({
+    //     url: 'v1/profile/avatar',
+    //     method: 'DELETE',
+    //   }),
+    //   invalidatesTags: ['User'],
+    //   // Обновляем данные пользователя в authSlice после успешного удаления
+    //   async onQueryStarted(_, { dispatch, queryFulfilled }) {
+    //     try {
+    //       await queryFulfilled;
+    //       // Импортируем updateUser action из authSlice
+    //       const { updateUser } = await import('../auth/authSlice');
+    //       dispatch(updateUser({ avatar_url: undefined }));
+    //     } catch (error) {
+    //       console.error('Error updating avatar in authSlice after delete:', error);
+    //     }
+    //   },
+    // }),
   }),
 });
 
@@ -998,7 +997,7 @@ export const {
   // Валюты хук
   useGetCurrencyQuery,
 
-  // Аватар хуки
-  useUploadAvatarMutation,
-  useDeleteAvatarMutation,
+  // DISABLED - Аватар хуки (only Steam avatars allowed)
+  // useUploadAvatarMutation,
+  // useDeleteAvatarMutation,
 } = userApi;

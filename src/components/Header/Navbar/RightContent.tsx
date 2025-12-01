@@ -163,7 +163,7 @@ const RightContent: React.FC<RightContentProps> = ({
           <div className="gaming-avatar-wrapper">
             <Avatar
               image={user.avatar_url}
-              steamAvatar={user.steam_avatar_url}
+              steamAvatar={user.steam_avatar_url || user.steam_avatar || user.steam_profile?.avatarfull}
               id={user.id || user.username}
               size="small"
             />
