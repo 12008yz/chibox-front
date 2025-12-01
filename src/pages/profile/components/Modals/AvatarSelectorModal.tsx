@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../../../../components/Modal';
 import { useGetAvatarsQuery, useUpdateAvatarMutation } from '../../../../features/user/userApi';
@@ -8,16 +8,25 @@ import { soundManager } from '../../../../utils/soundManager';
 interface AvatarSelectorModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentAvatarUrl?: string;
 }
 
 const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
   isOpen,
-  onClose
+  onClose,
+  currentAvatarUrl
 }) => {
   const { t } = useTranslation();
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(currentAvatarUrl || null);
   const { data: avatarsData, isLoading } = useGetAvatarsQuery();
   const [updateAvatar, { isLoading: isUpdating }] = useUpdateAvatarMutation();
+
+  // Обновляем выбранный аватар при изменении currentAvatarUrl или открытии модального окна
+  useEffect(() => {
+    if (isOpen && currentAvatarUrl) {
+      setSelectedAvatar(currentAvatarUrl);
+    }
+  }, [isOpen, currentAvatarUrl]);
 
   const handleSelectAvatar = async () => {
     if (!selectedAvatar) {
