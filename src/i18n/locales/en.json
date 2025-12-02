@@ -175,6 +175,7 @@
     },
     "inventory_descriptions": {
       "active": "Your current items and unopened cases",
+      "opened": "Opened cases: cases you have already opened and received items from",
       "withdrawn": "Items being withdrawn: pending shipment and already sent to Steam",
       "sold": "Items sold for currency or exchanged for subscription"
     },
@@ -254,6 +255,9 @@
     "level_max": "100",
     "xp_earned_for": "XP is earned for:",
     "opening_cases": "Opening cases",
+    "click_to_change_avatar": "Click to change avatar",
+    "weapon_type": "Type:",
+    "weapon_type_default": "Weapon",
     "inventory_tabs": {
       "active": "Active",
       "opened_cases": "Opened Cases",
