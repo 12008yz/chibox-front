@@ -419,7 +419,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     />
                     <label htmlFor="terms" className="text-xs sm:text-sm text-gray-300 cursor-pointer select-none leading-relaxed">
                       Я принимаю условия{' '}
-                      <a href="#" className="text-white hover:text-gray-200 underline font-medium">
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-200 underline font-medium">
                         Пользовательского соглашения
                       </a>
                     </label>
@@ -601,7 +601,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     />
                     <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer select-none leading-relaxed">
                       Я принимаю условия{' '}
-                      <a href="#" className="text-white hover:text-gray-200 underline font-medium">
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-200 underline font-medium">
                         Пользовательского соглашения
                       </a>
                     </label>
