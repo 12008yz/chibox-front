@@ -50,6 +50,7 @@ const Footer = () => {
       { name: t('footer.links.terms'), path: '/terms' },
       { name: t('footer.links.privacy'), path: '/privacy' },
       { name: t('footer.links.responsible_gaming'), path: '/responsible-gaming' },
+      { name: 'Реквизиты', path: '/requisites' },
     ],
   };
 
@@ -178,8 +179,32 @@ const Footer = () => {
             </h4>
             <div className="space-y-4">
               <p className="text-sm text-gray-400 mb-4">
-                Свяжитесь с нами в социальных сетях
+                Свяжитесь с нами
               </p>
+
+              {/* Email Contacts */}
+              <div className="space-y-2 mb-4">
+                <a
+                  href="mailto:support@chibox-game.ru"
+                  className="flex items-center gap-2 text-sm text-gray-300 hover:text-orange-400 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                  <span className="text-xs">support@chibox-game.ru</span>
+                </a>
+                <a
+                  href="mailto:help@chibox-game.ru"
+                  className="flex items-center gap-2 text-sm text-gray-300 hover:text-orange-400 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                  </svg>
+                  <span className="text-xs">help@chibox-game.ru</span>
+                </a>
+              </div>
 
               <a
                 href="https://t.me/chibox_official"
@@ -254,13 +279,16 @@ const Footer = () => {
       <div className="bg-black/50 border-t border-gray-800">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400 text-center md:text-left">
-              © 2024-2025 ChiBox. {t('footer.rights_reserved')}
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-sm text-gray-400">
+                © 2024-2025 ChiBox. {t('footer.rights_reserved')}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                ИП Чикасов Денис Владимирович, ИНН 711204279301, г. Богородицк
+              </p>
+            </div>
             <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
               <span>{t('footer.age_restriction')}</span>
-              <span>•</span>
-              <span>{t('footer.licensed')}</span>
             </div>
           </div>
         </div>

@@ -282,8 +282,8 @@ const PrivacyPage = () => {
             <div className="mt-4 bg-orange-900/20 border border-orange-500/30 p-4 rounded-lg">
               <p className="text-sm">
                 <strong className="text-orange-300">Для реализации ваших прав</strong> свяжитесь с нами по адресу{' '}
-                <a href="mailto:privacy@chibox.com" className="text-orange-400 hover:underline font-semibold">
-                  privacy@chibox.com
+                <a href="mailto:privacy@chibox-game.ru" className="text-orange-400 hover:underline font-semibold">
+                  privacy@chibox-game.ru
                 </a>
                 . Мы рассмотрим ваш запрос в течение 30 дней.
               </p>
@@ -314,8 +314,8 @@ const PrivacyPage = () => {
                 <h3 className="text-xl font-semibold text-orange-300 mb-2">Отзыв согласия</h3>
                 <p>
                   Вы можете отозвать согласие на обработку персональных данных в любое время, направив запрос на{' '}
-                  <a href="mailto:privacy@chibox.com" className="text-orange-400 hover:underline">
-                    privacy@chibox.com
+                  <a href="mailto:privacy@chibox-game.ru" className="text-orange-400 hover:underline">
+                    privacy@chibox-game.ru
                   </a>
                   . Обратите внимание, что отзыв согласия может привести к невозможности использования
                   некоторых функций сервиса.
@@ -484,8 +484,8 @@ const PrivacyPage = () => {
                 Если нам станет известно, что мы получили персональные данные несовершеннолетнего без согласия
                 родителей или законных представителей, мы примем меры для удаления таких данных в кратчайшие сроки.
                 Если вы считаете, что у нас есть информация о лице младше 18 лет, свяжитесь с нами:{' '}
-                <a href="mailto:privacy@chibox.com" className="text-orange-400 hover:underline">
-                  privacy@chibox.com
+                <a href="mailto:privacy@chibox-game.ru" className="text-orange-400 hover:underline">
+                  privacy@chibox-game.ru
                 </a>
               </p>
             </div>
@@ -524,14 +524,14 @@ const PrivacyPage = () => {
                 <div className="space-y-2 text-sm">
                   <p>
                     <strong className="text-white">Email:</strong>{' '}
-                    <a href="mailto:privacy@chibox.com" className="text-orange-400 hover:underline">
-                      privacy@chibox.com
+                    <a href="mailto:privacy@chibox-game.ru" className="text-orange-400 hover:underline">
+                      privacy@chibox-game.ru
                     </a>
                   </p>
                   <p>
                     <strong className="text-white">Общая поддержка:</strong>{' '}
-                    <a href="mailto:support@chibox.com" className="text-orange-400 hover:underline">
-                      support@chibox.com
+                    <a href="mailto:support@chibox-game.ru" className="text-orange-400 hover:underline">
+                      support@chibox-game.ru
                     </a>
                   </p>
                   <p className="text-gray-400 pt-2">

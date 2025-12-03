@@ -32,6 +32,7 @@ const ResponsibleGamingPage = lazy(() => import('./pages/ResponsibleGamingPage')
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
+const RequisitesPage = lazy(() => import('./pages/RequisitesPage'));
 
 const App: React.FC = () => {
   const auth = useAuth();
@@ -304,6 +305,7 @@ const App: React.FC = () => {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/requisites" element={<RequisitesPage />} />
 
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />
