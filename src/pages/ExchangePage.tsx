@@ -40,9 +40,9 @@ const ItemCard: React.FC<{
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const { item, count } = itemGroup;
-  // Используем price как sellPrice (цена продажи = 65% от рыночной стоимости)
+  // Используем price как sellPrice (цена продажи = 85% от рыночной стоимости)
   const itemPrice = parseFloat(item.price || '0');
-  const sellPrice = itemPrice * 0.65; // 65% от цены предмета
+  const sellPrice = itemPrice * 0.85; // 85% от цены предмета
   const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
 
