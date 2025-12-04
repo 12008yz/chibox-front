@@ -458,7 +458,7 @@ const ServicesPage = () => {
               <p>
                 <strong className="text-white">Поддержка:</strong> По всем вопросам обращайтесь на{' '}
                 <a href="mailto:deniscikasov@gmail.com" className="text-orange-400 hover:underline">
-                  deniscikasov@gmail.com
+                  support@chibox-game.ru
                 </a>
               </p>
             </div>
