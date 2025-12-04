@@ -42,11 +42,7 @@ const ItemCard: React.FC<{
   const { item, count } = itemGroup;
   // Используем price как sellPrice (цена продажи = 85% от рыночной стоимости)
   const itemPrice = parseFloat(item.price || '0');
-<<<<<<< HEAD
   const sellPrice = itemPrice * 0.85; // 85% от цены предмета
-=======
-  const sellPrice = itemPrice * 0.85; // 65% от цены предмета
->>>>>>> f232977 (85%)
   const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
 
