@@ -275,7 +275,10 @@ const ServicesPage = () => {
               <p className="text-gray-300 text-sm mb-3">
                 Классическая игра против ИИ с возможностью выиграть бонусные предметы
               </p>
-              <div className="text-green-400 font-semibold">Бесплатно для всех</div>
+              <div className="text-sm text-gray-400">
+                • Новички: 1 попытка ежедневно<br/>
+                • С подпиской: расширенный доступ
+              </div>
             </div>
 
             <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50">
@@ -293,14 +296,14 @@ const ServicesPage = () => {
 
             <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xl font-bold text-white">Рулетка</h3>
+                <h3 className="text-xl font-bold text-white">Улучшение предметов</h3>
                 <Sparkles className="w-6 h-6 text-orange-400" />
               </div>
               <p className="text-gray-300 text-sm mb-3">
-                Испытайте удачу и получите шанс на крупный выигрыш
+                Улучшайте предметы с шансом получить более ценные скины
               </p>
               <div className="text-sm text-gray-400">
-                Доступна с подпиской
+                Доступно всем пользователям
               </div>
             </div>
           </div>
@@ -376,7 +379,7 @@ const ServicesPage = () => {
             <h2 className="text-3xl font-bold text-green-400">Бесплатные бонусы для новичков</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gray-800/50 rounded-lg p-6 border border-green-500/30">
               <h3 className="text-lg font-bold text-white mb-2">Приветственные кейсы</h3>
               <p className="text-gray-300 text-sm">
@@ -388,6 +391,13 @@ const ServicesPage = () => {
               <h3 className="text-lg font-bold text-white mb-2">Попытки в Safe Cracker</h3>
               <p className="text-gray-300 text-sm">
                 2 бесплатные попытки во взломе сейфа для всех новых пользователей
+              </p>
+            </div>
+
+            <div className="bg-gray-800/50 rounded-lg p-6 border border-green-500/30">
+              <h3 className="text-lg font-bold text-white mb-2">Крестики-нолики</h3>
+              <p className="text-gray-300 text-sm">
+                1 бесплатная попытка в день для игры против ИИ с возможностью выиграть бонусы
               </p>
             </div>
           </div>
