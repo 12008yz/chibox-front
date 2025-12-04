@@ -17,7 +17,7 @@ const TermsPage = () => {
               пользователем (далее — «Пользователь», «Вы») и платформой{' '}
               <strong className="text-orange-400">ChiBox</strong> (далее — «Сервис», «мы», «наш») при
               использовании веб-сайта{' '}
-              <a href="https://chibox.com" className="text-orange-400 hover:underline">chibox.com</a>{' '}
+              <a href="https://chibox-game.ru" className="text-orange-400 hover:underline">chibox-game.ru</a>{' '}
               и связанных с ним услуг.
             </p>
 
@@ -700,8 +700,8 @@ const TermsPage = () => {
                 </p>
                 <ul className="list-disc ml-6 space-y-1 text-sm">
                   <li>Пользователь направляет письменную претензию на{' '}
-                    <a href="mailto:support@chibox.com" className="text-orange-400 hover:underline">
-                      support@chibox.com
+                    <a href="mailto:support@chibox-game.ru" className="text-orange-400 hover:underline">
+                      support@chibox-game.ru
                     </a>
                   </li>
                   <li>ChiBox рассматривает претензию в течение 30 календарных дней</li>
@@ -783,8 +783,8 @@ const TermsPage = () => {
                 <div className="space-y-2 text-sm">
                   <p>
                     <strong className="text-white">Email:</strong>{' '}
-                    <a href="mailto:support@chibox.com" className="text-orange-400 hover:underline">
-                      support@chibox.com
+                    <a href="mailto:support@chibox-game.ru" className="text-orange-400 hover:underline">
+                      support@chibox-game.ru
                     </a>
                   </p>
                   <p className="text-gray-400">
@@ -798,8 +798,8 @@ const TermsPage = () => {
                 <div className="space-y-2 text-sm">
                   <p>
                     <strong className="text-white">Email:</strong>{' '}
-                    <a href="mailto:legal@chibox.com" className="text-orange-400 hover:underline">
-                      legal@chibox.com
+                    <a href="mailto:legal@chibox-game.ru" className="text-orange-400 hover:underline">
+                      legal@chibox-game.ru
                     </a>
                   </p>
                   <p className="text-gray-400">

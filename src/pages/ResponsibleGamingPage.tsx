@@ -90,8 +90,8 @@ const ResponsibleGamingPage = () => {
 
               <p className="mb-2 text-white font-bold">Email</p>
               <p className="mb-4">
-                <a href="mailto:help@chibox.com" className="text-orange-400 hover:text-orange-300">
-                  help@chibox.com
+                <a href="mailto:help@chibox-game.ru" className="text-orange-400 hover:text-orange-300">
+                  help@chibox-game.ru
                 </a>
               </p>
 
@@ -109,8 +109,8 @@ const ResponsibleGamingPage = () => {
             <p className="mb-4">
               Если у вас есть вопросы или вам нужна помощь в настройке инструментов
               самоконтроля, свяжитесь с нашей службой поддержки:{' '}
-              <a href="mailto:support@chibox.com" className="text-orange-400 hover:text-orange-300">
-                support@chibox.com
+              <a href="mailto:support@chibox-game.ru" className="text-orange-400 hover:text-orange-300">
+                support@chibox-game.ru
               </a>
             </p>
           </section>

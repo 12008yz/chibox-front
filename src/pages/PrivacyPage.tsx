@@ -16,7 +16,7 @@ const PrivacyPage = () => {
             <p className="mb-4">
               Настоящая Политика конфиденциальности описывает, как <strong className="text-orange-400">ChiBox</strong> (далее — «мы», «наш», «сервис»)
               собирает, использует, хранит и защищает персональные данные пользователей при использовании платформы ChiBox,
-              доступной по адресу <a href="https://chibox.com" className="text-orange-400 hover:underline">chibox.com</a>.
+              доступной по адресу <a href="https://chibox-game.ru" className="text-orange-400 hover:underline">chibox-game.ru</a>.
             </p>
             <p className="mb-4">
               Используя наш сервис, вы подтверждаете, что ознакомились с настоящей Политикой конфиденциальности и соглашаетесь

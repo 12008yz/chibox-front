@@ -18,7 +18,7 @@ const DropRateBonuses: React.FC<DropRateBonusesProps> = ({ user }) => {
             <span className="text-green-400 text-xs sm:text-sm font-medium flex-shrink-0">+{parseFloat(Number(user.level_bonus_percentage).toFixed(2))}%</span>
           </div>
         )}
-        {(user.subscription_bonus_percentage ?? 0) > 0 && (
+        {(user.subscription_bonus_percentage ?? 0) > 0 && (user.subscription_days_left ?? 0) > 0 && (user.subscription_tier ?? 0) > 0 && (
           <div className="flex justify-between items-center gap-2">
             <span className="text-gray-400 text-xs sm:text-sm truncate">{t('profile.status_bonus')}</span>
             <span className="text-blue-400 text-xs sm:text-sm font-medium flex-shrink-0">+{parseFloat(Number(user.subscription_bonus_percentage).toFixed(1))}%</span>

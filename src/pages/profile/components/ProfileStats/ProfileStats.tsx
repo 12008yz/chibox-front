@@ -85,7 +85,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base sm:text-lg lg:text-xl font-bold text-white truncate">
-              {user.subscription_tier ? (
+              {user.subscription_tier && (user.subscription_days_left ?? 0) > 0 ? (
                 <>
                   {getSubscriptionName(user.subscription_tier, t)}
                   <span className="text-gray-400 text-xs sm:text-sm block truncate">

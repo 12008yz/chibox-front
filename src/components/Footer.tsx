@@ -43,6 +43,7 @@ const Footer = () => {
   const links = {
     company: [
       { name: t('footer.links.about'), path: '/about' },
+      { name: 'Каталог услуг', path: '/services' },
       { name: t('footer.links.contacts'), path: '/contacts' },
       { name: t('footer.links.faq'), path: '/faq' },
     ],
