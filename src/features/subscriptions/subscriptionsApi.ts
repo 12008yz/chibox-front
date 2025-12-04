@@ -15,7 +15,7 @@ export interface BuySubscriptionRequest {
   method: 'balance' | 'item' | 'promo' | 'bank_card';
   itemId?: string;
   promoCode?: string;
-  paymentMethod?: 'robokassa' | 'yookassa';
+  paymentMethod?: 'robokassa' | 'yookassa' | 'freekassa';
 }
 
 export interface SubscriptionStatus {
@@ -125,3 +125,4 @@ export const {
   useGetSubscriptionCaseStatusQuery,
   useClaimSubscriptionCaseMutation,
 } = subscriptionsApi;
+
