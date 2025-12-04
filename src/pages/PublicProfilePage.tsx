@@ -679,7 +679,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                     <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   <span className="truncate">{t('public_profile.opened_cases_tab')}</span>
-                  <span className="text-xs bg-white/20 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">{totalCounts?.caseItems || user.caseItemsPagination?.total || 0}</span>
+                  <span className="text-xs bg-white/20 px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">{user.totalCasesOpened || 0}</span>
                 </button>
               </div>
 
