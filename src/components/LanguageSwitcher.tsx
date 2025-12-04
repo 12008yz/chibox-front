@@ -49,9 +49,8 @@ const LanguageSwitcher: React.FC = () => {
   const calculateDropdownPosition = () => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       setDropdownPosition({
-        top: rect.bottom + scrollTop + 8,
+        top: rect.bottom + 8,
         right: window.innerWidth - rect.right
       });
     }
@@ -83,19 +82,23 @@ const LanguageSwitcher: React.FC = () => {
     };
   }, [isOpen]);
 
-  // Перерасчет позиции при скролле или изменении размера окна
+  // Закрытие dropdown при скролле, перерасчет при изменении размера окна
   useEffect(() => {
     if (isOpen) {
-      const handleReposition = () => {
+      const handleScroll = () => {
+        setIsOpen(false);
+      };
+
+      const handleResize = () => {
         calculateDropdownPosition();
       };
 
-      window.addEventListener('scroll', handleReposition);
-      window.addEventListener('resize', handleReposition);
+      window.addEventListener('scroll', handleScroll, true);
+      window.addEventListener('resize', handleResize);
 
       return () => {
-        window.removeEventListener('scroll', handleReposition);
-        window.removeEventListener('resize', handleReposition);
+        window.removeEventListener('scroll', handleScroll, true);
+        window.removeEventListener('resize', handleResize);
       };
     }
   }, [isOpen]);
