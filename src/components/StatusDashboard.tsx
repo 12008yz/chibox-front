@@ -70,14 +70,13 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
 
   // Количество попыток в зависимости от уровня подписки
-  const attemptsCount = subscriptionTier; // 1->1, 2->2, 3->3
 
   // Доступные активности
   const bonusActivities: BonusActivity[] = [
     {
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
-      description: `${attemptsCount} ${t('modals.daily_attempts')} | Выиграй бонусный кейс`,
+      description: `Выиграй бонусный кейс`,
       icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
@@ -86,7 +85,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       id: 'safe-cracker',
       name: 'Взлом сейфа',
-      description: `${attemptsCount} ${t('modals.daily_attempts')} | Подбери код и получи награду`,
+      description: `Подбери код и получи награду`,
       icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
@@ -301,16 +300,22 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
                   <span className="text-blue-400 font-bold text-sm md:text-base">1 {t('modals.case_per_day')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300 text-xs md:text-base">{t('modals.tic_tac_toe_attempts')}</span>
-                  <span className="text-purple-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('tic_tac_toe.title')}</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <ReceivedIcon className="text-purple-400 w-3 h-3 md:w-4 md:h-4" />
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300 text-xs md:text-base">{t('modals.safe_cracker_attempts')}</span>
-                  <span className="text-yellow-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">Взлом сейфа</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                    <ReceivedIcon className="text-yellow-400 w-3 h-3 md:w-4 md:h-4" />
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-300 text-xs md:text-base">{t('modals.slots_attempts')}</span>
-                  <span className="text-cyan-400 font-bold text-sm md:text-base">{subscriptionTier} {t('modals.daily_attempts')}</span>
+                  <span className="text-gray-300 text-xs md:text-base">{t('slots.title')}</span>
+                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                    <ReceivedIcon className="text-cyan-400 w-3 h-3 md:w-4 md:h-4" />
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300 text-xs md:text-base">{t('modals.item_withdrawal')}</span>
