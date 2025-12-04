@@ -36,11 +36,10 @@ const RightContent: React.FC<RightContentProps> = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
+  // Polling отключен, т.к. обновления приходят через WebSocket в реальном времени
   const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadNotificationsCountQuery(undefined, {
     skip: !user,
-    pollingInterval: 5000, // Проверяем каждые 5 секунд
     refetchOnMountOrArgChange: true,
-    refetchOnFocus: true,
   });
 
   const notificationCount = unreadCountData?.data?.count || 0;

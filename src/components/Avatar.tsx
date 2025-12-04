@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { getPreferredAvatar, debugAvatarUrls } from "../utils/avatarUtils";
+import { useState, useEffect, memo } from "react";
+import { getPreferredAvatar } from "../utils/avatarUtils";
 
 interface AvatarProps {
     image?: string;
@@ -13,7 +13,7 @@ interface AvatarProps {
     forceShowBorder?: boolean;
 }
 
-const Avatar: React.FC<AvatarProps> = ({
+const Avatar: React.FC<AvatarProps> = memo(({
     image,
     steamAvatar,
     loading,
@@ -31,22 +31,15 @@ const Avatar: React.FC<AvatarProps> = ({
         setLoaded(false);
         setImageError(false);
 
-        // Debug информация при первой загрузке
-        if (process.env.NODE_ENV === 'development') {
-            debugAvatarUrls(image, steamAvatar, id);
-        }
-
         // Получаем приоритетный источник аватара
         const imgSrc = getPreferredAvatar(image, steamAvatar, id);
 
         if (imgSrc) {
             const img = new Image();
             img.onload = () => {
-                console.log('✅ Avatar loaded successfully:', imgSrc);
                 setLoaded(true);
             };
             img.onerror = () => {
-                console.error('❌ Failed to load avatar:', imgSrc);
                 setImageError(true);
                 setLoaded(true);
             };
@@ -168,6 +161,8 @@ const Avatar: React.FC<AvatarProps> = ({
             )}
         </div>
     );
-};
+});
+
+Avatar.displayName = 'Avatar';
 
 export default Avatar;

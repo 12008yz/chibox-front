@@ -19,13 +19,11 @@ export function getAvatarUrl(avatarPath: string | null | undefined): string | nu
   // Если это относительный путь (/avatars/...)
   if (avatarPath.startsWith('/')) {
     const url = `${BACKEND_URL}${avatarPath}`;
-    console.log('🖼️ Avatar URL generated:', { avatarPath, url, BACKEND_URL });
     return url;
   }
 
   // Если путь не начинается со слеша, добавляем его
   const url = `${BACKEND_URL}/${avatarPath}`;
-  console.log('🖼️ Avatar URL generated (no slash):', { avatarPath, url, BACKEND_URL });
   return url;
 }
 
@@ -41,20 +39,17 @@ export function getPreferredAvatar(
   if (customAvatar) {
     const url = getAvatarUrl(customAvatar);
     if (url) {
-      console.log('✅ Using custom avatar:', url);
       return url;
     }
   }
 
   // Приоритет 2: Steam аватар
   if (steamAvatar) {
-    console.log('✅ Using Steam avatar:', steamAvatar);
     return steamAvatar;
   }
 
   // Приоритет 3: fallback аватар
   const fallback = generateFallbackAvatar(userId || 'user');
-  console.log('✅ Using fallback avatar for user:', userId);
   return fallback;
 }
 
