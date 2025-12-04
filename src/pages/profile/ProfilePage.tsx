@@ -248,10 +248,9 @@ const ProfilePage: React.FC = () => {
     (item.item_type === 'item' || item.item_type === 'case')
   ).length;
 
-  // Подсчитываем количество открытых кейсов (все предметы из кейсов)
-  const openedCasesCount = rawInventory.filter((item: any) =>
-    item.item_type === 'item' && item.source === 'case'
-  ).length;
+  // Используем поле total_cases_opened из профиля пользователя для точного подсчета
+  // Это правильно учитывает все открытые кейсы, включая проданные/выведенные/использованные предметы
+  const openedCasesCount = user?.total_cases_opened || 0;
 
   return (
     <div className="min-h-screen text-white relative">
@@ -336,6 +335,7 @@ const ProfilePage: React.FC = () => {
           onUserRefresh={refetchUser}
           translateCaseName={translateCaseName}
           openingCaseId={openingCaseId}
+          totalCasesOpened={openedCasesCount}
         />
 
       </div>

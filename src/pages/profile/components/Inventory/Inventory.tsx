@@ -14,6 +14,7 @@ interface InventoryProps {
   onUserRefresh: () => void;
   translateCaseName: (name: string) => string;
   openingCaseId: string | null;
+  totalCasesOpened: number;
 }
 
 const Inventory: React.FC<InventoryProps> = ({
@@ -24,7 +25,8 @@ const Inventory: React.FC<InventoryProps> = ({
   onInventoryRefresh,
   onUserRefresh,
   translateCaseName,
-  openingCaseId
+  openingCaseId,
+  totalCasesOpened
 }) => {
   const { t } = useTranslation();
 
@@ -41,7 +43,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const tabCounts = {
     active: getActiveInventory().length,
-    opened: getOpenedCases().length,
+    opened: totalCasesOpened, // Используем правильное значение из user.total_cases_opened
     withdrawn: getWithdrawnItems().length,
     sold: getSoldItems().length
   };
