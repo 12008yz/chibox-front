@@ -272,14 +272,21 @@ const SlotPage: React.FC = () => {
   }, [slotItemsData]);
 
   const canPlay = !isSpinning && !isLoading && auth.user && displayItems.length > 0 && slotStatusData?.data?.canPlay;
+  const canPlayPaid = !isSpinning && !isLoading && auth.user && displayItems.length > 0 && !slotStatusData?.data?.canPlay && (auth.user?.balance || 0) >= 10;
 
-  const handleSpin = async () => {
-    if (!canPlay) {
+  const handleSpin = async (usePaidSpin = false) => {
+    if (!canPlay && !usePaidSpin) {
       console.log('[SLOT DEBUG] Cannot play - conditions not met');
       return;
     }
 
-    console.log('[SLOT DEBUG] Starting spin...');
+    if (usePaidSpin && !canPlayPaid) {
+      console.log('[SLOT DEBUG] Cannot play paid - insufficient balance');
+      toast.error('Недостаточно средств. Требуется 10 chiCoins');
+      return;
+    }
+
+    console.log('[SLOT DEBUG] Starting spin...', usePaidSpin ? '(PAID)' : '(FREE)');
 
     try {
       setIsSpinning(true);
@@ -289,7 +296,7 @@ const SlotPage: React.FC = () => {
       soundManager.play('slotSpin');
 
       console.log('[SLOT DEBUG] Calling playSlot API...');
-      const response = await playSlot().unwrap();
+      const response = await playSlot(usePaidSpin ? { usePaidSpin: true } : undefined).unwrap();
       console.log('[SLOT DEBUG] API response received:', response);
 
       if (response.success && response.result) {
@@ -503,10 +510,11 @@ const SlotPage: React.FC = () => {
               </div>
             )}
 
-            {/* Улучшенная кнопка спина */}
-            <div className="text-center">
+            {/* Улучшенные кнопки спина */}
+            <div className="text-center space-y-4">
+              {/* Бесплатная кнопка */}
               <button
-                onClick={handleSpin}
+                onClick={() => handleSpin(false)}
                 disabled={!canPlay}
                 className={`group relative px-8 sm:px-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 overflow-hidden ${
                   canPlay
@@ -529,16 +537,46 @@ const SlotPage: React.FC = () => {
                 </span>
               </button>
 
+              {/* Платная кнопка (показывается только когда нет бесплатных попыток) */}
+              {!canPlay && auth.user && slotStatusData?.data && !slotStatusData.data.canPlay && (
+                <button
+                  onClick={() => handleSpin(true)}
+                  disabled={!canPlayPaid || isSpinning || isLoading}
+                  className={`group relative px-8 sm:px-12 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg md:text-xl transition-all duration-300 overflow-hidden ${
+                    canPlayPaid
+                      ? 'bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-400 hover:to-yellow-500 text-white shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:shadow-[0_0_40px_rgba(234,179,8,0.6)] transform hover:scale-110 active:scale-95'
+                      : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <span className="relative z-10 flex items-center gap-2 justify-center">
+                    <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <span>Крутить за 10 chiCoins</span>
+                  </span>
+                </button>
+              )}
+
+              {/* Подсказка о платной игре */}
+              {!canPlay && auth.user && slotStatusData?.data && !slotStatusData.data.canPlay && (auth.user?.balance || 0) < 10 && (
+                <div className="mt-2 p-3 sm:p-4 bg-gradient-to-r from-orange-900/30 to-red-900/30 border border-orange-500/50 rounded-xl text-orange-300 max-w-sm mx-auto">
+                  <div className="text-sm sm:text-base font-medium">
+                    💰 Недостаточно средств для платной игры
+                  </div>
+                  <div className="text-xs sm:text-sm mt-1">
+                    Требуется: 10 chiCoins | У вас: {auth.user?.balance || 0} chiCoins
+                  </div>
+                </div>
+              )}
+
               {/* Сообщения с улучшенным дизайном */}
               {!canPlay && auth.user && (
                 <>
-                  {slotStatusData?.data && !slotStatusData.data.hasSubscription && (
-                    <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border border-red-500/50 rounded-xl sm:rounded-2xl text-red-300 max-w-sm mx-auto ">
+                  {slotStatusData?.data && !slotStatusData.data.hasSubscription && !slotStatusData.data.canPlay && (
+                    <div className="mt-4 sm:mt-6 p-4 sm:p-5 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/50 rounded-xl sm:rounded-2xl text-blue-300 max-w-sm mx-auto ">
                       <div className="font-bold text-base sm:text-lg flex items-center gap-2">
                         <BalanceIcon className="w-5 h-5" />
-                        Требуется статус
+                        Бесплатные попытки закончились
                       </div>
-                      <div className="text-xs sm:text-sm mt-2">Оформите статус для игры в слот</div>
+                      <div className="text-xs sm:text-sm mt-2">Оформите статус для бесплатных игр или играйте за chiCoins</div>
                     </div>
                   )}
                 </>

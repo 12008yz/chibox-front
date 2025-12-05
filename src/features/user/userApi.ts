@@ -381,10 +381,11 @@ export const userApi = baseApi.injectEndpoints({
     }),
 
     // Игра в слот
-    playSlot: builder.mutation<PlaySlotResponse, void>({
-      query: () => ({
+    playSlot: builder.mutation<PlaySlotResponse, { usePaidSpin?: boolean } | void>({
+      query: (arg) => ({
         url: 'v1/games/play-slot',
         method: 'POST',
+        body: arg || {},
       }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
       onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
