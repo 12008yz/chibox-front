@@ -26,6 +26,7 @@ export interface CaseItemProps {
   generateGoldenSparks: () => React.ReactNode[];
   t: (key: string, options?: any) => string;
   isVisible?: boolean;
+  onItemClick?: (item: any) => void;
 }
 
 export interface StaticCaseItemProps {
@@ -68,3 +69,4 @@ export interface ModalFooterProps {
 }
 
 export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped';
+

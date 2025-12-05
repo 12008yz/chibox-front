@@ -912,7 +912,13 @@
     "bonus": "bonus",
     "received": "✓ Received!",
     "subscription_required": "Requires status level {{tier}}+",
-    "your_level": "Your level: {{level}}"
+    "your_level": "Your level: {{level}}",
+    "item_info": "Item Info",
+    "you_won": "You Won!",
+    "item_name": "Name",
+    "rarity": "Rarity",
+    "price": "Price",
+    "drop_chance": "Drop Chance"
   },
   "tic_tac_toe": {
     "title": "Tic Tac Toe",

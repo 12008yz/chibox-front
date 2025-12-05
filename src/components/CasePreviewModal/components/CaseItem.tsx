@@ -23,7 +23,8 @@ export const CaseItem = memo(({
   getRarityColor,
   generateGoldenSparks,
   t,
-  isVisible = true
+  isVisible = true,
+  onItemClick
 }: CaseItemProps) => {
   const [imageError, setImageError] = useState(false);
 
@@ -148,6 +149,13 @@ export const CaseItem = memo(({
   // Рендерим упрощенную версию для элементов вне области видимости (если не в анимации)
   const shouldRenderSimplified = !inView && !showOpeningAnimation && !isCurrentSliderPosition && !isWinningItemStopped;
 
+  // Обработчик клика на предмет только для мобильных устройств
+  const handleClick = useCallback(() => {
+    if (onItemClick && !showOpeningAnimation && window.innerWidth < 768) {
+      onItemClick(item);
+    }
+  }, [onItemClick, item, showOpeningAnimation]);
+
   return (
     <div
       ref={inViewRef}
@@ -155,6 +163,7 @@ export const CaseItem = memo(({
       data-item-index={animationIndex}
       className={itemClasses}
       style={dynamicStyles}
+      onClick={handleClick}
     >
       {shouldRenderSimplified ? (
         // Упрощенная версия для элементов вне области видимости
@@ -347,3 +356,4 @@ export const CaseItem = memo(({
 });
 
 CaseItem.displayName = 'CaseItem';
+	
