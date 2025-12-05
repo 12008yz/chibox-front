@@ -18,6 +18,28 @@ interface ItemInfoModalProps {
   t: (key: string) => string;
 }
 
+// Функция для получения изображения в высоком качестве (как для ПК)
+const getHighQualityImageUrl = (imageUrl: string): string => {
+  if (!imageUrl) return imageUrl;
+
+  // Если это изображение Steam, заменяем размер на высокое качество
+  if (imageUrl.includes('steamstatic.com/economy/image/')) {
+    // Заменяем размер на 730fx730f (высокое качество для ПК)
+    if (imageUrl.match(/\/\d+fx\d+f/)) {
+      return imageUrl.replace(/\/\d+fx\d+f/, '/730fx730f');
+    }
+
+    // Если размера нет, добавляем его
+    if (imageUrl.includes('?')) {
+      return imageUrl.replace(/\?/, '/730fx730f?');
+    }
+
+    return `${imageUrl}/730fx730f`;
+  }
+
+  return imageUrl;
+};
+
 const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
   isOpen,
   onClose,
@@ -29,6 +51,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
   if (!isOpen) return null;
 
   const rarityColorClass = getRarityColor(item.rarity);
+  const highQualityImageUrl = getHighQualityImageUrl(item.image_url);
 
   const modalContent = (
     <div
@@ -60,7 +83,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
           <div className={`mb-4 rounded-lg p-4 border-2 ${rarityColorClass} bg-gray-900`}>
             <div className="aspect-square flex items-center justify-center">
               <img
-                src={item.image_url}
+                src={highQualityImageUrl}
                 alt={item.name}
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => {

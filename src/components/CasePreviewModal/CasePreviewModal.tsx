@@ -730,7 +730,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       {selectedItem && (
         <ItemInfoModal
           isOpen={showItemInfoModal}
-          onClose={() => setShowItemInfoModal(false)}
+          onClose={() => {
+            setShowItemInfoModal(false);
+            setSelectedItem(null);
+          }}
           item={selectedItem}
           showDropChance={showDropChance}
           getRarityColor={getRarityColor}
