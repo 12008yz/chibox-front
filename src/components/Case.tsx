@@ -67,7 +67,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
 
   return (
     <div
-      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer"
+      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer group"
     >
       {!loaded && (
         <div className="flex w-full h-64 items-center justify-center">
@@ -80,7 +80,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
           src={caseImageUrl}
           alt={title}
           draggable="false"
-          className={`w-full h-32 ${isIceCase ? 'md:h-52' : 'md:h-64'} object-contain md:object-cover md:-ml-4 relative z-10 transition-opacity duration-200 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`case-image w-full h-32 ${isIceCase ? 'md:h-52' : 'md:h-64'} object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{
             pointerEvents: 'none',
             userSelect: 'none'

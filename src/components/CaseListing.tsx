@@ -101,7 +101,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <div
                     key={caseItem.id}
                     id={isFirstCase ? 'onboarding-cases' : undefined}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-lg"
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
                       if (!(e.target as HTMLElement).closest('button')) {
@@ -130,7 +130,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
                     id={isFirstCase ? 'onboarding-cases' : undefined}
-                    className=""
+                    className="rounded-lg"
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >
                     <Case

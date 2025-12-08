@@ -2015,3 +2015,61 @@ img[alt*="Case"] {
   user-select: none !important;
   pointer-events: none !important;
 }
+
+/* Анимация градиентной обводки для кейсов */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Анимация цвета обводки по контуру изображения */
+@keyframes caseGlow {
+  0% {
+    filter: drop-shadow(0 0 3px rgba(255, 107, 107, 0.8))
+            drop-shadow(0 0 6px rgba(255, 107, 107, 0.6))
+            drop-shadow(0 0 9px rgba(255, 107, 107, 0.4));
+  }
+  25% {
+    filter: drop-shadow(0 0 3px rgba(78, 205, 196, 0.8))
+            drop-shadow(0 0 6px rgba(78, 205, 196, 0.6))
+            drop-shadow(0 0 9px rgba(78, 205, 196, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 3px rgba(69, 183, 209, 0.8))
+            drop-shadow(0 0 6px rgba(69, 183, 209, 0.6))
+            drop-shadow(0 0 9px rgba(69, 183, 209, 0.4));
+  }
+  75% {
+    filter: drop-shadow(0 0 3px rgba(249, 202, 36, 0.8))
+            drop-shadow(0 0 6px rgba(249, 202, 36, 0.6))
+            drop-shadow(0 0 9px rgba(249, 202, 36, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 3px rgba(255, 107, 107, 0.8))
+            drop-shadow(0 0 6px rgba(255, 107, 107, 0.6))
+            drop-shadow(0 0 9px rgba(255, 107, 107, 0.4));
+  }
+}
+
+/* Стиль для изображений кейсов с обводкой при наведении */
+.group:hover .case-image {
+  /* steps(6) = переключение 6 раз за анимацию (вместо 60fps) = 90% меньше нагрузки */
+  animation: caseGlow 4s steps(6) infinite;
+  /* GPU ускорение через 3D трансформацию */
+  transform: scale(1.01) translate3d(0, 0, 0);
+}
+
+.case-image {
+  /* Оптимизация рендеринга */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  contain: layout style paint;
+  transition: transform 0.2s ease;
+}
