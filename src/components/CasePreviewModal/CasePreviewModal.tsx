@@ -10,6 +10,7 @@ import { useUserData } from '../../hooks/useUserData';
 import { CaseItem } from './components/CaseItem';
 import { ModalHeader } from './components/ModalHeader';
 import { ModalFooter } from './components/ModalFooter';
+import ItemInfoModal from './components/ItemInfoModal';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
@@ -45,6 +46,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [_shouldStopBetween, setShouldStopBetween] = useState(false);
   const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
+  const [showItemInfoModal, setShowItemInfoModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showDropChance, setShowDropChance] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -164,6 +168,20 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     scrollToItem(sliderPosition);
   }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem]);
 
+  // Функция для определения мобильного устройства
+  const isMobileDevice = () => {
+    return window.innerWidth < 768; // md breakpoint в Tailwind
+  };
+
+  // Обработчик клика на предмет для показа информации
+  const handleItemClick = (item: any, withDropChance: boolean = true) => {
+    if (!isMobileDevice() || showOpeningAnimation) return;
+
+    setSelectedItem(item);
+    setShowDropChance(withDropChance);
+    setShowItemInfoModal(true);
+  };
+
   const handleClose = () => {
     // Останавливаем все звуки при закрытии
     soundManager.stopAll();
@@ -193,8 +211,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   }, [itemsData?.data?.items, caseData.id]);
 
   const handleAnimationComplete = useCallback(() => {
+    // Сохраняем результат открытия перед сбросом
+    const wonItem = openingResult?.item;
+
     setShowOpeningAnimation(false);
-    setOpeningResult(null);
     setAnimationPhase('idle');
     setSliderPosition(0);
     setSliderOffset(0);
@@ -211,7 +231,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       clearTimeout(animationTimeoutRef.current);
       animationTimeoutRef.current = null;
     }
-  }, []);
+
+    // Открываем модальное окно на мобильных устройствах с информацией о выпавшем предмете
+    if (isMobileDevice() && wonItem) {
+      setTimeout(() => {
+        setSelectedItem(wonItem);
+        setShowDropChance(false);
+        setShowItemInfoModal(true);
+      }, 500); // Небольшая задержка для плавности
+    }
+
+    // Сбрасываем результат после обработки
+    setOpeningResult(null);
+  }, [openingResult]);
 
   // Улучшенная анимация открытия с fake slowdown
   const startAnimation = useCallback((wonItem: any) => {
@@ -659,6 +691,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   getRarityColor={getRarityColor}
                   generateGoldenSparks={generateGoldenSparks}
                   t={t}
+                  onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
                 />
               ))}
             </div>
@@ -691,7 +724,24 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   );
 
   // Рендерим модальное окно в body через портал
-  return createPortal(modalContent, document.body);
+  return (
+    <>
+      {createPortal(modalContent, document.body)}
+      {selectedItem && (
+        <ItemInfoModal
+          isOpen={showItemInfoModal}
+          onClose={() => {
+            setShowItemInfoModal(false);
+            setSelectedItem(null);
+          }}
+          item={selectedItem}
+          showDropChance={showDropChance}
+          getRarityColor={getRarityColor}
+          t={t}
+        />
+      )}
+    </>
+  );
 };
 
 export default CasePreviewModal;

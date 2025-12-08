@@ -32,7 +32,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('freekassa');
   const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa' | 'yookassa'>('freekassa');
-  const [amount, setAmount] = useState<string>('100');
+  const [amount, setAmount] = useState<string>('10');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
   const [selectedSubscription, setSelectedSubscription] = useState<number | null>(initialSelectedSubscription || null);
@@ -99,7 +99,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   ];
 
   const selectedPaymentMethod = paymentMethods.find(m => m.id === selectedMethod);
-  const minAmount = 100;
+  const minAmount = 10;
 
   const handleDeposit = async () => {
     if (!agreedToTerms) {

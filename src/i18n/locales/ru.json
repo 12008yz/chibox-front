@@ -935,7 +935,13 @@
     "bonus": "бонус",
     "received": "✓ Получен!",
     "subscription_required": "Требуется статус уровня {{tier}}+",
-    "your_level": "Ваш уровень: {{level}}"
+    "your_level": "Ваш уровень: {{level}}",
+    "item_info": "Информация о предмете",
+    "you_won": "Вы выиграли!",
+    "item_name": "Название",
+    "rarity": "Редкость",
+    "price": "Цена",
+    "drop_chance": "Шанс выпадения"
   },
   "tic_tac_toe": {
     "title": "Крестики-нолики",
