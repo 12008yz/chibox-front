@@ -276,21 +276,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* AAIO Payment System Banner */}
-      <div className="border-t border-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center">
-            <a href="https://aaio.so/" target="_blank" rel="noopener noreferrer">
-              <img
-                src="https://aaio.so/assets/svg/banners/big/white-1.svg"
-                alt="Aaio - Сервис по приему онлайн платежей"
-                title="Aaio - Сервис по приему онлайн платежей"
-                className="h-12 md:h-16 lg:h-20 object-contain hover:opacity-80 transition-opacity duration-300"
-              />
-            </a>
-          </div>
-        </div>
-      </div>
 
       {/* Bottom Bar */}
       <div className="bg-black/50 border-t border-gray-800">
