@@ -261,7 +261,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   {/* Amount Input */}
                   <div>
                     <label className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                      <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
                       Сумма пополнения
                     </label>
                     <div className="relative">
@@ -273,9 +272,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         className="w-full bg-gray-900/70 border border-gray-700 rounded-lg pl-4 pr-16 py-3 sm:py-4 text-white text-xl sm:text-2xl font-semibold focus:outline-none focus:border-gray-500 transition-colors"
                         placeholder="100"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm sm:text-base flex items-center gap-1">
-                        <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
-                      </span>
+                   
                     </div>
                   </div>
 
@@ -529,7 +526,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   {/* Amount Input */}
                   <div>
                     <label className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
-                      <img src="/images/chiCoin.png" alt="chiCoin" className="w-5 h-5" />
                       Сумма пополнения
                     </label>
                     <div className="relative">
@@ -541,9 +537,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         className="w-full bg-gray-900/70 border border-gray-700 rounded-lg pl-4 pr-16 py-4 text-white text-2xl font-semibold focus:outline-none focus:border-gray-500 transition-colors"
                         placeholder="100"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium flex items-center gap-1">
-                        <img src="/images/chiCoin.png" alt="ChiCoins" className="w-5 h-5 inline-block" />
-                      </span>
+                     
                     </div>
                     <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
                       Минимум: <span className="text-white font-medium flex items-center gap-1">
