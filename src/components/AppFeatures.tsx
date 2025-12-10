@@ -136,7 +136,10 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               {/* Цена */}
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-white mb-1">
-                  {tier.price}₽
+                  <span className="flex items-center gap-1">
+                    {tier.price}
+                    <img src="/images/chiCoin.png" alt="ChiCoins" className="w-5 h-5 inline-block" />
+                  </span>
                 </div>
                 <div className="text-gray-400 text-sm">
                   за {formatDaysI18n(tier.days, t)}

@@ -540,7 +540,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const requiredAmount = error?.data?.data?.required || 0;
         const availableAmount = error?.data?.data?.available || 0;
         const shortfall = requiredAmount - availableAmount;
-        toast.error(`Недостаточно ${shortfall}₽ для покупки`, {
+        toast.error(`Недостаточно ${shortfall} ChiCoins для покупки`, {
           duration: 3000,
           icon: '💳',
         });
