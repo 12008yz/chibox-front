@@ -8,8 +8,8 @@ class SoundManager {
   private unlocked: boolean = false;
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
   private minPlayInterval: number = 500; // Минимальная задержка между воспроизведениями в мс
-
-  // Загружаем звуки
+ 
+  // Загружаем  звуки
   private soundPaths = {
     click: '/sounds/click.mp3',
     upgrade: '/sounds/upgrade.mp3',
