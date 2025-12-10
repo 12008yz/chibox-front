@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSell } from "react-icons/md";
 import { GiUpgrade } from 'react-icons/gi';
-import { FaDice } from "react-icons/fa";
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { IoMdTrophy } from 'react-icons/io';
 import { ImConnection } from "react-icons/im";
