@@ -25,7 +25,6 @@ const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
 const ExchangePage = lazy(() => import('./pages/ExchangePage'));
 const UpgradePage = lazy(() => import('./pages/UpgradePage'));
-const SlotPage = lazy(() => import('./pages/SlotPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const ResponsibleGamingPage = lazy(() => import('./pages/ResponsibleGamingPage'));
@@ -290,15 +289,6 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/slot"
-              element={
-                <ProtectedRoute>
-                  <SlotPage />
-                </ProtectedRoute>
-              }
-            />
-
             {/* Footer Pages */}
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />

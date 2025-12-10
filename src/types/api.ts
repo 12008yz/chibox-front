@@ -379,61 +379,6 @@ export interface TicTacToeMakeMoveResponse {
   message?: string;
 }
 
-// Типы для слот игры
-export interface SlotItem {
-  id: string;
-  name: string;
-  image_url: string;
-  rarity: 'consumer' | 'industrial' | 'milspec' | 'restricted' | 'classified' | 'covert' | 'contraband' | 'exotic';
-  price: number;
-}
-
-export interface SlotResult {
-  items: SlotItem[];
-  isWin: boolean;
-  wonItem: SlotItem | null;
-  cost: number;
-  newBalance: number;
-}
-
-export interface PlaySlotResponse {
-  success: boolean;
-  result: SlotResult;
-  message?: string;
-}
-
-export interface FreeAttemptsInfo {
-  can_use: boolean;
-  reason: string;
-  next_available: string | null;
-  claim_count: number;
-  first_claim_date: string | null;
-  last_claim_date: string | null;
-}
-
-export interface SlotStatusData {
-  subscriptionTier: number;
-  subscriptionName: string;
-  limit: number;
-  used: number;
-  remaining: number;
-  free_attempts_remaining: number;
-  free_attempts_info: FreeAttemptsInfo;
-  canPlay: boolean;
-  cost: number;
-  balance: number;
-  nextResetTime: string;
-  nextResetTimeFormatted: string;
-  hasSubscription: boolean;
-  needsReset: boolean;
-}
-
-export interface SlotStatusResponse {
-  success: boolean;
-  data: SlotStatusData;
-  message?: string;
-}
-
 export interface UpgradeItem {
   id: string;
   name: string;

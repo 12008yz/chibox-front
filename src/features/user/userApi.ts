@@ -16,8 +16,6 @@ import type {
   TicTacToeCurrentGameResponse,
   TicTacToeCreateGameResponse,
   TicTacToeMakeMoveResponse,
-  PlaySlotResponse,
-  SlotStatusResponse,
   TopUpBalanceRequest,
   TopUpBalanceResponse
 } from '../../types/api';
@@ -378,55 +376,6 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
       invalidatesTags: ['Balance', 'User', 'Inventory'],
-    }),
-
-    // Игра в слот
-    playSlot: builder.mutation<PlaySlotResponse, { usePaidSpin?: boolean } | void>({
-      query: (arg) => ({
-        url: 'v1/games/play-slot',
-        method: 'POST',
-        body: arg || {},
-      }),
-      invalidatesTags: ['Balance', 'User', 'Inventory'],
-      onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
-        try {
-          await queryFulfilled;
-          // Обновляем статус слота после успешной игры
-          dispatch(userApi.util.invalidateTags(['Balance', 'User']));
-        } catch {
-          // Игнорируем ошибки
-        }
-      },
-    }),
-
-    // Получение статуса слота для пользователя
-    getSlotStatus: builder.query<SlotStatusResponse, void>({
-      query: () => 'v1/games/slot-status',
-      providesTags: ['Balance', 'User'],
-    }),
-
-    // Получение предметов для слота
-    getSlotItems: builder.query<
-      {
-        success: boolean;
-        data: {
-          items: Array<{
-            id: string;
-            name: string;
-            image_url: string;
-            price: number;
-            rarity: string;
-            weapon_type?: string;
-            skin_name?: string;
-          }>;
-          total_count: number;
-          rarity_distribution: Record<string, number>;
-        };
-      },
-      void
-    >({
-      query: () => 'v1/games/slot-items',
-      providesTags: ['SlotItems'],
     }),
 
     // Сброс кулдауна бонуса
@@ -994,9 +943,6 @@ export const {
   useGetBonusStatusQuery,
   useGetSafeCrackerStatusQuery,
   usePlaySafeCrackerMutation,
-  usePlaySlotMutation,
-  useGetSlotItemsQuery,
-  useGetSlotStatusQuery,
   useResetBonusCooldownMutation,
 
   useExchangeItemForSubscriptionMutation,
