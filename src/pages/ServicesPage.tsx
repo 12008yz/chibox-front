@@ -273,7 +273,7 @@ const ServicesPage = () => {
                 <Gamepad2 className="w-6 h-6 text-green-400" />
               </div>
               <p className="text-gray-300 text-sm mb-3">
-                Классическая игра против ИИ с возможностью выиграть бонусные предметы
+                Классическая игра против ИИ с возможностью получить бонусные предметы
               </p>
               <div className="text-sm text-gray-400">
                 • Новички: 1 попытка ежедневно<br/>
@@ -283,14 +283,14 @@ const ServicesPage = () => {
 
             <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xl font-bold text-white">Слот-машина</h3>
+                <h3 className="text-xl font-bold text-white">Мини-игра</h3>
                 <Trophy className="w-6 h-6 text-purple-400" />
               </div>
               <p className="text-gray-300 text-sm mb-3">
-                Классическая игра с возможностью выиграть предметы и chiCoins
+                Развлекательная игра с возможностью получить предметы и chiCoins
               </p>
               <div className="text-sm text-gray-400">
-                Стоимость зависит от ставки
+                Стоимость зависит от выбранного уровня
               </div>
             </div>
 
@@ -397,7 +397,7 @@ const ServicesPage = () => {
             <div className="bg-gray-800/50 rounded-lg p-6 border border-green-500/30">
               <h3 className="text-lg font-bold text-white mb-2">Крестики-нолики</h3>
               <p className="text-gray-300 text-sm">
-                1 бесплатная попытка в день для игры против ИИ с возможностью выиграть бонусы
+                1 бесплатная попытка в день для игры против ИИ с возможностью получить бонусы
               </p>
             </div>
           </div>

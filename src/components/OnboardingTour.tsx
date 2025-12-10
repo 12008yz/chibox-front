@@ -34,7 +34,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       position: 'bottom',
       arrowDirection: 'down',
       mobileTitle: 'Добро пожаловать!',
-      mobileDescription: 'Поздравляем! У вас есть 2 дня бонусов:\n\n• 2 бесплатных кейса\n• 2 попытки в слоты (в 16:00 МСК)\n• 2 попытки взлома сейфа (в 16:00 МСК)\n• 2 игры в крестики-нолики (в 16:00 МСК)'
     },
     {
       id: 'free_cases',
