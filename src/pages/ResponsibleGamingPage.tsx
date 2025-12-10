@@ -18,17 +18,17 @@ const ResponsibleGamingPage = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-4 text-white">Признаки проблемной игры</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Признаки чрезмерного увлечения</h2>
             <p className="mb-4">
               Обратите внимание на следующие признаки:
             </p>
             <ul className="list-disc ml-6 space-y-2">
               <li>Вы тратите больше времени и денег, чем планировали</li>
-              <li>Игра мешает вашей работе, учебе или личной жизни</li>
-              <li>Вы играете, чтобы убежать от проблем</li>
-              <li>Вы скрываете свою игровую активность от близких</li>
-              <li>Вы чувствуете беспокойство, когда не играете</li>
-              <li>Вы пытаетесь отыграть проигрыши</li>
+              <li>Использование сервиса мешает вашей работе, учебе или личной жизни</li>
+              <li>Вы используете платформу, чтобы убежать от проблем</li>
+              <li>Вы скрываете свою активность от близких</li>
+              <li>Вы чувствуете беспокойство, когда не используете сервис</li>
+              <li>Вы пытаетесь компенсировать потери</li>
             </ul>
           </section>
 
@@ -58,14 +58,14 @@ const ResponsibleGamingPage = () => {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-4 text-white">Советы по ответственной игре</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Советы по ответственному использованию</h2>
             <ul className="list-disc ml-6 space-y-2">
               <li>Установите бюджет и придерживайтесь его</li>
-              <li>Играйте только на деньги, которые можете позволить себе потерять</li>
-              <li>Не пытайтесь отыграть проигрыши</li>
+              <li>Используйте только средства, которые можете позволить себе потратить</li>
+              <li>Не пытайтесь компенсировать затраты</li>
               <li>Делайте регулярные перерывы</li>
-              <li>Не играйте под влиянием алкоголя или когда расстроены</li>
-              <li>Балансируйте игру с другими видами деятельности</li>
+              <li>Не используйте сервис под влиянием алкоголя или когда расстроены</li>
+              <li>Балансируйте развлечения с другими видами деятельности</li>
             </ul>
           </section>
 
@@ -81,11 +81,11 @@ const ResponsibleGamingPage = () => {
           <section>
             <h2 className="text-2xl font-bold mb-4 text-white">Получите помощь</h2>
             <p className="mb-4">
-              Если вы или кто-то из ваших знакомых испытывает проблемы с игровой зависимостью,
+              Если вы или кто-то из ваших знакомых испытывает проблемы с чрезмерным увлечением,
               обратитесь за помощью:
             </p>
             <div className="bg-orange-500/10 border border-orange-500/30 p-6 rounded-lg">
-              <p className="mb-2 text-white font-bold">Горячая линия помощи игрокам</p>
+              <p className="mb-2 text-white font-bold">Горячая линия психологической помощи</p>
               <p className="mb-4">8-800-XXX-XX-XX (звонок бесплатный, круглосуточно)</p>
 
               <p className="mb-2 text-white font-bold">Email</p>
@@ -95,11 +95,11 @@ const ResponsibleGamingPage = () => {
                 </a>
               </p>
 
-              <p className="mb-2 text-white font-bold">Онлайн-ресурсы</p>
+              <p className="mb-2 text-white font-bold">Полезные ресурсы</p>
               <ul className="space-y-1">
-                <li>• Анонимные игроки (www.gamblersanonymous.org)</li>
-                <li>• GamCare (www.gamcare.org.uk)</li>
-                <li>• BeGambleAware (www.begambleaware.org)</li>
+                <li>• Психологическая помощь онлайн</li>
+                <li>• Служба анонимной поддержки</li>
+                <li>• Консультации специалистов</li>
               </ul>
             </div>
           </section>
@@ -116,7 +116,7 @@ const ResponsibleGamingPage = () => {
           </section>
 
           <p className="text-sm text-gray-500 mt-12">
-            Помните: игра должна быть развлечением, а не способом заработка.
+            Помните: платформа предназначена для развлечения, а не для заработка.
           </p>
         </div>
       </div>
