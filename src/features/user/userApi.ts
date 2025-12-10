@@ -278,19 +278,6 @@ export const userApi = baseApi.injectEndpoints({
 
 
 
-    // Вывод баланса
-    withdrawBalance: builder.mutation<
-      ApiResponse<{ withdrawal_id: string }>,
-      { amount: number; method: string }
-    >({
-      query: (withdrawData) => ({
-        url: 'v1/withdraw-balance',
-        method: 'POST',
-        body: withdrawData,
-      }),
-      invalidatesTags: ['Balance', 'User'],
-    }),
-
     // Получение таблицы лидеров
     getLeaderboard: builder.query<
       ApiResponse<{
@@ -932,13 +919,11 @@ export const {
   useGetUnreadNotificationsCountQuery,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
-  // useDeleteNotificationMutation, // Удалено - дублирует экспорт из notificationsApi
   useGetUserTransactionsQuery,
   useGetUserStatisticsQuery,
   useGetGlobalStatisticsQuery,
   useGetUserSubscriptionQuery,
   useApplyPromoCodeMutation,
-  useWithdrawBalanceMutation,
   useGetLeaderboardQuery,
   useGetBonusStatusQuery,
   useGetSafeCrackerStatusQuery,
