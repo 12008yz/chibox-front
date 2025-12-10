@@ -318,7 +318,7 @@ const ExchangePage: React.FC = () => {
       const subscriptionDays = calculateSubscriptionDays(itemPrice);
 
       if (subscriptionDays < 1 || itemPrice < minExchangePrice) {
-        toast.error(t('exchange.min_exchange_price', { price: minExchangePrice }) + ` (${Math.round(itemPrice)}₽)`);
+        toast.error(t('exchange.min_exchange_price', { price: minExchangePrice }) + ` (${Math.round(itemPrice)} ChiCoins)`);
         return;
       }
 
@@ -454,7 +454,11 @@ const ExchangePage: React.FC = () => {
                 <RefreshCw className="text-orange-400 w-6 h-6 md:w-8 md:h-8" />
                 <div>
                   <div className="text-orange-400 text-xs md:text-sm font-medium">{t('exchange.exchange_rate')}</div>
-                  <div className="text-white text-sm md:text-xl font-bold">{pricePerDay}₽/{t('time.day')}</div>
+                  <div className="text-white text-sm md:text-xl font-bold flex items-center gap-1">
+                    {pricePerDay}
+                    <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 md:w-5 md:h-5 inline-block" />
+                    /{t('time.day')}
+                  </div>
                   <div className="text-gray-500 text-[10px] md:text-xs">{t('exchange.tier', { tier: subscriptionData?.data?.subscription_tier || 1 })}</div>
                 </div>
               </div>

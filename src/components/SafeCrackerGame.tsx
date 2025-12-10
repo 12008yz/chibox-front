@@ -343,7 +343,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                     <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-3 rounded-xl shadow-2xl border-2 border-green-300">
                       <div className="text-white font-bold text-2xl sm:text-3xl md:text-4xl whitespace-nowrap flex items-center gap-2">
                         <Coins className="w-8 h-8 sm:w-10 sm:h-10" />
-                        <span>+{prizeValue}₽</span>
+                        <span className="flex items-center gap-1">
+                          +{prizeValue}
+                          <img src="/images/chiCoin.png" alt="ChiCoins" className="w-5 h-5 inline-block" />
+                        </span>
                       </div>
                     </div>
                   </motion.div>
@@ -393,7 +396,10 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                             {wonItem.name}
                           </p>
                           <p className="text-yellow-300 font-bold text-xs sm:text-sm text-center">
-                            {wonItem.price}₽
+                            <span className="flex items-center gap-1">
+                              {wonItem.price}
+                              <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+                            </span>
                           </p>
                         </div>
                       </div>

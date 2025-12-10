@@ -34,7 +34,10 @@ const ServicesPage = () => {
                 <h3 className="text-2xl font-bold text-blue-400">Статус</h3>
                 <Shield className="w-8 h-8 text-blue-400" />
               </div>
-              <div className="text-3xl font-bold text-white mb-4">1 811 ₽</div>
+              <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+                1 811
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
+              </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
               <div className="space-y-3 text-sm">
@@ -63,7 +66,10 @@ const ServicesPage = () => {
                 <h3 className="text-2xl font-bold text-purple-400">Статус+</h3>
                 <Shield className="w-8 h-8 text-purple-400" />
               </div>
-              <div className="text-3xl font-bold text-white mb-4">3 666 ₽</div>
+              <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+                3 666
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
+              </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
               <div className="space-y-3 text-sm">
@@ -96,7 +102,10 @@ const ServicesPage = () => {
                 <h3 className="text-2xl font-bold text-orange-400">Статус++</h3>
                 <Crown className="w-8 h-8 text-orange-400" />
               </div>
-              <div className="text-3xl font-bold text-white mb-4">7 580 ₽</div>
+              <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+                7 580
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
+              </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
               <div className="space-y-3 text-sm">
@@ -148,7 +157,10 @@ const ServicesPage = () => {
             <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50">
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-xl font-bold text-white">Стандартный кейс</h3>
-                <div className="text-2xl font-bold text-orange-400">99 ₽</div>
+                <div className="text-2xl font-bold text-orange-400 flex items-center gap-1">
+                  99
+                  <img src="/images/chiCoin.png" alt="ChiCoins" className="w-6 h-6 inline-block" />
+                </div>
               </div>
               <p className="text-gray-300 text-sm">
                 Базовый кейс с разнообразными игровыми предметами из Counter-Strike 2
@@ -158,7 +170,10 @@ const ServicesPage = () => {
             <div className="bg-gray-800/50 rounded-lg p-6 border border-purple-500/50">
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-xl font-bold text-purple-300">Премиум кейс</h3>
-                <div className="text-2xl font-bold text-purple-400">499 ₽</div>
+                <div className="text-2xl font-bold text-purple-400 flex items-center gap-1">
+                  499
+                  <img src="/images/chiCoin.png" alt="ChiCoins" className="w-6 h-6 inline-block" />
+                </div>
               </div>
               <p className="text-gray-300 text-sm">
                 Улучшенный кейс с повышенным шансом получения редких и ценных предметов
@@ -168,39 +183,66 @@ const ServicesPage = () => {
 
           <div className="grid md:grid-cols-4 gap-4">
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">17 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                17
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Ночной дозор</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">49 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                49
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Пушистый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">101 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                101
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Санитарный набор</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">250 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                250
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Платиновый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">601 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                601
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Космический кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">998 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                998
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Морской кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">2 499 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                2 499
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Ледяной кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">5 000 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                5 000
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Бурый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
-              <div className="text-lg font-bold text-orange-400 mb-1">10 000 ₽</div>
+              <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
+                10 000
+                <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+              </div>
               <p className="text-xs text-gray-400">Демонический кейс</p>
             </div>
           </div>
@@ -365,7 +407,10 @@ const ServicesPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[100, 500, 1000, 2000, 5000].map(amount => (
               <div key={amount} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center hover:border-orange-500/50 transition-all">
-                <div className="text-2xl font-bold text-orange-400 mb-1">{amount} ₽</div>
+                <div className="text-2xl font-bold text-orange-400 mb-1 flex items-center gap-1">
+                  {amount}
+                  <img src="/images/chiCoin.png" alt="ChiCoins" className="w-6 h-6 inline-block" />
+                </div>
                 <div className="text-xs text-gray-400">≈ {amount * 10} chiCoins</div>
               </div>
             ))}
@@ -427,7 +472,7 @@ const ServicesPage = () => {
               <span className="text-orange-400 font-bold">•</span>
               <p>
                 <strong className="text-white">Система оплаты:</strong> Все платежи обрабатываются через
-                безопасные платежные системы (Robokassa, FreeKassa, YooMoney). Цены указаны в рублях РФ.
+                безопасные платежные системы (Robokassa, FreeKassa, YooMoney). Цены указаны в ChiCoins.
               </p>
             </div>
 
