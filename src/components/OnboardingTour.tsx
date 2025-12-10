@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaArrowDown, FaTimes, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { CelebrateIcon, GiftIcon, SlotsIcon, TicTacToeIcon, BalanceIcon } from './icons';
+import { CelebrateIcon, GiftIcon, TicTacToeIcon, BalanceIcon } from './icons';
 
 interface OnboardingStep {
   id: string;
@@ -47,16 +47,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       mobileDescription: 'Прокрутите вниз и найдите бесплатные кейсы. У вас есть 2 попытки открыть их!'
     },
     {
-      id: 'slot',
-      targetId: 'onboarding-slot-button',
-      title: t('onboarding.slot_title', 'Слоты - 2 Попытки!'),
-      description: t('onboarding.slot_description', 'Нажмите сюда, чтобы открыть слот-машину! У вас 2 бесплатные попытки. Первая доступна сразу, вторая — в 16:00 МСК. Действует 2 дня с регистрации!'),
-      position: 'bottom',
-      arrowDirection: 'down',
-      mobileTitle: 'Слоты',
-      mobileDescription: 'Откройте меню (☰ в правом верхнем углу) и нажмите "Слот". У вас 2 бесплатные попытки (вторая в 16:00 МСК)!'
-    },
-    {
       id: 'safe',
       targetId: 'onboarding-safe-button',
       title: t('onboarding.safe_title', 'Сейф - 2 Попытки!'),
@@ -96,8 +86,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         return <CelebrateIcon className={`${iconClass} w-6 h-6`} />;
       case 'free_cases':
         return <GiftIcon className={`${iconClass} w-6 h-6`} />;
-      case 'slot':
-        return <SlotsIcon className={`${iconClass} w-6 h-6`} />;
       case 'safe':
         return <span className={`${iconClass} text-2xl`}>🔐</span>;
       case 'tictactoe':

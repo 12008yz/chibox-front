@@ -92,15 +92,6 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       action: () => onPlaySafeCracker?.()
     },
     {
-      id: 'slots',
-      name: t('slots.title'),
-      description: `Испытай удачу в слоте`,
-      icon: <img src="/images/status3.png" alt="Слот-машина" className="w-full h-full object-contain"/>,
-      color: '',
-      available: true,
-      action: () => navigate('/slot')
-    },
-    {
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
