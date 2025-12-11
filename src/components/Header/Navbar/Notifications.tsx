@@ -25,7 +25,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         pollingInterval: openNotifications ? 3000 : 0, // Обновляем каждые 3 секунды когда панель открыта
     });
 
-    // Мутации для работы с уведомлениями
+    // Мутации для работы с  уведомлениями
     const [markAsRead] = useMarkNotificationAsReadMutation();
     const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
 
