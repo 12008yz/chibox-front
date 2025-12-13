@@ -208,8 +208,8 @@ const ExchangePage: React.FC = () => {
   // Функция расчета дней подписки
   const calculateSubscriptionDays = useCallback((itemPrice: number) => {
     // Используем ту же логику что и на бэкенде:
-    // Для тарифа 3: 325-350₽ = 1 день, 675-700₽ = 2 дня и т.д.
-    // Для тарифов 1,2: 186-200₽ = 1 день, 386-400₽ = 2 дня и т.д.
+    // Для тарифа 3: 325-350 ChiCoins = 1 день, 675-700 ChiCoins = 2 дня и т.д.
+    // Для тарифов 1,2: 186-200 ChiCoins = 1 день, 386-400 ChiCoins = 2 дня и т.д.
     return Math.floor((itemPrice + pricePerDay * 0.067) / pricePerDay);
   }, [pricePerDay]);
 
