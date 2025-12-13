@@ -59,7 +59,8 @@
     "marketplace": "Marktplatz",
     "coin_flip": "Münzwurf",
     "crash": "Crash",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "tower_defense": "Turmverteidigung"
   },
   "auth": {
     "login_title": "Anmelden",

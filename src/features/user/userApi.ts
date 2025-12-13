@@ -16,6 +16,11 @@ import type {
   TicTacToeCurrentGameResponse,
   TicTacToeCreateGameResponse,
   TicTacToeMakeMoveResponse,
+  TowerDefenseStatusResponse,
+  TowerDefenseCreateGameResponse,
+  TowerDefenseCompleteGameRequest,
+  TowerDefenseCompleteGameResponse,
+  TowerDefenseStatisticsResponse,
   TopUpBalanceRequest,
   TopUpBalanceResponse
 } from '../../types/api';
@@ -680,6 +685,47 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ['TicTacToe', 'Inventory', 'Cases'],
     }),
 
+    // Tower Defense API
+    getTowerDefenseStatus: builder.query<
+      TowerDefenseStatusResponse,
+      void
+    >({
+      query: () => 'v1/tower-defense/status',
+      providesTags: ['TicTacToe'], // Используем тот же тег для инвалидации
+    }),
+
+    createTowerDefenseGame: builder.mutation<
+      TowerDefenseCreateGameResponse,
+      { inventoryItemId?: string }
+    >({
+      query: (data) => ({
+        url: 'v1/tower-defense/new-game',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['TicTacToe', 'Inventory'],
+    }),
+
+    completeTowerDefenseGame: builder.mutation<
+      TowerDefenseCompleteGameResponse,
+      TowerDefenseCompleteGameRequest
+    >({
+      query: (data) => ({
+        url: 'v1/tower-defense/complete',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['TicTacToe', 'Inventory', 'Balance'],
+    }),
+
+    getTowerDefenseStatistics: builder.query<
+      TowerDefenseStatisticsResponse,
+      void
+    >({
+      query: () => 'v1/tower-defense/statistics',
+      providesTags: ['TicTacToe'],
+    }),
+
     // Upgrade API
     getUserUpgradeableItems: builder.query<
       ApiResponse<{
@@ -945,6 +991,12 @@ export const {
   useCreateTicTacToeGameMutation,
   useGetCurrentTicTacToeGameQuery,
   useMakeTicTacToeMoveMutation,
+
+  // Tower Defense hooks
+  useGetTowerDefenseStatusQuery,
+  useCreateTowerDefenseGameMutation,
+  useCompleteTowerDefenseGameMutation,
+  useGetTowerDefenseStatisticsQuery,
 
   // Upgrade хуки
   useGetUserUpgradeableItemsQuery,

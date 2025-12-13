@@ -59,7 +59,8 @@
     "marketplace": "Place de marché",
     "coin_flip": "Pile ou Face",
     "crash": "Crash",
-    "upgrade": "Amélioration"
+    "upgrade": "Amélioration",
+    "tower_defense": "Défense de Tour"
   },
   "auth": {
     "login_title": "Se connecter",
