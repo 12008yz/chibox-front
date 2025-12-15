@@ -25,7 +25,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         pollingInterval: openNotifications ? 3000 : 0, // Обновляем каждые 3 секунды когда панель открыта
     });
 
-    // Мутации для работы с уведомлениями
+    // Мутации для работы с  уведомлениями
     const [markAsRead] = useMarkNotificationAsReadMutation();
     const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
 
@@ -173,7 +173,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
 
         // Определяем тип уведомления по заголовку и переводим
         if (title.includes('Покупка кейсов') || title.toLowerCase().includes('case purchase')) {
-            const match = message.match(/(\d+).+?(\d+)₽/);
+            const match = message.match(/(\d+).+?(\d+)\s*(ChiCoins|ChiCoin)/i);
             if (match) {
                 return {
                     title: t('notifications.notification_types.case_purchase'),
@@ -264,7 +264,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         }
 
         if (title.includes('Бонус') || title.toLowerCase().includes('bonus')) {
-            const amountMatch = message.match(/(\d+)₽/);
+            const amountMatch = message.match(/(\d+)\s*(ChiCoins|ChiCoin)/i);
             if (amountMatch) {
                 return {
                     title: t('notifications.notification_types.bonus_claimed'),

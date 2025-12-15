@@ -25,6 +25,7 @@ const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
 const ExchangePage = lazy(() => import('./pages/ExchangePage'));
 const UpgradePage = lazy(() => import('./pages/UpgradePage'));
+const TowerDefensePage = lazy(() => import('./pages/TowerDefensePage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const ResponsibleGamingPage = lazy(() => import('./pages/ResponsibleGamingPage'));
@@ -286,6 +287,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <UpgradePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tower-defense"
+              element={
+                <ProtectedRoute>
+                  <TowerDefensePage />
                 </ProtectedRoute>
               }
             />

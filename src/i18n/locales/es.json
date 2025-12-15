@@ -59,7 +59,8 @@
     "marketplace": "Mercado",
     "coin_flip": "Cara o Cruz",
     "crash": "Crash",
-    "upgrade": "Mejora"
+    "upgrade": "Mejora",
+    "tower_defense": "Defensa de Torres"
   },
   "auth": {
     "login_title": "Iniciar sesión",

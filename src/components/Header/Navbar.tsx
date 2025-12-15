@@ -7,6 +7,7 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 import { IoMdTrophy } from 'react-icons/io';
 import { ImConnection } from "react-icons/im";
 import { HiSparkles } from 'react-icons/hi';
+import { GiSwordman } from 'react-icons/gi';
 import RightContent from "./Navbar/RightContent";
 
 interface NavbarProps {
@@ -69,6 +70,11 @@ const Navbar: React.FC<NavbarProps> = ({
       to: "/leaderboard",
       icon: <IoMdTrophy className="text-lg" />,
       label: t('header.leaderboard_table'),
+    },
+    {
+      to: "/tower-defense",
+      icon: <GiSwordman className="text-lg" />,
+      label: t('header.tower_defense'),
     }
   ];
 

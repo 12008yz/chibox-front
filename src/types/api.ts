@@ -379,6 +379,97 @@ export interface TicTacToeMakeMoveResponse {
   message?: string;
 }
 
+// Типы для Tower Defense
+export interface TowerDefenseGame {
+  id: string;
+  user_id: string;
+  waves_completed: number;
+  total_waves: number;
+  enemies_killed: number;
+  towers_built: number;
+  score: number;
+  result: 'win' | 'lose' | 'in_progress';
+  reward_amount?: number;
+  bet_item_id?: string;
+  bet_inventory_id?: string;
+  reward_item_id?: string;
+  game_data?: any;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TowerDefenseStatusResponse {
+  success: boolean;
+  data: {
+    canPlay: boolean;
+    attemptsLeft: number;
+    maxAttempts: number;
+    currentGame?: TowerDefenseGame;
+    hasSubscription: boolean;
+    subscriptionTier: number;
+  };
+}
+
+export interface TowerDefenseCreateGameResponse {
+  success: boolean;
+  data: {
+    game: TowerDefenseGame;
+    betItem?: {
+      id: string;
+      name: string;
+      price: number;
+      image_url: string;
+    };
+    rewardItem?: {
+      id: string;
+      name: string;
+      price: number;
+      image_url: string;
+    };
+    attemptsLeft: number;
+  };
+  message?: string;
+}
+
+export interface TowerDefenseCompleteGameRequest {
+  gameId: string;
+  wavesCompleted: number;
+  enemiesKilled: number;
+  towersBuilt: number;
+  result: 'win' | 'lose';
+}
+
+export interface TowerDefenseCompleteGameResponse {
+  success: boolean;
+  data: {
+    game: TowerDefenseGame;
+    reward?: number;
+    rewardItem?: {
+      id: string;
+      name: string;
+      price: number;
+      image_url: string;
+    };
+    newBalance: number;
+  };
+  message?: string;
+}
+
+export interface TowerDefenseStatisticsResponse {
+  success: boolean;
+  data: {
+    statistics: {
+      total_games: number;
+      wins: number;
+      losses: number;
+      total_rewards: number;
+      best_waves: number;
+      total_enemies_killed: number;
+    };
+  };
+}
+
 export interface UpgradeItem {
   id: string;
   name: string;

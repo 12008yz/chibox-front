@@ -59,7 +59,8 @@
     "marketplace": "交易市场",
     "coin_flip": "抛硬币",
     "crash": "崩溃游戏",
-    "upgrade": "升级"
+    "upgrade": "升级",
+    "tower_defense": "塔防"
   },
   "auth": {
     "login_title": "登录账户",

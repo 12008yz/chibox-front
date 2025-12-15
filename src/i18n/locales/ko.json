@@ -91,7 +91,8 @@
     "marketplace": "マーケットプレイス",
     "coin_flip": "コインフリップ",
     "crash": "クラッシュ",
-    "upgrade": "アップグレード"
+    "upgrade": "アップグレード",
+    "tower_defense": "타워 디펜스"
   },
   "auth": {
     "login_title": "ログイン",
