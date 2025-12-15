@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   useGetTowerDefenseStatusQuery,
   useCreateTowerDefenseGameMutation,
@@ -17,10 +16,9 @@ interface TowerDefenseGameProps {
 }
 
 const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, onRewardReceived }) => {
-  const { t } = useTranslation();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [showItemSelection, setShowItemSelection] = useState(false);
-  const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
+  const [gameResult, setGameResult] = useState<'win' | 'lose' | 'in_progress' | null>(null);
   const [rewardItem, setRewardItem] = useState<any>(null);
 
   const { data: statusData, refetch: refetchStatus } = useGetTowerDefenseStatusQuery(undefined, {
@@ -33,7 +31,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
   );
 
   const [createGame, { isLoading: isCreatingGame }] = useCreateTowerDefenseGameMutation();
-  const [completeGame, { isLoading: isCompletingGame }] = useCompleteTowerDefenseGameMutation();
+  const [completeGame] = useCompleteTowerDefenseGameMutation();
 
   const status = statusData?.data;
   const currentGame = status?.currentGame;
@@ -279,4 +277,3 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
 };
 
 export default TowerDefenseGame;
-

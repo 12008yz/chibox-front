@@ -276,7 +276,6 @@ const Footer = () => {
         </div>
       </div>
 
-
       {/* Bottom Bar */}
       <div className="bg-black/50 border-t border-gray-800">
         <div className="container mx-auto px-4 py-6">
@@ -286,7 +285,7 @@ const Footer = () => {
                 © 2024-2025 ChiBox. {t('footer.rights_reserved')}
               </p>
               <p className="text-xs text-gray-600 mt-1">
-                Самозанятый Чикасов Денис Владимирович, ИНН 711204279301, г. Богородицк
+                ИП Чикасов Денис Владимирович, ИНН 711204279301, ОГРНИП 325710000080682, г. Богородицк
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">

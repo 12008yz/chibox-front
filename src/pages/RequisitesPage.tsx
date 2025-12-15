@@ -19,16 +19,16 @@ const RequisitesPage = () => {
                 <span>711204279301</span>
               </div>
               <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <span className="font-semibold text-orange-300 min-w-[200px]">ОГРНИП:</span>
+                <span>325710000080682</span>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <span className="font-semibold text-orange-300 min-w-[200px]">Дата присвоения ОГРНИП:</span>
+                <span>15.12.2025</span>
+              </div>
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <span className="font-semibold text-orange-300 min-w-[200px]">Местонахождение:</span>
                 <span>г. Богородицк, Тульская область, Российская Федерация</span>
-              </div>
-              <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <span className="font-semibold text-orange-300 min-w-[200px]">Дата регистрации:</span>
-                <span>01.05.2025</span>
-              </div>
-              <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <span className="font-semibold text-orange-300 min-w-[200px]">Форма налогообложения:</span>
-                <span>Налог на профессиональный доход (самозанятый)</span>
               </div>
             </div>
           </section>
