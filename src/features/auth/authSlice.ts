@@ -1,17 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { User, AuthState } from '../../types/api';
 
-// Получаем токен из localStorage при инициализации
+// БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, недоступны для JavaScript
+// Не используем localStorage для токенов - это уязвимость XSS
+// Сохраняем только для обратной совместимости с существующими сессиями
 const getInitialToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('auth_token');
+    const oldToken = localStorage.getItem('auth_token');
+    if (oldToken) {
+      console.warn('⚠️ Найден старый токен в localStorage. Миграция на httpOnly cookies.');
+      // Удаляем старый токен для безопасности
+      localStorage.removeItem('auth_token');
+    }
+    return oldToken;
   }
   return null;
 };
 
 const initialState: AuthState = {
   user: null,
-  token: getInitialToken(),
+  token: getInitialToken(), // Только для миграции старых сессий
   isAuthenticated: !!getInitialToken(),
   isLoading: false,
   error: null,
@@ -35,15 +43,14 @@ const authSlice = createSlice({
         token: action.payload.token?.substring(0, 20) + '...'
       });
       state.user = action.payload.user;
-      state.token = action.payload.token;
+      state.token = action.payload.token; // Храним только в Redux для обратной совместимости
       state.isAuthenticated = true;
       state.isLoading = false;
 
-      // Сохраняем токен в localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', action.payload.token);
-        console.log('[authSlice] Token saved to localStorage');
-      }
+      // БЕЗОПАСНОСТЬ: НЕ сохраняем токен в localStorage
+      // Токены теперь в httpOnly cookies на стороне сервера
+      console.log('[authSlice] 🔒 Token is in httpOnly cookie (secure)');
+
       console.log('[authSlice] State after loginSuccess:', {
         isAuthenticated: state.isAuthenticated,
         hasUser: !!state.user,
@@ -84,13 +91,12 @@ const authSlice = createSlice({
 
     // Обновление токена
     setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
+      state.token = action.payload; // Храним только в Redux для обратной совместимости
       state.isAuthenticated = true;
 
-      // Сохраняем новый токен в localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', action.payload);
-      }
+      // БЕЗОПАСНОСТЬ: НЕ сохраняем токен в localStorage
+      // Токены теперь в httpOnly cookies на стороне сервера
+      console.log('[authSlice] 🔒 New token received (in httpOnly cookie)');
     },
 
     // Выход из системы
@@ -104,19 +110,19 @@ const authSlice = createSlice({
       state.lastLoginAttempt = null;
       state.sessionExpiry = null;
 
-      // Очищаем localStorage полностью или только связанные с auth ключи
+      // БЕЗОПАСНОСТЬ: Очищаем только пользовательские данные из localStorage
+      // Токены в httpOnly cookies будут очищены сервером при вызове /logout endpoint
       if (typeof window !== 'undefined') {
-        // Удаляем основной токен авторизации
+        // Удаляем старые токены если они были (для миграции)
         localStorage.removeItem('auth_token');
 
-        // Удаляем другие возможные ключи связанные с пользователем
+        // Удаляем другие пользовательские данные
         localStorage.removeItem('user_data');
         localStorage.removeItem('remember_me');
         localStorage.removeItem('last_login');
-
-        // Можно также очистить весь localStorage если нужно:
-        // localStorage.clear();
       }
+
+      console.log('[authSlice] 🔒 Logged out (httpOnly cookies will be cleared by server)');
     },
 
     // Ошибка авторизации
@@ -146,10 +152,13 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.sessionExpiry = null;
 
-        // Удаляем токен из localStorage
+        // БЕЗОПАСНОСТЬ: Токены в httpOnly cookies автоматически истекут
+        // Удаляем только старые токены если они были (для миграции)
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
         }
+
+        console.log('[authSlice] 🔒 Session expired (httpOnly cookies will expire automatically)');
       }
     },
   },

@@ -8,9 +8,12 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
   timeout: 60000, // 60 секунд таймаут (увеличен для медленных операций)
-  credentials: 'include', // Включаем отправку cookies для session-based аутентификации
+  credentials: 'include', // КРИТИЧЕСКИ ВАЖНО: отправляем httpOnly cookies с каждым запросом
   prepareHeaders: (headers, { getState }) => {
-    // Добавляем токен авторизации из состояния
+    // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, недоступны для JavaScript
+    // Браузер автоматически отправит cookies с каждым запросом благодаря credentials: 'include'
+
+    // Для обратной совместимости: если токен есть в Redux (старые сессии)
     const state = getState() as RootState;
     const token = state.auth.token;
 
@@ -21,7 +24,6 @@ const baseQuery = fetchBaseQuery({
     // НЕ устанавливаем Content-Type здесь!
     // Для JSON fetchBaseQuery установит автоматически
     // Для FormData браузер установит с правильным boundary
-    // Если тело запроса - это JSON (не FormData), fetchBaseQuery автоматически установит Content-Type
 
     return headers;
   },
@@ -36,12 +38,12 @@ const baseQueryWithRetry = retry(baseQuery, {
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
   let result = await baseQueryWithRetry(args, api, extraOptions);
 
-  // Если в ответе есть новый токен, обновляем его в localStorage и Redux
+  // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies
+  // Если в ответе есть токен (для обратной совместимости), сохраняем только в Redux
   if (result.data && typeof result.data === 'object' && 'token' in result.data && typeof (result.data as any).token === 'string') {
-    console.log('Получен новый токен от сервера, обновляем...');
-    localStorage.setItem('auth_token', (result.data as any).token);
+    console.log('🔒 Получен токен от сервера (уже в httpOnly cookie)');
 
-    // Обновляем токен в Redux store
+    // Обновляем токен в Redux store только для обратной совместимости
     api.dispatch({
       type: 'auth/setToken',
       payload: (result.data as any).token
@@ -54,24 +56,25 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
 
     try {
       // Пытаемся обновить токен через refresh endpoint
+      // Refresh token автоматически отправится из httpOnly cookie
       const refreshResult = await baseQuery(
         { url: '/v1/auth/refresh', method: 'POST' },
         api,
         extraOptions
       );
 
-      if (refreshResult.data && typeof refreshResult.data === 'object' && 'token' in refreshResult.data) {
-        const newToken = (refreshResult.data as any).token;
-        console.log('✅ Токен успешно обновлен');
+      if (refreshResult.data && typeof refreshResult.data === 'object' && 'success' in refreshResult.data && (refreshResult.data as any).success) {
+        console.log('✅ Токен успешно обновлен (новые токены в httpOnly cookies)');
 
-        // Сохраняем новый токен
-        localStorage.setItem('auth_token', newToken);
-        api.dispatch({
-          type: 'auth/setToken',
-          payload: newToken
-        });
+        // Обновляем токен в Redux только для обратной совместимости
+        if ('token' in refreshResult.data) {
+          api.dispatch({
+            type: 'auth/setToken',
+            payload: (refreshResult.data as any).token
+          });
+        }
 
-        // Повторяем оригинальный запрос с новым токеном
+        // Повторяем оригинальный запрос с новым токеном (из cookie)
         result = await baseQueryWithRetry(args, api, extraOptions);
       } else {
         // Не удалось обновить токен - выходим
