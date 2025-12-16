@@ -34,7 +34,7 @@ const baseQueryWithRetry = retry(baseQuery, {
 
 // Обертка для обработки ошибок авторизации и обновления токенов
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
-  const result = await baseQueryWithRetry(args, api, extraOptions);
+  let result = await baseQueryWithRetry(args, api, extraOptions);
 
   // Если в ответе есть новый токен, обновляем его в localStorage и Redux
   if (result.data && typeof result.data === 'object' && 'token' in result.data && typeof (result.data as any).token === 'string') {
@@ -48,10 +48,40 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
     });
   }
 
-  // Логируем ошибки авторизации, но НЕ делаем автоматический logout
+  // Обработка 401 ошибок - пытаемся обновить токен
   if (result.error?.status === 401) {
-    console.log('401 Unauthorized error for:', args);
-    // Автоматический logout теперь будет только в App.tsx для getCurrentUser
+    console.log('401 Unauthorized error, trying to refresh token...');
+
+    try {
+      // Пытаемся обновить токен через refresh endpoint
+      const refreshResult = await baseQuery(
+        { url: '/v1/auth/refresh', method: 'POST' },
+        api,
+        extraOptions
+      );
+
+      if (refreshResult.data && typeof refreshResult.data === 'object' && 'token' in refreshResult.data) {
+        const newToken = (refreshResult.data as any).token;
+        console.log('✅ Токен успешно обновлен');
+
+        // Сохраняем новый токен
+        localStorage.setItem('auth_token', newToken);
+        api.dispatch({
+          type: 'auth/setToken',
+          payload: newToken
+        });
+
+        // Повторяем оригинальный запрос с новым токеном
+        result = await baseQueryWithRetry(args, api, extraOptions);
+      } else {
+        // Не удалось обновить токен - выходим
+        console.log('❌ Не удалось обновить токен, делаем logout');
+        api.dispatch({ type: 'auth/logout' });
+      }
+    } catch (refreshError) {
+      console.error('Ошибка при обновлении токена:', refreshError);
+      api.dispatch({ type: 'auth/logout' });
+    }
   }
 
   // Логируем сетевые ошибки
