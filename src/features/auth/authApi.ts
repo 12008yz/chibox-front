@@ -24,7 +24,7 @@ export const authApi = baseApi.injectEndpoints({
 
     // Вход в систему
     login: builder.mutation<
-      ApiResponse<{ user: User; token: string }>,
+      ApiResponse<{ user: User }>,
       LoginRequest
     >({
       query: (credentials) => {
@@ -36,9 +36,14 @@ export const authApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: any) => {
-        console.log('[authApi] Login response received:', response);
+        console.log('[authApi] Login response received:', JSON.stringify(response, null, 2));
+        console.log('[authApi] Response keys:', Object.keys(response));
+        console.log('[authApi] response.success:', response.success);
+        console.log('[authApi] response.user:', response.user);
+
+        // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, не в теле ответа
         // Трансформируем ответ бэкенда к ожидаемому формату
-        if (response.success && response.token && response.user) {
+        if (response.success && response.user) {
           // Добавляем achievements и inventory к пользователю, если они есть
           const user = {
             ...response.user,
@@ -49,15 +54,19 @@ export const authApi = baseApi.injectEndpoints({
           const transformedResponse = {
             success: response.success,
             data: {
-              user,
-              token: response.token
+              user
+              // token больше не отправляется - он в httpOnly cookie
             },
             message: response.message
           };
           console.log('[authApi] Login transformed response:', transformedResponse);
           return transformedResponse;
         }
-        console.log('[authApi] Login response not successful, returning as is');
+        console.log('[authApi] Login response not successful or missing user, returning as is');
+        console.error('[authApi] ERROR: Expected response.success && response.user, but got:', {
+          success: response.success,
+          hasUser: !!response.user
+        });
         return response;
       },
       invalidatesTags: ['User', 'Profile'],

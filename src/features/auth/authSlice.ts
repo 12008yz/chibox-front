@@ -37,24 +37,24 @@ const authSlice = createSlice({
     },
 
     // Успешная авторизация
-    loginSuccess: (state, action: PayloadAction<{ user: User | null; token: string }>) => {
+    loginSuccess: (state, action: PayloadAction<{ user: User | null; token?: string }>) => {
       console.log('[authSlice] loginSuccess called with:', {
         user: action.payload.user,
-        token: action.payload.token?.substring(0, 20) + '...'
+        hasToken: !!action.payload.token
       });
       state.user = action.payload.user;
-      state.token = action.payload.token; // Храним только в Redux для обратной совместимости
+      // БЕЗОПАСНОСТЬ: НЕ сохраняем токен ни в Redux, ни в localStorage
+      // Токены ТОЛЬКО в httpOnly cookies на стороне сервера
+      // token больше не передается от сервера
+      state.token = null;
       state.isAuthenticated = true;
       state.isLoading = false;
 
-      // БЕЗОПАСНОСТЬ: НЕ сохраняем токен в localStorage
-      // Токены теперь в httpOnly cookies на стороне сервера
-      console.log('[authSlice] 🔒 Token is in httpOnly cookie (secure)');
+      console.log('[authSlice] 🔒 Token is in httpOnly cookie (secure, not accessible to JS)');
 
       console.log('[authSlice] State after loginSuccess:', {
         isAuthenticated: state.isAuthenticated,
-        hasUser: !!state.user,
-        hasToken: !!state.token
+        hasUser: !!state.user
       });
     },
 

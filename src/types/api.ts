@@ -320,6 +320,9 @@ export interface BonusStatus {
 // Auth state
 export interface AuthState {
   user: User | null;
+  // БЕЗОПАСНОСТЬ: Токены теперь ТОЛЬКО в httpOnly cookies
+  // token оставлен для обратной совместимости, но НЕ используется
+  // @deprecated Токены больше не хранятся в Redux - они в httpOnly cookies
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;

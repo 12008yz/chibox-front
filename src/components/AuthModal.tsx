@@ -68,17 +68,33 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
     setLoginError('');
 
     try {
+      console.log('[AuthModal] Sending login request...');
       const result = await login({ email: loginEmail, password: loginPassword }).unwrap();
 
+      console.log('[AuthModal] Login result received:', result);
+      console.log('[AuthModal] result.success:', result.success);
+      console.log('[AuthModal] result.data:', result.data);
+      console.log('[AuthModal] result.data?.user:', result.data?.user);
+
       if (result.success && result.data) {
+        console.log('[AuthModal] Login successful, calling handleLoginSuccess');
         handleLoginSuccess(result.data);
         onClose();
         navigate('/');
       } else {
+        console.error('[AuthModal] Login failed - success or data missing:', {
+          success: result.success,
+          hasData: !!result.data
+        });
         setLoginError(t('auth.login_error'));
       }
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error('[AuthModal] Login error caught:', err);
+      console.error('[AuthModal] Error details:', {
+        status: err?.status,
+        data: err?.data,
+        message: err?.data?.message
+      });
       setLoginError(err?.data?.message || t('auth.login_error_generic'));
     }
   };

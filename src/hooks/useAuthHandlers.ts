@@ -7,8 +7,9 @@ export const useAuthHandlers = () => {
   const dispatch = useAppDispatch();
 
   // Функция для обработки успешного логина
-  const handleLoginSuccess = (data: { user: any | null; token: string }) => {
-    if (data?.token) {
+  const handleLoginSuccess = (data: { user: any | null; token?: string }) => {
+    // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, не в теле ответа
+    if (data?.user) {
       // ВАЖНО: Очищаем старые данные перед новым логином
       console.log('Clearing old state before new login...');
 
@@ -19,10 +20,10 @@ export const useAuthHandlers = () => {
       dispatch(logout());
 
       // Только после очистки сохраняем новые данные
-      console.log('Setting new login data...');
+      console.log('Setting new login data (token in httpOnly cookie)...');
       dispatch(loginSuccess({
         user: data.user,
-        token: data.token,
+        // token больше не передается - он в httpOnly cookie
       }));
     }
   };
