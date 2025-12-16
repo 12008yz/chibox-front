@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { RootState } from '../store';
 import Title from '../components/Title';
 import TopPlayer from '../components/TopPlayer';
 import Player from '../components/Player';
@@ -44,7 +42,6 @@ const LeaderboardPage: React.FC = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const token = useSelector((state: RootState) => state.auth.token);
 
   const tabs: TabConfig[] = [
     {
@@ -68,19 +65,12 @@ const LeaderboardPage: React.FC = () => {
   ];
 
   const fetchLeaderboard = async (type: LeaderboardType) => {
-    if (!token) {
-      setLoading(false);
-      setError(t('leaderboard_page.auth_required'));
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
       const response = await fetch(`${API_URL}/v1/leaderboard?type=${type}&limit=10`, {
         credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -105,7 +95,7 @@ const LeaderboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchLeaderboard(activeTab);
-  }, [activeTab, token]);
+  }, [activeTab]);
 
   const handleTabChange = (tabId: LeaderboardType) => {
     setActiveTab(tabId);
