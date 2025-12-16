@@ -141,8 +141,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'lo
 
           if (loginResult.success && loginResult.data) {
             dispatch(loginSuccess({
-              user: loginResult.data.user,
-              token: loginResult.data.token
+              user: loginResult.data.user
             }));
             onClose();
           }

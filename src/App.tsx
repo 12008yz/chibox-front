@@ -16,6 +16,7 @@ import AuthModal from './components/AuthModal';
 import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
+import CookieBanner from './components/CookieBanner';
 
 // Lazy loading страниц
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -317,6 +318,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <DiagnosticOverlay />
+      <CookieBanner />
     </Router>
   );
 };

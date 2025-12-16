@@ -1097,5 +1097,18 @@
     "skip": "Skip",
     "next": "Next",
     "finish": "Finish"
+  },
+  "cookies": {
+    "title": "We use cookies",
+    "description": "We use essential cookies to ensure proper authentication and security of your account. These cookies are necessary for the website to function and cannot be disabled.",
+    "essential_title": "Essential Cookies",
+    "essential_description": "Authentication tokens (httpOnly cookies) for secure login and session management. These cookies protect your account and are stored securely.",
+    "duration": "Storage duration",
+    "duration_value": "Session cookies (deleted after closing browser) and long-term cookies (up to 30 days with your consent)",
+    "purpose": "Purpose",
+    "purpose_value": "User authentication, session security, protection against unauthorized access",
+    "accept": "Got it",
+    "learn_more": "Learn more",
+    "hide_details": "Hide details"
   }
 }
