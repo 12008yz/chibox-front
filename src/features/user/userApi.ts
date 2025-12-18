@@ -270,7 +270,7 @@ export const userApi = baseApi.injectEndpoints({
 
     // Применение промокода
     applyPromoCode: builder.mutation<
-      ApiResponse<{ reward_type: string; reward_value: number }>,
+      ApiResponse<{ newBalance: number; addedAmount: number }>,
       ApplyPromoRequest
     >({
       query: (promoData) => ({
@@ -279,6 +279,20 @@ export const userApi = baseApi.injectEndpoints({
         body: promoData,
       }),
       invalidatesTags: ['User', 'Balance'],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success && data.data?.newBalance !== undefined) {
+            // Обновляем баланс в Redux store
+            dispatch({
+              type: 'auth/updateBalance',
+              payload: data.data.newBalance,
+            });
+          }
+        } catch {
+          // Ошибка уже обработана в компоненте
+        }
+      },
     }),
 
 
