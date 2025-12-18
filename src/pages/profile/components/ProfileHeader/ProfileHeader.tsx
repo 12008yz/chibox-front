@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaGift } from 'react-icons/fa';
 import Avatar from '../../../../components/Avatar';
 import Tooltip from '../../../../components/Tooltip';
 import { calculateLevelProgress } from '../../utils/profileUtils';
 import Monetary from '../../../../components/Monetary';
 import AvatarSelectorModal from '../Modals/AvatarSelectorModal';
+import PromoCodeModal from '../Modals/PromoCodeModal';
 // import AvatarUploadModal from '../Modals/AvatarUploadModal'; // DISABLED - only Steam avatars
 // import { getAvatarUrl } from '../../../../utils/avatarUtils'; // DISABLED - only Steam avatars
 
@@ -17,6 +19,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
   const { t } = useTranslation();
   const { xpInCurrentLevel, xpToNextLevel, progressPercentage } = calculateLevelProgress(user);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isPromoCodeModalOpen, setIsPromoCodeModalOpen] = useState(false);
 
   return (
     <div className="relative bg-black/50 rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/10 overflow-hidden shadow-xl">
@@ -28,6 +31,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
 
       {/* Action Buttons */}
       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex gap-2 z-10">
+        {/* Promo Code Button */}
+        <button
+          onClick={() => setIsPromoCodeModalOpen(true)}
+          data-no-click-sound="true"
+          className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 rounded-lg transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/20"
+          title="Активировать промокод"
+        >
+          <FaGift className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 hover:text-purple-300 transition-colors" />
+        </button>
+
         {/* Settings Button */}
         <button
           onClick={onSettingsClick}
@@ -171,6 +184,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
         isOpen={isAvatarModalOpen}
         onClose={() => setIsAvatarModalOpen(false)}
         currentAvatarUrl={user.avatar_url}
+      />
+
+      {/* Promo Code Modal */}
+      <PromoCodeModal
+        isOpen={isPromoCodeModalOpen}
+        onClose={() => setIsPromoCodeModalOpen(false)}
       />
     </div>
   );

@@ -272,7 +272,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         className="w-full bg-gray-900/70 border border-gray-700 rounded-lg pl-4 pr-16 py-3 sm:py-4 text-white text-xl sm:text-2xl font-semibold focus:outline-none focus:border-gray-500 transition-colors"
                         placeholder="100"
                       />
-                   
+
                     </div>
                   </div>
 
@@ -289,24 +289,28 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                   {/* Promo Code */}
                   <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Промокод (опционально)
+                    <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                      Промокод на бонус к пополнению (опционально)
+                      <span className="text-xs text-purple-400 font-normal">DEPOSIT5, DEPOSIT10, DEPOSIT15</span>
                     </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                        placeholder="Введите промокод"
+                        placeholder="Введите промокод (например, DEPOSIT10)"
                         className="flex-1 bg-gray-900/70 border border-gray-700 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 transition-colors uppercase text-sm sm:text-base"
                       />
                       <button
                         onClick={handleApplyPromo}
-                        className="px-4 sm:px-5 py-2 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors text-sm sm:text-base"
+                        className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-colors text-sm sm:text-base shadow-lg hover:shadow-purple-500/50"
                       >
                         OK
                       </button>
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 После активации промокода вы получите дополнительный бонус к текущему балансу
+                    </p>
                   </div>
                 </div>
 
@@ -537,7 +541,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         className="w-full bg-gray-900/70 border border-gray-700 rounded-lg pl-4 pr-16 py-4 text-white text-2xl font-semibold focus:outline-none focus:border-gray-500 transition-colors"
                         placeholder="100"
                       />
-                     
+
                     </div>
                     <div className="mt-2 text-xs text-gray-400 flex items-center gap-1">
                       Минимум: <span className="text-white font-medium flex items-center gap-1">
