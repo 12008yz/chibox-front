@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaGift } from 'react-icons/fa';
+import { Gift } from 'lucide-react';
 import Avatar from '../../../../components/Avatar';
 import Tooltip from '../../../../components/Tooltip';
 import { calculateLevelProgress } from '../../utils/profileUtils';
@@ -38,7 +38,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onSettingsClick }) 
           className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 rounded-lg transition-all border border-purple-500/30 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/20"
           title="Активировать промокод"
         >
-          <FaGift className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 hover:text-purple-300 transition-colors" />
+          <Gift className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 hover:text-purple-300 transition-colors" />
         </button>
 
         {/* Settings Button */}

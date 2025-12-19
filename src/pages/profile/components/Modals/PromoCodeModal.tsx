@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { FaTimes, FaGift } from 'react-icons/fa';
+import { X, Gift } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApplyPromoCodeMutation } from '../../../../features/user/userApi';
 
@@ -20,7 +20,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const result = await applyPromo({ code: promoCode.trim().toUpperCase() }).unwrap();
+      const result = await applyPromo({ promo_code: promoCode.trim().toUpperCase() }).unwrap();
 
       if (result.success) {
         toast.success(result.message || 'Промокод успешно применён!');
@@ -58,7 +58,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-700/50">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
-              <FaGift className="text-white text-2xl" />
+              <Gift className="text-white text-2xl" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">Активировать промокод</h2>
@@ -69,7 +69,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
           >
-            <FaTimes className="text-xl" />
+            <X className="text-xl" />
           </button>
         </div>
 
@@ -92,7 +92,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
                 autoFocus
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <FaGift className="text-gray-600 text-xl" />
+                <Gift className="text-gray-600 text-xl" />
               </div>
             </div>
           </div>

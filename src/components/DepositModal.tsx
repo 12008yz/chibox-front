@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { FaTimes, FaWallet } from 'react-icons/fa';
-import { RiVipCrownFill } from 'react-icons/ri';
+import { X, Wallet, Lock, Crown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
 import { ReceivedIcon, ExchangeIcon } from './icons';
-import { Lock, Crown } from 'lucide-react';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -195,7 +193,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             {activeTab === 'balance' ? (
               <>
                 <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800">
-                  <FaWallet className="text-white text-base sm:text-xl" />
+                  <Wallet className="text-white text-base sm:text-xl" />
                 </div>
                 <span className="hidden sm:inline">Пополнение баланса</span>
                 <span className="sm:hidden">Баланс</span>
@@ -203,7 +201,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             ) : (
               <>
                 <div className="p-1.5 sm:p-2 rounded-lg bg-gray-800">
-                  <RiVipCrownFill className="text-white text-base sm:text-xl" />
+                  <Crown className="text-white text-base sm:text-xl" />
                 </div>
                 <span className="hidden sm:inline">Премиум подписка</span>
                 <span className="sm:hidden">VIP статус</span>
@@ -214,7 +212,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
             onClick={onClose}
             className="p-1.5 sm:p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
           >
-            <FaTimes className="text-lg sm:text-xl" />
+            <X className="text-lg sm:text-xl" />
           </button>
         </div>
 
@@ -239,7 +237,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 : 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
             }`}
           >
-            <RiVipCrownFill className="text-base sm:text-xl" />
+            <Crown className="text-base sm:text-xl" />
             <span>VIP</span>
           </button>
         </div>
@@ -426,7 +424,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     disabled={isTopUpLoading || !agreedToTerms || parseInt(amount) < minAmount || !selectedPaymentMethod?.enabled}
                     className="w-full py-3 sm:py-4 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-sm sm:text-base rounded-lg transition-colors flex items-center justify-center gap-2 sm:gap-3"
                   >
-                    <FaWallet className="text-base sm:text-lg" />
+                    <Wallet className="text-base sm:text-lg" />
                     <span>{isTopUpLoading ? 'Создание платежа...' : 'Пополнить баланс'}</span>
                   </button>
 
@@ -610,7 +608,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     disabled={isTopUpLoading || !agreedToTerms || parseInt(amount) < minAmount || !selectedPaymentMethod?.enabled}
                     className="w-full py-4 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-base rounded-lg transition-colors flex items-center justify-center gap-3"
                   >
-                    <FaWallet className="text-lg" />
+                    <Wallet className="text-lg" />
                     <span>{isTopUpLoading ? 'Создание платежа...' : 'Пополнить баланс'}</span>
                   </button>
 
@@ -771,7 +769,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 <div className="bg-gray-800/40 rounded-lg p-3 sm:p-4 border border-gray-700/30 space-y-3 sm:space-y-4">
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3 flex items-center gap-2">
-                      <RiVipCrownFill className="text-yellow-500" />
+                      <Crown className="text-yellow-500" />
                       Подтверждение покупки
                     </h3>
                   </div>
@@ -868,7 +866,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     disabled={isSubscriptionLoading}
                     className="w-full py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold text-sm sm:text-base rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
                   >
-                    <RiVipCrownFill className="text-base sm:text-lg" />
+                    <Crown className="text-base sm:text-lg" />
                     <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить VIP статус'}</span>
                   </button>
                 </div>
@@ -992,7 +990,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                       {/* Selected Tier Preview */}
                       <div>
                         <label className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                          <RiVipCrownFill />
+                          <Crown />
                           Выбранный статус
                         </label>
                         <div className="bg-gray-900/70 border border-gray-700/50 rounded-lg p-3">
@@ -1057,7 +1055,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         disabled={isSubscriptionLoading}
                         className="w-full py-3 bg-white hover:bg-gray-200 disabled:bg-gray-700 disabled:cursor-not-allowed text-black disabled:text-gray-500 font-semibold text-sm rounded-lg transition-colors flex items-center justify-center gap-2"
                       >
-                        <RiVipCrownFill className="text-base" />
+                        <Crown className="text-base" />
                         <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить статус'}</span>
                       </button>
 
