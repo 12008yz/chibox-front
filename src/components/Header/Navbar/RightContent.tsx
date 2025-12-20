@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
-import { FaRegBell, FaBell, FaPlus } from "react-icons/fa";
-import { RiVipCrownFill } from "react-icons/ri";
+import { Bell, BellRing, Plus, Crown } from "lucide-react";
 // import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../../Monetary";
 import { useNavigate } from "react-router-dom";
@@ -85,7 +84,7 @@ const RightContent: React.FC<RightContentProps> = ({
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
           >
-            <FaPlus className="text-[8px] sm:text-xs lg:text-sm group-hover:scale-110 transition-transform duration-200" />
+            <Plus className="text-[8px] sm:text-xs lg:text-sm group-hover:scale-110 transition-transform duration-200 w-3 h-3 lg:w-4 lg:h-4" />
           </button>
         </div>
       </div>
@@ -98,9 +97,9 @@ const RightContent: React.FC<RightContentProps> = ({
         >
           <div className="relative">
             {notificationCount > 0 ? (
-              <FaBell className="gaming-notification-icon gaming-notification-active text-sm lg:text-base xl:text-lg" />
+              <BellRing className="gaming-notification-icon gaming-notification-active w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
             ) : (
-              <FaRegBell className="gaming-notification-icon text-sm lg:text-base xl:text-lg" />
+              <Bell className="gaming-notification-icon w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
             )}
             {notificationCount > 0 && (
               <div className="gaming-notification-badge">
@@ -148,7 +147,7 @@ const RightContent: React.FC<RightContentProps> = ({
           <div className="hidden xl:flex flex-col min-w-[80px]">
             <span className="gaming-username truncate max-w-[120px]">{user.username}</span>
             <div className="flex items-center space-x-1">
-              <RiVipCrownFill className="text-yellow-400 text-xs flex-shrink-0" />
+              <Crown className="text-yellow-400 w-3 h-3 flex-shrink-0 fill-yellow-400" />
               <span className="gaming-level whitespace-nowrap">LVL {user.level || 1}</span>
             </div>
           </div>

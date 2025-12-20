@@ -203,7 +203,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Онлайн счетчик (Mobile) */}
             <div className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
-              <ImConnection className="text-green-400 animate-pulse" />
+              <Radio className="text-green-400 animate-pulse w-4 h-4" />
               <span className="text-sm text-gray-300 font-medium">
                 <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> {t('header.online') || 'онлайн'}
               </span>
