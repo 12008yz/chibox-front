@@ -10,7 +10,7 @@ import { soundManager } from '../../../../utils/soundManager';
 import { useLogoutMutation } from '../../../../features/auth/authApi';
 import { performFullLogout } from '../../../../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { LogOut } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -34,10 +34,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateUserProfileMutation();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
 
+  // Form states
   const [tradeUrl, setTradeUrl] = useState(() => user?.steam_trade_url || '');
   const [newUsername, setNewUsername] = useState(() => user?.username || '');
   const [usernameError, setUsernameError] = useState('');
   const [isFetchingTradeUrl, setIsFetchingTradeUrl] = useState(false);
+
+  // Email states
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState(() => user?.email || '');
+  const [emailError, setEmailError] = useState('');
+
   const prevIsOpenRef = useRef(false);
 
   // Блокировка скролла при открытии модального окна
@@ -60,9 +67,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       // Окно только что открылось
       setTradeUrl(user?.steam_trade_url || '');
       setNewUsername(user?.username || '');
+      setNewEmail(user?.email || '');
+      setIsEditingEmail(false);
+      setEmailError('');
     }
     prevIsOpenRef.current = isOpen;
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   // Обработчик изменения имени пользователя с валидацией
   const handleUsernameChange = (newValue: string) => {
@@ -78,6 +88,32 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       setUsernameError(validation.error || t('profile.settings.invalid_username'));
     } else {
       setUsernameError('');
+    }
+  };
+
+  // Валидация email
+  const validateEmail = (email: string): boolean => {
+    if (!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  /**
+   * Обработчик изменения email с валидацией
+   * @param newValue - новое значение email
+   */
+  const handleEmailChange = (newValue: string): void => {
+    setNewEmail(newValue);
+
+    if (newValue.trim() === '') {
+      setEmailError('');
+      return;
+    }
+
+    if (!validateEmail(newValue)) {
+      setEmailError(t('profile.settings.invalid_email') || 'Неверный формат email');
+    } else {
+      setEmailError('');
     }
   };
 
@@ -113,6 +149,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }
       }
 
+      // Валидация email, если он изменился
+      if (newEmail && newEmail !== user?.email) {
+        if (!validateEmail(newEmail)) {
+          showNotification(t('profile.settings.invalid_email') || 'Неверный формат email', 'error');
+          return;
+        }
+      }
+
       // Формируем данные для отправки
       const updateData: any = {};
 
@@ -122,6 +166,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
       if (newUsername && newUsername !== user?.username) {
         updateData.username = newUsername;
+      }
+
+      if (newEmail && newEmail !== user?.email) {
+        updateData.email = newEmail;
       }
 
       // Если нет изменений, просто закрываем окно
@@ -138,7 +186,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         console.log('Токен обновлен после изменения профиля');
       }
 
-      showNotification(t('profile.settings.settings_saved'), 'success');
+      // Если email был изменен, показываем специальное уведомление
+      if (updateData.email) {
+        showNotification(t('profile.settings.email_updated_verify_required') || 'Email обновлен. Требуется повторная верификация.', 'success');
+      } else {
+        showNotification(t('profile.settings.settings_saved'), 'success');
+      }
       onClose();
 
       // Обновляем данные пользователя
@@ -448,46 +501,108 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <label className="block text-sm font-medium text-gray-300 mb-2">
               {t('profile.settings.email_verification_label')}
             </label>
-            <button
-              onClick={user.is_email_verified ? undefined : onEmailVerificationOpen}
-              className={`w-full flex items-center gap-3 p-3 bg-black/20 rounded-lg border border-gray-600/30 text-left transition-colors ${
-                !user.is_email_verified ? 'hover:bg-black/30 hover:border-gray-500/50 cursor-pointer' : 'cursor-default'
-              }`}
-              disabled={user.is_email_verified}
-            >
-              {user.is_email_verified ? (
-                <>
-                  <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-white">{t('profile.settings.email_verified')}</p>
-                    <p className="text-xs text-gray-400">{user.email}</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-white">{t('profile.settings.verify_email_button')}</p>
-                    <p className="text-xs text-gray-400">{t('profile.settings.click_to_send_code')}</p>
-                  </div>
-                  <div className="text-orange-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </>
-              )}
-            </button>
+
+            {/* Если email редактируется */}
+            {isEditingEmail ? (
+              <div className="space-y-2">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  placeholder={t('profile.settings.email_placeholder') || 'example@email.com'}
+                  className={`w-full px-3 py-2 bg-black/30 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors ${
+                    emailError
+                      ? 'border-red-500 focus:border-red-400'
+                      : 'border-gray-600/50 focus:border-blue-500'
+                  }`}
+                />
+                {emailError && (
+                  <p className="text-xs text-red-400">
+                    {emailError}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setIsEditingEmail(false);
+                      setNewEmail(user?.email || '');
+                      setEmailError('');
+                    }}
+                    className="flex-1 px-3 py-2 bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 text-sm rounded-lg transition-colors"
+                  >
+                    {t('common.cancel') || 'Отмена'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!emailError && validateEmail(newEmail)) {
+                        setIsEditingEmail(false);
+                        showNotification(t('profile.settings.email_will_be_saved') || 'Email будет сохранен при нажатии кнопки "Сохранить"', 'info');
+                      }
+                    }}
+                    disabled={!!emailError || !validateEmail(newEmail)}
+                    className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
+                  >
+                    {t('common.apply') || 'Применить'}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400">
+                  {t('profile.settings.email_change_note') || 'После изменения email потребуется повторная верификация'}
+                </p>
+              </div>
+            ) : (
+              /* Если email не редактируется */
+              <div className="space-y-2">
+                <div className={`w-full flex items-center gap-3 p-3 bg-black/20 rounded-lg border border-gray-600/30`}>
+                  {user.is_email_verified ? (
+                    <>
+                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white">{t('profile.settings.email_verified')}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => setIsEditingEmail(true)}
+                        className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 text-xs rounded-lg transition-colors flex-shrink-0"
+                      >
+                        {t('common.edit') || 'Изменить'}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white">{user.email || t('profile.settings.no_email')}</p>
+                        <p className="text-xs text-orange-400">{t('profile.settings.email_not_verified') || 'Email не подтвержден'}</p>
+                      </div>
+                      <button
+                        onClick={onEmailVerificationOpen}
+                        className="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-400 text-xs rounded-lg transition-colors flex-shrink-0"
+                      >
+                        {t('profile.settings.verify') || 'Подтвердить'}
+                      </button>
+                    </>
+                  )}
+                </div>
+                {!user.email && (
+                  <button
+                    onClick={() => setIsEditingEmail(true)}
+                    className="w-full px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 text-sm rounded-lg transition-colors"
+                  >
+                    {t('profile.settings.add_email') || 'Добавить email'}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sound Settings */}
@@ -537,7 +652,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               disabled={isLoggingOut}
               className="w-full flex items-center justify-center gap-3 p-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg text-red-400 hover:text-red-300 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <FaSignOutAlt className="text-lg" />
+              <LogOut className="w-5 h-5" />
               <span>{isLoggingOut ? t('header.signing_out') : t('header.sign_out')}</span>
             </button>
           </div>
