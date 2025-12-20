@@ -53,15 +53,17 @@ const App: React.FC = () => {
 
 
   // Проверяем, находимся ли мы на странице Steam авторизации
-  const isSteamAuthPage = window.location.pathname === '/steam-auth';
+  const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
 
-  // Автоматически получаем данные пользователя если есть токен
-  // И либо нет полных данных пользователя, либо нет Steam данных
-  // НО НЕ загружаем если мы на странице Steam авторизации (там будет новый токен)
-  const shouldFetchUser = !isSteamAuthPage && auth.token && (
-    !auth.user ||
-    !auth.user.id ||
-    (auth.user.auth_provider === 'steam' && !auth.user.steam_avatar_url && !auth.user.steam_avatar)
+  // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, auth.token используется только для миграции старых сессий
+  // Автоматически получаем данные пользователя если:
+  // 1. Есть старый токен в Redux (для миграции) ИЛИ
+  // 2. Нет данных пользователя (проверим cookies на сервере)
+  // НО НЕ загружаем если мы на странице Steam авторизации (там загрузка идет отдельно)
+  const shouldFetchUser = !isSteamAuthPage && (
+    auth.token || // Старый токен для миграции
+    !auth.user || // Нет данных пользователя (проверим httpOnly cookies)
+    !auth.user.id
   );
 
   const {
@@ -72,8 +74,8 @@ const App: React.FC = () => {
   } = useGetCurrentUserQuery(
     undefined,
     {
-      skip: !shouldFetchUser, // Пропускаем запрос если нет токена или уже есть данные пользователя
-      refetchOnMountOrArgChange: false, // Не перезапрашиваем при повторном монтировании
+      skip: !shouldFetchUser, // Пропускаем только на странице Steam auth
+      refetchOnMountOrArgChange: true, // Перезапрашиваем для проверки httpOnly cookies
     }
   );
 
@@ -220,6 +222,10 @@ const App: React.FC = () => {
             />
             <Route
               path="/auth/success"
+              element={<SteamAuthPage />}
+            />
+            <Route
+              path="/auth/steam-success"
               element={<SteamAuthPage />}
             />
             <Route

@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuthHandlers } from '../hooks/useAuthHandlers';
+import { useLazyGetCurrentUserQuery, useUpdateProfileMutation } from '../features/auth/authApi';
 import { useAppDispatch } from '../store/hooks';
-import { logout } from '../features/auth/authSlice';
+import { loginSuccess, logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
+import SteamTradeUrlModal from '../components/SteamTradeUrlModal';
 
 const SteamAuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { handleLoginSuccess } = useAuthHandlers();
   const [error, setError] = useState<string | null>(null);
+  const [showTradeUrlModal, setShowTradeUrlModal] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [getCurrentUser] = useLazyGetCurrentUserQuery();
+  const [updateProfile] = useUpdateProfileMutation();
 
   // Очищаем старое состояние при монтировании компонента
   useEffect(() => {
@@ -31,53 +35,80 @@ const SteamAuthPage: React.FC = () => {
   }, []); // Выполняется только при монтировании
 
   useEffect(() => {
-    // Обрабатываем Steam auth callback сразу после очистки состояния
+    // Обрабатываем Steam auth callback
     console.log('SteamAuthPage: Processing Steam auth callback');
-    const token = searchParams.get('token');
     const provider = searchParams.get('provider');
 
-    console.log('SteamAuthPage: Token present:', !!token);
     console.log('SteamAuthPage: Provider:', provider);
 
-    if (token && provider === 'steam') {
-      try {
-        // Проверяем что токен валидный (базовая проверка формата)
-        const tokenParts = token.split('.');
-        if (tokenParts.length === 3) {
-          console.log('SteamAuthPage: Valid JWT token format, processing...');
+    if (provider === 'steam') {
+      // БЕЗОПАСНОСТЬ: Токен теперь в httpOnly cookie, не в URL
+      // Загружаем данные пользователя напрямую через API
+      console.log('SteamAuthPage: Fetching user data (token in httpOnly cookie)...');
 
-          // Сохраняем только токен, данные пользователя загрузятся через getCurrentUser API
-          const userData = {
-            user: null, // Не извлекаем данные из токена, пусть API их загрузит
-            token
-          };
+      getCurrentUser()
+        .unwrap()
+        .then((data) => {
+          console.log('SteamAuthPage: User data loaded:', data);
 
-          console.log('SteamAuthPage: Calling handleLoginSuccess with token');
-          // Обновляем состояние авторизации
-          handleLoginSuccess(userData);
+          if (data?.success && data.user) {
+            // Обновляем состояние авторизации
+            dispatch(loginSuccess({
+              user: data.user,
+              // token в httpOnly cookie, не передаем в Redux
+            }));
 
-          console.log('SteamAuthPage: Redirecting to home page...');
-          // Перенаправляем на главную страницу
-          navigate('/', { replace: true });
-        } else {
-          throw new Error('Неверный формат токена');
-        }
-      } catch (error) {
-        console.error('Ошибка обработки Steam токена:', error);
-        setError('Ошибка обработки данных авторизации');
-        setTimeout(() => {
-          navigate('/login?error=steam_auth_failed', { replace: true });
-        }, 3000);
-      }
+            // Сохраняем данные пользователя
+            setUserData(data.user);
+
+            // Проверяем, есть ли steam_trade_url
+            if (!data.user.steam_trade_url) {
+              console.log('SteamAuthPage: Steam Trade URL not set, showing modal...');
+              setShowTradeUrlModal(true);
+            } else {
+              console.log('SteamAuthPage: Steam Trade URL already set, redirecting...');
+              navigate('/', { replace: true });
+            }
+          } else {
+            throw new Error('Не удалось загрузить данные пользователя');
+          }
+        })
+        .catch((err) => {
+          console.error('Ошибка загрузки данных пользователя:', err);
+          setError('Ошибка загрузки данных пользователя');
+          setTimeout(() => {
+            navigate('/?error=steam_auth_failed', { replace: true });
+          }, 3000);
+        });
     } else {
-      // Если нет токена или провайдера, перенаправляем на страницу входа
-      console.error('SteamAuthPage: Missing token or provider');
+      // Если нет провайдера, перенаправляем на страницу входа
+      console.error('SteamAuthPage: Missing provider');
       setError('Отсутствуют данные авторизации');
       setTimeout(() => {
-        navigate('/login?error=missing_token', { replace: true });
+        navigate('/?error=missing_provider', { replace: true });
       }, 3000);
     }
-  }, [searchParams, navigate, handleLoginSuccess, dispatch]);
+  }, [searchParams, navigate, getCurrentUser, dispatch]);
+
+  const handleTradeUrlSubmit = async (tradeUrl: string) => {
+    try {
+      console.log('SteamAuthPage: Saving Steam Trade URL...');
+      await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+
+      console.log('SteamAuthPage: Steam Trade URL saved successfully');
+      setShowTradeUrlModal(false);
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('Ошибка сохранения Steam Trade URL:', err);
+      // Ошибка будет показана в модальном окне
+    }
+  };
+
+  const handleTradeUrlSkip = () => {
+    console.log('SteamAuthPage: User skipped Steam Trade URL setup');
+    setShowTradeUrlModal(false);
+    navigate('/', { replace: true });
+  };
 
   if (error) {
     return (
