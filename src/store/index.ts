@@ -20,13 +20,13 @@ const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 // Настройка Redux Store
 export const store = configureStore({
   reducer: {
-    // API reducer от RTK Query
+    // API reducer от RTK Query - НЕ персистим его
     [baseApi.reducerPath]: baseApi.reducer,
     // Persisted auth slice
     auth: persistedAuthReducer,
-    // UI состояние
+    // UI состояние - НЕ персистим
     ui: uiReducer,
-    // Глобальные ошибки
+    // Глобальные ошибки - НЕ персистим
     error: errorReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -35,6 +35,7 @@ export const store = configureStore({
         // Игнорируем action types от RTK Query и Redux Persist
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         ignoredActionsPaths: ['meta.arg', 'payload.timestamp'],
+        ignoredPaths: ['api'], // Игнорируем API состояние в проверке сериализуемости
       },
     }).concat(
       baseApi.middleware,

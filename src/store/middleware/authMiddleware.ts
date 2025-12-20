@@ -1,6 +1,6 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { authApi } from '../../features/auth/authApi';
-import { loginSuccess } from '../../features/auth/authSlice';
+import { loginSuccess, logout } from '../../features/auth/authSlice';
 import { baseApi } from '../api/baseApi';
 
 // Создаем middleware для обработки авторизации
@@ -42,5 +42,14 @@ authMiddleware.startListening({
     );
 
 
+  },
+});
+
+// Слушаем logout action для очистки состояния API
+authMiddleware.startListening({
+  actionCreator: logout,
+  effect: async (_action, listenerApi) => {
+    // Сбрасываем состояние RTK Query API, чтобы очистить весь кэш
+    listenerApi.dispatch(baseApi.util.resetApiState());
   },
 });
