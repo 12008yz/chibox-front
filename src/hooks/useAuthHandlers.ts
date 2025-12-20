@@ -11,7 +11,7 @@ export const useAuthHandlers = () => {
     // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, не в теле ответа
     if (data?.user) {
       // ВАЖНО: Очищаем старые данные перед новым логином
-      console.log('Clearing old state before new login...');
+
 
       // Сбрасываем кэш API
       dispatch(baseApi.util.resetApiState());
@@ -20,7 +20,7 @@ export const useAuthHandlers = () => {
       dispatch(logout());
 
       // Только после очистки сохраняем новые данные
-      console.log('Setting new login data (token in httpOnly cookie)...');
+
       dispatch(loginSuccess({
         user: data.user,
         // token больше не передается - он в httpOnly cookie

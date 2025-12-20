@@ -8,7 +8,7 @@ const getInitialToken = (): string | null => {
   if (typeof window !== 'undefined') {
     const oldToken = localStorage.getItem('auth_token');
     if (oldToken) {
-      console.warn('⚠️ Найден старый токен в localStorage. Миграция на httpOnly cookies.');
+
       // Удаляем старый токен для безопасности
       localStorage.removeItem('auth_token');
     }
@@ -38,10 +38,7 @@ const authSlice = createSlice({
 
     // Успешная авторизация
     loginSuccess: (state, action: PayloadAction<{ user: User | null; token?: string }>) => {
-      console.log('[authSlice] loginSuccess called with:', {
-        user: action.payload.user,
-        hasToken: !!action.payload.token
-      });
+
       state.user = action.payload.user;
       // БЕЗОПАСНОСТЬ: НЕ сохраняем токен ни в Redux, ни в localStorage
       // Токены ТОЛЬКО в httpOnly cookies на стороне сервера
@@ -50,12 +47,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.isLoading = false;
 
-      console.log('[authSlice] 🔒 Token is in httpOnly cookie (secure, not accessible to JS)');
 
-      console.log('[authSlice] State after loginSuccess:', {
-        isAuthenticated: state.isAuthenticated,
-        hasUser: !!state.user
-      });
     },
 
     // Обновление данных пользователя
@@ -96,7 +88,7 @@ const authSlice = createSlice({
 
       // БЕЗОПАСНОСТЬ: НЕ сохраняем токен в localStorage
       // Токены теперь в httpOnly cookies на стороне сервера
-      console.log('[authSlice] 🔒 New token received (in httpOnly cookie)');
+
     },
 
     // Выход из системы
@@ -122,7 +114,7 @@ const authSlice = createSlice({
         localStorage.removeItem('last_login');
       }
 
-      console.log('[authSlice] 🔒 Logged out (httpOnly cookies will be cleared by server)');
+
     },
 
     // Ошибка авторизации
@@ -158,7 +150,7 @@ const authSlice = createSlice({
           localStorage.removeItem('auth_token');
         }
 
-        console.log('[authSlice] 🔒 Session expired (httpOnly cookies will expire automatically)');
+
       }
     },
   },

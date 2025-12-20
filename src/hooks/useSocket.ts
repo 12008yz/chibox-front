@@ -40,7 +40,7 @@ const loadLiveDropsFromStorage = (): LiveDropData[] => {
       return validDrops.slice(0, MAX_LIVE_DROPS);
     }
   } catch (error) {
-    console.error('Ошибка загрузки live drops из localStorage:', error);
+
   }
   return [];
 };
@@ -50,7 +50,7 @@ const saveLiveDropsToStorage = (drops: LiveDropData[]) => {
   try {
     localStorage.setItem(LIVE_DROPS_STORAGE_KEY, JSON.stringify(drops));
   } catch (error) {
-    console.error('Ошибка сохранения live drops в localStorage:', error);
+
   }
 };
 
@@ -74,31 +74,30 @@ const createGlobalSocket = () => {
 
   // Обработчик успешного подключения
   globalSocket.on('connect', () => {
-    console.log('✅ WebSocket: Подключено к серверу');
-    console.log('🔌 Socket ID:', globalSocket?.id);
+
     connectionListeners.forEach(listener => listener(true));
   });
 
   // Обработчик отключения
   globalSocket.on('disconnect', (reason) => {
-    console.log('WebSocket: Отключено от сервера', reason);
+
     connectionListeners.forEach(listener => listener(false));
   });
 
   // Обработчик приветственного сообщения
   globalSocket.on('hello', (data) => {
-    console.log('WebSocket: Получено приветствие', data);
+
   });
 
   // Обработчик обновления количества пользователей онлайн
   globalSocket.on('onlineUsersUpdate', (data) => {
-    console.log('WebSocket: Обновление онлайн пользователей', data.count);
+
     onlineUsersListeners.forEach(listener => listener(data.count));
   });
 
   // Обработчик живых падений
   globalSocket.on('liveDrop', (data) => {
-    console.log('WebSocket: Получено живое падение', data);
+
     // Проверяем, что у нас есть уникальный ID
     if (data && data.id) {
       // Дополнительная проверка на дублирование на уровне сокета
@@ -107,7 +106,7 @@ const createGlobalSocket = () => {
 
       // Если это не первое получение этого дропа в течение 10 секунд, игнорируем
       if (receivedDrops.has(dropKey) && (currentTime - receivedDrops.get(dropKey)!) < 10000) {
-        console.warn('WebSocket: Дублированное живое падение, игнорируем:', dropKey);
+
         return;
       }
 
@@ -123,19 +122,19 @@ const createGlobalSocket = () => {
 
       liveDropListeners.forEach(listener => listener(data));
     } else {
-      console.warn('WebSocket: Получено живое падение без ID, игнорируем:', data);
+
     }
   });
 
   // Обработчик уведомлений
   globalSocket.on('notification', (data) => {
-    console.log('WebSocket: Получено уведомление', data);
+
     notificationListeners.forEach(listener => listener(data));
   });
 
   // Обработчик ошибок
   globalSocket.on('connect_error', (error) => {
-    console.error('WebSocket: Ошибка подключения', error);
+
     connectionListeners.forEach(listener => listener(false));
   });
 
@@ -165,7 +164,7 @@ export const useSocket = (): UseSocketReturn => {
         // Проверяем, нет ли уже такого дропа
         const existingDrop = prevDrops.find(existingDrop => existingDrop.id === drop.id);
         if (existingDrop) {
-          console.warn('useSocket: Дублированный drop, игнорируем:', drop.id);
+
           return prevDrops;
         }
 
@@ -173,7 +172,7 @@ export const useSocket = (): UseSocketReturn => {
         const dropTime = new Date(drop.dropTime).getTime();
         const now = Date.now();
         if (now - dropTime > 5 * 60 * 1000) {
-          console.log('useSocket: Drop слишком старый, игнорируем:', drop.id);
+
           return prevDrops;
         }
 
@@ -185,7 +184,7 @@ export const useSocket = (): UseSocketReturn => {
 
     // Обработчик уведомлений
     const notificationListener = (notification: NotificationData) => {
-      console.log('🔔 useSocket: Получено уведомление в реальном времени:', notification);
+
 
       // Немедленно инвалидируем кеш уведомлений и счетчика
       dispatch(userApi.util.invalidateTags(['Notifications']));
@@ -241,7 +240,7 @@ export const useSocket = (): UseSocketReturn => {
 
       // Если это последний компонент, закрываем соединение
       if (onlineUsersListeners.size === 0 && connectionListeners.size === 0 && notificationListeners.size === 0) {
-        console.log('WebSocket: Закрытие глобального подключения');
+
         if (globalSocket) {
           globalSocket.disconnect();
           globalSocket = null;

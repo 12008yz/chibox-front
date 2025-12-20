@@ -41,13 +41,6 @@ const App: React.FC = () => {
   const { onlineUsers } = useSocket();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
 
-  console.log('[App] Current auth state:', {
-    isAuthenticated: auth.isAuthenticated,
-    hasToken: !!auth.token,
-    hasUser: !!auth.user,
-    userId: auth.user?.id
-  });
-
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
@@ -76,14 +69,6 @@ const App: React.FC = () => {
     }
   );
 
-  console.log('getCurrentUser query state:', {
-    shouldFetchUser,
-    isLoading: isLoadingUser,
-    isFetching: isFetchingUser,
-    hasData: !!userData,
-    hasError: !!userError,
-    error: userError
-  });
 
   // Проверяем валидность сессии и очищаем устаревшие данные при загрузке
   useEffect(() => {
@@ -97,7 +82,7 @@ const App: React.FC = () => {
   // Обновляем данные пользователя когда получаем ответ от API
   useEffect(() => {
     if (userData?.success && userData.user && auth.token) {
-      console.log('Updating user data from getCurrentUser:', userData.user);
+
       dispatch(loginSuccess({
         user: userData.user,
         token: auth.token
@@ -108,7 +93,7 @@ const App: React.FC = () => {
   // Logout ТОЛЬКО при ошибке getCurrentUser (не при других API вызовах)
   useEffect(() => {
     if (userError && auth.token && shouldFetchUser) {
-      console.log('getCurrentUser failed, logging out:', userError);
+
       dispatch(logout());
     }
   }, [userError, auth.token, shouldFetchUser, dispatch]);
@@ -142,7 +127,7 @@ const App: React.FC = () => {
 
   // Показываем загрузку только при первичной проверке токена
   if (auth.token && (isLoadingUser || isFetchingUser) && (!auth.user || !auth.user.id)) {
-    console.log('Showing loading screen - fetching user data...');
+
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#151225]">
         <FloatingWatermark />

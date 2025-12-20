@@ -62,7 +62,7 @@ export const useRefreshUser = () => {
       }
       return result;
     } catch (error) {
-      console.error('Failed to refresh user data:', error);
+
       throw error;
     }
   };

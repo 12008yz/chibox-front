@@ -34,13 +34,13 @@ authMiddleware.startListening({
 authMiddleware.startListening({
   actionCreator: loginSuccess,
   effect: async (_action, listenerApi) => {
-    console.log('🔄 LoginSuccess detected, invalidating cache...');
+
 
     // Инвалидируем кэш пользовательских данных
     listenerApi.dispatch(
       baseApi.util.invalidateTags(['User', 'Profile', 'Balance', 'Inventory'])
     );
 
-    console.log('✅ Cache invalidated after login');
+
   },
 });

@@ -117,15 +117,13 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
           <button
             id={isTicTacToeCase ? 'onboarding-tictactoe-button' : undefined}
             onClick={(e) => {
-              console.log('=== КНОПКА ИГРАТЬ НАЖАТА ===');
-              console.log('Кнопка "Играть" нажата для кейса:', title);
-              console.log('isAuthenticated:', isAuthenticated);
+
               e.preventDefault();
               e.stopPropagation();
 
               // Проверяем авторизацию пользователя
               if (!isAuthenticated) {
-                console.log('Пользователь не авторизован, показываем модальное окно');
+
                 if (onAuthRequired) {
                   onAuthRequired();
                 }
@@ -133,17 +131,14 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
               }
 
               if (onPlayBonusGame) {
-                console.log('Вызываем onPlayBonusGame для кейса:', title);
                 try {
                   onPlayBonusGame();
-                  console.log('onPlayBonusGame вызван успешно');
                 } catch (error) {
-                  console.error('Ошибка при вызове onPlayBonusGame:', error);
                 }
               } else {
-                console.log('onPlayBonusGame не определен!');
+
               }
-              console.log('=== КОНЕЦ ОБРАБОТКИ КНОПКИ ИГРАТЬ ===');
+
             }}
             disabled={!isAuthenticated}
             className={`mt-2 px-2 md:px-4 py-1 md:py-2 rounded transition-colors text-xs md:text-sm font-medium ${
