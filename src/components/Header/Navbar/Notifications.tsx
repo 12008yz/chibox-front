@@ -18,7 +18,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     // Получаем уведомления из API
     const {
         data: notificationsData,
-        refetch: refetchNotifications
     } = useGetUserNotificationsQuery({ limit: 20 }, {
         refetchOnMountOrArgChange: true,
         refetchOnFocus: true,
@@ -38,13 +37,8 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         // Отмечаем все уведомления как прочитанные при закрытии панели
         if (unreadCount > 0) {
             markAllAsRead().unwrap()
-                .then(() => {
-                    // Обновляем данные после прочтения
-                    setTimeout(() => {
-                        refetchNotifications();
-                    }, 100);
-                })
                 .catch(() => {
+                    // Игнорируем ошибки, данные обновятся автоматически
                 });
         }
 
@@ -55,8 +49,9 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const handleMarkAsRead = async (notificationId: string) => {
         try {
             await markAsRead(notificationId).unwrap();
-            refetchNotifications();
+            // Данные обновятся автоматически благодаря invalidatesTags
         } catch {
+            // Игнорируем ошибки
         }
     };
 
@@ -64,8 +59,9 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const handleMarkAllAsRead = async () => {
         try {
             await markAllAsRead().unwrap();
-            refetchNotifications();
+            // Данные обновятся автоматически благодаря invalidatesTags
         } catch {
+            // Игнорируем ошибки
         }
     };
 
@@ -99,7 +95,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [openNotifications, unreadCount, markAllAsRead, refetchNotifications]);
+    }, [openNotifications, unreadCount, markAllAsRead]);
 
     // Функция для перевода названий кейсов
     const translateCaseName = (caseName: string) => {
