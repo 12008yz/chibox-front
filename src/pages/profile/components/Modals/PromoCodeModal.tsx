@@ -45,94 +45,74 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-gradient-to-br from-[#1a1f2e] to-[#16192a] rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden">
-        {/* Decorative gradient */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500" />
-
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-700/50">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg">
-              <Gift className="text-white text-2xl" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Активировать промокод</h2>
-              <p className="text-sm text-gray-400 mt-0.5">Введите код для получения бонусов</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-          >
-            <X className="text-xl" />
-          </button>
-        </div>
+      <div className="relative w-full max-w-md bg-[#0f1419] rounded-2xl shadow-2xl border border-gray-800 overflow-hidden">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-6">
+          {/* Header */}
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/5 rounded-xl">
+              <Gift className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold text-white">Активировать промокод</h2>
+              <p className="text-sm text-gray-400 mt-1">Введите код для получения бонусов</p>
+            </div>
+          </div>
+
           {/* Promo Code Input */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-300">
               Промокод
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                onKeyPress={handleKeyPress}
-                placeholder="Введите промокод"
-                className="w-full bg-gray-900/70 border border-gray-700 rounded-lg px-4 py-3.5 text-white text-lg font-semibold tracking-wider focus:outline-none focus:border-purple-500 transition-colors uppercase placeholder:normal-case placeholder:tracking-normal"
-                disabled={isLoading}
-                autoFocus
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <Gift className="text-gray-600 text-xl" />
-              </div>
-            </div>
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+              onKeyPress={handleKeyPress}
+              placeholder="ВВЕДИТЕ КОД"
+              className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3.5 text-white text-lg font-semibold tracking-widest focus:outline-none focus:border-gray-600 hover:border-gray-600 transition-colors uppercase placeholder:text-gray-600"
+              disabled={isLoading}
+              autoFocus
+            />
           </div>
 
           {/* Info Cards */}
-          <div className="grid grid-cols-1 gap-3">
-            <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <span className="text-purple-400 font-bold">💰</span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Бонусы к балансу</h3>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Получите бесплатные ChiCoins
-                  </p>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/5 border border-gray-800 rounded-xl p-4">
+              <div className="text-2xl mb-2">💰</div>
+              <h3 className="text-sm font-medium text-white">Баланс</h3>
+              <p className="text-xs text-gray-400 mt-1">
+                ChiCoins
+              </p>
             </div>
 
-            <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <span className="text-blue-400 font-bold">👑</span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">VIP подписка</h3>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Получите дни VIP статуса
-                  </p>
-                </div>
-              </div>
+            <div className="bg-white/5 border border-gray-800 rounded-xl p-4">
+              <div className="text-2xl mb-2">👑</div>
+              <h3 className="text-sm font-medium text-white">VIP</h3>
+              <p className="text-xs text-gray-400 mt-1">
+                Подписка
+              </p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
-              className="flex-1 py-3 px-4 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-semibold transition-colors"
+              className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-gray-800 text-white font-medium transition-colors"
               disabled={isLoading}
             >
               Отмена
@@ -140,7 +120,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
             <button
               onClick={handleApply}
               disabled={isLoading || !promoCode.trim()}
-              className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-purple-500/50"
+              className="flex-1 py-3 px-4 rounded-xl bg-white text-black font-medium hover:bg-gray-100 active:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white"
             >
               {isLoading ? 'Применение...' : 'Активировать'}
             </button>
