@@ -186,18 +186,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         console.log('Токен обновлен после изменения профиля');
       }
 
-      // Если email был изменен, показываем специальное уведомление
-      if (updateData.email) {
+      // Если email был изменен, показываем специальное уведомление и открываем окно верификации
+      const emailChanged = updateData.email || ('emailChanged' in result && result.emailChanged);
+      if (emailChanged) {
         showNotification(t('profile.settings.email_updated_verify_required') || 'Email обновлен. Требуется повторная верификация.', 'success');
+        onClose();
+
+        // Обновляем данные пользователя
+        setTimeout(() => {
+          onUserRefresh();
+          // Открываем модальное окно верификации email после обновления данных
+          setTimeout(() => {
+            onEmailVerificationOpen();
+          }, 500);
+        }, 500);
       } else {
         showNotification(t('profile.settings.settings_saved'), 'success');
-      }
-      onClose();
+        onClose();
 
-      // Обновляем данные пользователя
-      setTimeout(() => {
-        onUserRefresh();
-      }, 500);
+        // Обновляем данные пользователя
+        setTimeout(() => {
+          onUserRefresh();
+        }, 500);
+      }
     } catch (error: any) {
       console.error('Ошибка при сохранении настроек:', error);
       showNotification(error?.data?.message || t('profile.settings.settings_save_error'), 'error');
@@ -574,22 +585,35 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                      <div className={`w-8 h-8 ${user.email?.endsWith('@steam.local') ? 'bg-red-500/20' : 'bg-orange-500/20'} rounded-full flex items-center justify-center flex-shrink-0`}>
+                        <svg className={`w-4 h-4 ${user.email?.endsWith('@steam.local') ? 'text-red-400' : 'text-orange-400'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white">{user.email || t('profile.settings.no_email')}</p>
-                        <p className="text-xs text-orange-400">{t('profile.settings.email_not_verified') || 'Email не подтвержден'}</p>
+                        {user.email?.endsWith('@steam.local') ? (
+                          <p className="text-xs text-red-400">Steam email - измените на реальный</p>
+                        ) : (
+                          <p className="text-xs text-orange-400">{t('profile.settings.email_not_verified') || 'Email не подтвержден'}</p>
+                        )}
                       </div>
-                      <button
-                        onClick={onEmailVerificationOpen}
-                        className="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-400 text-xs rounded-lg transition-colors flex-shrink-0"
-                      >
-                        {t('profile.settings.verify') || 'Подтвердить'}
-                      </button>
+                      {user.email?.endsWith('@steam.local') ? (
+                        <button
+                          onClick={() => setIsEditingEmail(true)}
+                          className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-500/50 text-red-400 text-xs rounded-lg transition-colors flex-shrink-0"
+                        >
+                          {t('common.edit') || 'Изменить'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={onEmailVerificationOpen}
+                          className="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-400 text-xs rounded-lg transition-colors flex-shrink-0"
+                        >
+                          {t('profile.settings.verify') || 'Подтвердить'}
+                        </button>
+                      )}
                     </>
                   )}
                 </div>

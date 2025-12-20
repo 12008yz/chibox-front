@@ -24,6 +24,13 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   const handleSendVerificationCode = async () => {
     if (!user?.email) return;
 
+    // Проверяем, не Steam ли это email
+    if (user.email.endsWith('@steam.local')) {
+      alert(t('profile.settings.steam_email_cannot_verify'));
+      onClose();
+      return;
+    }
+
     try {
       await resendVerificationCode({ email: user.email }).unwrap();
       setEmailVerificationStep('verify');
