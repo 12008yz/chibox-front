@@ -96,8 +96,6 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
         onError(result.message || t('profile.item_withdraw.error_withdrawal_failed'));
       }
     } catch (error: any) {
-      console.error('Item withdrawal error:', error);
-
       // Специальная обработка ошибки отсутствия подписки
       if (error?.data?.error_code === 'SUBSCRIPTION_REQUIRED') {
         const subscriptionInfo = error.data.data?.subscription_status || t('profile.subscription_info.no_subscription');
@@ -111,11 +109,6 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   };
 
   if (!item.item) return null;
-
-  // Отладочная информация (только для критических ошибок)
-  if (!canWithdraw && !item.item.name) {
-    console.warn('ItemWithdrawBanner - Warning: Item has no name or steam_market_hash_name');
-  }
 
   const handleMobileClick = (e: React.MouseEvent) => {
     if (isMobile) {

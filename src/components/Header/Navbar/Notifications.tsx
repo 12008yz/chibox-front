@@ -44,8 +44,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                         refetchNotifications();
                     }, 100);
                 })
-                .catch((error) => {
-                    console.error(t('notifications.error_marking_read_on_close'), error);
+                .catch(() => {
                 });
         }
 
@@ -57,8 +56,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         try {
             await markAsRead(notificationId).unwrap();
             refetchNotifications();
-        } catch (error) {
-            console.error(t('notifications.error_marking_notification_read'), error);
+        } catch {
         }
     };
 
@@ -67,8 +65,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         try {
             await markAllAsRead().unwrap();
             refetchNotifications();
-        } catch (error) {
-            console.error(t('notifications.error_marking_all_read'), error);
+        } catch {
         }
     };
 

@@ -30,16 +30,6 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // // Логирование для отладки
-  // console.log(`Case "${title}":`, {
-  //   price,
-  //   isFreeCase: parseFloat(price) === 0 || isNaN(parseFloat(price)),
-  //   nextCaseAvailableTime,
-  //   fixedPrices,
-  //   isBonusCase,
-  //   hasPlayHandler: !!onPlayBonusGame
-  // });
-
   // Дефолтные изображения кейсов CS2
   const defaultCaseImages = [
     'https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frncVtqv7MPE8JaHHCj_Dl-wk4-NtFirikURy4jiGwo2udHqVaAEjDZp3EflK7EeSMnMs4w/256fx256f'

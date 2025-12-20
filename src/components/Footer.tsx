@@ -9,9 +9,6 @@ const Footer = () => {
     pollingInterval: 300000, // Обновляем каждые 5 минут
   });
 
-  // Отладка: выводим данные статистики в консоль
-  console.log('Footer Statistics Data:', statsData);
-
   // Форматируем числа с разделителями
   const formatNumber = (num: number) => {
     return num.toLocaleString('ru-RU');

@@ -284,7 +284,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
 
     if (wonItemIndex === -1) {
-      console.error('ОШИБКА АНИМАЦИИ: Выигранный предмет не найден');
       setAnimationPhase('stopped');
       setTimeout(() => handleAnimationComplete(), 1500);
       return;
@@ -479,11 +478,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]);
 
   const handleBuyCase = async () => {
-    console.log('=== handleBuyCase START ===');
-    console.log('States:', { isProcessing, buyLoading, openLoading, showOpeningAnimation });
-
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
-      console.log('BLOCKED: один из флагов true, выход');
       return;
     }
 
@@ -491,7 +486,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     try {
       if (onBuyAndOpenCase) {
-        console.log('Используем onBuyAndOpenCase callback');
         const result = await onBuyAndOpenCase(caseData);
         if (result && result.item) {
           setOpeningResult(result);
@@ -507,35 +501,24 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         quantity: 1
       };
 
-      console.log('Отправка запроса на покупку кейса:', buyParams);
       const result = await buyCase(buyParams).unwrap();
-      console.log('Результат покупки:', result);
 
       if (result.success) {
-        console.log('Метод оплаты: баланс');
-        console.log('inventory_cases:', result.data?.inventory_cases);
-
         if (result.data?.inventory_cases && result.data.inventory_cases.length > 0) {
           const inventoryCase = result.data.inventory_cases[0];
-          console.log('Найден купленный кейс в инвентаре:', inventoryCase);
-          console.log('Вызываем handleOpenCase с inventoryItemId:', inventoryCase.id);
 
           // Сбрасываем isProcessing перед вызовом handleOpenCase
           setIsProcessing(false);
           await handleOpenCase(undefined, inventoryCase.id);
-          console.log('handleOpenCase завершен');
           return; // Возвращаемся, чтобы не сбрасывать isProcessing в finally
         } else {
-          console.log('inventory_cases пустой или отсутствует');
           toast.success('Кейс успешно куплен!');
           handleClose();
         }
       } else {
-        console.error('Покупка не успешна:', result.message);
         toast.error(result.message || 'Ошибка покупки');
       }
     } catch (error: any) {
-      console.error('Ошибка покупки кейса:', error);
       if (error?.status === 400 && error?.data?.message?.includes('Недостаточно средств')) {
         const requiredAmount = error?.data?.data?.required || 0;
         const availableAmount = error?.data?.data?.available || 0;
@@ -550,20 +533,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         });
       }
     } finally {
-      console.log('=== handleBuyCase FINALLY ===');
       setIsProcessing(false);
     }
   };
 
   const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
-    console.log('=== handleOpenCase START ===');
-    console.log('Параметры:', { caseId, inventoryItemId });
-    console.log('caseData:', { id: caseData.id, name: caseData.name, type: caseData.type, min_subscription_tier: caseData.min_subscription_tier });
-    console.log('statusData:', statusData?.data);
-    console.log('States:', { isProcessing, buyLoading, openLoading, showOpeningAnimation });
-
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
-      console.log('BLOCKED: один из флагов true, выход');
       return;
     }
 
@@ -573,17 +548,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const openCaseParams: any = {};
       if (inventoryItemId) {
         openCaseParams.inventoryItemId = inventoryItemId;
-        console.log('Используем inventoryItemId:', inventoryItemId);
       } else if (caseId) {
         openCaseParams.case_id = caseId;
-        console.log('Используем caseId:', caseId);
       } else {
         openCaseParams.template_id = caseData.id;
-        console.log('Используем template_id (caseData.id):', caseData.id);
       }
-
-      console.log('Отправка запроса на открытие кейса:', openCaseParams);
-      console.log('userData:', { subscription_tier: userData?.subscription_tier, subscription_days_left: userData?.subscription_days_left });
 
       // Звук открытия кейса (не для ежедневного кейса)
       const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444" || "11111111-1111-1111-1111-111111111111" || "22222222-2222-2222-2222-222222222222" || "33333333-3333-3333-3333-333333333333" || "55555555-5555-5555-5555-555555555555" || "66666666-6666-6666-6666-666666666666" || "77777777-7777-7777-7777-777777777777";
@@ -592,17 +561,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
 
       const result = await openCase(openCaseParams).unwrap();
-      console.log('Результат открытия кейса:', result);
 
       if (result.success && result.data?.item) {
-        console.log('Кейс успешно открыт, запуск анимации. Предмет:', result.data.item);
         setOpeningResult(result.data);
         startAnimation(result.data.item);
-      } else {
-        console.warn('Открытие не успешно или нет предмета в результате');
       }
     } catch (error: any) {
-      console.error('Ошибка открытия кейса:', error);
       if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
         toast.error(error.data.message || 'Кейс уже получен сегодня', {
           duration: 4000,
@@ -615,7 +579,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         toast.error(error?.data?.message || 'Произошла ошибка при открытии кейса');
       }
     } finally {
-      console.log('=== handleOpenCase FINALLY ===');
       setIsProcessing(false);
     }
   };

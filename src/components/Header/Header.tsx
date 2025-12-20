@@ -62,7 +62,6 @@ const Header: React.FC<HeaderProps> = ({
   // Тост уведомления
   useEffect(() => {
     if (notification?.message) {
-      console.log('Notification:', notification.message);
     }
   }, [notification]);
 

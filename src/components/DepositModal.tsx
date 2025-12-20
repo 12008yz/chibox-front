@@ -132,7 +132,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         onClose();
       }
     } catch (error: any) {
-      console.error('Ошибка при пополнении:', error);
       toast.error(error?.data?.message || 'Ошибка создания платежа');
     }
   };
@@ -169,7 +168,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         onClose();
       }
     } catch (error: any) {
-      console.error('Ошибка при покупке подписки:', error);
       toast.error(error?.data?.message || 'Ошибка при покупке подписки');
     }
   };

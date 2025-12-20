@@ -18,7 +18,6 @@ export const Icon: React.FC<IconProps> = ({ name, className = '', ...props }) =>
   const IconComponent = Icons[name];
 
   if (!IconComponent) {
-    console.warn(`Icon "${name}" not found`);
     return null;
   }
 

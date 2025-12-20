@@ -42,8 +42,7 @@ const RightContent: React.FC<RightContentProps> = ({
   const handleLogout = async () => {
     try {
       await logoutApi().unwrap();
-    } catch (error) {
-      console.log('Logout API error (continuing with logout):', error);
+    } catch {
     } finally {
       performFullLogout(dispatch);
       navigate('/');

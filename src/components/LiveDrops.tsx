@@ -22,8 +22,7 @@ const LiveDrops: React.FC = () => {
             setAllDrops(data.data.drops);
           }
         }
-      } catch (error) {
-        console.error('Error loading live drops:', error);
+      } catch {
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +41,6 @@ const LiveDrops: React.FC = () => {
         // Фильтруем только действительно новые падения
         const newDrops = liveDrops.filter(drop => {
           if (!drop.id) {
-            console.warn('LiveDrop без ID, игнорируем:', drop);
             return false;
           }
 
@@ -50,7 +48,6 @@ const LiveDrops: React.FC = () => {
           const dropTime = new Date(drop.dropTime).getTime();
           const now = Date.now();
           if (now - dropTime > 5 * 60 * 1000) {
-            console.log('LiveDrop слишком старый, игнорируем:', drop.id);
             return false;
           }
 
@@ -65,7 +62,6 @@ const LiveDrops: React.FC = () => {
         // Объединяем только новые падения с существующими и ограничиваем до 12 для горизонтального просмотра
         const combined = [...newDrops, ...prevDrops].slice(0, 12);
 
-        console.log(`LiveDrops: Добавлено ${newDrops.length} новых падений, всего: ${combined.length}`);
         return combined;
       });
     }
