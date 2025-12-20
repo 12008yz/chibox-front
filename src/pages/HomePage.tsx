@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
   // Получаем глобальное состояние показа интро из Redux
   const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
-  console.log('[HomePage] Global showIntroVideo from Redux:', globalShowIntroVideo);
+  
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
@@ -57,7 +57,6 @@ const HomePage: React.FC = () => {
 
   // Синхронизируем локальное состояние с глобальным
   useEffect(() => {
-    console.log('[HomePage] Синхронизация: globalShowIntroVideo =', globalShowIntroVideo);
     if (globalShowIntroVideo) {
       console.log('[HomePage] Устанавливаем локальный showIntroVideo = true');
       setShowIntroVideo(true);
@@ -73,7 +72,7 @@ const HomePage: React.FC = () => {
 
   // Логирование изменений состояния игры
   useEffect(() => {
-    console.log('HomePage: showTicTacToeGame изменилось на:', showTicTacToeGame);
+   
   }, [showTicTacToeGame]);
 
   // Обработчики игры крестики-нолики
@@ -130,10 +129,8 @@ const HomePage: React.FC = () => {
 
   // Проверяем, нужно ли показать модальное окно регистрации
   useEffect(() => {
-    console.log('HomePage location.state:', location.state);
 
     if (location.state?.showRegistrationSuccess) {
-      console.log('Showing registration success modal');
 
       setRegistrationData({
         email: location.state.registrationEmail,

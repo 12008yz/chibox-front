@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../Avatar";
-import { FaRegBell, FaBell, FaSignOutAlt, FaPlus } from "react-icons/fa";
-import { RiVipCrownFill } from "react-icons/ri";
+import { Bell, LogOut, Plus, Crown } from "lucide-react";
 // import { MdLocalFireDepartment } from "react-icons/md";
 import Monetary from "../Monetary";
 import { useNavigate } from "react-router-dom";
@@ -94,7 +93,7 @@ const RightContent: React.FC<RightContentProps> = ({
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
           >
-            <FaPlus className="text-sm group-hover:scale-110 transition-transform duration-200" />
+            <Plus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform duration-200" />
           </button>
         </div>
       </div>
@@ -106,11 +105,7 @@ const RightContent: React.FC<RightContentProps> = ({
           className="gaming-notification-button"
         >
           <div className="relative">
-            {notificationCount > 0 ? (
-              <FaBell className="gaming-notification-icon gaming-notification-active" />
-            ) : (
-              <FaRegBell className="gaming-notification-icon" />
-            )}
+            <Bell className={`gaming-notification-icon ${notificationCount > 0 ? 'gaming-notification-active' : ''}`} />
             {notificationCount > 0 && (
               <div className="gaming-notification-badge">
                 <div className="gaming-notification-pulse"></div>
@@ -150,7 +145,7 @@ const RightContent: React.FC<RightContentProps> = ({
           <div className="hidden md:flex flex-col">
             <span className="gaming-username">{user.username}</span>
             <div className="flex items-center space-x-1">
-              <RiVipCrownFill className="text-yellow-400 text-xs" />
+              <Crown className="text-yellow-400 w-3 h-3 fill-yellow-400" />
               <span className="gaming-level">LVL {user.level || 1}</span>
             </div>
           </div>
@@ -164,7 +159,7 @@ const RightContent: React.FC<RightContentProps> = ({
         className="gaming-logout-button"
         title={t('header.sign_out')}
       >
-        <FaSignOutAlt className="text-lg" />
+        <LogOut className="w-5 h-5" />
       </button>
 
       {/* Deposit Modal */}

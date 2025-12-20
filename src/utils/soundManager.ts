@@ -42,7 +42,6 @@ class SoundManager {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioContextClass) {
         this.audioContext = new AudioContextClass();
-        console.log('🔊 SoundManager: AudioContext создан');
       }
     } catch (error) {
       console.warn('🔇 SoundManager: Не удалось создать AudioContext', error);
@@ -99,7 +98,6 @@ class SoundManager {
   // Предзагрузка всех звуков
   private preloadSounds() {
     let loadedCount = 0;
-    const totalSounds = Object.keys(this.soundPaths).length;
 
     Object.entries(this.soundPaths).forEach(([key, path]) => {
       try {
@@ -110,10 +108,6 @@ class SoundManager {
         // Обработчик успешной загрузки
         audio.addEventListener('canplaythrough', () => {
           loadedCount++;
-          console.log(`🔊 SoundManager: Загружен звук "${key}" (${loadedCount}/${totalSounds})`);
-          if (loadedCount === totalSounds) {
-            console.log('🔊 SoundManager: Все звуки предзагружены');
-          }
         }, { once: true });
 
         // Обработчик ошибки загрузки
@@ -132,7 +126,6 @@ class SoundManager {
   // Установка состояния звуков
   setSoundsEnabled(enabled: boolean) {
     this.soundsEnabled = enabled;
-    console.log(`🔊 SoundManager: Звуки ${enabled ? 'включены' : 'выключены'}`);
 
     if (!enabled) {
       this.stopAll();
@@ -318,5 +311,5 @@ export const useSound = () => {
 // Экспортируем для отладки в консоли
 if (typeof window !== 'undefined') {
   (window as any).soundManager = soundManager;
-  console.log('🔊 SoundManager: Доступен глобально через window.soundManager');
+ 
 }

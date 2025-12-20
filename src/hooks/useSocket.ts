@@ -79,13 +79,13 @@ const createGlobalSocket = () => {
   });
 
   // Обработчик отключения
-  globalSocket.on('disconnect', (reason) => {
+  globalSocket.on('disconnect', () => {
 
     connectionListeners.forEach(listener => listener(false));
   });
 
   // Обработчик приветственного сообщения
-  globalSocket.on('hello', (data) => {
+  globalSocket.on('hello', () => {
 
   });
 
@@ -133,7 +133,7 @@ const createGlobalSocket = () => {
   });
 
   // Обработчик ошибок
-  globalSocket.on('connect_error', (error) => {
+  globalSocket.on('connect_error', () => {
 
     connectionListeners.forEach(listener => listener(false));
   });

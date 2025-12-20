@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
 import type { Notification } from '../../../types/api';
-import { FaCheckCircle, FaInfoCircle, FaExclamationTriangle, FaTimesCircle, FaCog, FaUsers, FaComments, FaGift, FaBox, FaTimes } from 'react-icons/fa';
+import { CheckCircle, Info, AlertTriangle, XCircle, Settings, Users, MessageSquare, Gift, Package, X } from 'lucide-react';
 import LanguageSwitcher from '../../LanguageSwitcher';
 
 interface NotificationsProps {
@@ -307,29 +307,29 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     };
 
     const getNotificationIcon = (type: string) => {
-        const iconClass = "text-lg";
+        const iconClass = "w-5 h-5";
         switch (type) {
             case 'success':
-                return <FaCheckCircle className={`${iconClass} text-green-400`} />;
+                return <CheckCircle className={`${iconClass} text-green-400`} />;
             case 'info':
-                return <FaInfoCircle className={`${iconClass} text-blue-400`} />;
+                return <Info className={`${iconClass} text-blue-400`} />;
             case 'warning':
             case 'alert':
-                return <FaExclamationTriangle className={`${iconClass} text-yellow-400`} />;
+                return <AlertTriangle className={`${iconClass} text-yellow-400`} />;
             case 'error':
-                return <FaTimesCircle className={`${iconClass} text-red-400`} />;
+                return <XCircle className={`${iconClass} text-red-400`} />;
             case 'system':
-                return <FaCog className={`${iconClass} text-gray-400`} />;
+                return <Settings className={`${iconClass} text-gray-400`} />;
             case 'friendRequest':
-                return <FaUsers className={`${iconClass} text-purple-400`} />;
+                return <Users className={`${iconClass} text-purple-400`} />;
             case 'message':
-                return <FaComments className={`${iconClass} text-indigo-400`} />;
+                return <MessageSquare className={`${iconClass} text-indigo-400`} />;
             case 'caseOpen':
-                return <FaBox className={`${iconClass} text-orange-400`} />;
+                return <Package className={`${iconClass} text-orange-400`} />;
             case 'bonus':
-                return <FaGift className={`${iconClass} text-pink-400`} />;
+                return <Gift className={`${iconClass} text-pink-400`} />;
             default:
-                return <FaInfoCircle className={`${iconClass} text-blue-400`} />;
+                return <Info className={`${iconClass} text-blue-400`} />;
         }
     };
 
@@ -386,7 +386,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                 onClick={handleCloseNotifications}
                                 className="gaming-close-button"
                             >
-                                <FaTimes className="text-lg" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
@@ -406,7 +406,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     {notifications.length === 0 ? (
                         <div className="gaming-empty-state">
                             <div className="gaming-empty-icon">
-                                <FaGift className="text-4xl text-purple-400" />
+                                <Gift className="w-16 h-16 text-purple-400" />
                             </div>
                             <p className="gaming-empty-text">{t('notifications.no_new_notifications')}</p>
                             <p className="gaming-empty-subtext">{t('notifications.new_notifications_appear_here')}</p>

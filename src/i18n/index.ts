@@ -55,7 +55,7 @@ i18n
     resources,
     lng: getDefaultLanguage(),
     fallbackLng: ['en', 'ru'],
-    debug: process.env.NODE_ENV === 'development',
+    debug: false,
 
     interpolation: {
       escapeValue: false,
@@ -76,13 +76,6 @@ i18n
     // Настройки для лучшего fallback
     load: 'languageOnly',
     cleanCode: true,
-
-    // Настройки отладки
-    missingKeyHandler: (lng, _ns, key, _fallbackValue) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`Missing translation key: ${key} for language: ${lng}`);
-      }
-    },
   });
 
 export default i18n;

@@ -177,29 +177,6 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
                 target.style.setProperty('image-rendering', 'auto', 'important');
                 target.style.setProperty('isolation', 'auto', 'important');
 
-                // Отладочная информация - можно убрать после исправления
-                const computedStyle = getComputedStyle(target);
-                const parentStyle = target.parentElement ? getComputedStyle(target.parentElement) : null;
-
-                console.log('LiveDrop image loaded:', {
-                  src: target.src,
-                  filter: computedStyle.filter,
-                  mixBlendMode: computedStyle.mixBlendMode,
-                  colorScheme: computedStyle.colorScheme,
-                  opacity: computedStyle.opacity,
-                  transform: computedStyle.transform,
-                  imageRendering: computedStyle.imageRendering,
-                  // Проверяем родительские стили
-                  parentFilter: parentStyle?.filter,
-                  parentMixBlendMode: parentStyle?.mixBlendMode,
-                  parentColorScheme: parentStyle?.colorScheme,
-                  // Проверяем HTML атрибуты
-                  htmlColorScheme: document.documentElement.style.colorScheme,
-                  bodyColorScheme: document.body.style.colorScheme,
-                  // Проверяем CSS переменные
-                  rootComputedStyle: getComputedStyle(document.documentElement).colorScheme
-                });
-
                 // Дополнительная проверка через небольшую задержку
                 setTimeout(() => {
                   if (target && target.style) {
