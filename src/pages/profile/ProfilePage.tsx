@@ -23,19 +23,10 @@ import { injectProfileStyles } from './utils/profileStyles';
 import { soundManager } from '../../utils/soundManager';
 
 const ProfilePage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const auth = useAuth();
 
-  // Отладка переводов для проблемных ключей
-  console.log('ProfilePage debug:', {
-    currentLanguage: i18n.language,
-    tradeUrlRequired: t('profile.settings.trade_url_required'),
-    steamProfileLabel: t('profile.settings.steam_profile_label'),
-    emailVerificationLabel: t('profile.settings.email_verification_label'),
-    verifyEmailButton: t('profile.settings.verify_email_button'),
-    clickToSendCode: t('profile.settings.click_to_send_code'),
-    isTranslationWorking: t('profile.settings.trade_url_required') !== 'profile.settings.trade_url_required'
-  });
+ 
 
   // State для модальных окон
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -61,7 +52,7 @@ const ProfilePage: React.FC = () => {
       // Если получили новый токен, обновляем его в localStorage
       if (token) {
         localStorage.setItem('auth_token', token);
-        console.log('Токен обновлен после привязки Steam');
+       
       }
 
       showNotification(t('profile.steam_linked_success'), 'success');
@@ -193,7 +184,6 @@ const ProfilePage: React.FC = () => {
               refetchInventory(),
               refetchUser()
             ]);
-            console.log('Inventory and user data automatically refreshed after case opening');
           } catch (error) {
             console.error('Failed to auto-refresh inventory and user data:', error);
           }
@@ -202,7 +192,7 @@ const ProfilePage: React.FC = () => {
         showNotification(t('profile.item_info_error'), 'error');
       }
     } catch (error: any) {
-      console.error('Ошибка при открытии кейса:', error);
+      
       const errorMessage = error?.data?.message || error?.message || t('common.error');
       showNotification(t('profile.case_opening_error', { error: errorMessage }), 'error');
     } finally {

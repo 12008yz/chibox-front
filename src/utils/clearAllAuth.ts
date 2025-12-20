@@ -77,6 +77,5 @@ export const clearAllAuthData = () => {
  // Делаем функцию доступной глобально для быстрого вызова из консоли
  if (typeof window !== 'undefined') {
    (window as any).clearAllAuthData = clearAllAuthData;
-   console.log('💡 Совет: Вы можете вызвать clearAllAuthData() из консоли браузера для полной очистки');
  }
  

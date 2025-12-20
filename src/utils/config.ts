@@ -8,10 +8,3 @@ export const BACKGROUNDS = {
   upgrade: '/images/upgrade.png',
   leaderboard: '/images/liders.png',
 };
-
-// Для отладки
-console.log('Config loaded:', {
-  API_URL,
-  BACKEND_URL,
-  BACKGROUNDS
-});

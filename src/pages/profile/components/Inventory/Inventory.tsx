@@ -35,7 +35,6 @@ const Inventory: React.FC<InventoryProps> = ({
     setActiveInventoryTab,
     filteredInventory,
     getActiveInventory,
-    getOpenedCases,
     getWithdrawnItems,
     getSoldItems,
     getCaseTemplateById
@@ -48,30 +47,7 @@ const Inventory: React.FC<InventoryProps> = ({
     sold: getSoldItems().length
   };
 
-  // Вывод инвентаря в консоль
-  console.log('🎒 [INVENTORY] Полные данные инвентаря:', {
-    всего_предметов: inventoryData?.length || 0,
-    все_предметы: inventoryData,
-    активные: {
-      количество: getActiveInventory().length,
-      предметы: getActiveInventory()
-    },
-    открытые_кейсы: {
-      количество: getOpenedCases().length,
-      кейсы: getOpenedCases()
-    },
-    выведенные: {
-      количество: getWithdrawnItems().length,
-      предметы: getWithdrawnItems()
-    },
-    проданные: {
-      количество: getSoldItems().length,
-      предметы: getSoldItems()
-    },
-    текущая_вкладка: activeInventoryTab,
-    отфильтрованные_предметы: filteredInventory,
-    шаблоны_кейсов: caseTemplatesData
-  });
+ 
 
 
   return (

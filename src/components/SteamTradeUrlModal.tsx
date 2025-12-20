@@ -117,7 +117,7 @@ const SteamTradeUrlModal: React.FC<SteamTradeUrlModalProps> = ({
               <p className="text-sm font-medium text-white">Как получить Steam Trade URL:</p>
               <ol className="text-xs text-gray-400 space-y-1 list-decimal list-inside">
                 <li>Откройте <a href="https://steamcommunity.com/my/tradeoffers/privacy" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 underline">настройки обмена Steam</a></li>
-                <li>Прокрутите вниз до раздела "Third-Party Sites"</li>
+                <li>Прокрутите вниз до раздела "Ссылка на обмен"</li>
                 <li>Скопируйте вашу Trade URL</li>
                 <li>Вставьте её в поле выше</li>
               </ol>

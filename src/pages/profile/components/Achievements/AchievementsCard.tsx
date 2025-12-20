@@ -29,13 +29,6 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
-    console.log('🎯 Opening Achievements Modal');
-    console.log('📊 Achievements data:', {
-      total: achievementsProgress.length,
-      completed: completedAchievementsCount,
-      loading: achievementsLoading,
-      achievements: achievementsProgress
-    });
     setIsModalOpen(true);
   };
 

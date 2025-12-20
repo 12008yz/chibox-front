@@ -44,7 +44,6 @@ class SoundManager {
         this.audioContext = new AudioContextClass();
       }
     } catch (error) {
-      console.warn('🔇 SoundManager: Не удалось создать AudioContext', error);
     }
   }
 
@@ -56,7 +55,6 @@ class SoundManager {
       // Разблокируем AudioContext
       if (this.audioContext && this.audioContext.state === 'suspended') {
         this.audioContext.resume().then(() => {
-          console.log('🔊 SoundManager: AudioContext разблокирован');
         });
       }
 
@@ -81,7 +79,6 @@ class SoundManager {
       }
 
       this.unlocked = true;
-      console.log('🔊 SoundManager: Звуки разблокированы через взаимодействие пользователя');
 
       // Удаляем слушатели после разблокировки
       document.removeEventListener('click', unlockAudio);
@@ -111,14 +108,12 @@ class SoundManager {
         }, { once: true });
 
         // Обработчик ошибки загрузки
-        audio.addEventListener('error', (e) => {
-          console.error(`🔇 SoundManager: Ошибка загрузки звука "${key}" из "${path}"`, e);
+        audio.addEventListener('error', () => {
         }, { once: true });
 
         audio.src = path;
         this.sounds.set(key, audio);
       } catch (error) {
-        console.error(`🔇 SoundManager: Исключение при создании аудио "${key}"`, error);
       }
     });
   }
@@ -140,7 +135,6 @@ class SoundManager {
   // Установка громкости (0.0 - 1.0)
   setVolume(volume: number) {
     this.volume = Math.max(0, Math.min(1, volume));
-    console.log(`🔊 SoundManager: Громкость установлена на ${Math.round(this.volume * 100)}%`);
 
     this.sounds.forEach(audio => {
       audio.volume = this.volume;
@@ -155,14 +149,11 @@ class SoundManager {
   // Воспроизведение звука
   play(soundKey: string, loop: boolean = false, ignoreThrottle: boolean = false) {
     if (!this.soundsEnabled) {
-      console.log(`🔇 SoundManager: Звуки отключены, пропускаем "${soundKey}"`);
       return;
     }
 
     const sound = this.sounds.get(soundKey);
     if (!sound) {
-      console.warn(`🔇 SoundManager: Звук "${soundKey}" не найден`);
-      console.log('🔊 SoundManager: Доступные звуки:', Array.from(this.sounds.keys()).join(', '));
       return;
     }
 
@@ -171,7 +162,6 @@ class SoundManager {
       const now = Date.now();
       const lastPlay = this.lastPlayTime.get(soundKey) || 0;
       if (now - lastPlay < this.minPlayInterval) {
-        console.log(`🔇 SoundManager: Пропускаем "${soundKey}" - слишком частое воспроизведение (${now - lastPlay}мс)`);
         return;
       }
       this.lastPlayTime.set(soundKey, now);
@@ -198,40 +188,32 @@ class SoundManager {
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log(`🔊 SoundManager: Воспроизведен звук "${soundKey}"${loop ? ' (зациклен)' : ''}`);
           })
           .catch(error => {
             // Если не удалось воспроизвести, удаляем из активных
             this.activeClones.delete(clone);
 
             if (error.name === 'NotAllowedError') {
-              console.warn(`🔇 SoundManager: Браузер блокирует автовоспроизведение "${soundKey}". Требуется взаимодействие пользователя.`);
               if (!this.unlocked) {
-                console.log('🔊 SoundManager: Кликните в любом месте страницы для разблокировки звуков');
               }
             } else if (error.name === 'NotSupportedError') {
-              console.error(`🔇 SoundManager: Формат звука "${soundKey}" не поддерживается`, error);
             } else {
-              console.error(`🔇 SoundManager: Ошибка воспроизведения "${soundKey}"`, error);
             }
           });
       }
     } catch (error) {
-      console.error(`🔇 SoundManager: Исключение при воспроизведении "${soundKey}"`, error);
     }
   }
 
   // Остановка всех звуков
   stopAll() {
-    console.log('🔊 SoundManager: Остановка всех звуков');
 
     // Останавливаем оригинальные звуки
-    this.sounds.forEach((sound, key) => {
+    this.sounds.forEach((sound) => {
       try {
         sound.pause();
         sound.currentTime = 0;
       } catch (error) {
-        console.warn(`🔇 SoundManager: Не удалось остановить звук "${key}"`, error);
       }
     });
 
@@ -241,18 +223,15 @@ class SoundManager {
         clone.pause();
         clone.currentTime = 0;
       } catch (error) {
-        console.warn(`🔇 SoundManager: Не удалось остановить клон`, error);
       }
     });
 
     // Очищаем Set активных клонов
     this.activeClones.clear();
-    console.log('🔊 SoundManager: Все звуки и клоны остановлены');
   }
 
   // Остановка конкретного звука (для зацикленных звуков)
   stop(soundKey: string) {
-    console.log(`🔊 SoundManager: Остановка звука "${soundKey}"`);
 
     // Останавливаем оригинальный звук если он играет
     const sound = this.sounds.get(soundKey);
@@ -261,7 +240,6 @@ class SoundManager {
         sound.pause();
         sound.currentTime = 0;
       } catch (error) {
-        console.warn(`🔇 SoundManager: Не удалось остановить звук "${soundKey}"`, error);
       }
     }
 
@@ -275,11 +253,9 @@ class SoundManager {
           this.activeClones.delete(clone);
         }
       } catch (error) {
-        console.warn(`🔇 SoundManager: Не удалось остановить клон "${soundKey}"`, error);
       }
     });
 
-    console.log(`🔊 SoundManager: Звук "${soundKey}" остановлен`);
   }
 
   // Проверка статуса загрузки звуков

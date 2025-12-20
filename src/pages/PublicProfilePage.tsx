@@ -14,8 +14,6 @@ const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
 
-  console.log('🆔 PublicProfilePage - USER ID:', id);
-
   // State для пагинации (отдельно для каждого таба)
   const [activePage, setActivePage] = useState(1);
   const [openedPage, setOpenedPage] = useState(1);
@@ -33,16 +31,6 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
     { skip: !id }
   );
 
-  // Логируем состояние запроса
-  console.log('🌐 API запрос getPublicProfile:', {
-    userId: id,
-    currentPage,
-    tab: activeInventoryTab,
-    isLoading,
-    error,
-    hasData: !!profileData,
-    profileData: profileData
-  });
 
   // Получаем шаблоны кейсов для отображения информации о кейсах в инвентаре
   const { data: caseTemplatesData } = useGetCaseTemplatesQuery();
@@ -71,36 +59,10 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   // Обновляем списки при получении новых данных
   React.useEffect(() => {
     if (profileData?.user) {
-      console.log('📊 PublicProfile - ПОЛНЫЙ ОТВЕТ:', profileData);
-      console.log('📊 PublicProfile - Инвентарь:', {
-        activeTab: activeInventoryTab,
-        inventoryCount: profileData.user.inventory?.length || 0,
-        inventoryItems: profileData.user.inventory,
-        caseItemsCount: profileData.user.caseItems?.length || 0,
-        caseItems: profileData.user.caseItems,
-        inventoryPagination: profileData.user.inventoryPagination,
-        caseItemsPagination: profileData.user.caseItemsPagination
-      });
-
-      // Детальный вывод каждого предмета в инвентаре
-      console.log('🔍 [PUBLIC INVENTORY] Детальная информация о каждом предмете:');
-      profileData.user.inventory?.forEach((item, index) => {
-        console.log(`Предмет ${index + 1}:`, {
-          id: item.id,
-          item_type: item.item_type,
-          status: item.status,
-          source: item.source,
-          acquisition_date: item.acquisition_date,
-          case_template_id: item.case_template_id,
-          case_template: item.case_template,
-          item_data: item.item,
-          полный_объект: item
-        });
-      });
+     
 
       if (activeInventoryTab === 'active') {
         if (activePage === 1) {
-          console.log('📦 Setting inventory items:', profileData.user.inventory?.length);
           setInventoryItems(profileData.user.inventory || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -108,13 +70,11 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.inventory || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
-            console.log('📦 Adding new inventory items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
       } else {
         if (openedPage === 1) {
-          console.log('🎁 Setting case items:', profileData.user.caseItems?.length);
           setCaseItemsList(profileData.user.caseItems || []);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
@@ -122,7 +82,6 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             const newItems = (profileData.user.caseItems || []).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
-            console.log('🎁 Adding new case items:', newItems.length);
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
@@ -235,12 +194,6 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
     const filtered = inventoryItems.filter(item =>
       item.status !== 'sold' && item.status !== 'withdrawn' && item.status !== 'used'
     );
-    console.log('🔍 getActiveInventory:', {
-      totalItems: inventoryItems.length,
-      filteredItems: filtered.length,
-      allItems: inventoryItems,
-      filtered: filtered
-    });
     return filtered;
   };
 
@@ -263,14 +216,6 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
 
   const filteredInventory = getFilteredInventory();
 
-  // Логируем что будем рендерить
-  console.log('🎨 Рендеринг инвентаря:', {
-    activeTab: activeInventoryTab,
-    filteredInventoryLength: filteredInventory.length,
-    filteredInventory: filteredInventory,
-    inventoryItemsLength: inventoryItems.length,
-    caseItemsListLength: caseItemsList.length
-  });
 
   return (
     <div className="min-h-screen text-white relative">
@@ -508,11 +453,6 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                             alt={achievement.name}
                             className="w-full h-full object-contain p-0.5"
                             onError={(e) => {
-                              console.error('❌ Achievement image failed to load:', {
-                                name: achievement.name,
-                                src: e.currentTarget.src,
-                                originalPath: achievement.icon_url
-                              });
                               // Fallback to emoji if image fails to load
                               e.currentTarget.style.display = 'none';
                               const parent = e.currentTarget.parentElement;
