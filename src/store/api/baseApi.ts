@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 
 // Базовый URL для API (подстраивается под ваш backend)
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
@@ -23,51 +24,116 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
-// Базовый query с retry логикой (упрощенная версия)
-const baseQueryWithRetry = retry(baseQuery, {
-  maxRetries: 2,
-});
+// Базовый query с retry логикой (не применяется к 401 и 403 ошибкам)
+const baseQueryWithRetry: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  let result = await baseQuery(args, api, extraOptions);
+
+  // Retry только для сетевых ошибок, не для ошибок авторизации
+  if (result.error && result.error.status !== 401 && result.error.status !== 403) {
+    let retries = 0;
+    const maxRetries = 2;
+
+    while (retries < maxRetries && (result.error.status === 'FETCH_ERROR' || result.error.status === 'TIMEOUT_ERROR')) {
+      retries++;
+      console.log(`Retry attempt ${retries}/${maxRetries}...`);
+      await new Promise(resolve => setTimeout(resolve, 1000 * retries)); // Exponential backoff
+      result = await baseQuery(args, api, extraOptions);
+
+      if (!result.error) break;
+    }
+  }
+
+  return result;
+};
+
+// Флаг для предотвращения множественных попыток обновления токена одновременно
+let isRefreshing = false;
+let refreshPromise: Promise<any> | null = null;
+
+// Функция для сброса состояния обновления (вызывается при logout)
+export const resetRefreshState = () => {
+  isRefreshing = false;
+  refreshPromise = null;
+};
 
 // Обертка для обработки ошибок авторизации и обновления токенов
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
+  // Проверяем, не является ли это запросом logout или refresh
+  const isLogoutRequest = typeof args === 'object' && args.url?.includes('/logout');
+  const isRefreshRequest = typeof args === 'object' && args.url?.includes('/refresh');
+
   let result = await baseQueryWithRetry(args, api, extraOptions);
 
   // БЕЗОПАСНОСТЬ: Токены ТОЛЬКО в httpOnly cookies, НЕ в теле ответа
   // Браузер автоматически отправляет и получает cookies
   // JavaScript НЕ имеет доступа к токенам - защита от XSS
 
-  // НЕ сохраняем токены из ответа - их там больше нет
-
   // Обработка 401 ошибок - пытаемся обновить токен
-  if (result.error?.status === 401) {
+  if (result.error?.status === 401 && !isLogoutRequest && !isRefreshRequest) {
+    // Проверяем, авторизован ли пользователь в Redux
+    const state = api.getState();
+    const isAuthenticated = state.auth?.isAuthenticated;
+
+    // Если пользователь не авторизован, не пытаемся обновить токен
+    if (!isAuthenticated) {
+      console.log('❌ Пользователь не авторизован, пропускаем обновление токена');
+      return result;
+    }
+
     console.log('401 Unauthorized error, trying to refresh token...');
 
-    try {
-      // Пытаемся обновить токен через refresh endpoint
-      // Refresh token автоматически отправится из httpOnly cookie
-      const refreshResult = await baseQuery(
-        { url: '/v1/auth/refresh', method: 'POST' },
-        api,
-        extraOptions
-      );
-
-      if (refreshResult.data && typeof refreshResult.data === 'object' && 'success' in refreshResult.data && (refreshResult.data as any).success) {
-        console.log('✅ Токен успешно обновлен (новые токены в httpOnly cookies)');
-
-        // НЕ обновляем токен в Redux - его там нет и не должно быть
-        // Токены ТОЛЬКО в httpOnly cookies
-
-        // Повторяем оригинальный запрос с новым токеном (из cookie)
+    // Если уже происходит обновление токена, ждем его завершения
+    if (isRefreshing && refreshPromise) {
+      try {
+        await refreshPromise;
+        // Повторяем оригинальный запрос после обновления токена
         result = await baseQueryWithRetry(args, api, extraOptions);
-      } else {
-        // Не удалось обновить токен - выходим
-        console.log('❌ Не удалось обновить токен, делаем logout');
-        api.dispatch({ type: 'auth/logout' });
+      } catch {
+        // Обновление не удалось, возвращаем оригинальную ошибку
+        return result;
       }
-    } catch (refreshError) {
-      console.error('Ошибка при обновлении токена:', refreshError);
-      api.dispatch({ type: 'auth/logout' });
+      return result;
     }
+
+    // Начинаем процесс обновления токена
+    isRefreshing = true;
+    refreshPromise = (async () => {
+      try {
+        // Пытаемся обновить токен через refresh endpoint
+        // Refresh token автоматически отправится из httpOnly cookie
+        const refreshResult = await baseQuery(
+          { url: '/v1/auth/refresh', method: 'POST' },
+          api,
+          extraOptions
+        );
+
+        if (refreshResult.data && typeof refreshResult.data === 'object' && 'success' in refreshResult.data && (refreshResult.data as any).success) {
+          console.log('✅ Токен успешно обновлен (новые токены в httpOnly cookies)');
+
+          // НЕ обновляем токен в Redux - его там нет и не должно быть
+          // Токены ТОЛЬКО в httpOnly cookies
+
+          // Повторяем оригинальный запрос с новым токеном (из cookie)
+          result = await baseQueryWithRetry(args, api, extraOptions);
+        } else {
+          // Не удалось обновить токен - выходим
+          console.log('❌ Не удалось обновить токен, делаем logout');
+          api.dispatch({ type: 'auth/logout' });
+        }
+      } catch (refreshError) {
+        console.error('Ошибка при обновлении токена:', refreshError);
+        api.dispatch({ type: 'auth/logout' });
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+
+    await refreshPromise;
   }
 
   // Логируем сетевые ошибки
