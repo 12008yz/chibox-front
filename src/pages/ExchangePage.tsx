@@ -270,8 +270,6 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Selling item:', { itemId, itemName, sellPrice, userId: auth.user.id });
-
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
       if (!itemGroup || itemGroup.instances.length === 0) {
@@ -287,7 +285,6 @@ const ExchangePage: React.FC = () => {
       }
 
       const inventoryItem = availableInstances[0];
-      console.log('Using inventory item ID:', inventoryItem.id, 'Available instances:', availableInstances.length);
 
       const result = await sellItem({ itemId: inventoryItem.id }).unwrap();
       if (result.success) {
@@ -300,7 +297,6 @@ const ExchangePage: React.FC = () => {
         }, 500);
       }
     } catch (error: any) {
-      console.error('Ошибка при продаже предмета:', error);
       const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
     }
@@ -322,7 +318,6 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Exchanging item:', { itemId, itemName, itemPrice, subscriptionDays, userId: auth.user.id });
 
       // Находим группу предметов
       const itemGroup = groupedAndFilteredItems.find(group => group.item.id === itemId);
@@ -338,7 +333,6 @@ const ExchangePage: React.FC = () => {
         return;
       }
 
-      console.log('Using inventory item ID for exchange:', inventoryItem.id);
       const result = await exchangeItem({
         userId: auth.user.id,
         itemId: inventoryItem.id  // Используем ID конкретного экземпляра в инвентаре
@@ -360,7 +354,6 @@ const ExchangePage: React.FC = () => {
         }, 500);
       }
     } catch (error: any) {
-      console.error('Ошибка при обмене предмета:', error);
       const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
     }

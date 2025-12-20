@@ -40,7 +40,6 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
 
   // Обработка 401 ошибок - пытаемся обновить токен
   if (result.error?.status === 401) {
-    console.log('401 Unauthorized error, trying to refresh token...');
 
     try {
       // Пытаемся обновить токен через refresh endpoint
@@ -52,7 +51,6 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
       );
 
       if (refreshResult.data && typeof refreshResult.data === 'object' && 'success' in refreshResult.data && (refreshResult.data as any).success) {
-        console.log('✅ Токен успешно обновлен (новые токены в httpOnly cookies)');
 
         // НЕ обновляем токен в Redux - его там нет и не должно быть
         // Токены ТОЛЬКО в httpOnly cookies
@@ -61,18 +59,11 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
         result = await baseQueryWithRetry(args, api, extraOptions);
       } else {
         // Не удалось обновить токен - выходим
-        console.log('❌ Не удалось обновить токен, делаем logout');
         api.dispatch({ type: 'auth/logout' });
       }
     } catch (refreshError) {
-      console.error('Ошибка при обновлении токена:', refreshError);
       api.dispatch({ type: 'auth/logout' });
     }
-  }
-
-  // Логируем сетевые ошибки
-  if (result.error?.status === 'FETCH_ERROR' || result.error?.status === 'TIMEOUT_ERROR') {
-    console.error('Network error:', result.error);
   }
 
   return result;
