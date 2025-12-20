@@ -84,26 +84,3 @@ export async function checkImageAvailability(url: string): Promise<boolean> {
     setTimeout(() => resolve(false), 5000);
   });
 }
-
-/**
- * Debug информация для аватаров
- */
-export function debugAvatarUrls(customAvatar?: string | null, steamAvatar?: string | null, userId?: string) {
-  console.group('🔍 Avatar Debug Info');
-  console.log('Environment:', {
-    VITE_API_URL: import.meta.env.VITE_API_URL,
-    BACKEND_URL,
-  });
-  console.log('Avatar data:', {
-    customAvatar,
-    steamAvatar,
-    userId,
-  });
-  console.log('Generated URLs:', {
-    customUrl: customAvatar ? getAvatarUrl(customAvatar) : null,
-    steamUrl: steamAvatar,
-    fallbackUrl: generateFallbackAvatar(userId || 'user'),
-  });
-  console.log('Preferred avatar:', getPreferredAvatar(customAvatar, steamAvatar, userId));
-  console.groupEnd();
-}

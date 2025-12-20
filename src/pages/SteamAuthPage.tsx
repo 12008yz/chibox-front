@@ -17,7 +17,6 @@ const SteamAuthPage: React.FC = () => {
 
   // Очищаем старое состояние при монтировании компонента
   useEffect(() => {
-    console.log('SteamAuthPage mounted: Clearing old auth state...');
 
     // Полная очистка
     const keysToKeep = ['theme', 'language', 'cookieConsent'];
@@ -35,20 +34,16 @@ const SteamAuthPage: React.FC = () => {
 
   useEffect(() => {
     // Обрабатываем Steam auth callback
-    console.log('SteamAuthPage: Processing Steam auth callback');
     const provider = searchParams.get('provider');
 
-    console.log('SteamAuthPage: Provider:', provider);
 
     if (provider === 'steam') {
       // БЕЗОПАСНОСТЬ: Токен теперь в httpOnly cookie, не в URL
       // Загружаем данные пользователя напрямую через API
-      console.log('SteamAuthPage: Fetching user data (token in httpOnly cookie)...');
 
       getCurrentUser()
         .unwrap()
         .then((data) => {
-          console.log('SteamAuthPage: User data loaded:', data);
 
           if (data?.success && data.user) {
             // Обновляем состояние авторизации
@@ -59,10 +54,8 @@ const SteamAuthPage: React.FC = () => {
 
             // Проверяем, есть ли steam_trade_url
             if (!data.user.steam_trade_url) {
-              console.log('SteamAuthPage: Steam Trade URL not set, showing modal...');
               setShowTradeUrlModal(true);
             } else {
-              console.log('SteamAuthPage: Steam Trade URL already set, redirecting...');
               navigate('/', { replace: true });
             }
           } else {
@@ -77,7 +70,6 @@ const SteamAuthPage: React.FC = () => {
         });
     } else {
       // Если нет провайдера, перенаправляем на страницу входа
-      console.error('SteamAuthPage: Missing provider');
       setError('Отсутствуют данные авторизации');
       setTimeout(() => {
         navigate('/?error=missing_provider', { replace: true });
@@ -87,20 +79,16 @@ const SteamAuthPage: React.FC = () => {
 
   const handleTradeUrlSubmit = async (tradeUrl: string) => {
     try {
-      console.log('SteamAuthPage: Saving Steam Trade URL...');
       await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
 
-      console.log('SteamAuthPage: Steam Trade URL saved successfully');
       setShowTradeUrlModal(false);
       navigate('/', { replace: true });
     } catch (err) {
-      console.error('Ошибка сохранения Steam Trade URL:', err);
       // Ошибка будет показана в модальном окне
     }
   };
 
   const handleTradeUrlSkip = () => {
-    console.log('SteamAuthPage: User skipped Steam Trade URL setup');
     setShowTradeUrlModal(false);
     navigate('/', { replace: true });
   };
