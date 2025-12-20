@@ -3,7 +3,7 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, lazy, Suspense, useState } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 
@@ -12,7 +12,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import FloatingWatermark from './components/FloatingWatermark';
 import SteamLoadingPage from './components/SteamLoadingPage';
-import AuthModal from './components/AuthModal';
 import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
@@ -41,8 +40,6 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { onlineUsers } = useSocket();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
 
   console.log('[App] Current auth state:', {
     isAuthenticated: auth.isAuthenticated,
@@ -159,28 +156,11 @@ const App: React.FC = () => {
 
   // Компонент для защищенных маршрутов
   const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-    useEffect(() => {
-      if (!auth.isAuthenticated) {
-        setAuthModalOpen(true);
-        setAuthModalTab('login');
-      }
-    }, []);
-
     if (!auth.isAuthenticated) {
       return <Navigate to="/" replace />;
     }
 
     return children;
-  };
-
-  // Компонент для редиректа с открытием модального окна
-  const LoginRedirect: React.FC<{ tab: 'login' | 'register' }> = ({ tab }) => {
-    useEffect(() => {
-      setAuthModalOpen(true);
-      setAuthModalTab(tab);
-    }, [tab]);
-
-    return <Navigate to="/" replace />;
   };
 
   return (
@@ -192,16 +172,6 @@ const App: React.FC = () => {
           <Header
             onlineUsers={onlineUsers}
             user={auth.user}
-            authModalOpen={authModalOpen}
-            setAuthModalOpen={setAuthModalOpen}
-            authModalTab={authModalTab}
-            setAuthModalTab={setAuthModalTab}
-          />
-
-          <AuthModal
-            isOpen={authModalOpen}
-            onClose={() => setAuthModalOpen(false)}
-            defaultTab={authModalTab}
           />
 
           <main>
@@ -212,14 +182,6 @@ const App: React.FC = () => {
           }>
             <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route
-              path="/login"
-              element={<LoginRedirect tab="login" />}
-            />
-            <Route
-              path="/register"
-              element={<LoginRedirect tab="register" />}
-            />
             <Route
               path="/auth/success"
               element={<SteamAuthPage />}

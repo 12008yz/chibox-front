@@ -130,17 +130,27 @@ const SteamAuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#151225]">
-      <div className="text-center">
-        <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h2 className="text-white text-xl font-semibold mb-2">
-          Завершение авторизации Steam...
-        </h2>
-        <p className="text-gray-400">
-          Пожалуйста, подождите
-        </p>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-[#151225]">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <h2 className="text-white text-xl font-semibold mb-2">
+            Завершение авторизации Steam...
+          </h2>
+          <p className="text-gray-400">
+            Пожалуйста, подождите
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Steam Trade URL Modal */}
+      <SteamTradeUrlModal
+        isOpen={showTradeUrlModal}
+        onClose={handleTradeUrlSkip}
+        onSubmit={handleTradeUrlSubmit}
+        canSkip={true}
+      />
+    </>
   );
 };
 

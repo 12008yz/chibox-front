@@ -11,15 +11,12 @@ import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 import SafeCrackerButton from '../SafeCrackerButton';
+import SteamLoginButton from '../../SteamLoginButton';
 
 interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   user?: any; // TODO: заменить на правильный тип
-  authModalOpen?: boolean;
-  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  authModalTab?: 'login' | 'register';
-  setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
   isMobileMenu?: boolean;
 }
 
@@ -27,8 +24,6 @@ const RightContent: React.FC<RightContentProps> = ({
   openNotifications,
   setOpenNotifications,
   user,
-  setAuthModalOpen,
-  setAuthModalTab,
   isMobileMenu = false
 }) => {
   const { t } = useTranslation();
@@ -66,24 +61,7 @@ const RightContent: React.FC<RightContentProps> = ({
   if (!user) {
     return (
       <div className="flex items-center space-x-3">
-        <button
-          onClick={() => {
-            setAuthModalTab?.('login');
-            setAuthModalOpen?.(true);
-          }}
-          className="gaming-button gaming-button-secondary"
-        >
-          {t('header.login')}
-        </button>
-        <button
-          onClick={() => {
-            setAuthModalTab?.('register');
-            setAuthModalOpen?.(true);
-          }}
-          className="gaming-button gaming-button-primary"
-        >
-          {t('header.register')}
-        </button>
+        <SteamLoginButton />
       </div>
     );
   }

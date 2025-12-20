@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 
 interface SteamTradeUrlModalProps {
   isOpen: boolean;
@@ -17,7 +16,6 @@ const SteamTradeUrlModal: React.FC<SteamTradeUrlModalProps> = ({
   onSubmit,
   canSkip = true
 }) => {
-  const { t } = useTranslation();
   const [tradeUrl, setTradeUrl] = useState('');
   const [error, setError] = useState('');
 

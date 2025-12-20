@@ -1,22 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
-import { MdOutlineSell } from "react-icons/md";
-import { GiUpgrade } from 'react-icons/gi';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import { IoMdTrophy } from 'react-icons/io';
-import { ImConnection } from "react-icons/im";
-import { HiSparkles } from 'react-icons/hi';
+import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
 
 interface NavbarProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   user?: any;
-  authModalOpen?: boolean;
-  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  authModalTab?: 'login' | 'register';
-  setAuthModalTab?: React.Dispatch<React.SetStateAction<'login' | 'register'>>;
   onlineUsers?: number;
 }
 
@@ -24,10 +15,6 @@ const Navbar: React.FC<NavbarProps> = ({
   openNotifications,
   setOpenNotifications,
   user,
-  authModalOpen,
-  setAuthModalOpen,
-  authModalTab,
-  setAuthModalTab,
   onlineUsers = 0
 }) => {
   const { t } = useTranslation();
@@ -57,17 +44,17 @@ const Navbar: React.FC<NavbarProps> = ({
   const links = [
     {
       to: "/exchange",
-      icon: <MdOutlineSell className="text-lg" />,
+      icon: <ShoppingBag className="text-lg" />,
       label: t('header.exchange_items'),
     },
     {
       to: "/upgrade",
-      icon: <GiUpgrade className="text-lg" />,
+      icon: <TrendingUp className="text-lg" />,
       label: t('header.upgrade'),
     },
     {
       to: "/leaderboard",
-      icon: <IoMdTrophy className="text-lg" />,
+      icon: <Trophy className="text-lg" />,
       label: t('header.leaderboard_table'),
     }
   ];
@@ -108,7 +95,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 </span>
                 <div className="text-[9px] md:text-[10px] lg:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
-                  <HiSparkles className="text-orange-400 animate-spin-fast" />
+                  <Sparkles className="text-orange-400 animate-spin-fast w-3 h-3" />
                 </div>
               </div>
             </Link>
@@ -142,7 +129,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
               {/* Онлайн пользователи (Desktop) */}
               <div className="hidden md:flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-700/30">
-                <ImConnection className="text-green-400 animate-pulse text-sm lg:text-base" />
+                <Radio className="text-green-400 animate-pulse w-4 h-4 lg:w-5 lg:h-5" />
                 <span className="text-xs lg:text-sm text-gray-300 font-medium">
                   <span className="text-white font-bold">{onlineUsers.toLocaleString()}</span> <span className="hidden xl:inline">{t('header.online') || 'Online'}</span>
                 </span>
@@ -154,10 +141,6 @@ const Navbar: React.FC<NavbarProps> = ({
                   openNotifications={openNotifications}
                   setOpenNotifications={setOpenNotifications}
                   user={user}
-                  authModalOpen={authModalOpen}
-                  setAuthModalOpen={setAuthModalOpen}
-                  authModalTab={authModalTab}
-                  setAuthModalTab={setAuthModalTab}
                 />
               </div>
 
@@ -167,9 +150,9 @@ const Navbar: React.FC<NavbarProps> = ({
                 className="lg:hidden p-2 text-gray-300 hover:text-white transition-colors"
               >
                 {mobileMenuOpen ? (
-                  <FaTimes className="text-2xl" />
+                  <X className="w-6 h-6" />
                 ) : (
-                  <FaBars className="text-2xl" />
+                  <Menu className="w-6 h-6" />
                 )}
               </button>
             </div>
@@ -232,10 +215,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 openNotifications={openNotifications}
                 setOpenNotifications={setOpenNotifications}
                 user={user}
-                authModalOpen={authModalOpen}
-                setAuthModalOpen={setAuthModalOpen}
-                authModalTab={authModalTab}
-                setAuthModalTab={setAuthModalTab}
                 isMobileMenu={true}
               />
             </div>

@@ -154,7 +154,7 @@ export const authApi = baseApi.injectEndpoints({
     // Обновление профиля
     updateProfile: builder.mutation<
       ApiResponse<User>,
-      Partial<Pick<User, 'username' | 'email'>>
+      Partial<Pick<User, 'username' | 'email' | 'steam_trade_url'>>
     >({
       query: (updateData) => ({
         url: 'v1/profile',
