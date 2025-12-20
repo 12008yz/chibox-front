@@ -16,15 +16,12 @@ export const getImageUrl = (path: string | null | undefined): string => {
 
   // Очищаем неправильные пути, если они остались
   let cleanPath = path;
-  let cleaned = false;
 
   if (cleanPath.includes('../public/')) {
     cleanPath = cleanPath.replace('../public', '');
-    cleaned = true;
   }
   if (cleanPath.includes('public/')) {
     cleanPath = cleanPath.replace('public/', '');
-    cleaned = true;
   }
 
 
