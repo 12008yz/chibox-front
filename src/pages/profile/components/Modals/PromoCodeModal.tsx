@@ -89,24 +89,6 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
 
-          {/* Info Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/5 border border-gray-800 rounded-xl p-4">
-              <div className="text-2xl mb-2">💰</div>
-              <h3 className="text-sm font-medium text-white">Баланс</h3>
-              <p className="text-xs text-gray-400 mt-1">
-                ChiCoins
-              </p>
-            </div>
-
-            <div className="bg-white/5 border border-gray-800 rounded-xl p-4">
-              <div className="text-2xl mb-2">👑</div>
-              <h3 className="text-sm font-medium text-white">VIP</h3>
-              <p className="text-xs text-gray-400 mt-1">
-                Подписка
-              </p>
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
