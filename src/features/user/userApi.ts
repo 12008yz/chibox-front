@@ -279,7 +279,7 @@ export const userApi = baseApi.injectEndpoints({
         body: promoData,
       }),
       invalidatesTags: ['User', 'Balance'],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data?.newBalance !== undefined) {

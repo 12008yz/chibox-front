@@ -12,7 +12,6 @@ const SteamAuthPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
   const [showTradeUrlModal, setShowTradeUrlModal] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
   const [getCurrentUser] = useLazyGetCurrentUserQuery();
   const [updateProfile] = useUpdateProfileMutation();
 
@@ -57,9 +56,6 @@ const SteamAuthPage: React.FC = () => {
               user: data.user,
               // token в httpOnly cookie, не передаем в Redux
             }));
-
-            // Сохраняем данные пользователя
-            setUserData(data.user);
 
             // Проверяем, есть ли steam_trade_url
             if (!data.user.steam_trade_url) {
