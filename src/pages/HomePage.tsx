@@ -62,7 +62,6 @@ const HomePage: React.FC = () => {
   // Синхронизируем локальное состояние с глобальным
   useEffect(() => {
     if (globalShowIntroVideo) {
-      console.log('[HomePage] Устанавливаем локальный showIntroVideo = true');
       setShowIntroVideo(true);
     }
   }, [globalShowIntroVideo]);
@@ -83,7 +82,6 @@ const HomePage: React.FC = () => {
 
   // Обработчики игры крестики-нолики
   const handleTicTacToeGameClose = () => {
-    console.log('HomePage: Закрываем игру крестики-нолики');
     setShowTicTacToeGame(false);
     setBonusCase(null);
     // Обновляем данные после закрытия игры
@@ -92,7 +90,6 @@ const HomePage: React.FC = () => {
   };
 
   const handleTicTacToeWin = async () => {
-    console.log('HomePage: Победа в крестики-нолики! Бонусный кейс добавлен в инвентарь.');
     setShowTicTacToeGame(false);
     setBonusCase(null);
 
@@ -102,25 +99,21 @@ const HomePage: React.FC = () => {
   };
 
   const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
-    console.log('HomePage: Открываем игру крестики-нолики для кейса:', caseTemplate.name);
     setBonusCase(caseTemplate);
     setShowTicTacToeGame(true);
   };
 
   // Обработчики для StatusDashboard
   const handlePlayTicTacToe = () => {
-    console.log('HomePage: Открываем крестики-нолики из StatusDashboard');
     setShowTicTacToeGame(true);
   };
 
   const handlePlaySafeCracker = () => {
-    console.log('HomePage: Открываем Safe Cracker из StatusDashboard');
     setShowSafeCrackerGame(true);
   };
 
   // Обработчик для показа модального окна авторизации
   const handleAuthRequired = () => {
-    console.log('HomePage: Требуется авторизация, перенаправляем на /login');
     navigate('/login');
   };
 
@@ -158,7 +151,6 @@ const HomePage: React.FC = () => {
   };
 
   const handleVideoEnd = () => {
-    console.log('[HomePage] Video ended, hiding intro video');
     setShowIntroVideo(false);
     dispatch(setGlobalShowIntroVideo(false)); // Сбрасываем глобальное состояние
     setRegistrationData(null); // Очищаем данные регистрации
@@ -166,7 +158,6 @@ const HomePage: React.FC = () => {
     // После видео проверяем, нужно ли показать trade URL modal
     if (globalShowTradeUrlModal) {
       // Показываем trade modal после окончания видео
-      console.log('[HomePage] Showing Trade URL modal after video');
       setTimeout(() => {
         setShowTradeUrlModal(true);
       }, 300);
@@ -237,7 +228,6 @@ const HomePage: React.FC = () => {
 
         if (!hasWonRecently) {
           // Если не выиграл в крестики-нолики, не можем открыть бонусный кейс
-          console.log(t('homepage.need_bonus_game_win'));
           return null; // Не открываем кейс сейчас
         }
         // Если выиграл, продолжаем открытие кейса
@@ -247,14 +237,12 @@ const HomePage: React.FC = () => {
       const isFreeCase = parseFloat(caseTemplate.price) === 0 || isNaN(parseFloat(caseTemplate.price));
 
       if (isFreeCase) {
-        console.log('Открываем бесплатный кейс напрямую по template_id:', caseTemplate.id);
 
         // Для бесплатных кейсов сразу открываем по template_id
         const openResult = await openCase({
           template_id: caseTemplate.id
         }).unwrap();
 
-        console.log('Результат открытия бесплатного кейса:', openResult);
 
         if (openResult.success && openResult.data?.item) {
           // Принудительно обновляем данные пользователя и кейсов
@@ -271,7 +259,6 @@ const HomePage: React.FC = () => {
       }
 
       // Для платных кейсов покупаем сначала
-      console.log('Покупаем платный кейс:', caseTemplate.id);
       const buyResult = await buyCase({
         case_template_id: caseTemplate.id,
         caseTemplateId: caseTemplate.id,
@@ -279,7 +266,6 @@ const HomePage: React.FC = () => {
         quantity: 1
       }).unwrap();
 
-      console.log('Результат покупки кейса:', buyResult);
 
       if (!buyResult.success) {
         throw new Error('Ошибка покупки кейса');
@@ -292,22 +278,18 @@ const HomePage: React.FC = () => {
 
       // Проверяем наличие inventory_cases в ответе
       const inventoryCases = buyResult.data?.inventory_cases;
-      console.log('inventory_cases из результата покупки:', inventoryCases);
 
       if (!inventoryCases || inventoryCases.length === 0) {
-        console.error('Полный результат покупки:', buyResult);
         throw new Error('Кейс не был добавлен в инвентарь');
       }
 
       const inventoryItemId = inventoryCases[0].id;
-      console.log('Открываем кейс из инвентаря:', inventoryItemId);
 
       // Открываем кейс используя inventoryItemId
       const openResult = await openCase({
         inventoryItemId: inventoryItemId
       }).unwrap();
 
-      console.log('Результат открытия кейса:', openResult);
 
       if (openResult.success && openResult.data?.item) {
         // Принудительно обновляем данные пользователя и кейсов для обновления баланса в navbar
@@ -322,7 +304,6 @@ const HomePage: React.FC = () => {
         throw new Error('Ошибка открытия кейса');
       }
     } catch (error: any) {
-      console.error('Ошибка при покупке и открытии кейса:', error);
 
       // Показываем toast уведомление вместо alert
       // toast уведомления обрабатываются в CasePreviewModal
@@ -331,10 +312,6 @@ const HomePage: React.FC = () => {
       throw error;
     }
   };
-
-  if (casesError) {
-    console.error('Ошибка загрузки кейсов:', casesError);
-  }
 
   // Принудительное обновление данных при маунте
   useEffect(() => {
@@ -394,7 +371,6 @@ const HomePage: React.FC = () => {
 
                   // Функция для принудительного обновления данных
                   const handleDataUpdate = () => {
-                    console.log('Принудительное обновление данных...');
                     refetchUser();
                     refetchCases();
                     refetchFreeCaseStatus();

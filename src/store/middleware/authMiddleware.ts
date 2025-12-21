@@ -49,7 +49,6 @@ authMiddleware.startListening({
 authMiddleware.startListening({
   actionCreator: logout,
   effect: async (_action, listenerApi) => {
-    console.log('🔐 Обработка logout - очистка состояния API');
 
     // Сбрасываем флаг обновления токена
     resetRefreshState();
@@ -57,6 +56,5 @@ authMiddleware.startListening({
     // Сбрасываем состояние RTK Query API, чтобы очистить весь кэш и остановить все активные запросы
     listenerApi.dispatch(baseApi.util.resetApiState());
 
-    console.log('✅ Состояние API очищено');
   },
 });

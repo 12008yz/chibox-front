@@ -279,6 +279,16 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
 
     let position: any = {};
 
+    // Для первого шага показываем подсказку по центру экрана
+    if (currentStep === 0) {
+      position = {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+      };
+      return position;
+    }
+
     switch (step.position) {
       case 'bottom':
         position = {
@@ -428,25 +438,33 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         {/* Затемнение фона */}
         <div className="absolute inset-0 bg-black/70"></div>
 
-        {/* Подсветка элемента */}
-        <div
-          className="absolute onboarding-highlight rounded-lg border-2 border-cyan-400"
-          style={{
-            top: targetPosition.top - 4,
-            left: targetPosition.left - 4,
-            width: targetPosition.width + 8,
-            height: targetPosition.height + 8,
-            pointerEvents: 'auto'
-          }}
-        />
+        {/* Подсветка элемента - скрываем для первого шага */}
+        {currentStep !== 0 && (
+          <div
+            className="absolute onboarding-highlight border-2 border-cyan-400"
+            style={{
+              top: targetPosition.top - 4,
+              left: targetPosition.left - 4,
+              width: targetPosition.width + 8,
+              height: targetPosition.height + 8,
+              pointerEvents: 'auto',
+              borderRadius: step.id === 'free_cases' ? '24px' : '8px',
+              boxShadow: step.id === 'free_cases'
+                ? '0 0 30px rgba(34, 211, 238, 0.6), inset 0 0 20px rgba(34, 211, 238, 0.3)'
+                : '0 0 20px rgba(34, 211, 238, 0.5)'
+            }}
+          />
+        )}
 
-        {/* Анимированная стрелка */}
-        <div
-          className="absolute onboarding-arrow z-[9999]"
-          style={getArrowPosition()}
-        >
-          <ArrowDown className="text-cyan-400 text-4xl" />
-        </div>
+        {/* Анимированная стрелка - скрываем для первого шага */}
+        {currentStep !== 0 && (
+          <div
+            className="absolute onboarding-arrow z-[9999]"
+            style={getArrowPosition()}
+          >
+            <ArrowDown className="text-cyan-400 text-4xl" />
+          </div>
+        )}
 
         {/* Подсказка */}
         <div

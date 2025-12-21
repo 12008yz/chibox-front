@@ -62,27 +62,16 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
       return;
     }
 
-    const handleCanPlay = () => {
-      setIsVideoReady(true);
-
-      if (isOpen) {
-        video.play().catch(() => {
-        });
-      }
-    };
-
     const handleEnded = () => {
       onVideoEnd();
     };
 
-    video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('ended', handleEnded);
 
     return () => {
-      video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('ended', handleEnded);
     };
-  }, [onVideoEnd, isOpen]);
+  }, [onVideoEnd]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -109,6 +98,15 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
     }
   };
 
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Если звук выключен - включаем его при клике на видео
+    if (isMuted && videoRef.current) {
+      videoRef.current.muted = false;
+      setIsMuted(false);
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -132,30 +130,28 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
         preload="auto"
         autoPlay
         controls={false}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleVideoClick}
       >
         <source src={videoUrl} type="video/mp4" />
       </video>
 
-      {/* Кнопка звука с подсказкой (только если звук был заблокирован) */}
+      {/* Кнопка звука всегда видна */}
+      <button
+        onClick={toggleMute}
+        className={`absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200 ${isMuted ? 'animate-pulse' : ''}`}
+        title={isMuted ? "Включить звук" : "Выключить звук"}
+      >
+        {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+      </button>
+
+      {/* Подсказка при выключенном звуке */}
       {isMuted && (
-        <button
-          onClick={toggleMute}
-          className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200 flex items-center gap-3 animate-pulse"
-          title="Включить звук"
-        >
-          <VolumeX className="w-6 h-6" />
-          <span className="text-sm font-medium">Нажмите, чтобы включить звук</span>
-        </button>
-      )}
-      {!isMuted && (
-        <button
-          onClick={toggleMute}
-          className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200"
-          title="Выключить звук"
-        >
-          <Volume2 className="w-6 h-6" />
-        </button>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center pointer-events-none">
+          <div className="bg-black/70 px-6 py-4 rounded-lg animate-pulse">
+            <VolumeX className="w-12 h-12 mx-auto mb-2" />
+            <p className="text-lg font-semibold">Нажмите для включения звука</p>
+          </div>
+        </div>
       )}
 
       {/* Кнопка пропуска */}

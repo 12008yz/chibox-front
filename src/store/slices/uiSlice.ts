@@ -173,10 +173,7 @@ const uiSlice = createSlice({
 
     // Интро видео
     setShowIntroVideo: (state, action: PayloadAction<boolean>) => {
-      console.log('[uiSlice] setShowIntroVideo called with:', action.payload);
-      console.log('[uiSlice] Previous value:', state.showIntroVideo);
       state.showIntroVideo = action.payload;
-      console.log('[uiSlice] New value:', state.showIntroVideo);
     },
 
     // Trade URL модалка
