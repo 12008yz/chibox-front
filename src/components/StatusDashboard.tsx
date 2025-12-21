@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaGamepad, FaGift, FaFire, FaChartLine, FaClock, FaCoins, FaTrophy } from 'react-icons/fa';
-import { MdTrendingUp } from 'react-icons/md';
-import { RiVipCrownFill } from 'react-icons/ri';
-// import { GiTicTacToe } from 'react-icons/gi';
-import { IoSparkles } from 'react-icons/io5';
+import { Gamepad2, Gift, Flame, TrendingUp, Clock, Coins, Trophy, Crown, Sparkles } from 'lucide-react';
 import { formatDaysI18n } from '../utils/declension';
 import Monetary from './Monetary';
 import Title from './Title';
@@ -107,39 +103,39 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
     {
       label: t('profile.cases_opened'),
       value: openedCasesCount,
-      icon: <FaGift className="text-green-400" />,
+      icon: <Gift className="text-green-400" />,
       color: 'text-green-400'
     },
     {
       label: t('common.balance'),
       value: <Monetary value={user.balance || 0} />,
-      icon: <FaCoins className="text-yellow-400" />,
+      icon: <Coins className="text-yellow-400" />,
       color: 'text-yellow-400'
     },
     {
       label: t('public_profile.total_value'),
       value: <Monetary value={user.total_items_value || 0} />,
-      icon: <FaTrophy className="text-emerald-400" />,
+      icon: <Trophy className="text-emerald-400" />,
       color: 'text-emerald-400'
     },
     {
       label: t('profile.level'),
       value: user.level || 1,
-      icon: <FaChartLine className="text-blue-400" />,
+      icon: <TrendingUp className="text-blue-400" />,
       color: 'text-blue-400'
     },
     {
       label: t('time.days'),
       value: daysLeft,
-      icon: <FaClock className="text-purple-400" />,
+      icon: <Clock className="text-purple-400" />,
       color: 'text-purple-400'
     }
   ];
 
   const tabs = [
-    { id: 'activities', name: t('profile.achievements'), icon: <FaGamepad /> },
-    { id: 'stats', name: t('profile.statistics'), icon: <FaChartLine /> },
-    { id: 'benefits', name: t('auth.bonuses'), icon: <RiVipCrownFill /> }
+    { id: 'activities', name: t('profile.achievements'), icon: <Gamepad2 /> },
+    { id: 'stats', name: t('profile.statistics'), icon: <TrendingUp /> },
+    { id: 'benefits', name: t('auth.bonuses'), icon: <Crown /> }
   ];
 
   return (
@@ -166,7 +162,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
               <div className="flex-1">
                 <h2 className="text-xl md:text-3xl font-bold text-white flex items-center gap-1 md:gap-2">
                   {currentStatus.name}
-                  <IoSparkles className="text-yellow-300 text-sm md:text-base" />
+                  <Sparkles className="text-yellow-300 text-sm md:text-base" />
                 </h2>
                 <p className="text-white/80 text-sm md:text-lg">+{currentStatus.bonus}% {t('common.bonus_keyword')}</p>
                 <p className="text-white/60 text-xs md:text-base">{formatDaysI18n(daysLeft, t)}</p>
@@ -206,7 +202,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       {/* Контент вкладок */}
       <div className="w-full max-w-5xl">
         {activeTab === 'activities' && (
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 justify-items-center max-w-4xl mx-auto">
             {bonusActivities.map((activity) => (
               <div
                 key={activity.id}
@@ -278,7 +274,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
             <div className="bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-4 md:p-6">
               <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
-                <FaFire className="text-orange-400 text-sm md:text-base" />
+                <Flame className="text-orange-400 text-sm md:text-base" />
                 {t('auth.bonuses')}
               </h3>
               <div className="space-y-2 md:space-y-3">
@@ -327,7 +323,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
             <div className="bg-gray-900/60 border border-gray-700/50 rounded-lg md:rounded-xl p-4 md:p-6">
               <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
-                <MdTrendingUp className="text-green-400 text-sm md:text-base" />
+                <TrendingUp className="text-green-400 text-sm md:text-base" />
                 {t('modals.all_bonuses_access')}
               </h3>
               <div className="space-y-2 md:space-y-3">
