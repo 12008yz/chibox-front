@@ -21,7 +21,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { setShowIntroVideo as setGlobalShowIntroVideo, setShowTradeUrlModal as setGlobalShowTradeUrlModal, setShowOnboarding, setHasSeenOnboarding } from '../store/slices/uiSlice';
+import { setShowIntroVideo as setGlobalShowIntroVideo, setShowTradeUrlModal as setGlobalShowTradeUrlModal, setShowOnboarding, setHasSeenOnboarding, setShowAuthModal } from '../store/slices/uiSlice';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -114,7 +114,7 @@ const HomePage: React.FC = () => {
 
   // Обработчик для показа модального окна авторизации
   const handleAuthRequired = () => {
-    navigate('/login');
+    dispatch(setShowAuthModal(true));
   };
 
   // Мутации для покупки и открытия кейсов

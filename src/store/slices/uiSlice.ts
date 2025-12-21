@@ -54,6 +54,9 @@ export interface UIState {
   // Онбординг
   hasSeenOnboarding: boolean;
   showOnboarding: boolean;
+
+  // Auth модалка
+  showAuthModal: boolean;
 }
 
 const initialState: UIState = {
@@ -71,6 +74,7 @@ const initialState: UIState = {
   showTradeUrlModal: false,
   hasSeenOnboarding: false,
   showOnboarding: false,
+  showAuthModal: false,
 };
 
 const uiSlice = createSlice({
@@ -196,6 +200,11 @@ const uiSlice = createSlice({
       }
     },
 
+    // Auth модалка
+    setShowAuthModal: (state, action: PayloadAction<boolean>) => {
+      state.showAuthModal = action.payload;
+    },
+
     // Сброс состояния
     resetUIState: () => initialState,
   },
@@ -225,6 +234,7 @@ export const {
   setShowTradeUrlModal,
   setShowOnboarding,
   setHasSeenOnboarding,
+  setShowAuthModal,
   resetUIState,
 } = uiSlice.actions;
 

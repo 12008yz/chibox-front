@@ -10,7 +10,8 @@ import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
 import LanguageSwitcher from '../../LanguageSwitcher';
 import SafeCrackerButton from '../SafeCrackerButton';
-import SteamLoginButton from '../../SteamLoginButton';
+import { useAppDispatch } from '../../../store/hooks';
+import { setShowAuthModal } from '../../../store/slices/uiSlice';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -27,6 +28,7 @@ const RightContent: React.FC<RightContentProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Получаем количество непрочитанных уведомлений
@@ -59,8 +61,23 @@ const RightContent: React.FC<RightContentProps> = ({
 
   if (!user) {
     return (
-      <div className="flex items-center space-x-3">
-        <SteamLoginButton />
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
+        <button
+          onClick={() => dispatch(setShowAuthModal(true))}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="text-white"
+          >
+            <path d="M12 0a12 12 0 0 0-8.2 20.8l4.4-1.8a3.4 3.4 0 0 0 6.4-1.8 3.4 3.4 0 0 0-3.3-3.4h-.2l-4.5-6.6a4.5 4.5 0 0 1 8.8 1.2v.3l6.6 4.5a3.4 3.4 0 0 0 1.8-6.4A12 12 0 0 0 12 0zm-4.6 16.6l-3.6 1.5a2.6 2.6 0 0 0 4.8.9l-1.2-2.4zm7.9-5.4a2.3 2.3 0 1 1-4.6 0 2.3 2.3 0 0 1 4.6 0z"/>
+          </svg>
+          <span className="hidden sm:inline">{t('header.login')}</span>
+        </button>
       </div>
     );
   }

@@ -16,6 +16,8 @@ import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
 import CookieBanner from './components/CookieBanner';
+import AuthModal from './components/AuthModal';
+import { setShowAuthModal } from './store/slices/uiSlice';
 
 // Lazy loading страниц
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -43,6 +45,7 @@ const App: React.FC = () => {
   const showIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
   const showTradeUrlModal = useAppSelector(state => state.ui.showTradeUrlModal);
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
+  const showAuthModal = useAppSelector(state => state.ui.showAuthModal);
 
 
   // Проверяем, находимся ли мы на странице Steam авторизации
@@ -144,6 +147,12 @@ const App: React.FC = () => {
 
   // Компонент для защищенных маршрутов
   const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+    useEffect(() => {
+      if (!auth.isAuthenticated) {
+        dispatch(setShowAuthModal(true));
+      }
+    }, []);
+
     if (!auth.isAuthenticated) {
       return <Navigate to="/" replace />;
     }
@@ -276,6 +285,12 @@ const App: React.FC = () => {
       <DiagnosticOverlay />
       {/* Скрываем cookie banner во время онбординга */}
       {!showIntroVideo && !showTradeUrlModal && !showOnboarding && <CookieBanner />}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => dispatch(setShowAuthModal(false))}
+      />
     </Router>
   );
 };
