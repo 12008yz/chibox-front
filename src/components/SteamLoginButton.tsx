@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store/hooks';
 import { logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
+import { toastWithSound } from '../utils/toastWithSound';
 
 interface SteamLoginButtonProps {
   isLoading?: boolean;
@@ -20,6 +21,16 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
 
   const handleSteamLogin = () => {
     if (disabled || isLoading) return;
+
+    // Показываем предупреждение о загрузке
+    toastWithSound.warning('⏱️ Загрузка страницы может занять около 2 минут. Пожалуйста, подождите...', {
+      duration: 5000,
+      style: {
+        background: '#1a1829',
+        color: '#fff',
+        border: '1px solid rgba(251, 191, 36, 0.3)',
+      },
+    });
 
     // Очищаем старое состояние ПЕРЕД редиректом на Steam
     console.log('Clearing state before Steam login...');
