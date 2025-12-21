@@ -57,8 +57,16 @@ const CaseListing: React.FC<CaseListingProps> = ({
       return; // Позволяем стандартному поведению Link сработать
     }
 
-    // Иначе показываем превью
+    // Предотвращаем переход по ссылке
     event.preventDefault();
+
+    // Проверяем авторизацию пользователя
+    if (!isAuthenticated && onAuthRequired) {
+      onAuthRequired();
+      return;
+    }
+
+    // Иначе показываем превью
     setPreviewCase(caseItem);
     setIsPreviewOpen(true);
   };

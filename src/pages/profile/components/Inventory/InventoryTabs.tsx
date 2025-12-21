@@ -63,7 +63,11 @@ const InventoryTabs: React.FC<InventoryTabsProps> = ({ activeTab, onTabChange, c
       {tabs.map((tab) => (
         <button
           key={tab.key}
-          onClick={() => onTabChange(tab.key)}
+          onClick={(e) => {
+            e.preventDefault();
+            onTabChange(tab.key);
+          }}
+          type="button"
           className={`px-2 py-1.5 sm:px-3 sm:py-2 lg:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 min-w-0 ${
             activeTab === tab.key
               ? `bg-gradient-to-r ${tab.gradient} text-white shadow-lg`

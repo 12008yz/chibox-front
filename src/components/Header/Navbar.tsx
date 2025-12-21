@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
+import { useAppDispatch } from '../../store/hooks';
+import { setShowAuthModal } from '../../store/slices/uiSlice';
 
 interface NavbarProps {
   openNotifications: boolean;
@@ -19,6 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { t } = useTranslation();
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -39,6 +42,14 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // Обработчик клика по ссылкам с проверкой авторизации
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!user) {
+      e.preventDefault();
+      dispatch(setShowAuthModal(true));
+    }
   };
 
   const links = [
@@ -106,6 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link
                   key={index}
                   to={link.to}
+                  onClick={handleLinkClick}
                   className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                 >
                   {/* Фоновый эффект при наведении */}
@@ -188,7 +200,12 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link
                   key={index}
                   to={link.to}
-                  onClick={toggleMobileMenu}
+                  onClick={(e) => {
+                    handleLinkClick(e);
+                    if (user) {
+                      toggleMobileMenu();
+                    }
+                  }}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
                 >
                   <span className="text-orange-400">
