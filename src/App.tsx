@@ -40,6 +40,9 @@ const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const { onlineUsers } = useSocket();
   const soundsEnabled = useAppSelector(state => state.ui.soundsEnabled);
+  const showIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
+  const showTradeUrlModal = useAppSelector(state => state.ui.showTradeUrlModal);
+  const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
 
 
   // Проверяем, находимся ли мы на странице Steam авторизации
@@ -271,7 +274,8 @@ const App: React.FC = () => {
         </div>
       </div>
       <DiagnosticOverlay />
-      <CookieBanner />
+      {/* Скрываем cookie banner во время онбординга */}
+      {!showIntroVideo && !showTradeUrlModal && !showOnboarding && <CookieBanner />}
     </Router>
   );
 };

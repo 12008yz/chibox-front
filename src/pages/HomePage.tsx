@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
+import { useUpdateProfileMutation } from '../features/auth/authApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 import IntroVideo from '../components/IntroVideo';
+import SteamTradeUrlModal from '../components/SteamTradeUrlModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
@@ -19,7 +21,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { setShowIntroVideo as setGlobalShowIntroVideo, setShowOnboarding, setHasSeenOnboarding } from '../store/slices/uiSlice';
+import { setShowIntroVideo as setGlobalShowIntroVideo, setShowTradeUrlModal as setGlobalShowTradeUrlModal, setShowOnboarding, setHasSeenOnboarding } from '../store/slices/uiSlice';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -31,8 +33,9 @@ const HomePage: React.FC = () => {
 
   // Получаем глобальное состояние показа интро из Redux
   const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
+  const globalShowTradeUrlModal = useAppSelector(state => state.ui.showTradeUrlModal);
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
-  
+
 
   // Получаем данные о кейсах (принудительно обновляем при каждом маунте)
   const { data: casesData, error: casesError, isLoading: casesLoading, refetch: refetchCases } = useGetAllCasesQuery(undefined, {
@@ -50,6 +53,7 @@ const HomePage: React.FC = () => {
 
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showIntroVideo, setShowIntroVideo] = useState(false);
+  const [showTradeUrlModal, setShowTradeUrlModal] = useState(false);
   const [registrationData, setRegistrationData] = useState<{
     email: string;
     previewUrl?: string;
@@ -63,6 +67,8 @@ const HomePage: React.FC = () => {
     }
   }, [globalShowIntroVideo]);
 
+  // НЕ синхронизируем trade modal сразу - он должен показываться только после видео!
+
   // Состояние игры крестики-нолики
   const [showTicTacToeGame, setShowTicTacToeGame] = useState(false);
   const [_bonusCase, setBonusCase] = useState<CaseTemplate | null>(null);
@@ -72,7 +78,7 @@ const HomePage: React.FC = () => {
 
   // Логирование изменений состояния игры
   useEffect(() => {
-   
+
   }, [showTicTacToeGame]);
 
   // Обработчики игры крестики-нолики
@@ -121,6 +127,7 @@ const HomePage: React.FC = () => {
   // Мутации для покупки и открытия кейсов
   const [buyCase] = useBuyCaseMutation();
   const [openCase] = useOpenCaseMutation();
+  const [updateProfile] = useUpdateProfileMutation();
 
   // Запрос для получения информации о крестиках-ноликах
   const { data: ticTacToeData, refetch: refetchTicTacToe } = useGetCurrentTicTacToeGameQuery(undefined, {
@@ -156,7 +163,52 @@ const HomePage: React.FC = () => {
     dispatch(setGlobalShowIntroVideo(false)); // Сбрасываем глобальное состояние
     setRegistrationData(null); // Очищаем данные регистрации
 
-    // После видео показываем онбординг, если пользователь его еще не видел
+    // После видео проверяем, нужно ли показать trade URL modal
+    if (globalShowTradeUrlModal) {
+      // Показываем trade modal после окончания видео
+      console.log('[HomePage] Showing Trade URL modal after video');
+      setTimeout(() => {
+        setShowTradeUrlModal(true);
+      }, 300);
+    } else {
+      // Если trade modal не нужен, показываем онбординг
+      const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
+      if (!hasSeenOnboardingStorage && userData?.id) {
+        setTimeout(() => {
+          dispatch(setShowOnboarding(true));
+        }, 500);
+      }
+    }
+  };
+
+  // Обработчики для Trade URL Modal
+  const handleTradeUrlSubmit = async (tradeUrl: string) => {
+    try {
+      await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
+
+      setShowTradeUrlModal(false);
+      dispatch(setGlobalShowTradeUrlModal(false));
+
+      // После сохранения trade URL показываем onboarding
+      const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
+      if (!hasSeenOnboardingStorage && userData?.id) {
+        setTimeout(() => {
+          dispatch(setShowOnboarding(true));
+        }, 500);
+      }
+
+      // Обновляем данные пользователя
+      refetchUser();
+    } catch (err) {
+      console.error('Failed to update trade URL:', err);
+    }
+  };
+
+  const handleTradeUrlSkip = () => {
+    setShowTradeUrlModal(false);
+    dispatch(setGlobalShowTradeUrlModal(false));
+
+    // После пропуска показываем onboarding
     const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeenOnboardingStorage && userData?.id) {
       setTimeout(() => {
@@ -506,6 +558,14 @@ const HomePage: React.FC = () => {
         isOpen={showIntroVideo}
         onVideoEnd={handleVideoEnd}
         videoUrl="/preview.mp4"
+      />
+
+      {/* Steam Trade URL Modal - показывается только после видео */}
+      <SteamTradeUrlModal
+        isOpen={showTradeUrlModal && !showIntroVideo}
+        onClose={handleTradeUrlSkip}
+        onSubmit={handleTradeUrlSubmit}
+        canSkip={true}
       />
 
       {/* Модальное окно успешной регистрации */}

@@ -48,6 +48,9 @@ export interface UIState {
   // Интро видео
   showIntroVideo: boolean;
 
+  // Trade URL модалка
+  showTradeUrlModal: boolean;
+
   // Онбординг
   hasSeenOnboarding: boolean;
   showOnboarding: boolean;
@@ -65,6 +68,7 @@ const initialState: UIState = {
   animationsEnabled: true,
   soundsEnabled: true,
   showIntroVideo: false,
+  showTradeUrlModal: false,
   hasSeenOnboarding: false,
   showOnboarding: false,
 };
@@ -175,6 +179,11 @@ const uiSlice = createSlice({
       console.log('[uiSlice] New value:', state.showIntroVideo);
     },
 
+    // Trade URL модалка
+    setShowTradeUrlModal: (state, action: PayloadAction<boolean>) => {
+      state.showTradeUrlModal = action.payload;
+    },
+
     // Онбординг
     setShowOnboarding: (state, action: PayloadAction<boolean>) => {
       state.showOnboarding = action.payload;
@@ -216,6 +225,7 @@ export const {
   setAnimationsEnabled,
   setSoundsEnabled,
   setShowIntroVideo,
+  setShowTradeUrlModal,
   setShowOnboarding,
   setHasSeenOnboarding,
   resetUIState,

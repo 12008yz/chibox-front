@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useLazyGetCurrentUserQuery, useUpdateProfileMutation } from '../features/auth/authApi';
+import { useLazyGetCurrentUserQuery } from '../features/auth/authApi';
 import { useAppDispatch } from '../store/hooks';
 import { loginSuccess, logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
-import SteamTradeUrlModal from '../components/SteamTradeUrlModal';
+import { setShowIntroVideo, setShowTradeUrlModal } from '../store/slices/uiSlice';
 
 const SteamAuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [error, setError] = useState<string | null>(null);
-  const [showTradeUrlModal, setShowTradeUrlModal] = useState(false);
   const [getCurrentUser] = useLazyGetCurrentUserQuery();
-  const [updateProfile] = useUpdateProfileMutation();
 
   // Очищаем старое состояние при монтировании компонента
   useEffect(() => {
@@ -52,12 +50,16 @@ const SteamAuthPage: React.FC = () => {
               // token в httpOnly cookie, не передаем в Redux
             }));
 
+            // Устанавливаем флаги для показа видео и модалки
+            dispatch(setShowIntroVideo(true));
+
             // Проверяем, есть ли steam_trade_url
             if (!data.user.steam_trade_url) {
-              setShowTradeUrlModal(true);
-            } else {
-              navigate('/', { replace: true });
+              dispatch(setShowTradeUrlModal(true));
             }
+
+            // Перенаправляем на главную
+            navigate('/', { replace: true });
           } else {
             throw new Error('Не удалось загрузить данные пользователя');
           }
@@ -76,22 +78,6 @@ const SteamAuthPage: React.FC = () => {
       }, 3000);
     }
   }, [searchParams, navigate, getCurrentUser, dispatch]);
-
-  const handleTradeUrlSubmit = async (tradeUrl: string) => {
-    try {
-      await updateProfile({ steam_trade_url: tradeUrl }).unwrap();
-
-      setShowTradeUrlModal(false);
-      navigate('/', { replace: true });
-    } catch (err) {
-      // Ошибка будет показана в модальном окне
-    }
-  };
-
-  const handleTradeUrlSkip = () => {
-    setShowTradeUrlModal(false);
-    navigate('/', { replace: true });
-  };
 
   if (error) {
     return (
@@ -113,27 +99,17 @@ const SteamAuthPage: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="min-h-screen flex items-center justify-center bg-[#151225]">
-        <div className="text-center">
-          <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <h2 className="text-white text-xl font-semibold mb-2">
-            Завершение авторизации Steam...
-          </h2>
-          <p className="text-gray-400">
-            Пожалуйста, подождите
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[#151225]">
+      <div className="text-center">
+        <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 className="text-white text-xl font-semibold mb-2">
+          Завершение авторизации Steam...
+        </h2>
+        <p className="text-gray-400">
+          Пожалуйста, подождите
+        </p>
       </div>
-
-      {/* Steam Trade URL Modal */}
-      <SteamTradeUrlModal
-        isOpen={showTradeUrlModal}
-        onClose={handleTradeUrlSkip}
-        onSubmit={handleTradeUrlSubmit}
-        canSkip={true}
-      />
-    </>
+    </div>
   );
 };
 
