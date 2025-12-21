@@ -82,14 +82,15 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
       <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap">
         {cases && cases.length > 0 ? (
-          cases.map((caseItem, index) => {
+          cases.map((caseItem) => {
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
-              const isFirstCase = index === 1; // Второй кейс - это бесплатный кейс для онбординга
-              const isTicTacToeCase = index === 2 && isBonusCase; // Третий кейс - это крестики-нолики
 
               // Проверяем, является ли это бесплатным кейсом для новых пользователей
               const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
+
+              // Проверяем, является ли это кейсом крестиков-ноликов (бонусный кейс)
+              const isTicTacToeCase = isBonusCase;
               // Используем next_available_time из каждого кейса, если он есть
               const caseNextAvailableTime = isFreeCase && freeCaseStatus
                 ? freeCaseStatus.nextAvailableTime
@@ -100,7 +101,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                 return (
                   <div
                     key={caseItem.id}
-                    id={isFirstCase ? 'onboarding-cases' : undefined}
+                    id={isFreeCase ? 'onboarding-cases' : undefined}
                     className="cursor-pointer rounded-lg"
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
@@ -129,7 +130,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <Link
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
-                    id={isFirstCase ? 'onboarding-cases' : undefined}
+                    id={isFreeCase ? 'onboarding-cases' : undefined}
                     className="rounded-lg"
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >

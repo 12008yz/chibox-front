@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { VolumeX, Volume2 } from 'lucide-react';
 
 interface IntroVideoProps {
   isOpen: boolean;
@@ -16,27 +17,37 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
       const video = videoRef.current;
 
       video.currentTime = 0;
-
-      video.muted = false;
       video.volume = 1.0;
 
       video.load();
 
       const attemptPlay = (attemptNumber = 1, maxAttempts = 5) => {
+        // Сначала пытаемся воспроизвести со звуком
+        video.muted = false;
         const playPromise = video.play();
 
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
               setIsVideoReady(true);
+              setIsMuted(false);
             })
             .catch(() => {
-              if (attemptNumber < maxAttempts) {
-                const delay = attemptNumber * 100;
-                setTimeout(() => {
-                  attemptPlay(attemptNumber + 1, maxAttempts);
-                }, delay);
-              }
+              // Если не получилось со звуком, пробуем без звука
+              video.muted = true;
+              video.play()
+                .then(() => {
+                  setIsVideoReady(true);
+                  setIsMuted(true);
+                })
+                .catch(() => {
+                  if (attemptNumber < maxAttempts) {
+                    const delay = attemptNumber * 100;
+                    setTimeout(() => {
+                      attemptPlay(attemptNumber + 1, maxAttempts);
+                    }, delay);
+                  }
+                });
             });
         }
       };
@@ -119,22 +130,33 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
         className="w-full h-full object-cover"
         playsInline
         preload="auto"
-        muted={isMuted}
-        autoPlay={true}
+        autoPlay
         controls={false}
         onClick={(e) => e.stopPropagation()}
       >
         <source src={videoUrl} type="video/mp4" />
       </video>
 
-      {/* Кнопка звука */}
-      <button
-        onClick={toggleMute}
-        className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200 text-2xl"
-        title={isMuted ? 'Включить звук' : 'Выключить звук'}
-      >
-        {isMuted ? '🔇' : '🔊'}
-      </button>
+      {/* Кнопка звука с подсказкой (только если звук был заблокирован) */}
+      {isMuted && (
+        <button
+          onClick={toggleMute}
+          className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200 flex items-center gap-3 animate-pulse"
+          title="Включить звук"
+        >
+          <VolumeX className="w-6 h-6" />
+          <span className="text-sm font-medium">Нажмите, чтобы включить звук</span>
+        </button>
+      )}
+      {!isMuted && (
+        <button
+          onClick={toggleMute}
+          className="absolute top-8 left-8 text-white bg-black/50 hover:bg-black/80 p-4 rounded-lg transition-all duration-200"
+          title="Выключить звук"
+        >
+          <Volume2 className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Кнопка пропуска */}
       <button

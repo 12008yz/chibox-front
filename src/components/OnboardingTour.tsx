@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaArrowDown, FaTimes, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { ArrowDown, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { CelebrateIcon, GiftIcon, TicTacToeIcon, BalanceIcon } from './icons';
 
 interface OnboardingStep {
@@ -36,6 +36,16 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       mobileTitle: 'Добро пожаловать!',
     },
     {
+      id: 'tictactoe',
+      targetId: 'onboarding-tictactoe-button',
+      title: t('onboarding.tictactoe_title', 'Крестики-Нолики'),
+      description: t('onboarding.tictactoe_description', 'Сразитесь! Победа принесет вам бонусный кейс.'),
+      position: 'bottom',
+      arrowDirection: 'down',
+      mobileTitle: 'Крестики-нолики',
+      mobileDescription: 'Найдите кейс с кнопкой "Играть". Победите компьютер, чтобы получить награду!'
+    },
+    {
       id: 'free_cases',
       targetId: 'onboarding-cases',
       title: t('onboarding.free_cases_title', '2 Бесплатных Кейса!'),
@@ -44,26 +54,6 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       arrowDirection: 'down',
       mobileTitle: 'Бесплатные Кейсы',
       mobileDescription: 'Прокрутите вниз и найдите бесплатные кейсы. У вас есть 2 попытки открыть их!'
-    },
-    {
-      id: 'safe',
-      targetId: 'onboarding-safe-button',
-      title: t('onboarding.safe_title', 'Сейф - 2 Попытки!'),
-      description: t('onboarding.safe_description', 'Здесь кнопка взлома сейфа! 2 бесплатные попытки подобрать код и получить награду. Первая попытка сейчас, вторая — в 16:00 МСК. Успейте за 2 дня!'),
-      position: 'bottom',
-      arrowDirection: 'down',
-      mobileTitle: 'Сейф',
-      mobileDescription: 'В меню (☰) справа от баланса найдите кнопку с замком. Это сейф! 2 бесплатные попытки (вторая в 16:00 МСК).'
-    },
-    {
-      id: 'tictactoe',
-      targetId: 'onboarding-tictactoe-button',
-      title: t('onboarding.tictactoe_title', 'Крестики-нолики - 2 Попытки!'),
-      description: t('onboarding.tictactoe_description', 'Нажмите "Играть" на этом кейсе! 2 бесплатные игры в крестики-нолики. Победите компьютер и получите бонусный кейс. Первая игра сейчас, вторая — в 16:00 МСК. 2 дня!'),
-      position: 'bottom',
-      arrowDirection: 'down',
-      mobileTitle: 'Крестики-нолики',
-      mobileDescription: 'Прокрутите кейсы и найдите кейс "Крестики-нолики". Победите компьютер, чтобы получить награду! 2 игры (вторая в 16:00 МСК).'
     },
     {
       id: 'balance',
@@ -202,7 +192,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
               onClick={handleSkip}
               className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors p-2"
             >
-              <FaTimes className="text-xl" />
+              <X className="w-5 h-5" />
             </button>
 
             {/* Заголовок */}
@@ -244,7 +234,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
                   onClick={handlePrevious}
                   className="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
                 >
-                  <FaArrowLeft className="text-sm" />
+                  <ArrowLeft className="w-4 h-4" />
                   <span className="font-medium">Назад</span>
                 </button>
               )}
@@ -256,7 +246,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
                 <span>
                   {currentStep < steps.length - 1 ? 'Далее' : 'Начать играть!'}
                 </span>
-                {currentStep < steps.length - 1 && <FaArrowRight className="text-sm" />}
+                {currentStep < steps.length - 1 && <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
 
@@ -455,7 +445,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           className="absolute onboarding-arrow z-[9999]"
           style={getArrowPosition()}
         >
-          <FaArrowDown className="text-cyan-400 text-4xl" />
+          <ArrowDown className="text-cyan-400 text-4xl" />
         </div>
 
         {/* Подсказка */}
@@ -469,7 +459,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
               onClick={handleSkip}
               className="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
             >
-              <FaTimes />
+              <X className="w-5 h-5" />
             </button>
 
             {/* Заголовок */}
