@@ -245,17 +245,32 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setIsFetchingTradeUrl(true);
 
     try {
-      const response = await fetch('/api/v1/steam/fetch-trade-url', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
+      const url = `${apiUrl}/v1/steam/fetch-trade-url`;
+
+      console.log('Отправка запроса на получение Trade URL:', url);
+
+      const response = await fetch(url, {
         method: 'POST',
+        credentials: 'include', // ВАЖНО: отправляем httpOnly cookies для авторизации
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Content-Type': 'application/json'
         }
       });
 
-      const result = await response.json();
+      console.log('Статус ответа:', response.status);
 
-      if (result.success && result.data.steam_trade_url) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Ошибка сервера:', errorData);
+        showNotification(errorData.message || t('profile.settings.trade_url_fetch_error'), 'error');
+        return;
+      }
+
+      const result = await response.json();
+      console.log('Результат получения Trade URL:', result);
+
+      if (result.success && result.data?.steam_trade_url) {
         setTradeUrl(result.data.steam_trade_url);
         showNotification(t('profile.settings.trade_url_fetched'), 'success');
         // Обновляем данные пользователя
@@ -266,19 +281,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         // Если не удалось получить автоматически, показываем инструкции
         const instructions = result.data?.manual_instructions;
         if (instructions) {
-          showNotification(t('profile.settings.trade_url_manual_instructions'), 'info');
+          showNotification(
+            result.message || t('profile.settings.trade_url_manual_instructions'),
+            'info'
+          );
 
           // Открываем страницу настроек Steam в новой вкладке
           if (instructions.privacy_url) {
             window.open(instructions.privacy_url, '_blank');
           }
         } else {
-          showNotification(t('profile.settings.trade_url_fetch_error'), 'error');
+          showNotification(
+            result.message || t('profile.settings.trade_url_fetch_error'),
+            'error'
+          );
         }
       }
     } catch (error: any) {
       console.error('Ошибка при получении Trade URL:', error);
-      showNotification(t('profile.settings.trade_url_fetch_network_error'), 'error');
+      showNotification(
+        error.message || t('profile.settings.trade_url_fetch_network_error'),
+        'error'
+      );
     } finally {
       setIsFetchingTradeUrl(false);
     }
