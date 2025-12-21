@@ -114,6 +114,14 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
           width: rect.width,
           height: rect.height
         });
+
+        // Для free_cases применяем drop-shadow к изображению кейса
+        if (step.id === 'free_cases') {
+          const caseImage = element.querySelector('.case-image') as HTMLElement;
+          if (caseImage) {
+            caseImage.style.filter = 'drop-shadow(0 0 8px rgba(34, 211, 238, 0.9)) drop-shadow(0 0 16px rgba(34, 211, 238, 0.7)) drop-shadow(0 0 24px rgba(34, 211, 238, 0.5))';
+          }
+        }
       } else {
         setTimeout(updatePosition, 100);
       }
@@ -124,12 +132,36 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     window.addEventListener('scroll', updatePosition);
 
     return () => {
+      // Очищаем стили при размонтировании
+      const step = steps[currentStep];
+      if (step?.id === 'free_cases') {
+        const element = document.getElementById(step.targetId);
+        if (element) {
+          const caseImage = element.querySelector('.case-image') as HTMLElement;
+          if (caseImage) {
+            caseImage.style.filter = '';
+          }
+        }
+      }
+
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition);
     };
   }, [isActive, currentStep, isMobile]);
 
   const handleNext = () => {
+    // Очищаем стили перед переходом
+    const currentStepData = steps[currentStep];
+    if (currentStepData?.id === 'free_cases') {
+      const element = document.getElementById(currentStepData.targetId);
+      if (element) {
+        const caseImage = element.querySelector('.case-image') as HTMLElement;
+        if (caseImage) {
+          caseImage.style.filter = '';
+        }
+      }
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -138,12 +170,36 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
   };
 
   const handlePrevious = () => {
+    // Очищаем стили перед переходом
+    const currentStepData = steps[currentStep];
+    if (currentStepData?.id === 'free_cases') {
+      const element = document.getElementById(currentStepData.targetId);
+      if (element) {
+        const caseImage = element.querySelector('.case-image') as HTMLElement;
+        if (caseImage) {
+          caseImage.style.filter = '';
+        }
+      }
+    }
+
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const handleSkip = () => {
+    // Очищаем стили при закрытии
+    const currentStepData = steps[currentStep];
+    if (currentStepData?.id === 'free_cases') {
+      const element = document.getElementById(currentStepData.targetId);
+      if (element) {
+        const caseImage = element.querySelector('.case-image') as HTMLElement;
+        if (caseImage) {
+          caseImage.style.filter = '';
+        }
+      }
+    }
+
     onComplete();
   };
 
@@ -438,8 +494,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         {/* Затемнение фона */}
         <div className="absolute inset-0 bg-black/70"></div>
 
-        {/* Подсветка элемента - скрываем для первого шага */}
-        {currentStep !== 0 && (
+        {/* Подсветка элемента - скрываем для первого шага и для free_cases (там эффект на самом изображении) */}
+        {currentStep !== 0 && step.id !== 'free_cases' && (
           <div
             className="absolute onboarding-highlight border-2 border-cyan-400"
             style={{
@@ -448,10 +504,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
               width: targetPosition.width + 8,
               height: targetPosition.height + 8,
               pointerEvents: 'auto',
-              borderRadius: step.id === 'free_cases' ? '24px' : '8px',
-              boxShadow: step.id === 'free_cases'
-                ? '0 0 30px rgba(34, 211, 238, 0.6), inset 0 0 20px rgba(34, 211, 238, 0.3)'
-                : '0 0 20px rgba(34, 211, 238, 0.5)'
+              borderRadius: '8px',
+              boxShadow: '0 0 20px rgba(34, 211, 238, 0.5)'
             }}
           />
         )}
