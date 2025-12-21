@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResendVerificationCodeMutation, useVerifyEmailMutation } from '../../../../features/user/userApi';
 
@@ -6,12 +6,14 @@ interface EmailVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: any;
+  skipToVerify?: boolean; // Сразу показать форму ввода кода (код уже отправлен)
 }
 
 const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   isOpen,
   onClose,
-  user
+  user,
+  skipToVerify = false
 }) => {
   const { t } = useTranslation();
   const [resendVerificationCode, { isLoading: isResendingCode }] = useResendVerificationCodeMutation();
@@ -19,6 +21,15 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
 
   const [verificationCode, setVerificationCode] = useState('');
   const [emailVerificationStep, setEmailVerificationStep] = useState<'send' | 'verify'>('send');
+
+  // Если skipToVerify = true, сразу переходим к вводу кода
+  useEffect(() => {
+    if (isOpen && skipToVerify) {
+      setEmailVerificationStep('verify');
+    } else if (isOpen && !skipToVerify) {
+      setEmailVerificationStep('send');
+    }
+  }, [isOpen, skipToVerify]);
 
   // Функция для отправки кода подтверждения email
   const handleSendVerificationCode = async () => {

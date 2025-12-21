@@ -17,7 +17,7 @@ interface SettingsModalProps {
   onClose: () => void;
   user: any;
   onUserRefresh: () => void;
-  onEmailVerificationOpen: () => void;
+  onEmailVerificationOpen: (skipToVerify?: boolean) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -189,15 +189,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       // Если email был изменен, показываем специальное уведомление и открываем окно верификации
       const emailChanged = updateData.email || ('emailChanged' in result && result.emailChanged);
       if (emailChanged) {
-        showNotification(t('profile.settings.email_updated_verify_required') || 'Email обновлен. Требуется повторная верификация.', 'success');
+        showNotification(t('profile.settings.email_updated_verify_required') || 'Email обновлен. Код отправлен на почту.', 'success');
         onClose();
 
         // Обновляем данные пользователя
         setTimeout(() => {
           onUserRefresh();
-          // Открываем модальное окно верификации email после обновления данных
+          // Открываем модальное окно верификации email, сразу с формой ввода кода
           setTimeout(() => {
-            onEmailVerificationOpen();
+            onEmailVerificationOpen(true); // true = skipToVerify
           }, 500);
         }, 500);
       } else {
@@ -608,7 +608,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         </button>
                       ) : (
                         <button
-                          onClick={onEmailVerificationOpen}
+                          onClick={() => onEmailVerificationOpen(false)}
                           className="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/30 hover:border-orange-500/50 text-orange-400 text-xs rounded-lg transition-colors flex-shrink-0"
                         >
                           {t('profile.settings.verify') || 'Подтвердить'}

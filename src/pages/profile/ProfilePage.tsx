@@ -26,12 +26,13 @@ const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuth();
 
- 
+
 
   // State для модальных окон
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [shouldSkipToVerify, setShouldSkipToVerify] = useState(false);
 
   // State для отслеживания ID открываемого кейса
   const [openingCaseId, setOpeningCaseId] = useState<string | null>(null);
@@ -52,7 +53,7 @@ const ProfilePage: React.FC = () => {
       // Если получили новый токен, обновляем его в localStorage
       if (token) {
         localStorage.setItem('auth_token', token);
-       
+
       }
 
       showNotification(t('profile.steam_linked_success'), 'success');
@@ -192,7 +193,7 @@ const ProfilePage: React.FC = () => {
         showNotification(t('profile.item_info_error'), 'error');
       }
     } catch (error: any) {
-      
+
       const errorMessage = error?.data?.message || error?.message || t('common.error');
       showNotification(t('profile.case_opening_error', { error: errorMessage }), 'error');
     } finally {
@@ -336,8 +337,9 @@ const ProfilePage: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         user={user}
         onUserRefresh={refetchUser}
-        onEmailVerificationOpen={() => {
+        onEmailVerificationOpen={(skipToVerify = false) => {
           setIsSettingsOpen(false);
+          setShouldSkipToVerify(skipToVerify);
           setIsEmailVerificationOpen(true);
         }}
       />
@@ -345,8 +347,12 @@ const ProfilePage: React.FC = () => {
       {/* Email Verification Modal */}
       <EmailVerificationModal
         isOpen={isEmailVerificationOpen}
-        onClose={() => setIsEmailVerificationOpen(false)}
+        onClose={() => {
+          setIsEmailVerificationOpen(false);
+          setShouldSkipToVerify(false);
+        }}
         user={user}
+        skipToVerify={shouldSkipToVerify}
       />
 
       {/* Deposit Modal */}
