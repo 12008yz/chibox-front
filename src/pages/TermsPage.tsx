@@ -230,9 +230,7 @@ const TermsPage = () => {
                 <p className="mb-2">Вы можете пополнить баланс ChiCoins следующими способами:</p>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Банковские карты (Visa, MasterCard, МИР)</li>
-                  <li>Электронные кошельки (YooMoney, QIWI и др.)</li>
-                  <li>Платежные системы (Robokassa и другие)</li>
-                  <li>Криптовалюты (при доступности)</li>
+                  <li>СПБ</li>
                 </ul>
                 <p className="text-sm text-gray-400 mt-2">
                   Минимальная сумма пополнения: 100 ChiCoins. Комиссия платежной системы может взиматься
