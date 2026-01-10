@@ -47,7 +47,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
 
     // Покупка подписки
     buySubscription: builder.mutation<
-      ApiResponse<SubscriptionStatus & { balance?: number; paymentUrl?: string }>,
+      ApiResponse<SubscriptionStatus & { balance?: number; paymentUrl?: string; qrUrl?: string }>,
       BuySubscriptionRequest
     >({
       query: (subscriptionData) => ({

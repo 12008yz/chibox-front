@@ -544,7 +544,8 @@ export interface TopUpBalanceRequest {
 export interface TopUpBalanceResponse {
   success: boolean;
   data: {
-    paymentUrl: string;
+    paymentUrl?: string;
+    qrUrl?: string;
     paymentId: string;
   };
   message?: string;
