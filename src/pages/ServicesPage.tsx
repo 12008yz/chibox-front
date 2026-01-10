@@ -472,7 +472,7 @@ const ServicesPage = () => {
               <span className="text-orange-400 font-bold">•</span>
               <p>
                 <strong className="text-white">Система оплаты:</strong> Все платежи обрабатываются через
-                безопасные платежные системы (Robokassa, FreeKassa, YooMoney). Цены указаны в ChiCoins.
+                безопасные платежные системы (Robokassa, FreeKassa, Альфа-Банк). Цены указаны в ChiCoins.
               </p>
             </div>
 

@@ -451,7 +451,7 @@ const PrivacyPage = () => {
                 <p className="mb-2">Мы можем передавать ваши данные следующим категориям получателей:</p>
                 <ul className="list-disc ml-6 space-y-1">
                   <li><strong className="text-white">Платежные системы</strong> — для обработки пополнений
-                  (Robokassa, YooMoney и другие)</li>
+                  (Robokassa, Альфа-Банк и другие)</li>
                   <li><strong className="text-white">Steam/Valve Corporation</strong> — для вывода виртуальных
                   предметов в ваш инвентарь</li>
                   <li><strong className="text-white">Аналитические сервисы</strong> — для анализа трафика и

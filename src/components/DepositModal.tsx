@@ -29,7 +29,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('freekassa');
-  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa' | 'yookassa'>('freekassa');
+  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa' | 'alfabank'>('freekassa');
   const [amount, setAmount] = useState<string>('10');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -49,6 +49,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     }
   }, [initialSelectedSubscription]);
 
+
   // FREEKASSA Logo Component
   const FreeKassaLogo = () => (
     <svg width="110" height="35" fill="none" className="w-full h-auto">
@@ -58,10 +59,13 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     </svg>
   );
 
-  // YooKassa Logo Component
-  const YooKassaLogo = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 28" fill="none" className="w-3/4 h-auto mx-auto">
-      <path fillRule="evenodd" clipRule="evenodd" d="M11.342 13.937C11.376 6.257 17.565 0 25.342 0c7.709 0 14.088 6.291 14 14 0 7.709-6.291 14-14 14-7.688 0-13.966-6.169-14-13.937v10.393H6.38L0 4.076h11.342v9.861zm8.772.063c0 2.835 2.392 5.228 5.228 5.228 2.924 0 5.228-2.393 5.228-5.228s-2.393-5.228-5.228-5.228c-2.836 0-5.228 2.393-5.228 5.228z" fill="#0070F0"/>
+  // Альфа-Банк Logo Component
+  const AlfabankLogo = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 50" fill="none" className="w-full h-auto">
+      {/* Красный фон */}
+      <rect x="0" y="0" width="180" height="50" rx="4" fill="#EF3124"/>
+      {/* Белый текст */}
+      <text x="90" y="32" fill="white" fontSize="18" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">АЛЬФА-БАНК</text>
     </svg>
   );
 
@@ -81,12 +85,12 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       type: 'card'
     },
     {
-      id: 'yookassa',
-      name: 'ЮКасса',
+      id: 'alfabank',
+      name: 'Альфа-Банк',
       icon: (
         <div className="flex items-center justify-center w-full h-full px-2">
           <div className="w-full">
-            <YooKassaLogo />
+            <AlfabankLogo />
           </div>
         </div>
       ),
@@ -118,7 +122,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
     try {
       // Определяем payment_method на основе выбранного способа оплаты
-      const paymentMethod = selectedMethod === 'freekassa' ? 'freekassa' : 'yookassa';
+      const paymentMethod = selectedMethod === 'freekassa' ? 'freekassa' : 'alfabank';
 
       const result = await topUpBalance({
         amount: amountNum,
@@ -126,10 +130,18 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         payment_method: paymentMethod
       }).unwrap();
 
-      if (result.success && result.data?.paymentUrl) {
-        window.location.href = result.data.paymentUrl;
-        toast.success('Переход к оплате...');
-        onClose();
+      if (result.success && result.data) {
+        // Если выбран Альфа-Банк и есть QR-ссылка, открываем прямую ссылку в новой вкладке
+        if (paymentMethod === 'alfabank' && result.data.qrUrl) {
+          window.open(result.data.qrUrl, '_blank');
+          toast.success('QR-код открыт в новой вкладке');
+          onClose();
+        } else if (result.data.paymentUrl) {
+          // Для других методов - редирект
+          window.location.href = result.data.paymentUrl;
+          toast.success('Переход к оплате...');
+          onClose();
+        }
       }
     } catch (error: any) {
       toast.error(error?.data?.message || 'Ошибка создания платежа');
@@ -159,13 +171,20 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       }).unwrap();
 
       if (result.success) {
-        if (result.data?.paymentUrl) {
+        // Если выбран Альфа-Банк и есть QR-ссылка, открываем прямую ссылку в новой вкладке
+        if (selectedSubscriptionMethod === 'alfabank' && result.data?.qrUrl) {
+          window.open(result.data.qrUrl, '_blank');
+          toast.success('QR-код открыт в новой вкладке');
+          onClose();
+        } else if (result.data?.paymentUrl) {
+          // Для других методов - редирект
           window.location.href = result.data.paymentUrl;
           toast.success('Переход к оплате...');
+          onClose();
         } else {
           toast.success('Подписка успешно активирована!');
+          onClose();
         }
-        onClose();
       }
     } catch (error: any) {
       toast.error(error?.data?.message || 'Ошибка при покупке подписки');
@@ -835,16 +854,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                       </button>
 
                       <button
-                        onClick={() => setSelectedSubscriptionMethod('yookassa')}
+                        onClick={() => setSelectedSubscriptionMethod('alfabank')}
                         className={`
                           relative rounded-lg border transition-colors p-2 sm:p-3 h-14 sm:h-16
-                          ${selectedSubscriptionMethod === 'yookassa'
+                          ${selectedSubscriptionMethod === 'alfabank'
                             ? 'bg-gray-800 border-white'
                             : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
                           }
                         `}
                       >
-                        {selectedSubscriptionMethod === 'yookassa' && (
+                        {selectedSubscriptionMethod === 'alfabank' && (
                           <div className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-white rounded-full flex items-center justify-center">
                             <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -852,7 +871,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           </div>
                         )}
                         <div className="flex items-center justify-center h-full">
-                          <YooKassaLogo />
+                          <AlfabankLogo />
                         </div>
                       </button>
                     </div>
@@ -1088,16 +1107,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                           </button>
 
                           <button
-                            onClick={() => setSelectedSubscriptionMethod('yookassa')}
+                            onClick={() => setSelectedSubscriptionMethod('alfabank')}
                             className={`
                               relative rounded-lg border transition-colors p-3 h-16
-                              ${selectedSubscriptionMethod === 'yookassa'
+                              ${selectedSubscriptionMethod === 'alfabank'
                                 ? 'bg-gray-800 border-white'
                                 : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
                               }
                             `}
                           >
-                            {selectedSubscriptionMethod === 'yookassa' && (
+                            {selectedSubscriptionMethod === 'alfabank' && (
                               <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white rounded-full flex items-center justify-center">
                                 <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -1105,7 +1124,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                               </div>
                             )}
                             <div className="flex items-center justify-center h-full">
-                              <YooKassaLogo />
+                              <AlfabankLogo />
                             </div>
                           </button>
                         </div>

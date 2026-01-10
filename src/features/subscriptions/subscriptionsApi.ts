@@ -15,7 +15,7 @@ export interface BuySubscriptionRequest {
   method: 'balance' | 'item' | 'promo' | 'bank_card';
   itemId?: string;
   promoCode?: string;
-  paymentMethod?: 'robokassa' | 'yookassa' | 'freekassa';
+  paymentMethod?: 'robokassa' | 'alfabank' | 'freekassa';
 }
 
 export interface SubscriptionStatus {
