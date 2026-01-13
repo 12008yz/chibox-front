@@ -20,7 +20,7 @@ const RequisitesPage = () => {
               </div>
               <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <span className="font-semibold text-orange-300 min-w-[200px]">ОГРНИП:</span>
-                <span>325710000080682</span>
+                <span>325710000086112</span>
               </div>
               <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <span className="font-semibold text-orange-300 min-w-[200px]">Дата присвоения ОГРНИП:</span>
