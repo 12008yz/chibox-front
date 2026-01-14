@@ -303,7 +303,7 @@ export interface ApplyPromoRequest {
 
 export interface DepositRequest {
   amount: number;
-  payment_method: 'alfabank' | 'freekassa';
+  payment_method: 'freekassa';
 }
 
 export interface BonusStatus {

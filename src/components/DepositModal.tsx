@@ -29,7 +29,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('freekassa');
-  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa' | 'alfabank'>('freekassa');
+  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa'>('freekassa');
   const [amount, setAmount] = useState<string>('10');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -59,16 +59,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     </svg>
   );
 
-  // Альфа-Банк Logo Component
-  const AlfabankLogo = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 50" fill="none" className="w-full h-auto">
-      {/* Красный фон */}
-      <rect x="0" y="0" width="180" height="50" rx="4" fill="#EF3124"/>
-      {/* Белый текст */}
-      <text x="90" y="32" fill="white" fontSize="18" fontWeight="bold" textAnchor="middle" fontFamily="Arial, sans-serif">АЛЬФА-БАНК</text>
-    </svg>
-  );
-
   const paymentMethods: PaymentMethod[] = [
     {
       id: 'freekassa',
@@ -81,20 +71,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         </div>
       ),
       badge: 'Все способы',
-      enabled: true,
-      type: 'card'
-    },
-    {
-      id: 'alfabank',
-      name: 'Альфа-Банк',
-      icon: (
-        <div className="flex items-center justify-center w-full h-full px-2">
-          <div className="w-full">
-            <AlfabankLogo />
-          </div>
-        </div>
-      ),
-      badge: 'Карты',
       enabled: true,
       type: 'card'
     },
@@ -121,23 +97,14 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     }
 
     try {
-      // Определяем payment_method на основе выбранного способа оплаты
-      const paymentMethod = selectedMethod === 'freekassa' ? 'freekassa' : 'alfabank';
-
       const result = await topUpBalance({
         amount: amountNum,
         currency: 'ChiCoins',
-        payment_method: paymentMethod
+        payment_method: 'freekassa'
       }).unwrap();
 
       if (result.success && result.data) {
-        // Если выбран Альфа-Банк и есть QR-ссылка, открываем прямую ссылку в новой вкладке
-        if (paymentMethod === 'alfabank' && result.data.qrUrl) {
-          window.open(result.data.qrUrl, '_blank');
-          toast.success('QR-код открыт в новой вкладке');
-          onClose();
-        } else if (result.data.paymentUrl) {
-          // Для других методов - редирект
+        if (result.data.paymentUrl) {
           window.location.href = result.data.paymentUrl;
           toast.success('Переход к оплате...');
           onClose();
@@ -171,13 +138,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       }).unwrap();
 
       if (result.success) {
-        // Если выбран Альфа-Банк и есть QR-ссылка, открываем прямую ссылку в новой вкладке
-        if (selectedSubscriptionMethod === 'alfabank' && result.data?.qrUrl) {
-          window.open(result.data.qrUrl, '_blank');
-          toast.success('QR-код открыт в новой вкладке');
-          onClose();
-        } else if (result.data?.paymentUrl) {
-          // Для других методов - редирект
+        if (result.data?.paymentUrl) {
           window.location.href = result.data.paymentUrl;
           toast.success('Переход к оплате...');
           onClose();
@@ -823,59 +784,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     })()}
                   </div>
 
-                  {/* Payment Method Selection */}
-                  <div>
-                    <label className="text-xs sm:text-sm font-medium text-gray-300 mb-2 block">
-                      Способ оплаты
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => setSelectedSubscriptionMethod('freekassa')}
-                        className={`
-                          relative rounded-lg border transition-colors p-2 sm:p-3 h-14 sm:h-16
-                          ${selectedSubscriptionMethod === 'freekassa'
-                            ? 'bg-gray-800 border-white'
-                            : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
-                          }
-                        `}
-                      >
-                        {selectedSubscriptionMethod === 'freekassa' && (
-                          <div className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-white rounded-full flex items-center justify-center">
-                            <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-center h-full">
-                          <div className="w-full text-black dark:text-white">
-                            <FreeKassaLogo />
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => setSelectedSubscriptionMethod('alfabank')}
-                        className={`
-                          relative rounded-lg border transition-colors p-2 sm:p-3 h-14 sm:h-16
-                          ${selectedSubscriptionMethod === 'alfabank'
-                            ? 'bg-gray-800 border-white'
-                            : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
-                          }
-                        `}
-                      >
-                        {selectedSubscriptionMethod === 'alfabank' && (
-                          <div className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-white rounded-full flex items-center justify-center">
-                            <svg className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-center h-full">
-                          <AlfabankLogo />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
 
                   {/* Purchase Button */}
                   <button
@@ -1076,59 +984,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                         <span>{isSubscriptionLoading ? 'Создание платежа...' : 'Купить статус'}</span>
                       </button>
 
-                      {/* Payment Method Selection */}
-                      <div>
-                        <label className="text-xs font-medium text-gray-300 mb-2 block">
-                          Способ оплаты
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => setSelectedSubscriptionMethod('freekassa')}
-                            className={`
-                              relative rounded-lg border transition-colors p-3 h-16
-                              ${selectedSubscriptionMethod === 'freekassa'
-                                ? 'bg-gray-800 border-white'
-                                : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
-                              }
-                            `}
-                          >
-                            {selectedSubscriptionMethod === 'freekassa' && (
-                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                                <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-center h-full">
-                              <div className="w-full text-black dark:text-white">
-                                <FreeKassaLogo />
-                              </div>
-                            </div>
-                          </button>
-
-                          <button
-                            onClick={() => setSelectedSubscriptionMethod('alfabank')}
-                            className={`
-                              relative rounded-lg border transition-colors p-3 h-16
-                              ${selectedSubscriptionMethod === 'alfabank'
-                                ? 'bg-gray-800 border-white'
-                                : 'bg-gray-900/50 border-gray-700 hover:border-gray-600'
-                              }
-                            `}
-                          >
-                            {selectedSubscriptionMethod === 'alfabank' && (
-                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                                <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-center h-full">
-                              <AlfabankLogo />
-                            </div>
-                          </button>
-                        </div>
-                      </div>
                     </>
                   ) : (
                     /* No Selection State */
