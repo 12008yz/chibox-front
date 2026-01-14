@@ -29,7 +29,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('freekassa');
-  const [selectedSubscriptionMethod, setSelectedSubscriptionMethod] = useState<'freekassa'>('freekassa');
   const [amount, setAmount] = useState<string>('10');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -134,7 +133,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       const result = await buySubscription({
         tierId,
         method: 'bank_card',
-        paymentMethod: selectedSubscriptionMethod
+        paymentMethod: 'freekassa'
       }).unwrap();
 
       if (result.success) {
