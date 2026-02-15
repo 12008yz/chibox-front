@@ -59,6 +59,8 @@ const authSlice = createSlice({
           action.payload.username !== state.user.username ||
           action.payload.balance !== state.user.balance ||
           action.payload.email !== state.user.email ||
+          action.payload.subscription_tier !== state.user.subscription_tier ||
+          action.payload.subscription_expiry_date !== state.user.subscription_expiry_date ||
           JSON.stringify(action.payload.inventory) !== JSON.stringify(state.user.inventory);
 
         if (needsUpdate) {

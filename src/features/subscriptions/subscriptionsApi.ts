@@ -56,19 +56,29 @@ export const subscriptionsApi = baseApi.injectEndpoints({
         method: 'POST',
         body: subscriptionData,
       }),
-      invalidatesTags: ['Subscription', 'User', 'Balance'],
-      // Обновляем баланс пользователя после покупки
+      invalidatesTags: ['Subscription', 'User', 'Balance', 'Profile'],
+      // Обновляем профиль и баланс сразу после покупки (как при пополнении баланса)
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success && data.data.balance !== undefined) {
-            dispatch({
-              type: 'auth/updateBalance',
-              payload: data.data.balance,
-            });
+          if (!data?.success) return;
+          // Бэкенд при успешной оплате балансом/предметом/промо возвращает { success, tier, balance, message } без обёртки data
+          const balance = (data as { balance?: number }).balance;
+          const tier = (data as { tier?: { id: number; expiry_date?: string; max_daily_cases?: number } }).tier;
+          if (balance !== undefined) {
+            dispatch({ type: 'auth/updateBalance', payload: balance });
+          }
+          if (tier) {
+            const { updateUser } = await import('../auth/authSlice');
+            dispatch(updateUser({
+              balance: balance,
+              subscription_expiry_date: tier.expiry_date,
+              subscription_tier: String(tier.id),
+              max_daily_cases: tier.max_daily_cases,
+            }));
           }
         } catch {
-          // Обработка ошибок
+          // при ошибке инвалидация тегов всё равно обновит данные при следующем запросе
         }
       },
     }),
