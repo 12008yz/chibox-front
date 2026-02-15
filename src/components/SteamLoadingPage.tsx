@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
+import { API_URL } from '../utils/config';
 
 const SteamLoadingPage: React.FC = () => {
   useEffect(() => {
-    // Редирект на Steam auth endpoint
-    const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
+    const serverUrl = API_URL;
     const steamUrl = `${serverUrl}/v1/auth/steam`;
 
     // Минимальная задержка только для показа экрана

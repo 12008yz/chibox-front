@@ -1,9 +1,7 @@
 /**
  * Утилиты для работы с аватарами пользователей
  */
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
-const BACKEND_URL = API_URL.replace('/api', '');
+import { API_URL, BACKEND_URL } from './config';
 
 /**
  * Получает полный URL аватара

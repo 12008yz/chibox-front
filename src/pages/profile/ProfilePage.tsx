@@ -21,6 +21,7 @@ import EmailVerificationModal from './components/Modals/EmailVerificationModal';
 // Импорты утилит
 import { injectProfileStyles } from './utils/profileStyles';
 import { soundManager } from '../../utils/soundManager';
+import { getApiErrorMessage } from '../../utils/config';
 
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -193,7 +194,7 @@ const ProfilePage: React.FC = () => {
       }
     } catch (error: any) {
 
-      const errorMessage = error?.data?.message || error?.message || t('common.error');
+      const errorMessage = getApiErrorMessage(error, t('common.error'));
       showNotification(t('profile.case_opening_error', { error: errorMessage }), 'error');
     } finally {
       setOpeningCaseId(null);

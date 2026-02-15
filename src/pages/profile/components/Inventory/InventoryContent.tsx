@@ -8,6 +8,7 @@ import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../../../../ut
 import { isUserItem, isUserCase, type InventoryTab } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
 import { useCancelWithdrawalMutation } from '../../../../features/user/userApi';
+import { getApiErrorMessage } from '../../../../utils/config';
 
 interface InventoryContentProps {
   activeTab: InventoryTab;
@@ -82,7 +83,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
       }
     } catch (error: any) {
       showNotification(
-        error?.data?.message || t('profile.withdrawal_cancel_error'),
+        getApiErrorMessage(error, t('profile.withdrawal_cancel_error')),
         'error'
       );
     } finally {

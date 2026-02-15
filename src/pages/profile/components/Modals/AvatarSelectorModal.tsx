@@ -4,6 +4,7 @@ import Modal from '../../../../components/Modal';
 import { useGetAvatarsQuery, useUpdateAvatarMutation } from '../../../../features/user/userApi';
 import { toastWithSound } from '../../../../utils/toastWithSound';
 import { soundManager } from '../../../../utils/soundManager';
+import { getApiErrorMessage } from '../../../../utils/config';
 
 interface AvatarSelectorModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
       toastWithSound.success(t('profile.avatar_updated') || 'Аватар успешно обновлен!');
       onClose();
     } catch (error: any) {
-      toastWithSound.error(error?.data?.message || t('profile.avatar_update_error') || 'Не удалось обновить аватар');
+      toastWithSound.error(getApiErrorMessage(error, t('profile.avatar_update_error') || 'Не удалось обновить аватар'));
     }
   };
 

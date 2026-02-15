@@ -15,6 +15,7 @@ import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
 import { getCaseImageUrl } from '../../utils/steamImageUtils';
+import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
 
 // Добавляем стили в head только один раз
@@ -519,7 +520,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         toast.error(result.message || 'Ошибка покупки');
       }
     } catch (error: any) {
-      if (error?.status === 400 && error?.data?.message?.includes('Недостаточно средств')) {
+      const msg = getApiErrorMessage(error, '');
+      if (error?.status === 400 && msg.includes('Недостаточно средств')) {
         const requiredAmount = error?.data?.data?.required || 0;
         const availableAmount = error?.data?.data?.available || 0;
         const shortfall = requiredAmount - availableAmount;
@@ -528,7 +530,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           icon: '💳',
         });
       } else {
-        toast.error(error?.data?.message || error?.message || 'Ошибка покупки кейса', {
+        toast.error(getApiErrorMessage(error, 'Ошибка покупки кейса'), {
           duration: 3000,
         });
       }
@@ -567,8 +569,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         startAnimation(result.data.item);
       }
     } catch (error: any) {
-      if (error?.data?.message?.includes('уже получали') || error?.data?.message?.includes('завтра')) {
-        toast.error(error.data.message || 'Кейс уже получен сегодня', {
+      const openMsg = getApiErrorMessage(error, 'Произошла ошибка при открытии кейса');
+      if (openMsg.includes('уже получали') || openMsg.includes('завтра')) {
+        toast.error(openMsg || 'Кейс уже получен сегодня', {
           duration: 4000,
         });
         onClose();
@@ -576,7 +579,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           setTimeout(() => onDataUpdate(), 100);
         }
       } else {
-        toast.error(error?.data?.message || 'Произошла ошибка при открытии кейса');
+        toast.error(openMsg);
       }
     } finally {
       setIsProcessing(false);

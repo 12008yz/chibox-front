@@ -11,6 +11,7 @@ import { useLogoutMutation } from '../../../../features/auth/authApi';
 import { performFullLogout } from '../../../../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
+import { API_URL, BACKEND_URL, getApiErrorMessage } from '../../../../utils/config';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -209,7 +210,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }, 500);
       }
     } catch (error: any) {
-      showNotification(error?.data?.message || t('profile.settings.settings_save_error'), 'error');
+      showNotification(getApiErrorMessage(error, t('profile.settings.settings_save_error')), 'error');
     }
   };
 
@@ -221,8 +222,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
 
-    const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru';
-    const steamLinkUrl = `${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`;
+    const steamLinkUrl = `${BACKEND_URL}/v1/auth/link-steam?token=${encodeURIComponent(token)}`;
     window.location.href = steamLinkUrl;
     onClose();
   };
@@ -237,8 +237,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setIsFetchingTradeUrl(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
-      const url = `${apiUrl}/v1/steam/fetch-trade-url`;
+      const url = `${API_URL}/v1/steam/fetch-trade-url`;
 
       const response = await fetch(url, {
         method: 'POST',

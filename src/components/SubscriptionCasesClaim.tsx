@@ -4,6 +4,7 @@ import {
   useClaimSubscriptionCaseMutation
 } from '../features/subscriptions/subscriptionsApi';
 import { GiftIcon, TooLowIcon, ReceivedIcon, ProcessingIcon } from './icons';
+import { getApiErrorMessage } from '../utils/config';
 
 interface SubscriptionCasesClaimProps {
   className?: string;
@@ -101,17 +102,14 @@ export const SubscriptionCasesClaim: React.FC<SubscriptionCasesClaimProps> = ({
         refetchStatus();
       }
     } catch (error: any) {
-      // Улучшенная обработка ошибок
       let errorMessage = 'Ошибка при получении кейсов';
-
       if (error?.status === 429) {
         errorMessage = 'Слишком частые запросы. Пожалуйста, подождите.';
       } else if (error?.status === 409) {
         errorMessage = 'Запрос уже обрабатывается. Подождите завершения.';
-      } else if (error?.data?.message) {
-        errorMessage = error.data.message;
+      } else {
+        errorMessage = getApiErrorMessage(error, errorMessage);
       }
-
       setErrorMessage(errorMessage);
 
       // Если это ошибка множественных запросов, обновляем статус через короткое время

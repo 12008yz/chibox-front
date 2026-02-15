@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Gift } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApplyPromoCodeMutation } from '../../../../features/user/userApi';
+import { getApiErrorMessage } from '../../../../utils/config';
 
 interface PromoCodeModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
         onClose();
       }
     } catch (error: any) {
-      const errorMessage = error?.data?.message || 'Ошибка при применении промокода';
+      const errorMessage = getApiErrorMessage(error, 'Ошибка при применении промокода');
       toast.error(errorMessage);
     }
   };

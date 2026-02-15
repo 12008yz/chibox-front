@@ -12,7 +12,7 @@ import Monetary from '../components/Monetary';
 import { formatDaysI18n } from '../utils/declension';
 import type { UserInventoryItem, Item } from '../types/api';
 import { getItemImageUrl, adaptImageSize } from '../utils/steamImageUtils';
-import { BACKGROUNDS } from '../utils/config';
+import { BACKGROUNDS, getApiErrorMessage } from '../utils/config';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
 import { Coins, Star, Search, RefreshCw } from 'lucide-react';
@@ -297,7 +297,7 @@ const ExchangePage: React.FC = () => {
         }, 500);
       }
     } catch (error: any) {
-      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
+      const errorMessage = getApiErrorMessage(error, t('errors.server_error'));
       toast.error(errorMessage);
     }
   };
@@ -354,7 +354,7 @@ const ExchangePage: React.FC = () => {
         }, 500);
       }
     } catch (error: any) {
-      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
+      const errorMessage = getApiErrorMessage(error, t('errors.server_error'));
       toast.error(errorMessage);
     }
   };

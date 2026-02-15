@@ -12,6 +12,7 @@ import Monetary from '../components/Monetary';
 import { getItemImageUrl } from '../utils/steamImageUtils';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
+import { getApiErrorMessage } from '../utils/config';
 import { Search, Zap, Target, Sparkles } from 'lucide-react';
 import { CelebrateIcon, SadIcon, ReceivedIcon, CancelIcon } from '../components/icons';
 
@@ -1423,7 +1424,7 @@ const UpgradePage: React.FC = () => {
       }, 7500);
 
     } catch (error: any) {
-      const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
+      const errorMessage = getApiErrorMessage(error, t('errors.server_error'));
       toast.error(errorMessage);
       // Сбрасываем флаг обработки в случае ошибки
       setIsProcessingUpgrade(false);

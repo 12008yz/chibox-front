@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResendVerificationCodeMutation, useVerifyEmailMutation } from '../../../../features/user/userApi';
+import { getApiErrorMessage } from '../../../../utils/config';
 
 interface EmailVerificationModalProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       setEmailVerificationStep('verify');
       alert(t('profile.settings.verification_code_sent'));
     } catch (error: any) {
-      alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.verification_code_error')}`);
+      alert(`${t('common.error')}: ${getApiErrorMessage(error, t('profile.settings.verification_code_error'))}`);
     }
   };
 
@@ -65,7 +66,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       setVerificationCode('');
       setEmailVerificationStep('send');
     } catch (error: any) {
-      alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.email_verify_error')}`);
+      alert(`${t('common.error')}: ${getApiErrorMessage(error, t('profile.settings.email_verify_error'))}`);
     }
   };
 

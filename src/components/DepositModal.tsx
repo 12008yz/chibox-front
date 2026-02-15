@@ -7,6 +7,7 @@ import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
 import { ReceivedIcon, ExchangeIcon } from './icons';
+import { getApiErrorMessage } from '../utils/config';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -147,7 +148,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Ошибка создания платежа');
+      toast.error(getApiErrorMessage(error, 'Ошибка создания платежа'));
     }
   };
 
@@ -161,7 +162,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         setPromoCode('');
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Неверный промокод');
+      toast.error(getApiErrorMessage(error, 'Неверный промокод'));
     }
   };
 
@@ -185,7 +186,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Ошибка при покупке подписки');
+      toast.error(getApiErrorMessage(error, 'Ошибка при покупке подписки'));
     }
   };
 

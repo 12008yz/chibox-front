@@ -5,6 +5,7 @@ import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUt
 import type { UserInventoryItem } from '../types/api';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
+import { getApiErrorMessage } from '../utils/config';
 
 interface ItemWithdrawBannerProps {
   item: UserInventoryItem;
@@ -101,7 +102,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
         const subscriptionInfo = error.data.data?.subscription_status || t('profile.subscription_info.no_subscription');
         onError(`${error.data.message}. ${t('profile.subscription_info.status')}: ${subscriptionInfo}. ${t('profile.subscription_info.purchase_suggestion')}.`);
       } else {
-        onError(error?.data?.message || t('profile.item_withdraw.error_not_found'));
+        onError(getApiErrorMessage(error, t('profile.item_withdraw.error_not_found')));
       }
     } finally {
       setIsWithdrawing(false);
