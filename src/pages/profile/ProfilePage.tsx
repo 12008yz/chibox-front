@@ -48,17 +48,10 @@ const ProfilePage: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get('success');
     const error = urlParams.get('error');
-    const token = urlParams.get('token');
 
     if (success === 'steam_linked') {
-      // Если получили новый токен, обновляем его в localStorage
-      if (token) {
-        localStorage.setItem('auth_token', token);
-
-      }
-
+      // Токен теперь приходит в httpOnly cookie с бэкенда — не используем token из URL
       showNotification(t('profile.steam_linked_success'), 'success');
-      // Очищаем URL от параметров
       window.history.replaceState({}, '', window.location.pathname);
     } else if (error) {
       let errorMessage = t('profile.steam_link_error');
