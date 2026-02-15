@@ -539,6 +539,8 @@ export interface TopUpBalanceRequest {
   amount: number;
   currency?: string;
   payment_method?: string;
+  /** Для Unitpay: 'card' | 'sbp' — сразу открывает форму с выбранным способом */
+  unitpay_system?: string;
 }
 
 export interface TopUpBalanceResponse {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Wallet, Lock, Crown } from 'lucide-react';
+import { X, Wallet, Lock, Crown, CreditCard, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
@@ -22,13 +22,17 @@ type PaymentMethod = {
   badge?: string;
   enabled: boolean;
   type: 'sbp' | 'card' | 'crypto' | 'other';
+  /** backend: 'unitpay' | 'freekassa' */
+  payment_method: string;
+  /** для unitpay: сразу открыть форму карты или СБП */
+  unitpay_system?: 'card' | 'sbp';
 };
 
 const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance', initialSelectedSubscription }) => {
   const { } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
-  const [selectedMethod, setSelectedMethod] = useState<string>('freekassa');
+  const [selectedMethod, setSelectedMethod] = useState<string>('unitpay_card');
   const [amount, setAmount] = useState<string>('10');
   const [promoCode, setPromoCode] = useState<string>('');
   const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
@@ -60,6 +64,34 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const paymentMethods: PaymentMethod[] = [
     {
+      id: 'unitpay_card',
+      name: 'Банковская карта',
+      icon: (
+        <div className="flex items-center justify-center w-full h-full p-2">
+          <CreditCard className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+        </div>
+      ),
+      badge: 'Visa, МИР, Mastercard',
+      enabled: true,
+      type: 'card',
+      payment_method: 'unitpay',
+      unitpay_system: 'card'
+    },
+    {
+      id: 'unitpay_sbp',
+      name: 'СБП',
+      icon: (
+        <div className="flex items-center justify-center w-full h-full p-2">
+          <Smartphone className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+        </div>
+      ),
+      badge: 'Система быстрых платежей',
+      enabled: true,
+      type: 'sbp',
+      payment_method: 'unitpay',
+      unitpay_system: 'sbp'
+    },
+    {
       id: 'freekassa',
       name: 'FREEKASSA',
       icon: (
@@ -71,7 +103,8 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       ),
       badge: 'Все способы',
       enabled: true,
-      type: 'card'
+      type: 'card',
+      payment_method: 'freekassa'
     },
   ];
 
@@ -96,11 +129,15 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     }
 
     try {
-      const result = await topUpBalance({
+      const payload: { amount: number; currency: string; payment_method: string; unitpay_system?: string } = {
         amount: amountNum,
         currency: 'ChiCoins',
-        payment_method: 'freekassa'
-      }).unwrap();
+        payment_method: selectedPaymentMethod?.payment_method || 'unitpay'
+      };
+      if (selectedPaymentMethod?.unitpay_system) {
+        payload.unitpay_system = selectedPaymentMethod.unitpay_system;
+      }
+      const result = await topUpBalance(payload).unwrap();
 
       if (result.success && result.data) {
         if (result.data.paymentUrl) {
@@ -133,7 +170,8 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       const result = await buySubscription({
         tierId,
         method: 'bank_card',
-        paymentMethod: 'freekassa'
+        paymentMethod: selectedMethod.startsWith('unitpay') ? 'unitpay' : 'freekassa',
+        unitpay_system: selectedMethod === 'unitpay_sbp' ? 'sbp' : selectedMethod === 'unitpay_card' ? 'card' : undefined
       }).unwrap();
 
       if (result.success) {
@@ -344,16 +382,24 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                           {/* Payment Info */}
                           <div className="text-xs text-gray-500 text-center">
-                            {method.id === 'freekassa' ? (
+                            {method.id === 'unitpay_card' && (
+                              <div className="flex flex-wrap gap-1 justify-center">
+                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Visa</span>
+                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">МИР</span>
+                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Mastercard</span>
+                              </div>
+                            )}
+                            {method.id === 'unitpay_sbp' && (
+                              <div className="flex flex-wrap gap-1 justify-center">
+                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Система быстрых платежей</span>
+                              </div>
+                            )}
+                            {method.id === 'freekassa' && (
                               <div className="flex flex-wrap gap-1 justify-center">
                                 <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">МИР</span>
                                 <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Visa</span>
                                 <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Mastercard</span>
                                 <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">СБП</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-wrap gap-1 justify-center">
-                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-700/50 rounded text-[10px] sm:text-xs">Банковские карты</span>
                               </div>
                             )}
                           </div>
@@ -367,7 +413,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-white mb-1 text-xs sm:text-sm">Защищенная оплата</p>
-                      <p className="text-gray-400 text-xs sm:text-sm">После нажатия кнопки "Пополнить" вы будете перенаправлены на безопасную страницу оплаты</p>
+                      <p className="text-gray-400 text-xs sm:text-sm">Выберите способ — после нажатия «Пополнить» откроется форма оплаты картой или СБП без дополнительного выбора</p>
                     </div>
                   </div>
                 </div>
@@ -472,16 +518,24 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                           {/* Payment Info */}
                           <div className="text-xs text-gray-500 text-center">
-                            {method.id === 'freekassa' ? (
+                            {method.id === 'unitpay_card' && (
+                              <div className="flex flex-wrap gap-1 justify-center">
+                                <span className="px-2 py-1 bg-gray-700/50 rounded">Visa</span>
+                                <span className="px-2 py-1 bg-gray-700/50 rounded">МИР</span>
+                                <span className="px-2 py-1 bg-gray-700/50 rounded">Mastercard</span>
+                              </div>
+                            )}
+                            {method.id === 'unitpay_sbp' && (
+                              <div className="flex flex-wrap gap-1 justify-center">
+                                <span className="px-2 py-1 bg-gray-700/50 rounded">СБП</span>
+                              </div>
+                            )}
+                            {method.id === 'freekassa' && (
                               <div className="flex flex-wrap gap-1 justify-center">
                                 <span className="px-2 py-1 bg-gray-700/50 rounded">МИР</span>
                                 <span className="px-2 py-1 bg-gray-700/50 rounded">Visa</span>
                                 <span className="px-2 py-1 bg-gray-700/50 rounded">Mastercard</span>
                                 <span className="px-2 py-1 bg-gray-700/50 rounded">СБП</span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-wrap gap-1 justify-center">
-                                <span className="px-2 py-1 bg-gray-700/50 rounded">Банковские карты</span>
                               </div>
                             )}
                           </div>
@@ -495,7 +549,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                     <Lock className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-white mb-1">Защищенная оплата</p>
-                      <p className="text-gray-400">После нажатия кнопки "Пополнить" вы будете перенаправлены на безопасную страницу оплаты</p>
+                      <p className="text-gray-400">Выберите способ — после «Пополнить» откроется форма оплаты картой или СБП без дополнительного выбора</p>
                     </div>
                   </div>
                 </div>
