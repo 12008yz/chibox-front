@@ -17,7 +17,6 @@ import OnboardingTour from '../components/OnboardingTour';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
 
-import { useSocket } from '../hooks/useSocket';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
@@ -28,7 +27,6 @@ const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  useSocket(); // Подключаем сокеты
   const { userData, refetch: refetchUser } = useUserData({ autoRefresh: false }); // Получаем данные пользователя
 
   // Получаем глобальное состояние показа интро из Redux

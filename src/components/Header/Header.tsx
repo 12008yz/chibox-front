@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import Navbar from "./Navbar";
 import CaseOpenedNotification from "./CaseOpenedNotification";
 
@@ -32,7 +32,7 @@ interface HeaderProps {
   user?: any;
 }
 
-const Header: React.FC<HeaderProps> = ({
+const HeaderComponent: React.FC<HeaderProps> = ({
   onlineUsers = 0,
   recentCaseOpenings = [],
   notification,
@@ -93,4 +93,5 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
+const Header = memo(HeaderComponent);
 export default Header;

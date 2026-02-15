@@ -5,6 +5,11 @@ import { useAppDispatch } from '../store/hooks';
 import { userApi } from '../features/user/userApi';
 import { toastWithSound } from '../utils/toastWithSound';
 
+export interface UseSocketOptions {
+  /** Подписываться на liveDrop (иначе при каждом дропе не будет лишних ре-рендеров App/Header) */
+  subscribeToLiveDrops?: boolean;
+}
+
 interface UseSocketReturn {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   onlineUsers: number;
@@ -141,10 +146,13 @@ const createGlobalSocket = () => {
   return globalSocket;
 };
 
-export const useSocket = (): UseSocketReturn => {
+export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
+  const subscribeToLiveDrops = options?.subscribeToLiveDrops ?? false;
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() => loadLiveDropsFromStorage());
+  const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() =>
+    subscribeToLiveDrops ? loadLiveDropsFromStorage() : []
+  );
   const initialized = useRef(false);
   const dispatch = useAppDispatch();
 
@@ -159,28 +167,19 @@ export const useSocket = (): UseSocketReturn => {
     // Функции-слушатели для этого компонента
     const onlineUsersListener = (count: number) => setOnlineUsers(count);
     const connectionListener = (connected: boolean) => setIsConnected(connected);
-    const liveDropListener = (drop: LiveDropData) => {
-      setLiveDrops(prevDrops => {
-        // Проверяем, нет ли уже такого дропа
-        const existingDrop = prevDrops.find(existingDrop => existingDrop.id === drop.id);
-        if (existingDrop) {
-
-          return prevDrops;
+    const liveDropListener = subscribeToLiveDrops
+      ? (drop: LiveDropData) => {
+          setLiveDrops(prevDrops => {
+            const existingDrop = prevDrops.find(existing => existing.id === drop.id);
+            if (existingDrop) return prevDrops;
+            const dropTime = new Date(drop.dropTime).getTime();
+            if (Date.now() - dropTime > 5 * 60 * 1000) return prevDrops;
+            const newDrops = [drop, ...prevDrops.slice(0, MAX_LIVE_DROPS - 1)];
+            saveLiveDropsToStorage(newDrops);
+            return newDrops;
+          });
         }
-
-        // Дополнительная проверка - если дроп очень старый, не добавляем
-        const dropTime = new Date(drop.dropTime).getTime();
-        const now = Date.now();
-        if (now - dropTime > 5 * 60 * 1000) {
-
-          return prevDrops;
-        }
-
-        const newDrops = [drop, ...prevDrops.slice(0, MAX_LIVE_DROPS - 1)];
-        saveLiveDropsToStorage(newDrops);
-        return newDrops;
-      });
-    };
+      : undefined;
 
     // Обработчик уведомлений
     const notificationListener = (notification: NotificationData) => {
@@ -222,10 +221,10 @@ export const useSocket = (): UseSocketReturn => {
       }
     };
 
-    // Регистрируем слушатели
+    // Регистрируем слушатели (liveDrops только если нужен — меньше ре-рендеров App/Header)
     onlineUsersListeners.add(onlineUsersListener);
     connectionListeners.add(connectionListener);
-    liveDropListeners.add(liveDropListener);
+    if (liveDropListener) liveDropListeners.add(liveDropListener);
     notificationListeners.add(notificationListener);
 
     // Устанавливаем начальное состояние
@@ -235,11 +234,11 @@ export const useSocket = (): UseSocketReturn => {
     return () => {
       onlineUsersListeners.delete(onlineUsersListener);
       connectionListeners.delete(connectionListener);
-      liveDropListeners.delete(liveDropListener);
+      if (liveDropListener) liveDropListeners.delete(liveDropListener);
       notificationListeners.delete(notificationListener);
 
       // Если это последний компонент, закрываем соединение
-      if (onlineUsersListeners.size === 0 && connectionListeners.size === 0 && notificationListeners.size === 0) {
+      if (onlineUsersListeners.size === 0 && connectionListeners.size === 0 && liveDropListeners.size === 0 && notificationListeners.size === 0) {
 
         if (globalSocket) {
           globalSocket.disconnect();

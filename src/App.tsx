@@ -3,7 +3,7 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useCallback } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 
@@ -37,6 +37,18 @@ const FAQPage = lazy(() => import('./pages/FAQPage'));
 const RequisitesPage = lazy(() => import('./pages/RequisitesPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 
+const ProtectedRoute: React.FC<{
+  children: React.ReactElement;
+  isAuthenticated: boolean;
+  onShowAuthModal: () => void;
+}> = ({ children, isAuthenticated, onShowAuthModal }) => {
+  useEffect(() => {
+    if (!isAuthenticated) onShowAuthModal();
+  }, [isAuthenticated, onShowAuthModal]);
+  if (!isAuthenticated) return <Navigate to="/" replace />;
+  return children;
+};
+
 const App: React.FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
@@ -46,7 +58,7 @@ const App: React.FC = () => {
   const showTradeUrlModal = useAppSelector(state => state.ui.showTradeUrlModal);
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
   const showAuthModal = useAppSelector(state => state.ui.showAuthModal);
-
+  const onShowAuthModal = useCallback(() => dispatch(setShowAuthModal(true)), [dispatch]);
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
@@ -145,21 +157,6 @@ const App: React.FC = () => {
     );
   }
 
-  // Компонент для защищенных маршрутов
-  const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-    useEffect(() => {
-      if (!auth.isAuthenticated) {
-        dispatch(setShowAuthModal(true));
-      }
-    }, []);
-
-    if (!auth.isAuthenticated) {
-      return <Navigate to="/" replace />;
-    }
-
-    return children;
-  };
-
   return (
     <Router>
       <ScrollToTopOnRoute />
@@ -196,7 +193,7 @@ const App: React.FC = () => {
             <Route
               path="/profile"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
                   <ProfilePage />
                 </ProtectedRoute>
               }
@@ -212,7 +209,7 @@ const App: React.FC = () => {
             <Route
               path="/exchange"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
                   <ExchangePage />
                 </ProtectedRoute>
               }
@@ -251,7 +248,7 @@ const App: React.FC = () => {
             <Route
               path="/upgrade"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
                   <UpgradePage />
                 </ProtectedRoute>
               }
@@ -259,7 +256,7 @@ const App: React.FC = () => {
             <Route
               path="/tower-defense"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
                   <TowerDefensePage />
                 </ProtectedRoute>
               }

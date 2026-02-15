@@ -4,10 +4,11 @@ import { LiveDropData } from '../types/socket';
 import LiveDropItem from './LiveDropItem';
 import { useTranslation } from 'react-i18next';
 import { Flame } from 'lucide-react';
+import { API_URL } from '../utils/config';
 
 const LiveDrops: React.FC = () => {
   const { t } = useTranslation();
-  const { liveDrops, isConnected } = useSocket();
+  const { liveDrops, isConnected } = useSocket({ subscribeToLiveDrops: true });
   const [allDrops, setAllDrops] = useState<LiveDropData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -15,7 +16,7 @@ const LiveDrops: React.FC = () => {
   useEffect(() => {
     const fetchInitialDrops = async () => {
       try {
-        const response = await fetch('/api/v1/live-drops?limit=12'); // Уменьшили лимит для горизонтального отображения
+        const response = await fetch(`${API_URL}/v1/live-drops?limit=12`);
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
