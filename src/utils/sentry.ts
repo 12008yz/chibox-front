@@ -58,7 +58,7 @@ export const initSentry = () => {
  };
  
  // Установка пользовательского контекста
- export const setUserContext = (user: { id: string; email?: string; username?: string }) => {
+ export const setUserContext = (_user: { id: string; email?: string; username?: string }) => {
    if (import.meta.env.VITE_SENTRY_DSN) {
      // Раскомментируйте когда установите @sentry/react
      // Sentry.setUser(user);
@@ -74,7 +74,7 @@ export const initSentry = () => {
  };
  
  // Установка дополнительного контекста
- export const setContext = (key: string, value: Record<string, unknown>) => {
+ export const setContext = (_key: string, _value: Record<string, unknown>) => {
    if (import.meta.env.VITE_SENTRY_DSN) {
      // Раскомментируйте когда установите @sentry/react
      // Sentry.setContext(key, value);

@@ -1,7 +1,7 @@
 /**
  * Утилиты для работы с аватарами пользователей
  */
-import { API_URL, BACKEND_URL } from './config';
+import { BACKEND_URL } from './config';
 
 /**
  * Получает полный URL аватара

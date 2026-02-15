@@ -1,6 +1,5 @@
-import { API_URL, BACKEND_URL } from './config';
+import { BACKEND_URL } from './config';
 
-const API_BASE_URL = API_URL;
 const SERVER_BASE_URL = BACKEND_URL;
 
 export const getImageUrl = (path: string | null | undefined): string => {

@@ -31,7 +31,7 @@ export function extractMarketHashName(marketUrl: string): string | null {
 }
 
 // Функция для создания прямой ссылки на изображение Steam
-export function createSteamImageUrl(marketHashName: string, size: string = '256fx256f'): string {
+export function createSteamImageUrl(_marketHashName: string, size: string = '256fx256f'): string {
   // Используем дефолтное изображение CS2 предмета, так как для создания правильной ссылки
   // нужен точный hash изображения, который можно получить только через парсинг страницы
   return `https://community.fastly.steamstatic.com/economy/image/6TMcQ7eX6E0EZl2byXi7vaVtMyCbg7JT9Nj26yLB0uiTHKECVqCQJYPQOiKc1A9hdeGdqRmPbEbD8Q_VfQ/${size}`;
