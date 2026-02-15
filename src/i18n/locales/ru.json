@@ -597,7 +597,7 @@
     "balance_top_up": "Пополнение баланса",
     "or_enter_custom": "Или введите свою сумму:",
     "enter_amount": "Введите сумму",
-    "minimum_deposit_info": "• Минимальная сумма пополнения: 100 ChiCoins",
+    "minimum_deposit_info": "• Минимальная сумма пополнения: 10 ChiCoins",
     "deposit_info": "• Средства поступят на баланс после успешной оплаты",
     "cards_supported": "• Поддерживаются банковские карты",
     "top_up_for": "Пополнить на {{amount}} ChiCoins",
@@ -622,7 +622,7 @@
     "all_bonuses_access": "Доступ ко всем бонусам",
     "drop_chance_bonus": "К шансу выпадения",
     "enter_correct_amount": "Введите корректную сумму для пополнения",
-    "minimum_amount": "Минимальная сумма пополнения: 100 ChiCoins",
+    "minimum_amount": "Минимальная сумма пополнения: 10 ChiCoins",
     "payment_error": "Ошибка при создании платежа",
     "subscription_error": "Ошибка при покупке статуса"
   },
