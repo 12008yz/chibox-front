@@ -34,7 +34,7 @@ export interface User {
     avatar?: string;
     avatarmedium?: string;
     avatarfull?: string;
-    [key: string]: any; // Для других полей Steam профиля
+    [key: string]: unknown;
   };
   avatar_url?: string; // Пользовательский аватар
   steam_avatar?: string; // Виртуальное поле для обратной совместимости
@@ -73,7 +73,7 @@ export interface CaseTemplate {
   availability_end?: string | null;
   max_opens_per_user?: number | null;
   cooldown_hours?: number;
-  item_pool_config?: any;
+  item_pool_config?: unknown;
   special_conditions?: string | null;
   sort_order?: number;
   color_scheme?: string | null;
@@ -133,7 +133,7 @@ export interface UserInventoryItem {
   status: 'available' | 'sold' | 'withdrawn' | 'used' | 'inventory' | 'pending_withdrawal' | 'converted_to_subscription';
   case_id?: string;
   case_template_id?: string;
-  withdrawal?: any;
+  withdrawal?: unknown;
   transaction_date?: string;
   expires_at?: string;
 }
@@ -202,7 +202,7 @@ export interface Notification {
   read_at?: string;
   expires_at?: string;
   importance: number;
-  data?: any;
+  data?: unknown;
   created_at: string;
   updated_at: string;
 }
@@ -396,7 +396,7 @@ export interface TowerDefenseGame {
   bet_item_id?: string;
   bet_inventory_id?: string;
   reward_item_id?: string;
-  game_data?: any;
+  game_data?: unknown;
   completed_at?: string;
   created_at: string;
   updated_at: string;

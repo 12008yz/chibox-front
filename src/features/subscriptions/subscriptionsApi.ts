@@ -1,5 +1,5 @@
 import { baseApi } from '../../store/api/baseApi';
-import type { ApiResponse } from '../../types/api';
+import type { ApiResponse, UserCaseItem } from '../../types/api';
 
 export interface SubscriptionTier {
   id: number;
@@ -104,7 +104,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
       ApiResponse<{
         cases_claimed: number;
         next_available_time: string;
-        user_cases: any[];
+        user_cases: UserCaseItem[];
       }>,
       void
     >({

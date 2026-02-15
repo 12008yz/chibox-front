@@ -3,8 +3,8 @@ import type {
   CaseTemplate,
   BuyCaseRequest,
   OpenCaseRequest,
-  // UserInventoryItem,
   Item,
+  UserCaseItem,
   ApiResponse,
   PaginatedResponse
 } from '../../types/api';
@@ -22,7 +22,7 @@ export const casesApi = baseApi.injectEndpoints({
     getAllCases: builder.query<ApiResponse<{
       free_cases: CaseTemplate[];
       paid_cases: CaseTemplate[];
-      user_cases: any[];
+      user_cases: UserCaseItem[];
       user_subscription_tier: number;
       next_case_available_time?: string | null;
     }>, void>({
@@ -33,7 +33,7 @@ export const casesApi = baseApi.injectEndpoints({
 
     // Получение истории кейсов пользователя
     getUserCases: builder.query<
-      PaginatedResponse<any>,
+      PaginatedResponse<{ id: string; case_template_id?: string; item?: Item; created_at?: string }>,
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 20 } = {}) =>
@@ -46,7 +46,7 @@ export const casesApi = baseApi.injectEndpoints({
       ApiResponse<{
         case_id?: string;
         new_balance?: number;
-        inventory_cases?: any[];
+        inventory_cases?: UserCaseItem[];
         paymentUrl?: string;
         message?: string;
         balance?: number;
@@ -84,7 +84,7 @@ export const casesApi = baseApi.injectEndpoints({
     openCase: builder.mutation<
       ApiResponse<{
         item: Item;
-        animation_data?: any;
+        animation_data?: Record<string, unknown>;
         new_balance?: number;
         caseId?: string;
       }>,
@@ -130,7 +130,7 @@ export const casesApi = baseApi.injectEndpoints({
 
     // Получение статистики дропов (последние выпавшие предметы)
     getRecentDrops: builder.query<
-      ApiResponse<any[]>,
+      ApiResponse<Array<{ user: { username: string }; item: Item; created_at?: string }>>,
       { limit?: number }
     >({
       query: ({ limit = 10 } = {}) => `v1/live-drops?limit=${limit}`,
@@ -138,7 +138,7 @@ export const casesApi = baseApi.injectEndpoints({
 
     // Получение информации о покупке кейса
     getCasePurchaseInfo: builder.query<
-      ApiResponse<any>,
+      ApiResponse<Record<string, unknown>>,
       void
     >({
       query: () => 'v1/cases/purchase-info',
