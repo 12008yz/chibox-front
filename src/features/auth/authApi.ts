@@ -27,20 +27,12 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ user: User }>,
       LoginRequest
     >({
-      query: (credentials) => {
-        console.log('[authApi] Login query:', { email: credentials.email });
-        return {
+      query: (credentials) => ({
           url: 'v1/login',
           method: 'POST',
           body: credentials,
-        };
-      },
+      }),
       transformResponse: (response: any) => {
-        console.log('[authApi] Login response received:', JSON.stringify(response, null, 2));
-        console.log('[authApi] Response keys:', Object.keys(response));
-        console.log('[authApi] response.success:', response.success);
-        console.log('[authApi] response.user:', response.user);
-
         // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, не в теле ответа
         // Трансформируем ответ бэкенда к ожидаемому формату
         if (response.success && response.user) {
@@ -59,14 +51,8 @@ export const authApi = baseApi.injectEndpoints({
             },
             message: response.message
           };
-          console.log('[authApi] Login transformed response:', transformedResponse);
           return transformedResponse;
         }
-        console.log('[authApi] Login response not successful or missing user, returning as is');
-        console.error('[authApi] ERROR: Expected response.success && response.user, but got:', {
-          success: response.success,
-          hasUser: !!response.user
-        });
         return response;
       },
       invalidatesTags: ['User', 'Profile'],
@@ -77,19 +63,12 @@ export const authApi = baseApi.injectEndpoints({
       ApiResponse<{ userId: string; email: string; codeExpires: string }> & { previewUrl?: string },
       RegisterRequest
     >({
-      query: (userData) => {
-        console.log('[authApi] Register query:', {
-          username: userData.username,
-          email: userData.email
-        });
-        return {
-          url: 'v1/register',
-          method: 'POST',
-          body: userData,
-        };
-      },
+      query: (userData) => ({
+        url: 'v1/register',
+        method: 'POST',
+        body: userData,
+      }),
       transformResponse: (response: any) => {
-        console.log('[authApi] Register response received:', response);
         // Регистрация возвращает другой формат - userId, email, codeExpires
         if (response.success) {
           const transformedResponse = {
@@ -102,10 +81,8 @@ export const authApi = baseApi.injectEndpoints({
             message: response.message,
             previewUrl: response.previewUrl // для тестового режима
           };
-          console.log('[authApi] Register transformed response:', transformedResponse);
           return transformedResponse;
         }
-        console.log('[authApi] Register response not successful, returning as is');
         return response;
       },
       invalidatesTags: ['User', 'Profile'],

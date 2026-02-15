@@ -33,7 +33,6 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
     });
 
     // Очищаем старое состояние ПЕРЕД редиректом на Steam
-    console.log('Clearing state before Steam login...');
 
     // Сначала очищаем localStorage вручную
     const keysToKeep = ['theme', 'language', 'cookieConsent'];
@@ -49,8 +48,6 @@ const SteamLoginButton: React.FC<SteamLoginButtonProps> = ({
     dispatch(baseApi.util.resetApiState());
     dispatch(logout());
 
-    // Переходим на промежуточную страницу загрузки
-    console.log('Navigating to Steam loading page...');
     navigate('/steam-loading');
   };
 

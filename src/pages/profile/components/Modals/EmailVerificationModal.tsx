@@ -47,7 +47,6 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       setEmailVerificationStep('verify');
       alert(t('profile.settings.verification_code_sent'));
     } catch (error: any) {
-      console.error('Ошибка при отправке кода:', error);
       alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.verification_code_error')}`);
     }
   };
@@ -66,7 +65,6 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
       setVerificationCode('');
       setEmailVerificationStep('send');
     } catch (error: any) {
-      console.error('Ошибка при подтверждении email:', error);
       alert(`${t('common.error')}: ${error?.data?.message || t('profile.settings.email_verify_error')}`);
     }
   };

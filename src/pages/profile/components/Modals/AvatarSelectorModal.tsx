@@ -40,7 +40,6 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
       toastWithSound.success(t('profile.avatar_updated') || 'Аватар успешно обновлен!');
       onClose();
     } catch (error: any) {
-      console.error('Ошибка обновления аватара:', error);
       toastWithSound.error(error?.data?.message || t('profile.avatar_update_error') || 'Не удалось обновить аватар');
     }
   };

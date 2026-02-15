@@ -1238,7 +1238,6 @@ const UpgradePage: React.FC = () => {
         // Сбрасываем целевой предмет
         setSelectedTargetItem('');
 
-        console.log('Очищены недоступные предметы из выбора');
       }
     }
   }, [upgradeableItems, selectedInventoryIds, selectedItemIds, showAnimation, isUpgrading, isProcessingUpgrade]);
@@ -1284,13 +1283,11 @@ const UpgradePage: React.FC = () => {
   const handleSelectSourceItem = useCallback((itemId: string) => {
     const itemGroup = filteredItems.find(group => group.item.id === itemId);
     if (!itemGroup) {
-      console.warn('Предмет не найден:', itemId);
       return;
     }
 
     // Проверяем, что экземпляры предмета существуют
     if (!itemGroup.instances || itemGroup.instances.length === 0) {
-      console.warn('У предмета нет доступных экземпляров:', itemId);
       return;
     }
 
@@ -1426,7 +1423,6 @@ const UpgradePage: React.FC = () => {
       }, 7500);
 
     } catch (error: any) {
-      console.error('Ошибка при апгрейде:', error);
       const errorMessage = error?.data?.message || error?.message || t('errors.server_error');
       toast.error(errorMessage);
       // Сбрасываем флаг обработки в случае ошибки

@@ -71,7 +71,6 @@ export const userApi = baseApi.injectEndpoints({
               // Находим проданный предмет и меняем его статус
               const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
               if (itemIndex !== -1) {
-                console.log('Optimistically updating sold item status:', draft.data.items[itemIndex]);
                 // Меняем статус на sold
                 draft.data.items[itemIndex].status = 'sold';
                 draft.data.items[itemIndex].transaction_date = new Date().toISOString();
@@ -115,7 +114,6 @@ export const userApi = baseApi.injectEndpoints({
               // Находим предмет по inventoryItemId
               const itemIndex = draft.data.items.findIndex(item => item.id === arg.inventoryItemId);
               if (itemIndex !== -1) {
-                console.log('Optimistically updating withdrawn item status:', draft.data.items[itemIndex]);
                 // Меняем статус на pending_withdrawal
                 draft.data.items[itemIndex].status = 'pending_withdrawal';
                 draft.data.items[itemIndex].transaction_date = new Date().toISOString();
@@ -147,8 +145,8 @@ export const userApi = baseApi.injectEndpoints({
       async onQueryStarted(_, { queryFulfilled }) {
         try {
           await queryFulfilled;
-        } catch (error) {
-          console.error('Failed to cancel withdrawal:', error);
+        } catch {
+          // rollback via invalidatesTags
         }
       },
     }),
@@ -418,7 +416,6 @@ export const userApi = baseApi.injectEndpoints({
               // Находим предмет по ID экземпляра инвентаря
               const itemIndex = draft.data.items.findIndex(item => item.id === arg.itemId);
               if (itemIndex !== -1) {
-                console.log('Optimistically updating exchanged item status:', draft.data.items[itemIndex]);
                 // Меняем статус на used
                 draft.data.items[itemIndex].status = 'used';
                 draft.data.items[itemIndex].transaction_date = new Date().toISOString();
@@ -441,15 +438,12 @@ export const userApi = baseApi.injectEndpoints({
                   draft.data.subscription_days_left = response.data.data.subscription_days_left;
                   draft.data.expiry_date = response.data.data.subscription_expiry_date;
                   draft.data.subscription_expiry_date = response.data.data.subscription_expiry_date;
-                  console.log('Updated subscription days optimistically:', response.data.data.subscription_days_left);
                 }
               })
             );
           }
-        } catch (error) {
-          // Откатываем оптимистичное обновление при ошибке
+        } catch {
           inventoryPatch.undo();
-          console.error('Exchange failed, rolled back optimistic update:', error);
         }
       },
     }),
@@ -957,8 +951,8 @@ export const userApi = baseApi.injectEndpoints({
             const { updateUser } = await import('../auth/authSlice');
             dispatch(updateUser({ avatar_url: data.data.avatar_url }));
           }
-        } catch (error) {
-          console.error('Error updating avatar in authSlice:', error);
+        } catch {
+          // invalidatesTags обновит данные
         }
       },
     }),

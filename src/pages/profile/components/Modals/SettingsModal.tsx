@@ -183,7 +183,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       // Если сервер вернул новый токен, обновляем его в localStorage
       if ('token' in result && result.token) {
         localStorage.setItem('auth_token', result.token);
-        console.log('Токен обновлен после изменения профиля');
       }
 
       // Если email был изменен, показываем специальное уведомление и открываем окно верификации
@@ -210,7 +209,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }, 500);
       }
     } catch (error: any) {
-      console.error('Ошибка при сохранении настроек:', error);
       showNotification(error?.data?.message || t('profile.settings.settings_save_error'), 'error');
     }
   };
@@ -224,12 +222,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     }
 
     const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru';
-    console.log('Попытка привязки Steam:', {
-      serverUrl,
-      token: token.substring(0, 20) + '...',
-      fullUrl: `${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`
-    });
-
     const steamLinkUrl = `${serverUrl}/v1/auth/link-steam?token=${encodeURIComponent(token)}`;
     window.location.href = steamLinkUrl;
     onClose();
@@ -248,8 +240,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       const apiUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
       const url = `${apiUrl}/v1/steam/fetch-trade-url`;
 
-      console.log('Отправка запроса на получение Trade URL:', url);
-
       const response = await fetch(url, {
         method: 'POST',
         credentials: 'include', // ВАЖНО: отправляем httpOnly cookies для авторизации
@@ -258,17 +248,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }
       });
 
-      console.log('Статус ответа:', response.status);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Ошибка сервера:', errorData);
         showNotification(errorData.message || t('profile.settings.trade_url_fetch_error'), 'error');
         return;
       }
 
       const result = await response.json();
-      console.log('Результат получения Trade URL:', result);
 
       if (result.success && result.data?.steam_trade_url) {
         setTradeUrl(result.data.steam_trade_url);
@@ -298,7 +284,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }
       }
     } catch (error: any) {
-      console.error('Ошибка при получении Trade URL:', error);
       showNotification(
         error.message || t('profile.settings.trade_url_fetch_network_error'),
         'error'
@@ -315,8 +300,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleLogout = async () => {
     try {
       await logoutApi().unwrap();
-    } catch (error) {
-      console.log('Logout API error (continuing with logout):', error);
+    } catch {
+      // continue with logout
     } finally {
       performFullLogout(dispatch);
       onClose();

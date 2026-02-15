@@ -8,7 +8,6 @@ export const initSentry = () => {
    const sentryDSN = import.meta.env.VITE_SENTRY_DSN;
  
    if (!sentryDSN) {
-     console.log('Sentry DSN не настроен. Отслеживание ошибок отключено.');
      return;
    }
  
@@ -49,18 +48,12 @@ export const initSentry = () => {
      },
    });
    */
- 
-   console.log('Sentry инициализирован (заглушка). Установите @sentry/react для полной функциональности.');
  };
  
  // Ручное логирование ошибки
- export const logError = (error: Error, context?: Record<string, unknown>) => {
+ export const logError = (_error: Error, _context?: Record<string, unknown>) => {
    if (import.meta.env.VITE_SENTRY_DSN) {
-     // Раскомментируйте когда установите @sentry/react
      // Sentry.captureException(error, { extra: context });
-     console.error('Error logged to Sentry:', error, context);
-   } else {
-     console.error('Error:', error, context);
    }
  };
  
@@ -69,7 +62,6 @@ export const initSentry = () => {
    if (import.meta.env.VITE_SENTRY_DSN) {
      // Раскомментируйте когда установите @sentry/react
      // Sentry.setUser(user);
-     console.log('User context set:', user);
    }
  };
  
@@ -78,7 +70,6 @@ export const initSentry = () => {
    if (import.meta.env.VITE_SENTRY_DSN) {
      // Раскомментируйте когда установите @sentry/react
      // Sentry.setUser(null);
-     console.log('User context cleared');
    }
  };
  
@@ -87,7 +78,6 @@ export const initSentry = () => {
    if (import.meta.env.VITE_SENTRY_DSN) {
      // Раскомментируйте когда установите @sentry/react
      // Sentry.setContext(key, value);
-     console.log('Context set:', key, value);
    }
  };
  

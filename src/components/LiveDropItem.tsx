@@ -34,18 +34,6 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
   const rarityColor = getRarityColor(drop.item.rarity);
   const isHighValue = drop.item.price >= 100;
 
-  // Проверяем и логируем данные для отладки
-  React.useEffect(() => {
-    if (drop.item.image === drop.user.avatar) {
-      console.error('ОШИБКА: Изображение предмета совпадает с аватаром!', {
-        itemImage: drop.item.image,
-        userAvatar: drop.user.avatar,
-        itemName: drop.item.name,
-        userName: drop.user.username
-      });
-    }
-  }, [drop]);
-
   return (
     <Link
       to={`/user/${drop.user.id}`}
@@ -183,14 +171,6 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
                     target.style.setProperty('filter', 'none', 'important');
                     target.style.setProperty('mix-blend-mode', 'normal', 'important');
 
-                    // Дополнительная отладка
-                    const computedStyle = getComputedStyle(target);
-                    if (computedStyle.filter !== 'none') {
-                      console.warn('Filter still applied after timeout:', computedStyle.filter);
-                    }
-                    if (computedStyle.mixBlendMode !== 'normal') {
-                      console.warn('Mix-blend-mode still applied:', computedStyle.mixBlendMode);
-                    }
                   }
                 }, 100);
               }}

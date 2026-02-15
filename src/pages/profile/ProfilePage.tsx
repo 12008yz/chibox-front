@@ -186,7 +186,6 @@ const ProfilePage: React.FC = () => {
               refetchUser()
             ]);
           } catch (error) {
-            console.error('Failed to auto-refresh inventory and user data:', error);
           }
         }, 2000);
       } else {

@@ -76,9 +76,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         // Воспроизводим звуки результата
         if (game.result === 'win') {
           soundManager.play('win');
-          console.log('TicTacToeGame: Победа! Окно закроется через 2 секунды.');
-
-          // Автоматически закрываем окно через 2 секунды при победе
           setTimeout(() => {
             if (onRewardReceived) {
               onRewardReceived();
@@ -89,7 +86,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           soundManager.play('gameOver');
         } else if (game.result === 'draw') {
           soundManager.play('draw');
-          console.log('TicTacToeGame: Ничья!');
         }
       }, 1500); // Задержка 1.5 секунды для всех результатов при загрузке
     }
@@ -149,9 +145,6 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             // Звуки результата
             if (result.game?.result === 'win') {
               soundManager.play('win');
-              console.log('TicTacToeGame: Победа! Окно закроется через 2 секунды.');
-
-              // Автоматически закрываем окно через 2 секунды при победе
               setTimeout(() => {
                 if (onRewardReceived) {
                   onRewardReceived();
@@ -160,12 +153,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
               }, 2000);
             } else if (result.game?.result === 'lose') {
               soundManager.play('gameOver');
-              console.log('TicTacToeGame: Результат игры:', result.game?.result);
             } else if (result.game?.result === 'draw') {
               soundManager.play('draw');
-              console.log('TicTacToeGame: Ничья!');
-            } else {
-              console.log('TicTacToeGame: Результат игры:', result.game?.result);
             }
           }, 1500); // Задержка 1.5 секунды для всех результатов
         }

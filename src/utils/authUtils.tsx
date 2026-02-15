@@ -32,10 +32,7 @@ export const performFullLogout = (dispatch: AppDispatch) => {
     // Очищаем sessionStorage полностью
     sessionStorage.clear();
 
-    console.log('Full logout completed - all user data cleared');
-
-  } catch (error) {
-    console.error('Error during full logout:', error);
+  } catch {
     // В случае ошибки все равно выполняем базовый logout
     dispatch(logout());
   }
@@ -60,8 +57,8 @@ export const cleanupExpiredData = () => {
         localStorage.removeItem(key);
       }
     });
-  } catch (error) {
-    console.error('Error cleaning up expired data:', error);
+  } catch {
+    // cleanup failed
   }
 };
 
@@ -78,7 +75,7 @@ export const cacheUserData = (user: any, remember = false) => {
         notifications: user.notificationSettings
       }));
     }
-  } catch (error) {
-    console.error('Error caching user data:', error);
+  } catch {
+    // cache failed
   }
 };

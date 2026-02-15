@@ -73,11 +73,9 @@ export const casesApi = baseApi.injectEndpoints({
               // Импортируем action напрямую
               const { updateBalance } = await import('../../features/auth/authSlice');
               dispatch(updateBalance(newBalance));
-              console.log('Баланс обновлен после покупки кейса:', newBalance);
             }
           }
         } catch (error) {
-          console.error('Ошибка при обновлении баланса после покупки:', error);
         }
       },
     }),
@@ -107,7 +105,6 @@ export const casesApi = baseApi.injectEndpoints({
             // Импортируем action напрямую
             const { updateBalance } = await import('../../features/auth/authSlice');
             dispatch(updateBalance(data.data.new_balance));
-            console.log('Баланс обновлен после открытия кейса:', data.data.new_balance);
           }
 
           // Принудительно инвалидируем все связанные кеши
@@ -115,7 +112,6 @@ export const casesApi = baseApi.injectEndpoints({
             casesApi.util.invalidateTags(['Inventory', 'Balance', 'User'])
           );
         } catch (error) {
-          console.error('Ошибка при обновлении баланса после открытия:', error);
         }
       },
     }),

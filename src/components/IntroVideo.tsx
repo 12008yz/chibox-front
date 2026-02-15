@@ -111,7 +111,6 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ isOpen, onVideoEnd, videoUrl })
     return null;
   }
 
-  console.log('[IntroVideo] Rendering video player, isVideoReady:', isVideoReady);
 
   return (
     <div

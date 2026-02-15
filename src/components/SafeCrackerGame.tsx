@@ -172,7 +172,6 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
       refetchStatus();
 
     } catch (err: any) {
-      console.error('Ошибка Safe Cracker:', err);
       toast.error(err.data?.message || 'Произошла ошибка');
       setIsSpinning(false);
     }

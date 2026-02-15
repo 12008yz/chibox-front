@@ -39,7 +39,6 @@ const baseQueryWithRetry: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuer
 
     while (retries < maxRetries && (result.error.status === 'FETCH_ERROR' || result.error.status === 'TIMEOUT_ERROR')) {
       retries++;
-      console.log(`Retry attempt ${retries}/${maxRetries}...`);
       await new Promise(resolve => setTimeout(resolve, 1000 * retries)); // Exponential backoff
       result = await baseQuery(args, api, extraOptions);
 
@@ -80,11 +79,8 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
 
     // Если пользователь не авторизован, не пытаемся обновить токен
     if (!isAuthenticated) {
-      console.log('❌ Пользователь не авторизован, пропускаем обновление токена');
       return result;
     }
-
-    console.log('401 Unauthorized error, trying to refresh token...');
 
     // Если уже происходит обновление токена, ждем его завершения
     if (isRefreshing && refreshPromise) {
@@ -112,20 +108,15 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
         );
 
         if (refreshResult.data && typeof refreshResult.data === 'object' && 'success' in refreshResult.data && (refreshResult.data as any).success) {
-          console.log('✅ Токен успешно обновлен (новые токены в httpOnly cookies)');
-
           // НЕ обновляем токен в Redux - его там нет и не должно быть
           // Токены ТОЛЬКО в httpOnly cookies
 
           // Повторяем оригинальный запрос с новым токеном (из cookie)
           result = await baseQueryWithRetry(args, api, extraOptions);
         } else {
-          // Не удалось обновить токен - выходим
-          console.log('❌ Не удалось обновить токен, делаем logout');
           api.dispatch({ type: 'auth/logout' });
         }
-      } catch (refreshError) {
-        console.error('Ошибка при обновлении токена:', refreshError);
+      } catch {
         api.dispatch({ type: 'auth/logout' });
       } finally {
         isRefreshing = false;
@@ -134,11 +125,6 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
     })();
 
     await refreshPromise;
-  }
-
-  // Логируем сетевые ошибки
-  if (result.error?.status === 'FETCH_ERROR' || result.error?.status === 'TIMEOUT_ERROR') {
-    console.error('Network error:', result.error);
   }
 
   return result;

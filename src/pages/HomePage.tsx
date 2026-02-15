@@ -191,7 +191,6 @@ const HomePage: React.FC = () => {
       // Обновляем данные пользователя
       refetchUser();
     } catch (err) {
-      console.error('Failed to update trade URL:', err);
     }
   };
 

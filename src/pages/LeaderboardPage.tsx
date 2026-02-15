@@ -87,7 +87,6 @@ const LeaderboardPage: React.FC = () => {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('leaderboard_page.data_error'));
-      console.error('Ошибка загрузки лидерборда:', err);
     } finally {
       setLoading(false);
     }

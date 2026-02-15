@@ -78,8 +78,8 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
           handleCompleteGame(result.data.game.id, true);
         }, 5000);
       }
-    } catch (error: any) {
-      console.error('Ошибка создания игры:', error);
+    } catch {
+      // creation failed
     }
   };
 
@@ -113,8 +113,8 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
 
         refetchStatus();
       }
-    } catch (error: any) {
-      console.error('Ошибка завершения игры:', error);
+    } catch {
+      // finish failed
     }
   };
 

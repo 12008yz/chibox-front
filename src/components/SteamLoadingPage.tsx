@@ -6,8 +6,6 @@ const SteamLoadingPage: React.FC = () => {
     const serverUrl = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
     const steamUrl = `${serverUrl}/v1/auth/steam`;
 
-    console.log('SteamLoadingPage: Redirecting to Steam in 100ms...');
-
     // Минимальная задержка только для показа экрана
     const timer = setTimeout(() => {
       window.location.href = steamUrl;
