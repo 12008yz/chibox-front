@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import CaseWithDrop from '../../../../components/CaseWithDrop';
@@ -7,7 +7,7 @@ import { getRarityColor, getRarityName } from '../../utils/profileUtils';
 import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../../../../utils/steamImageUtils';
 import { isUserItem, isUserCase, type InventoryTab } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
-import { useCancelWithdrawalMutation } from '../../../../features/user/userApi';
+import { useCancelWithdrawalMutation, useCheckWithdrawalStatusesMutation } from '../../../../features/user/userApi';
 import { getApiErrorMessage } from '../../../../utils/config';
 
 interface InventoryContentProps {
@@ -35,7 +35,27 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
 }) => {
   const { t } = useTranslation();
   const [cancelWithdrawal] = useCancelWithdrawalMutation();
+  const [checkWithdrawalStatuses] = useCheckWithdrawalStatusesMutation();
   const [cancellingIds, setCancellingIds] = useState<Set<string>>(new Set());
+  const withdrawnTabCheckDone = useRef(false);
+
+  // При открытии вкладки «Выведенные» проверяем в Steam, принят ли трейд — чтобы сразу показать «Успешно»
+  useEffect(() => {
+    if (activeTab !== 'withdrawn') {
+      withdrawnTabCheckDone.current = false;
+      return;
+    }
+    if (withdrawnTabCheckDone.current) return;
+    withdrawnTabCheckDone.current = true;
+    checkWithdrawalStatuses()
+      .unwrap()
+      .then((res) => {
+        if (res?.updated && res.updated > 0) {
+          onInventoryRefresh();
+        }
+      })
+      .catch(() => {});
+  }, [activeTab, checkWithdrawalStatuses, onInventoryRefresh]);
 
 
   // Функция для показа уведомлений
@@ -172,12 +192,12 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
               <div className="absolute top-2 left-2 z-30">
                 <div className={`text-xs px-2 py-1 rounded-full text-white font-semibold ${
                   activeTab === 'withdrawn' ?
-                    (inventoryItem.status === 'pending_withdrawal' ? 'bg-orange-500' : 'bg-purple-500') :
+                    (inventoryItem.status === 'pending_withdrawal' ? 'bg-orange-500' : 'bg-green-600') :
                   activeTab === 'sold' ? 'bg-yellow-500' :
                   'bg-orange-500'
                 }`}>
                   {activeTab === 'withdrawn' ?
-                    (inventoryItem.status === 'pending_withdrawal' ? t('profile.status_pending_withdrawal') : t('profile.status_withdrawn')) :
+                    (inventoryItem.status === 'pending_withdrawal' ? t('profile.status_pending_withdrawal') : t('profile.status_withdrawal_success')) :
                    activeTab === 'sold' ? t('profile.status_sold') :
                    t('profile.status_opened')}
                 </div>

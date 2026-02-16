@@ -194,6 +194,7 @@
     "open_button": "Abrir",
     "status_pending_withdrawal": "Retiro Pendiente",
     "status_withdrawn": "Retirado",
+    "status_withdrawal_success": "Exitoso",
     "status_sold": "Vendido",
     "status_opened": "Abierto",
     "item_withdraw_success": "¡Objeto \"{{itemName}}\" enviado exitosamente para retiro!",

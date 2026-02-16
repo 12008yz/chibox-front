@@ -131,6 +131,18 @@ export const userApi = baseApi.injectEndpoints({
       },
     }),
 
+    // Проверка статусов отправленных выводов (принят ли трейд в Steam) — обновляет заявки без ожидания крона
+    checkWithdrawalStatuses: builder.mutation<
+      ApiResponse<{ updated: number }>,
+      void
+    >({
+      query: () => ({
+        url: 'v1/withdrawals/check-status',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Inventory', 'User'],
+    }),
+
     // Отмена вывода предмета
     cancelWithdrawal: builder.mutation<
       ApiResponse<{ withdrawal_id: string; status: string }>,
@@ -966,6 +978,7 @@ export const {
   useSellItemMutation,
   useWithdrawItemMutation,
   useCancelWithdrawalMutation,
+  useCheckWithdrawalStatusesMutation,
   useGetUserAchievementsQuery,
   useGetAchievementsProgressQuery,
   useGetUserMissionsQuery,

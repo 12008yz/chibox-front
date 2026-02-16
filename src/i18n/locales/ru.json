@@ -207,6 +207,7 @@
     "open_button": "Открыть",
     "status_pending_withdrawal": "Ожидает отправки",
     "status_withdrawn": "Выведен",
+    "status_withdrawal_success": "Успешно",
     "status_sold": "Продан",
     "status_opened": "Открыт",
     "item_withdraw_success": "Предмет \"{{itemName}}\" успешно отправлен на вывод!",

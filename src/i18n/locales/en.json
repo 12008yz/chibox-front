@@ -202,6 +202,7 @@
     "open_button": "Open",
     "status_pending_withdrawal": "Pending Withdrawal",
     "status_withdrawn": "Withdrawn",
+    "status_withdrawal_success": "Successful",
     "status_sold": "Sold",
     "status_opened": "Opened",
     "item_withdraw_success": "Item \"{{itemName}}\" successfully sent for withdrawal!",

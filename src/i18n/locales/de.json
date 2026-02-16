@@ -194,6 +194,7 @@
     "open_button": "Öffnen",
     "status_pending_withdrawal": "Abhebung ausstehend",
     "status_withdrawn": "Abgehoben",
+    "status_withdrawal_success": "Erfolgreich",
     "status_sold": "Verkauft",
     "status_opened": "Geöffnet",
     "item_withdraw_success": "Gegenstand \"{{itemName}}\" erfolgreich zur Abhebung gesendet!",

@@ -226,6 +226,7 @@
     "open_button": "開く",
     "status_pending_withdrawal": "引き出し待ち",
     "status_withdrawn": "引き出し済み",
+    "status_withdrawal_success": "成功",
     "status_sold": "売却済み",
     "status_opened": "開封済み",
     "item_withdraw_success": "アイテム \"{{itemName}}\" が正常に引き出しに送信されました！",

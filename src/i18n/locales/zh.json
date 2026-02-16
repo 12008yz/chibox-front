@@ -194,6 +194,7 @@
     "open_button": "开启",
     "status_pending_withdrawal": "待提取",
     "status_withdrawn": "已提取",
+    "status_withdrawal_success": "成功",
     "status_sold": "已出售",
     "status_opened": "已开启",
     "item_withdraw_success": "物品\"{{itemName}}\"成功发送提取！",
