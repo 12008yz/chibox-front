@@ -541,6 +541,8 @@ export interface TopUpBalanceRequest {
   payment_method?: string;
   /** Для Unitpay: 'card' | 'sbp' — сразу открывает форму с выбранным способом */
   unitpay_system?: string;
+  /** Промокод на бонус к пополнению (DEPOSIT5, DEPOSIT10, DEPOSIT15) — бонус % применится после оплаты */
+  promo_code?: string;
 }
 
 export interface TopUpBalanceResponse {
