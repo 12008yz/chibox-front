@@ -98,6 +98,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
       ApiResponse<{
         has_active_subscription: boolean;
         can_claim: boolean;
+        has_subscription_case_in_inventory: boolean;
         subscription_tier: number;
         next_available_time: string | null;
         time_remaining: string | null;
@@ -106,7 +107,7 @@ export const subscriptionsApi = baseApi.injectEndpoints({
       void
     >({
       query: () => 'v1/subscription/case-status',
-      providesTags: ['Subscription', 'Cases'],
+      providesTags: ['Subscription', 'Cases', 'Inventory'],
     }),
 
     // Получение ежедневных кейсов подписки

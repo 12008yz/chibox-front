@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
+import { useGetSubscriptionCaseStatusQuery } from '../features/subscriptions/subscriptionsApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import { useUpdateProfileMutation } from '../features/auth/authApi';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
@@ -43,6 +44,12 @@ const HomePage: React.FC = () => {
   // Получаем статус бесплатного кейса для новых пользователей
   const { data: freeCaseStatus, refetch: refetchFreeCaseStatus } = useGetFreeCaseStatusQuery(undefined, {
     skip: !userData?.id, // Пропускаем если пользователь не авторизован
+    refetchOnMountOrArgChange: true,
+  });
+
+  // Статус ежедневного кейса подписки (есть ли кейс в инвентаре — скрываем таймер и даём открыть)
+  const { data: subscriptionCaseStatus } = useGetSubscriptionCaseStatusQuery(undefined, {
+    skip: !userData?.id,
     refetchOnMountOrArgChange: true,
   });
 
@@ -409,6 +416,7 @@ const HomePage: React.FC = () => {
 
                   const subscriptionCases = getSubscriptionCases();
                   const hasActiveSubscription = userSubscriptionTier > 0 && subscriptionDaysLeft > 0;
+                  const hasSubscriptionCaseInInventory = subscriptionCaseStatus?.data?.has_subscription_case_in_inventory === true;
 
                   // Определяем название и описание секции
                   const getSectionTitle = () => {
@@ -443,7 +451,7 @@ const HomePage: React.FC = () => {
                             description={getSectionDescription()}
                             cases={subscriptionCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
-                            nextCaseAvailableTime={nextCaseAvailableTime}
+                            nextCaseAvailableTime={hasSubscriptionCaseInInventory ? undefined : nextCaseAvailableTime}
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             freeCaseStatus={freeCaseStatus?.data}
