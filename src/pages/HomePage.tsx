@@ -451,7 +451,8 @@ const HomePage: React.FC = () => {
                             description={getSectionDescription()}
                             cases={subscriptionCases}
                             onBuyAndOpenCase={handleBuyAndOpenCase}
-                            nextCaseAvailableTime={hasSubscriptionCaseInInventory ? undefined : nextCaseAvailableTime}
+                            nextCaseAvailableTime={nextCaseAvailableTime}
+                            hideSubscriptionDailyCaseTimer={hasSubscriptionCaseInInventory}
                             onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             freeCaseStatus={freeCaseStatus?.data}

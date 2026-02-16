@@ -14,6 +14,8 @@ interface CaseListingProps {
   onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<any>;
   fixedPrices?: boolean;
   nextCaseAvailableTime?: string;
+  /** Если true, у ежедневного подписного кейса (не бонусного) не показываем таймер — кейс доступен для открытия */
+  hideSubscriptionDailyCaseTimer?: boolean;
   onDataUpdate?: () => void;
   onPlayBonusGame?: (caseTemplate: CaseTemplate) => void;
   freeCaseStatus?: {
@@ -37,6 +39,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
   onBuyAndOpenCase,
   fixedPrices = false,
   nextCaseAvailableTime,
+  hideSubscriptionDailyCaseTimer = false,
   onDataUpdate,
   onPlayBonusGame,
   freeCaseStatus,
@@ -99,10 +102,12 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
               // Проверяем, является ли это кейсом крестиков-ноликов (бонусный кейс)
               const isTicTacToeCase = isBonusCase;
-              // Используем next_available_time из каждого кейса, если он есть
+              // Если есть подписной кейс в инвентаре — не показываем таймер у ежедневного подписного кейса (не бонуса)
               const caseNextAvailableTime = isFreeCase && freeCaseStatus
                 ? freeCaseStatus.nextAvailableTime
-                : (caseItem.next_available_time || nextCaseAvailableTime);
+                : (hideSubscriptionDailyCaseTimer && !isBonusCase
+                    ? undefined
+                    : (caseItem.next_available_time || nextCaseAvailableTime));
 
               if (isBonusCase) {
                 // Для бонусного кейса не используем Link, чтобы кнопка "Играть" работала
