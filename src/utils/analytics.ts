@@ -1,4 +1,11 @@
 // Утилита для работы с аналитикой (Google Analytics и Яндекс.Метрика)
+//
+// Подключение Яндекс.Метрики:
+// 1. Создайте счётчик на https://metrika.yandex.ru
+// 2. В .env или .env.production добавьте: VITE_YANDEX_METRIKA_ID=XXXXXXXX (номер счётчика)
+// 3. При сборке/запуске аналитика инициализируется автоматически.
+//
+// События: trackEvent('goal_name', { param: 'value' }) или trackYMEvent / trackGAEvent
 
 declare global {
    interface Window {
@@ -100,17 +107,22 @@ declare global {
    }
  };
  
- // Инициализация всей аналитики
+// Инициализация всей аналитики
  export const initAnalytics = () => {
    const gaId = import.meta.env.VITE_GA_MEASUREMENT_ID;
    const ymId = import.meta.env.VITE_YANDEX_METRIKA_ID;
- 
+
    if (gaId) {
      initGoogleAnalytics(gaId);
    }
- 
+
    if (ymId) {
      initYandexMetrika(ymId);
+     if (import.meta.env.DEV) {
+       console.log('[Яндекс.Метрика] Инициализирован счётчик:', ymId);
+     }
+   } else if (import.meta.env.DEV) {
+     console.warn('[Яндекс.Метрика] Не найден VITE_YANDEX_METRIKA_ID в .env — перезапустите dev-сервер (npm run dev)');
    }
  };
  

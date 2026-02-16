@@ -9,6 +9,10 @@ import "./i18n";
 import App from "./App.tsx";
 // Импортируем утилиту очистки данных (будет доступна в консоли как window.clearAllAuthData)
 import "./utils/clearAllAuth";
+import { initAnalytics } from "./utils/analytics";
+
+// Подключаем Яндекс.Метрику / Google Analytics при наличии ID в переменных окружения
+initAnalytics();
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
