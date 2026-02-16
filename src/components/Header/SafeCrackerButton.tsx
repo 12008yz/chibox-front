@@ -26,7 +26,7 @@ const SafeCrackerButton = () => {
         className={`
           relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 xl:w-14 xl:h-14 rounded-lg font-medium transition-all duration-300 p-1
           ${canPlay
-            ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg hover:shadow-yellow-500/50 hover:scale-105 active:scale-95'
+            ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white hover:scale-105 active:scale-95'
             : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'
           }
         `}
