@@ -37,11 +37,16 @@ declare global {
    });
  };
  
- // Яндекс.Метрика
+ // Яндекс.Метрика (по рекомендации Яндекса: tag.js с id, init с referrer/url, noscript-пиксель)
+ const YM_SCRIPT_BASE = "https://mc.yandex.ru/metrika/tag.js";
+
  export const initYandexMetrika = (counterId: string) => {
    if (!counterId) return;
- 
-   // Добавляем скрипт Яндекс.Метрики
+
+   const id = Number(counterId);
+   const scriptUrl = `${YM_SCRIPT_BASE}?id=${counterId}`;
+
+   // Официальный сниппет: очередь ym и загрузка tag.js с id в URL
    (function(m,e,t,r,i,k,a){
      // @ts-expect-error - Yandex Metrika snippet
      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -50,15 +55,41 @@ declare global {
      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
      // @ts-expect-error - Yandex Metrika snippet
      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-   })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
- 
-   window.ym?.(Number(counterId), "init", {
+   })(window, document, "script", scriptUrl, "ym");
+
+   // Инициализация как в официальном коде: referrer, url, остальные опции
+   window.ym?.(id, "init", {
      clickmap: true,
      trackLinks: true,
      accurateTrackBounce: true,
      webvisor: true,
      trackHash: true,
+     referrer: document.referrer,
+     url: location.href,
    });
+
+   // Noscript-пиксель для пользователей без JavaScript (как в рекомендации Яндекса)
+   if (typeof document !== "undefined" && document.body) {
+     const noscript = document.createElement("noscript");
+     const div = document.createElement("div");
+     const img = document.createElement("img");
+     img.src = `https://mc.yandex.ru/watch/${counterId}`;
+     img.style.cssText = "position:absolute; left:-9999px;";
+     img.alt = "";
+     div.appendChild(img);
+     noscript.appendChild(div);
+     document.body.appendChild(noscript);
+   }
+
+   // Если скрипт не загрузился (499/блокировщик) — в dev выводим подсказку
+   const ymScript = document.querySelector<HTMLScriptElement>(`script[src*="mc.yandex.ru/metrika/tag.js"]`);
+   if (ymScript) {
+     ymScript.onerror = () => {
+       if (import.meta.env.DEV) {
+         console.info("[Яндекс.Метрика] Скрипт не загружен (возможна блокировка расширением). На продакшене у пользователей без блокировщика всё работает.");
+       }
+     };
+   }
  };
  
  // Отправка события в Google Analytics
