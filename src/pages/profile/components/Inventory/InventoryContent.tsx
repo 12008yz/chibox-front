@@ -50,7 +50,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
     checkWithdrawalStatuses()
       .unwrap()
       .then((res) => {
-        if (res?.updated && res.updated > 0) {
+        if (res?.data?.updated != null && res.data.updated > 0) {
           onInventoryRefresh();
         }
       })
