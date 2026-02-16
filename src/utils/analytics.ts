@@ -37,16 +37,15 @@ declare global {
    });
  };
  
- // Яндекс.Метрика (по рекомендации Яндекса: tag.js с id, init с referrer/url, noscript-пиксель)
- const YM_SCRIPT_BASE = "https://mc.yandex.ru/metrika/tag.js";
+ // Яндекс.Метрика (скрипт без ?id= — с id в URL сервер может отдать gif вместо JS)
+ const YM_SCRIPT_URL = "https://mc.yandex.ru/metrika/tag.js";
 
  export const initYandexMetrika = (counterId: string) => {
    if (!counterId) return;
 
    const id = Number(counterId);
-   const scriptUrl = `${YM_SCRIPT_BASE}?id=${counterId}`;
 
-   // Официальный сниппет: очередь ym и загрузка tag.js с id в URL
+   // Очередь ym и загрузка tag.js (без query: id передаётся в ym(id, 'init', ...))
    (function(m,e,t,r,i,k,a){
      // @ts-expect-error - Yandex Metrika snippet
      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -55,7 +54,7 @@ declare global {
      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
      // @ts-expect-error - Yandex Metrika snippet
      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-   })(window, document, "script", scriptUrl, "ym");
+   })(window, document, "script", YM_SCRIPT_URL, "ym");
 
    // Инициализация как в официальном коде: referrer, url, остальные опции
    window.ym?.(id, "init", {
