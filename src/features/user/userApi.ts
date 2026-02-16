@@ -255,6 +255,16 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ['Transactions'],
     }),
 
+    // История пополнений и покупок статусов
+    getPaymentHistory: builder.query<
+      ApiResponse<{ items: Array<{ id: string; purpose: 'deposit' | 'subscription'; amount: number; description: string; completed_at: string | null }> }>,
+      { limit?: number }
+    >({
+      query: ({ limit = 15 } = {}) =>
+        `v1/balance/payment-history?limit=${limit}`,
+      providesTags: ['Transactions', 'Balance'],
+    }),
+
     // Получение статистики пользователя
     getUserStatistics: builder.query<ApiResponse<any>, void>({
       query: () => 'v1/statistics',
@@ -987,6 +997,7 @@ export const {
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
   useGetUserTransactionsQuery,
+  useGetPaymentHistoryQuery,
   useGetUserStatisticsQuery,
   useGetGlobalStatisticsQuery,
   useGetUserSubscriptionQuery,

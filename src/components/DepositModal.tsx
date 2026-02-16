@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Wallet, Lock, Crown } from 'lucide-react';
+import { X, Wallet, Lock, Crown, History } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useTopUpBalanceMutation, useApplyPromoCodeMutation } from '../features/user/userApi';
+import { useTopUpBalanceMutation, useApplyPromoCodeMutation, useGetPaymentHistoryQuery } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
 import { ReceivedIcon } from './icons';
@@ -68,6 +68,32 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
   const { data: subscriptionTiersData } = useGetSubscriptionTiersQuery();
   const subscriptionTiers = subscriptionTiersData?.data || [];
+
+  const { data: paymentHistoryData } = useGetPaymentHistoryQuery(
+    { limit: 50 },
+    { skip: !isOpen }
+  );
+  const paymentHistory = paymentHistoryData?.success ? paymentHistoryData.data?.items ?? [] : [];
+  const previewCount = 8;
+  const paymentHistoryPreview = paymentHistory.slice(0, previewCount);
+  const hasMoreHistory = paymentHistory.length > previewCount;
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+
+  const renderHistoryRow = (item: { id: string; purpose: string; amount: number; description: string; completed_at: string | null }) => {
+    const date = item.completed_at
+      ? new Date(item.completed_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+      : '—';
+    const isSubscription = item.purpose === 'subscription';
+    return (
+      <div key={item.id} className="flex items-center justify-between text-xs py-1.5 px-2 rounded bg-gray-800/40">
+        <span className="text-gray-500 shrink-0 w-20">{date}</span>
+        <span className={`truncate mx-1 min-w-0 ${isSubscription ? 'text-amber-400/90' : 'text-emerald-400/90'}`}>{item.description}</span>
+        {isSubscription && <span className="text-gray-500 shrink-0"><Monetary value={item.amount} /></span>}
+      </div>
+    );
+  };
+
+  const historyListClassName = 'max-h-32 overflow-y-auto overflow-x-hidden space-y-1 pr-1 rounded';
 
   useEffect(() => {
     if (initialSelectedSubscription !== undefined) {
@@ -428,6 +454,31 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                       Оплата через: <span className="text-gray-300 font-medium">{selectedPaymentMethod.name}</span>
                     </div>
                   )}
+                  {/* История — мобильная версия */}
+                  <div className="border-t border-gray-700/30 pt-4 mt-2">
+                    <div className="flex items-center justify-between gap-2 text-gray-400 text-xs font-medium mb-2">
+                      <div className="flex items-center gap-2">
+                        <History className="w-3.5 h-3.5" />
+                        <span>История</span>
+                      </div>
+                      {hasMoreHistory && (
+                        <button
+                          type="button"
+                          onClick={() => setHistoryModalOpen(true)}
+                          className="text-amber-400/90 hover:text-amber-400 text-xs font-medium"
+                        >
+                          Вся история ({paymentHistory.length})
+                        </button>
+                      )}
+                    </div>
+                    <div className={historyListClassName}>
+                      {paymentHistoryPreview.length === 0 ? (
+                        <p className="text-xs text-gray-500 py-1">Пока нет операций</p>
+                      ) : (
+                        paymentHistoryPreview.map(renderHistoryRow)
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -561,6 +612,31 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   <div className="text-center text-xs text-gray-500 pt-2">
                     Оплата через: <span className="text-gray-300 font-medium">{selectedPaymentMethod?.name || 'Не выбрано'}</span>
                   </div>
+                  {/* История — в правой колонке, скролл при большом списке */}
+                  <div className="border-t border-gray-700/50 pt-4 mt-2">
+                    <div className="flex items-center justify-between gap-2 text-gray-400 text-xs font-medium mb-2">
+                      <div className="flex items-center gap-2">
+                        <History className="w-3.5 h-3.5" />
+                        <span>История</span>
+                      </div>
+                      {hasMoreHistory && (
+                        <button
+                          type="button"
+                          onClick={() => setHistoryModalOpen(true)}
+                          className="text-amber-400/90 hover:text-amber-400 text-xs font-medium shrink-0"
+                        >
+                          Вся история ({paymentHistory.length})
+                        </button>
+                      )}
+                    </div>
+                    <div className={historyListClassName}>
+                      {paymentHistoryPreview.length === 0 ? (
+                        <p className="text-xs text-gray-500 py-1">Пока нет операций</p>
+                      ) : (
+                        paymentHistoryPreview.map(renderHistoryRow)
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
@@ -670,10 +746,65 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                   </button>
                 </div>
               )}
+
+              {/* История на вкладке VIP */}
+              <div className="mt-6 pt-4 border-t border-gray-700/30">
+                <div className="flex items-center justify-between gap-2 text-gray-400 text-xs font-medium mb-2">
+                  <div className="flex items-center gap-2">
+                    <History className="w-3.5 h-3.5" />
+                    <span>История</span>
+                  </div>
+                  {hasMoreHistory && (
+                    <button
+                      type="button"
+                      onClick={() => setHistoryModalOpen(true)}
+                      className="text-amber-400/90 hover:text-amber-400 text-xs font-medium"
+                    >
+                      Вся история ({paymentHistory.length})
+                    </button>
+                  )}
+                </div>
+                <div className={historyListClassName}>
+                  {paymentHistoryPreview.length === 0 ? (
+                    <p className="text-xs text-gray-500 py-1">Пока нет операций</p>
+                  ) : (
+                    paymentHistoryPreview.map(renderHistoryRow)
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Модальное окно «Вся история» */}
+      {historyModalOpen && (
+        <div data-no-click-sound className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setHistoryModalOpen(false)} />
+          <div data-no-click-sound className="relative bg-[#1a1f2e] rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden border border-gray-700/30 shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-gray-700/20">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <History className="w-5 h-5 text-gray-400" />
+                Вся история
+              </h3>
+              <button
+                type="button"
+                onClick={() => setHistoryModalOpen(false)}
+                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[calc(80vh-80px)] space-y-1.5 pr-2">
+              {paymentHistory.length === 0 ? (
+                <p className="text-sm text-gray-500 py-4 text-center">Пока нет операций</p>
+              ) : (
+                paymentHistory.map(renderHistoryRow)
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
