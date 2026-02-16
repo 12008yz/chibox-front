@@ -30,6 +30,17 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [depositModalInitialTab, setDepositModalInitialTab] = useState<'balance' | 'subscription'>('balance');
+
+  // Открытие модалки пополнения из других мест (например, из превью кейса — «Купить статус»)
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription' }>) => {
+      setDepositModalInitialTab(e.detail?.tab || 'balance');
+      setIsDepositModalOpen(true);
+    };
+    window.addEventListener('openDepositModal', handler as EventListener);
+    return () => window.removeEventListener('openDepositModal', handler as EventListener);
+  }, []);
 
   // Получаем количество непрочитанных уведомлений
   // Polling отключен, т.к. обновления приходят через WebSocket в реальном времени
@@ -96,6 +107,7 @@ const RightContent: React.FC<RightContentProps> = ({
           <button
             id="onboarding-deposit-button"
             onClick={() => {
+              setDepositModalInitialTab('balance');
               setIsDepositModalOpen(true);
             }}
             className="gaming-balance-add-button group"
@@ -175,6 +187,7 @@ const RightContent: React.FC<RightContentProps> = ({
       <DepositModal
         isOpen={isDepositModalOpen}
         onClose={() => setIsDepositModalOpen(false)}
+        initialTab={depositModalInitialTab}
       />
     </div>
   );

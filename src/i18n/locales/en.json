@@ -905,6 +905,8 @@
     "open": "Open",
     "buy_and_open": "Buy and Open",
     "open_case": "Open Case",
+    "buy_status_link": "Buy status",
+    "status_required_short": "Status required",
     "buying": "Buying...",
     "opening": "Opening...",
     "going_to_payment": "Going to payment...",

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { throttle } from 'lodash-es';
 import toast from 'react-hot-toast';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../../features/cases/casesApi';
+import { useBuySubscriptionMutation } from '../../features/subscriptions/subscriptionsApi';
 import { CaseTemplate } from '../../types/api';
 import { useUserData } from '../../hooks/useUserData';
 import { CaseItem } from './components/CaseItem';
@@ -61,6 +62,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
+  const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
   // Функция для получения цены кейса
   const getCasePrice = useCallback((caseData: CaseTemplate): number => {
@@ -69,6 +71,27 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
   }, [statusData]);
+
+  // Покупка статуса с переходом сразу на страницу оплаты (tier 1/2/3)
+  const handleBuyStatusClick = useCallback(async (tier: number) => {
+    try {
+      const result = await buySubscription({
+        tierId: tier,
+        method: 'bank_card',
+        paymentMethod: 'unitpay',
+      }).unwrap();
+      if (result?.data?.paymentUrl) {
+        onClose();
+        window.location.href = result.data.paymentUrl;
+      } else if (result?.success) {
+        toast.success('Статус активирован');
+        onClose();
+        if (onDataUpdate) setTimeout(() => onDataUpdate(), 100);
+      }
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Ошибка при создании платежа'));
+    }
+  }, [buySubscription, onClose, onDataUpdate]);
 
   // Проверяем авторизацию пользователя
   useEffect(() => {
@@ -683,6 +706,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           handleOpenCase={handleOpenCase}
           getCasePrice={getCasePrice}
           t={t}
+          onBuyStatusClick={handleBuyStatusClick}
+          buyStatusLoading={buySubscriptionLoading}
         />
       </div>
     </div>

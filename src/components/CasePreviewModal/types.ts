@@ -66,6 +66,9 @@ export interface ModalFooterProps {
   handleOpenCase: (caseId?: string, inventoryItemId?: string) => void;
   getCasePrice: (caseData: CaseTemplate) => number;
   t: (key: string, options?: any) => string;
+  /** При клике «Купить статус» — вызывается с требуемым tier (1/2/3); при отсутствии открывается модалка пополнения */
+  onBuyStatusClick?: (tier: number) => void | Promise<void>;
+  buyStatusLoading?: boolean;
 }
 
 export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped';

@@ -16,26 +16,39 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   handleBuyCase,
   handleOpenCase,
   getCasePrice,
-  t
+  t,
+  onBuyStatusClick,
+  buyStatusLoading = false
 }) => {
+  const subscriptionBlocked = statusData?.data && !statusLoading && statusData.data.subscriptionRequired && !statusData.data.canOpen && !statusData.data.canBuy;
+  const requiredTier = statusData?.data?.minSubscriptionTier ?? 1;
+
+  const handleBuyStatus = () => {
+    if (buyStatusLoading) return;
+    if (onBuyStatusClick) {
+      Promise.resolve(onBuyStatusClick(requiredTier)).catch(() => {});
+    } else {
+      window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription', tier: requiredTier } }));
+      handleClose();
+    }
+  };
+
   return (
     <div className="flex-shrink-0 p-3 sm:p-4 md:p-6 border-t border-gray-700 bg-[#1a1629]">
-      <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
-        {statusData?.data && !statusLoading && (
-          <div>
-            {statusData.data.reason && !statusData.data.canOpen && !statusData.data.canBuy && (
-              <span className="text-red-400">{statusData.data.reason}</span>
-            )}
-            {statusData.data.subscriptionRequired && (
-              <div className="mt-1">
-                {t('case_preview_modal.subscription_required', { tier: statusData.data.minSubscriptionTier })}
-                <br />
-                {t('case_preview_modal.your_level', { level: statusData.data.userSubscriptionTier })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Текст о требуемом статусе — только когда статуса нет */}
+      {subscriptionBlocked && (
+        <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+          <div>{t('case_preview_modal.status_required_short', 'Требуется статус')}</div>
+          <button
+            type="button"
+            onClick={handleBuyStatus}
+            disabled={buyStatusLoading}
+            className="mt-2 text-amber-400 hover:text-amber-300 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {buyStatusLoading ? t('case_preview_modal.going_to_payment', 'Переход к оплате...') : t('case_preview_modal.buy_status_link', 'Купить статус')}
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-between items-stretch sm:items-center">
         <button

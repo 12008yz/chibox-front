@@ -925,6 +925,8 @@
   "case_preview_modal": {
     "opening": "Открытие...",
     "open_case": "Открыть кейс",
+    "buy_status_link": "Купить статус",
+    "status_required_short": "Требуется статус",
     "subscription_required": "Требуется статус уровня {{tier}}+",
     "your_level": "Ваш уровень: {{level}}",
     "free_case": "Бесплатный кейс",
