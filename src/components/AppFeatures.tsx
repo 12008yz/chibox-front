@@ -31,7 +31,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
     {
       id: 1,
       name: 'Статус',
-      price: 10,
+      price: 1911,
       days: 30,
       bonus_percentage: 2.0,
       max_daily_cases: 1,
@@ -52,7 +52,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
     {
       id: 2,
       name: 'Статус+',
-      price: 10,
+      price: 3499,
       days: 30,
       bonus_percentage: 3.0,
       max_daily_cases: 1,
@@ -74,7 +74,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
     {
       id: 3,
       name: 'Статус++',
-      price: 10,
+      price: 6310,
       days: 30,
       bonus_percentage: 5.0,
       max_daily_cases: 1,
