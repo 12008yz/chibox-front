@@ -57,6 +57,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const animationTimoutsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех таймаутов анимации
   const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
+  const scrollLockRef = useRef<number | null>(null); // Позиция скролла при открытии модалки (для восстановления)
 
   // Мобильная/планшетная версия: горизонтальный скролл + центральный квадрат (breakpoint lg 1024px)
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
@@ -128,7 +129,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowGoldenSparks(false);
       setShowWinEffects(false);
       setShouldStopBetween(false);
+      // Полная блокировка скролла фона: html, body и фиксация позиции (надёжно на мобиле)
+      const scrollY = window.scrollY;
+      scrollLockRef.current = scrollY;
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.touchAction = 'none';
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -137,12 +148,24 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowOpeningAnimation(false);
       setAnimationPhase('idle');
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
-      // Очищаем все таймауты и интервалы анимации при закрытии
       animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
       animationTimoutsRef.current = [];
       animationIntervalsRef.current.forEach(interval => clearInterval(interval));
       animationIntervalsRef.current = [];
-      document.body.style.overflow = 'unset';
+      // Восстановление скролла и позиции
+      const savedScroll = scrollLockRef.current;
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.touchAction = '';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      if (savedScroll !== null) {
+        window.scrollTo(0, savedScroll);
+        scrollLockRef.current = null;
+      }
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
     }
@@ -151,7 +174,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Cleanup при размонтировании
   useEffect(() => {
     return () => {
-      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.touchAction = '';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      if (scrollLockRef.current !== null) {
+        window.scrollTo(0, scrollLockRef.current);
+        scrollLockRef.current = null;
+      }
       soundManager.stopAll(); // Останавливаем все звуки при размонтировании
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
