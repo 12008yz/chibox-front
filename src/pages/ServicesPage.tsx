@@ -35,7 +35,7 @@ const ServicesPage = () => {
                 <Shield className="w-8 h-8 text-blue-400" />
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
-                1 811
+                1 911
                 <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
@@ -67,7 +67,7 @@ const ServicesPage = () => {
                 <Shield className="w-8 h-8 text-purple-400" />
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
-                3 666
+                3 499
                 <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
@@ -103,7 +103,7 @@ const ServicesPage = () => {
                 <Crown className="w-8 h-8 text-orange-400" />
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
-                7 580
+                6 310
                 <img src="/images/chiCoin.png" alt="ChiCoins" className="w-8 h-8 inline-block" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
