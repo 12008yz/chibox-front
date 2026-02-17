@@ -114,8 +114,10 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     : t('notifications.notification_types.withdrawal_no_stock_success_wait'));
             }
             setWithdrawalNoStockNotification(null);
-        } catch {
-            toast.error(t('common.error'));
+        } catch (err: unknown) {
+            const d = (err as { data?: { message?: string; error?: string } })?.data;
+            const msg = d?.message || d?.error || t('common.error');
+            toast.error(msg);
         } finally {
             setResolvingNoStock(false);
         }
