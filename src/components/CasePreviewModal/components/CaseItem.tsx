@@ -171,20 +171,34 @@ export const CaseItem = memo(({
       ) : (
         <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
           {adaptedImageUrl && !imageError ? (
-            <LazyLoadImage
-              src={adaptedImageUrl}
-              alt={item.name}
-              effect="opacity"
-              className={`max-w-full max-h-full object-contain optimized-image ${
-                item.isExcluded ? 'opacity-70' : ''
-              }`}
-              threshold={100}
-              placeholder={
-                <div className="w-full h-full bg-gray-900 animate-pulse" />
-              }
-              onError={handleImageError}
-              wrapperClassName="w-full h-full flex items-center justify-center"
-            />
+            // Во время анимации открытия — обычный img (картинки уже в кэше после preload), без LazyLoad, чтобы на iPhone не было пустых слотов
+            showOpeningAnimation ? (
+              <img
+                src={adaptedImageUrl}
+                alt={item.name}
+                className={`max-w-full max-h-full object-contain optimized-image ${
+                  item.isExcluded ? 'opacity-70' : ''
+                }`}
+                onError={handleImageError}
+                loading="eager"
+                decoding="async"
+              />
+            ) : (
+              <LazyLoadImage
+                src={adaptedImageUrl}
+                alt={item.name}
+                effect="opacity"
+                className={`max-w-full max-h-full object-contain optimized-image ${
+                  item.isExcluded ? 'opacity-70' : ''
+                }`}
+                threshold={100}
+                placeholder={
+                  <div className="w-full h-full bg-gray-900 animate-pulse" />
+                }
+                onError={handleImageError}
+                wrapperClassName="w-full h-full flex items-center justify-center"
+              />
+            )
           ) : (
             <div className="text-gray-500 text-xs text-center">
               {t('case_preview_modal.no_image')}

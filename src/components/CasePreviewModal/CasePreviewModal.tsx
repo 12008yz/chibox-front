@@ -15,7 +15,7 @@ import ItemInfoModal from './components/ItemInfoModal';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
-import { getCaseImageUrl } from '../../utils/steamImageUtils';
+import { getCaseImageUrl, preloadItemImages } from '../../utils/steamImageUtils';
 import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
 
@@ -75,6 +75,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     if (isOpen && caseData?.id) refetchCaseStatus();
   }, [isOpen, caseData?.id, refetchCaseStatus]);
+
+  // Предзагрузка изображений предметов при открытии модалки — чтобы на iPhone картинки успевали прогрузиться до анимации
+  useEffect(() => {
+    if (!isOpen || !itemsData?.data?.items?.length) return;
+    const urls = itemsData.data.items.map((item: { image_url?: string }) => item.image_url);
+    preloadItemImages(urls);
+  }, [isOpen, itemsData?.data?.items]);
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
@@ -375,7 +382,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     let currentAvailablePosition = 0;
-    const initialSpeed = 80; // Быстрее начальная скорость
+    // На мобильных (особенно iPhone) чуть реже обновляем кадры, чтобы анимация не лагала
+    const initialSpeed = isMobileOrTablet ? 100 : 80;
     let currentSpeed = initialSpeed;
     const distance = wonItemIndex;
 
@@ -554,7 +562,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       trackTimeout(animateSlider, currentSpeed);
     };
 
-    trackTimeout(() => animateSlider(), 500);
+    // На мобильных даём ещё 200–300 мс на догрузку картинок после preload
+    const startDelay = isMobileOrTablet ? 700 : 500;
+    trackTimeout(() => animateSlider(), startDelay);
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
 
   const handleBuyCase = async () => {
@@ -728,13 +738,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
                         aria-hidden
                       />
-                      <div className="flex-1 min-h-0 overflow-hidden flex items-center">
+                      <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
                         <div
-                          className="flex flex-nowrap items-center gap-3 py-4 will-change-transform"
+                          className="flex flex-nowrap items-center gap-3 py-4 will-change-transform case-open-strip"
                           style={{
                             paddingLeft: 'calc(50% - 50px)',
                             paddingRight: 'calc(50% - 50px)',
                             transform: `translate3d(${offsetPx}px, 0, 0)`,
+                            WebkitTransform: `translate3d(${offsetPx}px, 0, 0)`,
                           }}
                         >
                           {itemsWithAdjustedChances.map((item: any, index: number) => (

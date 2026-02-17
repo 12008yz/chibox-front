@@ -170,6 +170,19 @@ export function adaptImageSize(imageUrl: string | null | undefined): string | nu
   return `${imageUrl}/${optimalSize}`;
 }
 
+/**
+ * Предзагрузка изображений (для плавной анимации открытия кейса на мобильных).
+ * Вызывается при открытии модалки, чтобы к моменту клика «Открыть» картинки были в кэше.
+ */
+export function preloadItemImages(urls: (string | null | undefined)[]): void {
+  const unique = Array.from(new Set(urls.filter((u): u is string => !!u)));
+  unique.forEach((src) => {
+    const adapted = adaptImageSize(src) ?? src;
+    const img = new Image();
+    img.src = adapted;
+  });
+}
+
 // Функция для получения дефолтного изображения предмета
 export function getDefaultItemImage(itemName?: string): string {
   // Дефолтные изображения предметов CS2

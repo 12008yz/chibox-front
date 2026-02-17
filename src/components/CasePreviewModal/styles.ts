@@ -583,6 +583,13 @@ export const strikeAnimationStyles = `
     display: none;
   }
 
+  /* Полоска предметов при открытии кейса — снижает лаги на iPhone */
+  .case-open-strip {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    contain: layout style;
+  }
+
   /* Оптимизация изображений */
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;
