@@ -971,22 +971,23 @@ export const userApi = baseApi.injectEndpoints({
       query: () => 'v1/avatars',
     }),
 
-    // Обновление аватара пользователя
-    updateAvatar: builder.mutation<ApiResponse<{ avatar_url: string; fullUrl: string }>, { avatar_url: string }>({
+    // Обновление аватара пользователя (avatar_url: string — выбор из списка; '' или null — сброс на Steam)
+    updateAvatar: builder.mutation<
+      ApiResponse<{ avatar_url: string | null; fullUrl: string | null }>,
+      { avatar_url: string | null }
+    >({
       query: (body) => ({
         url: 'v1/avatar',
         method: 'PUT',
-        body,
+        body: { avatar_url: body.avatar_url ?? '' },
       }),
       invalidatesTags: ['User'],
-      // Обновляем данные пользователя в authSlice после успешного обновления
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success && data.data?.avatar_url) {
-            // Импортируем updateUser action из authSlice
+          if (data.success && data.data) {
             const { updateUser } = await import('../auth/authSlice');
-            dispatch(updateUser({ avatar_url: data.data.avatar_url }));
+            dispatch(updateUser({ avatar_url: data.data.avatar_url ?? undefined }));
           }
         } catch {
           // invalidatesTags обновит данные

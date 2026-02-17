@@ -45,6 +45,17 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
     }
   };
 
+  const handleResetToSteam = async () => {
+    try {
+      await updateAvatar({ avatar_url: '' }).unwrap();
+      soundManager.play('click');
+      toastWithSound.success(t('profile.avatar_reset_to_steam') || 'Аватар сброшен, используется аватар из Steam');
+      onClose();
+    } catch (error: any) {
+      toastWithSound.error(getApiErrorMessage(error, t('profile.avatar_update_error') || 'Не удалось сбросить аватар'));
+    }
+  };
+
   const avatars = avatarsData?.data?.avatars || [];
 
   return (
@@ -110,6 +121,21 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
               ))}
             </div>
 
+            {currentAvatarUrl && (
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={handleResetToSteam}
+                  disabled={isUpdating}
+                  className="w-full px-4 py-3 bg-gray-600/50 hover:bg-gray-600/70 text-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0a12 12 0 0 0-8.2 20.8l4.4-1.8a3.4 3.4 0 0 0 6.4-1.8 3.4 3.4 0 0 0-3.3-3.4h-.2l-4.5-6.6a4.5 4.5 0 0 1 8.8 1.2v.3l6.6 4.5a3.4 3.4 0 0 0 1.8-6.4A12 12 0 0 0 12 0z" />
+                  </svg>
+                  {t('profile.use_steam_avatar') || 'Использовать аватар из Steam'}
+                </button>
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={onClose}
