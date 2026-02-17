@@ -719,42 +719,94 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
+  // Только на мобильных во время анимации — один скролл на весь экран (без шапки, кнопок, фона)
+  const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsWithAdjustedChances.length > 0 && (
+    <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
+      <div className="relative w-full h-full flex items-center min-h-0">
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
+          aria-hidden
+        />
+        <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
+          <div
+            ref={mobileStripRef}
+            className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
+            style={{
+              paddingLeft: 'calc(50% - 50px)',
+              paddingRight: 'calc(50% - 50px)',
+            }}
+          >
+            {itemsWithAdjustedChances.map((item: any, index: number) => (
+              <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
+                <CaseItem
+                  item={item}
+                  index={index}
+                  animationIndex={index}
+                  showOpeningAnimation={showOpeningAnimation}
+                  sliderPosition={sliderPosition}
+                  sliderOffset={sliderOffset}
+                  openingResult={openingResult}
+                  animationPhase={animationPhase}
+                  caseData={caseData}
+                  showStrikeThrough={showStrikeThrough}
+                  showGoldenSparks={showGoldenSparks}
+                  showWinEffects={showWinEffects}
+                  getRarityColor={getRarityColor}
+                  generateGoldenSparks={generateGoldenSparks}
+                  t={t}
+                  onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const modalContent = (
     <>
-      {/* Вспышка на весь экран при победе */}
       {showWinEffects && <div className="win-flash-overlay" />}
 
-      <div
-        className={`fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
-          isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
-        }`}
-        onClick={handleClose}
-        style={{
-          backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
-        }}
-      >
-        <div
-          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
-            isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
-          } ${showWinEffects ? 'win-shake' : ''}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-        <ModalHeader
-          caseData={caseData}
-          caseImageUrl={caseImageUrl}
-          fixedPrices={fixedPrices}
-          onClose={handleClose}
-          t={t}
-        />
+      {/* Мобильные: во время анимации — только скролл, без модалки. Десктоп — без изменений. */}
+      {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
+        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full" style={{ backgroundColor: 'transparent' }}>
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+            {mobileScrollOnlyContent}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div
+            className={`fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
+              isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
+            }`}
+            onClick={handleClose}
+            style={{
+              backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
+            }}
+          >
+            <div
+              className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
+                isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
+              } ${showWinEffects ? 'win-shake' : ''}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ModalHeader
+                caseData={caseData}
+                caseImageUrl={caseImageUrl}
+                fixedPrices={fixedPrices}
+                onClose={handleClose}
+                t={t}
+              />
 
-        {/* Содержимое кейса: мобил/планшет — горизонтальный скролл + центральный квадрат; десктоп — сетка */}
-        <div
-          className={`flex-1 min-h-0 relative virtualized-container flex flex-col ${
-            animationPhase === 'speeding-up' ? 'spinning-container' : ''
-          }`}
-          style={{ maxHeight: 'calc(90vh - 200px)', minHeight: isMobileOrTablet ? 180 : undefined }}
-        >
-          {isLoading ? (
+              <div
+                className={`flex-1 min-h-0 relative virtualized-container flex flex-col ${
+                  animationPhase === 'speeding-up' ? 'spinning-container' : ''
+                }`}
+                style={{ maxHeight: 'calc(90vh - 200px)', minHeight: isMobileOrTablet ? 180 : undefined }}
+              >
+                {isLoading ? (
             <div className="flex items-center justify-center py-12 p-6">
               <div className="spinner" />
               <p className="text-white ml-4">{t('case_preview_modal.loading_items')}</p>
@@ -765,58 +817,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : itemsWithAdjustedChances.length > 0 ? (
             isMobileOrTablet ? (
-              showOpeningAnimation ? (
-                /* Мобильная анимация: полоска на transform (без скролла), плавно и без лагов */
-                (() => {
-                  // На мобильных transform задаётся через ref (без re-render на каждый шаг); иначе из state
-                  const offsetPx = -(sliderPosition + sliderOffset) * MOBILE_ITEM_WIDTH;
-                  return (
-                    <div className="relative w-full h-full flex items-center min-h-0">
-                      <div
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
-                        aria-hidden
-                      />
-                      <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
-                        <div
-                          ref={mobileStripRef}
-                          className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
-                          style={{
-                            paddingLeft: 'calc(50% - 50px)',
-                            paddingRight: 'calc(50% - 50px)',
-                            // На мобильных transform обновляется через ref в анимации; иначе через state
-                            ...(isMobileOrTablet ? {} : { transform: `translate3d(${offsetPx}px, 0, 0)`, WebkitTransform: `translate3d(${offsetPx}px, 0, 0)` }),
-                          }}
-                        >
-                          {itemsWithAdjustedChances.map((item: any, index: number) => (
-                            <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
-                              <CaseItem
-                                item={item}
-                                index={index}
-                                animationIndex={index}
-                                showOpeningAnimation={showOpeningAnimation}
-                                sliderPosition={sliderPosition}
-                                sliderOffset={sliderOffset}
-                                openingResult={openingResult}
-                                animationPhase={animationPhase}
-                                caseData={caseData}
-                                showStrikeThrough={showStrikeThrough}
-                                showGoldenSparks={showGoldenSparks}
-                                showWinEffects={showWinEffects}
-                                getRarityColor={getRarityColor}
-                                generateGoldenSparks={generateGoldenSparks}
-                                t={t}
-                                onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()
-              ) : (
-                /* Превью в стиле ggDrop: крупный кейс, алерт, кнопка, сетка 2 колонки */
-                <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll p-4">
+              /* Превью мобильный: крупный кейс, алерт, кнопка, сетка 2 колонки */
+              <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll p-4">
                   {/* Крупное изображение кейса */}
                   <div className="flex justify-center mb-4">
                     <img
@@ -892,7 +894,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     ))}
                   </div>
                 </div>
-              )
             ) : (
               /* Десктоп: вертикальный скролл и сетка */
               <div
@@ -950,8 +951,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           onBuyStatusClick={handleBuyStatusClick}
           buyStatusLoading={buySubscriptionLoading}
         />
-      </div>
-    </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 
