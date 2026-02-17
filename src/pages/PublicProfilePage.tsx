@@ -125,6 +125,8 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   }
 
   const user = profileData.user;
+  const dailyStreak = (user as any).dailyStreak ?? (user as any).daily_streak ?? 0;
+  const maxDailyStreak = (user as any).maxDailyStreak ?? (user as any).max_daily_streak ?? 0;
 
   // Функция для получения шаблона кейса по ID
   const getCaseTemplateById = (templateId: string) => {
@@ -419,7 +421,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
               <div className="min-w-0 flex-1">
                 <p className="text-gray-400 text-xs sm:text-sm truncate">{t('public_profile.daily_streak')}</p>
                 <p className="text-lg sm:text-xl font-bold text-white">
-                  {t('public_profile.daily_streak_format', { current: user.dailyStreak || 0, max: user.maxDailyStreak || 0 })}
+                  {t('public_profile.daily_streak_format', { current: dailyStreak, max: maxDailyStreak })}
                 </p>
               </div>
             </div>

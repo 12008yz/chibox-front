@@ -55,7 +55,7 @@ export const authApi = baseApi.injectEndpoints({
         }
         return response;
       },
-      invalidatesTags: ['User', 'Profile'],
+      invalidatesTags: ['User', 'Profile', 'Achievements'],
     }),
 
     // Регистрация
