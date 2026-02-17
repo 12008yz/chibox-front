@@ -57,7 +57,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     // Игнорируем ошибки, данные обновятся автоматически
                 });
         }
-
+        setWithdrawalNoStockNotification(null);
         setOpenNotifications(false);
     };
 
