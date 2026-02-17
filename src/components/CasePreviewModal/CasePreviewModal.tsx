@@ -59,8 +59,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
-  const { data: statusData, isLoading: statusLoading } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
+  const { data: statusData, isLoading: statusLoading, refetch: refetchCaseStatus } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
+
+  // Всегда подтягивать свежий статус при открытии модалки (подписка могла измениться — покупка или выдача через скрипт)
+  useEffect(() => {
+    if (isOpen && caseData?.id) refetchCaseStatus();
+  }, [isOpen, caseData?.id, refetchCaseStatus]);
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
