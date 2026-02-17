@@ -1,10 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation } from '../../../features/user/userApi';
+import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
+import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMarkAllNotificationsAsReadMutation, useResolveWithdrawalNoStockMutation } from '../../../features/user/userApi';
+import { updateBalance } from '../../../features/auth/authSlice';
 import type { Notification } from '../../../types/api';
-import { CheckCircle, Info, AlertTriangle, XCircle, Settings, Users, MessageSquare, Gift, Package, X } from 'lucide-react';
+import { CheckCircle, Info, AlertTriangle, XCircle, Settings, Users, MessageSquare, Gift, Package, X, Coins, Clock } from 'lucide-react';
 import LanguageSwitcher from '../../LanguageSwitcher';
+
+export interface WithdrawalNoStockData {
+  subtype: string;
+  withdrawal_id: string;
+  item_name: string;
+  item_value: number;
+  item_id?: string;
+}
 
 interface NotificationsProps {
     openNotifications: boolean;
@@ -13,6 +24,7 @@ interface NotificationsProps {
 
 const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpenNotifications }) => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
     const notificationsRef = useRef<HTMLDivElement>(null);
 
     // Получаем уведомления из API
@@ -24,9 +36,13 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         pollingInterval: openNotifications ? 8000 : 0, // каждые 8 сек при открытой панели (меньше нагрузка)
     });
 
-    // Мутации для работы с  уведомлениями
+    // Мутации для работы с уведомлениями
     const [markAsRead] = useMarkNotificationAsReadMutation();
     const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
+    const [resolveNoStock] = useResolveWithdrawalNoStockMutation();
+
+    const [withdrawalNoStockNotification, setWithdrawalNoStockNotification] = useState<Notification | null>(null);
+    const [resolvingNoStock, setResolvingNoStock] = useState(false);
 
     const notifications = notificationsData?.data?.items || [];
 
@@ -71,8 +87,37 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             await handleMarkAsRead(notification.id);
         }
 
+        const data = notification.data as WithdrawalNoStockData | undefined;
+        if (data?.subtype === 'withdrawal_item_not_in_stock') {
+            setWithdrawalNoStockNotification(notification);
+            return;
+        }
+
         if (notification.link) {
             window.location.href = notification.link;
+        }
+    };
+
+    const handleResolveNoStock = async (action: 'chicoins' | 'wait') => {
+        if (!withdrawalNoStockNotification) return;
+        const data = withdrawalNoStockNotification.data as WithdrawalNoStockData;
+        if (!data?.withdrawal_id) return;
+        setResolvingNoStock(true);
+        try {
+            const result = await resolveNoStock({ withdrawalId: data.withdrawal_id, action }).unwrap();
+            if (result.success) {
+                if (action === 'chicoins' && result.data?.new_balance != null) {
+                    dispatch(updateBalance(result.data.new_balance));
+                }
+                toast.success(action === 'chicoins'
+                    ? t('notifications.notification_types.withdrawal_no_stock_success_chicoins')
+                    : t('notifications.notification_types.withdrawal_no_stock_success_wait'));
+            }
+            setWithdrawalNoStockNotification(null);
+        } catch {
+            toast.error(t('common.error'));
+        } finally {
+            setResolvingNoStock(false);
         }
     };
 
@@ -106,6 +151,8 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     // Улучшенная логика определения типа уведомления
     const detectNotificationType = (notification: Notification, translated: { title: string, message: string | any }) => {
         const { title } = translated;
+        const data = notification.data as WithdrawalNoStockData | undefined;
+        if (data?.subtype === 'withdrawal_item_not_in_stock') return 'warning';
 
         // Success: Покупка кейса, повышение уровня, достижение, бонус получен, приветствие
         if (
@@ -256,6 +303,20 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
             }
         }
 
+        // Предмет не у бота — выбор: ChiCoins или подождать
+        if (title.includes('Предмет временно отсутствует') || title.toLowerCase().includes('item temporarily out of stock')) {
+            const data = notification.data as WithdrawalNoStockData | undefined;
+            if (data?.item_name != null && data?.item_value != null) {
+                return {
+                    title: t('notifications.notification_types.withdrawal_item_not_in_stock'),
+                    message: t('notifications.notification_types.withdrawal_item_not_in_stock_message', {
+                        itemName: data.item_name,
+                        value: data.item_value
+                    })
+                };
+            }
+        }
+
         if (title.includes('Бонус') || title.toLowerCase().includes('bonus')) {
             const amountMatch = message.match(/(\d+)\s*(ChiCoins|ChiCoin)/i);
             if (amountMatch) {
@@ -396,6 +457,57 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                         </button>
                     )}
                 </div>
+
+                {/* Модальное окно выбора: ChiCoins или ожидание (предмет не у бота) */}
+                {withdrawalNoStockNotification && (() => {
+                    const data = (withdrawalNoStockNotification.data as WithdrawalNoStockData) || {};
+                    const value = data.item_value ?? 0;
+                    return (
+                        <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/60 p-4">
+                            <div className="bg-gray-900 border border-white/20 rounded-xl shadow-xl max-w-md w-full p-5">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h4 className="text-lg font-semibold text-white">
+                                        {t('notifications.notification_types.withdrawal_no_stock_choice_title')}
+                                    </h4>
+                                    <button
+                                        type="button"
+                                        onClick={() => setWithdrawalNoStockNotification(null)}
+                                        className="text-gray-400 hover:text-white p-1"
+                                        aria-label="Close"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                <p className="text-gray-300 text-sm mb-5">
+                                    {t('notifications.notification_types.withdrawal_item_not_in_stock_message', {
+                                        itemName: data.item_name || '',
+                                        value: data.item_value ?? 0
+                                    })}
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <button
+                                        type="button"
+                                        disabled={resolvingNoStock}
+                                        onClick={() => handleResolveNoStock('chicoins')}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30 transition disabled:opacity-50"
+                                    >
+                                        <Coins className="w-5 h-5" />
+                                        {t('notifications.notification_types.withdrawal_no_stock_choice_chicoins', { value })}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={resolvingNoStock}
+                                        onClick={() => handleResolveNoStock('wait')}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/40 hover:bg-blue-500/30 transition disabled:opacity-50"
+                                    >
+                                        <Clock className="w-5 h-5" />
+                                        {t('notifications.notification_types.withdrawal_no_stock_choice_wait')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
 
                 {/* Список уведомлений */}
                 <div className="gaming-notifications-list">

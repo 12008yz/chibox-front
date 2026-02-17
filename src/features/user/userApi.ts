@@ -645,6 +645,19 @@ export const userApi = baseApi.injectEndpoints({
       query: (withdrawalId) => `v1/withdraw-item/${withdrawalId}`,
     }),
 
+    // Разрешение ситуации "предмет не у бота": ChiCoins или ожидание
+    resolveWithdrawalNoStock: builder.mutation<
+      ApiResponse<{ withdrawal_id: string; balance_added?: number; new_balance?: number; status?: string }>,
+      { withdrawalId: string; action: 'chicoins' | 'wait' }
+    >({
+      query: ({ withdrawalId, action }) => ({
+        url: `v1/withdraw-item/${withdrawalId}/resolve-no-stock`,
+        method: 'POST',
+        body: { action },
+      }),
+      invalidatesTags: ['Notifications', 'Inventory', 'Balance', 'User'],
+    }),
+
     // Повторная отправка кода подтверждения email
     resendVerificationCode: builder.mutation<
       ApiResponse<{ codeExpires: string }>,
@@ -1015,6 +1028,7 @@ export const {
   useGetSteamInventoryQuery,
   useGetPublicProfileQuery,
   useGetWithdrawalStatusQuery,
+  useResolveWithdrawalNoStockMutation,
   useResendVerificationCodeMutation,
   useVerifyEmailMutation,
   useUpdateUserProfileMutation,
