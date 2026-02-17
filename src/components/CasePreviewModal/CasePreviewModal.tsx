@@ -79,7 +79,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Предзагрузка изображений предметов при открытии модалки — чтобы на iPhone картинки успевали прогрузиться до анимации
   useEffect(() => {
     if (!isOpen || !itemsData?.data?.items?.length) return;
-    const urls = itemsData.data.items.map((item: { image_url?: string }) => item.image_url);
+    const urls = itemsData.data.items.map((item) => item.image_url);
     preloadItemImages(urls);
   }, [isOpen, itemsData?.data?.items]);
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
