@@ -574,6 +574,15 @@ export const strikeAnimationStyles = `
     transform: translate3d(0, 0, 0);
   }
 
+  /* Скрытие полосы прокрутки (скролл остаётся рабочим) */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Оптимизация изображений */
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;

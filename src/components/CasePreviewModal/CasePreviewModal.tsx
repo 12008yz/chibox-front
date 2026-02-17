@@ -58,6 +58,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const animationTimoutsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех таймаутов анимации
   const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
 
+  // Мобильная/планшетная версия: горизонтальный скролл + центральный квадрат (breakpoint lg 1024px)
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
+  useEffect(() => {
+    const check = () => setIsMobileOrTablet(window.innerWidth < 1024);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
   const { data: statusData, isLoading: statusLoading, refetch: refetchCaseStatus } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
@@ -159,7 +167,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
   }, []);
 
-  // Оптимизированный автоскролл с throttling
+  // Оптимизированный автоскролл с throttling (вертикальный на десктопе, горизонтальный на мобиле/планшете)
   const scrollToItem = useCallback(
     throttle((index: number) => {
       if (!scrollContainerRef.current || !showOpeningAnimation || animationPhase === 'idle') return;
@@ -169,7 +177,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const currentItem = items[index] as HTMLElement;
 
       if (currentItem) {
-        // Используем requestAnimationFrame для плавности
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
         }
@@ -177,18 +184,28 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         animationFrameRef.current = requestAnimationFrame(() => {
           const containerRect = container.getBoundingClientRect();
           const itemRect = currentItem.getBoundingClientRect();
-          const itemTop = itemRect.top - containerRect.top + container.scrollTop;
-          const containerHeight = container.clientHeight;
-          const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
 
-          container.scrollTo({
-            top: Math.max(0, targetScrollTop),
-            behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
-          });
+          if (isMobileOrTablet) {
+            const itemLeft = itemRect.left - containerRect.left + container.scrollLeft;
+            const containerWidth = container.clientWidth;
+            const targetScrollLeft = itemLeft - (containerWidth / 2) + (itemRect.width / 2);
+            container.scrollTo({
+              left: Math.max(0, targetScrollLeft),
+              behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
+            });
+          } else {
+            const itemTop = itemRect.top - containerRect.top + container.scrollTop;
+            const containerHeight = container.clientHeight;
+            const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
+            container.scrollTo({
+              top: Math.max(0, targetScrollTop),
+              behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
+            });
+          }
         });
       }
-    }, 16), // Throttle до 60 FPS
-    [showOpeningAnimation, animationPhase]
+    }, 16),
+    [showOpeningAnimation, animationPhase, isMobileOrTablet]
   );
 
   // Автоскролл к выбранному элементу во время анимации
@@ -320,7 +337,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     setSliderPosition(0);
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      if (isMobileOrTablet) {
+        scrollContainerRef.current.scrollTo({ left: 0, behavior: 'auto' });
+      } else {
+        scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     let currentAvailablePosition = 0;
@@ -504,7 +525,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
 
     trackTimeout(() => animateSlider(), 500);
-  }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]);
+  }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
 
   const handleBuyCase = async () => {
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
@@ -648,49 +669,107 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           t={t}
         />
 
-        {/* Содержимое кейса - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ */}
+        {/* Содержимое кейса: мобил/планшет — горизонтальный скролл + центральный квадрат; десктоп — сетка */}
         <div
-          ref={scrollContainerRef}
-          className={`flex-1 p-6 overflow-y-auto relative virtualized-container smooth-scroll ${
+          className={`flex-1 relative virtualized-container ${
             animationPhase === 'speeding-up' ? 'spinning-container' : ''
           }`}
-          style={{ maxHeight: 'calc(90vh - 200px)' }}
+          style={{ maxHeight: 'calc(90vh - 200px)', minHeight: isMobileOrTablet ? 180 : undefined }}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-12 p-6">
               <div className="spinner" />
               <p className="text-white ml-4">{t('case_preview_modal.loading_items')}</p>
             </div>
           ) : error ? (
-            <div className="text-center py-12">
+            <div className="text-center py-12 p-6">
               <p className="text-red-400">{t('case_preview_modal.loading_error')}</p>
             </div>
           ) : itemsWithAdjustedChances.length > 0 ? (
-            <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
-              {itemsWithAdjustedChances.map((item: any, index: number) => (
-                <CaseItem
-                  key={item.id || index}
-                  item={item}
-                  index={index}
-                  animationIndex={index}
-                  showOpeningAnimation={showOpeningAnimation}
-                  sliderPosition={sliderPosition}
-                  sliderOffset={sliderOffset}
-                  openingResult={openingResult}
-                  animationPhase={animationPhase}
-                  caseData={caseData}
-                  showStrikeThrough={showStrikeThrough}
-                  showGoldenSparks={showGoldenSparks}
-                  showWinEffects={showWinEffects}
-                  getRarityColor={getRarityColor}
-                  generateGoldenSparks={generateGoldenSparks}
-                  t={t}
-                  onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+            isMobileOrTablet ? (
+              /* Мобильная/планшетная версия: горизонтальная полоса + квадрат по центру */
+              <div className="relative w-full h-full flex items-center">
+                {/* Центральный квадрат — результат открытия */}
+                <div
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
+                  aria-hidden
                 />
-              ))}
-            </div>
+                {/* Горизонтальный скролл предметов */}
+                <div
+                  ref={scrollContainerRef}
+                  className="flex-1 overflow-x-auto overflow-y-hidden smooth-scroll py-4 hide-scrollbar"
+                  style={{
+                    scrollSnapType: 'x mandatory',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
+                  <div
+                    className="flex flex-nowrap items-center gap-3"
+                    style={{ minWidth: 'max-content', paddingLeft: 'calc(50vw - 50px)', paddingRight: 'calc(50vw - 50px)' }}
+                  >
+                    {itemsWithAdjustedChances.map((item: any, index: number) => (
+                      <div
+                        key={item.id || index}
+                        className="flex-shrink-0 w-[100px] sm:w-[112px]"
+                        style={{ scrollSnapAlign: 'center' }}
+                      >
+                        <CaseItem
+                          item={item}
+                          index={index}
+                          animationIndex={index}
+                          showOpeningAnimation={showOpeningAnimation}
+                          sliderPosition={sliderPosition}
+                          sliderOffset={sliderOffset}
+                          openingResult={openingResult}
+                          animationPhase={animationPhase}
+                          caseData={caseData}
+                          showStrikeThrough={showStrikeThrough}
+                          showGoldenSparks={showGoldenSparks}
+                          showWinEffects={showWinEffects}
+                          getRarityColor={getRarityColor}
+                          generateGoldenSparks={generateGoldenSparks}
+                          t={t}
+                          onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Десктоп: вертикальный скролл и сетка */
+              <div
+                ref={scrollContainerRef}
+                className={`flex-1 p-6 overflow-y-auto smooth-scroll`}
+                style={{ maxHeight: 'calc(90vh - 200px)' }}
+              >
+                <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
+                  {itemsWithAdjustedChances.map((item: any, index: number) => (
+                    <CaseItem
+                      key={item.id || index}
+                      item={item}
+                      index={index}
+                      animationIndex={index}
+                      showOpeningAnimation={showOpeningAnimation}
+                      sliderPosition={sliderPosition}
+                      sliderOffset={sliderOffset}
+                      openingResult={openingResult}
+                      animationPhase={animationPhase}
+                      caseData={caseData}
+                      showStrikeThrough={showStrikeThrough}
+                      showGoldenSparks={showGoldenSparks}
+                      showWinEffects={showWinEffects}
+                      getRarityColor={getRarityColor}
+                      generateGoldenSparks={generateGoldenSparks}
+                      t={t}
+                      onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-12 p-6">
               <p className="text-gray-400">{t('case_preview_modal.no_items')}</p>
             </div>
           )}
