@@ -635,6 +635,8 @@ export const userApi = baseApi.injectEndpoints({
         });
         return `v1/users/${userId}?${params.toString()}`;
       },
+      providesTags: (_result, _error, arg) => [{ type: 'User' as const, id: arg.userId }, 'Profile'],
+      keepUnusedDataFor: 60,
     }),
 
     // Получение статуса вывода предмета
