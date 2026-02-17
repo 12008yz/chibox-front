@@ -152,6 +152,8 @@
     "subscription_expires": "Subscription Expires",
     "subscription_days_left": "Days left: {{days}}",
     "steam_profile": "Steam Profile",
+    "select_avatar": "Select avatar",
+    "select_avatar_first": "Select an avatar first",
     "trade_url": "Trade URL",
     "user_not_found": "User not found",
     "please_login": "Please sign in",

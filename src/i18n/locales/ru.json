@@ -155,6 +155,8 @@
     "subscription_expires": "Статус истекает",
     "subscription_days_left": "Дней осталось: {{days}}",
     "steam_profile": "Steam профиль",
+    "select_avatar": "Выберите аватар",
+    "select_avatar_first": "Выберите аватар",
     "trade_url": "Trade URL",
     "user_not_found": "Пользователь не найден",
     "please_login": "Пожалуйста, войдите в систему",
