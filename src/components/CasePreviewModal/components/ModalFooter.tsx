@@ -23,8 +23,8 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   const subscriptionBlocked = statusData?.data && !statusLoading && statusData.data.subscriptionRequired && !statusData.data.canOpen && !statusData.data.canBuy;
   const requiredTier = statusData?.data?.minSubscriptionTier ?? 1;
   const statusRequiredText = requiredTier > 0
-    ? t('case_preview_modal.subscription_required', 'Требуется статус уровня {{tier}}+', { tier: requiredTier })
-    : t('case_preview_modal.status_required_short', 'Требуется статус');
+    ? t('case_preview_modal.subscription_required', { defaultValue: 'Требуется статус уровня {{tier}}+', tier: requiredTier })
+    : t('case_preview_modal.status_required_short', { defaultValue: 'Требуется статус' });
 
   const handleBuyStatus = () => {
     if (buyStatusLoading) return;
