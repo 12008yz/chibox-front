@@ -58,6 +58,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const animationTimoutsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех таймаутов анимации
   const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
   const scrollLockRef = useRef<number | null>(null); // Позиция скролла при открытии модалки (для восстановления)
+  // Мобильная оптимизация: позиция полоски через ref, без лишних re-render на каждый шаг
+  const mobileStripRef = useRef<HTMLDivElement>(null);
+  const mobileAnimationRef = useRef<{ position: number; offset: number }>({ position: 0, offset: 0 });
+  const MOBILE_ITEM_WIDTH = 112; // 100px карточка + 12px gap
 
   // Мобильная/планшетная версия: горизонтальный скролл + центральный квадрат (breakpoint lg 1024px)
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
@@ -82,6 +86,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const urls = itemsData.data.items.map((item) => item.image_url);
     preloadItemImages(urls);
   }, [isOpen, itemsData?.data?.items]);
+
+  // Мобильная полоска: начальная позиция при старте анимации (ref может быть уже смонтирован)
+  useEffect(() => {
+    if (showOpeningAnimation && isMobileOrTablet && mobileStripRef.current) {
+      mobileStripRef.current.style.transform = 'translate3d(0,0,0)';
+      mobileStripRef.current.style.webkitTransform = 'translate3d(0,0,0)';
+    }
+  }, [showOpeningAnimation, isMobileOrTablet]);
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
@@ -399,6 +411,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const easeInQuart = (t: number): number => Math.pow(t, 4);
     const easeInOutCubic = (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
+    // На мобильных обновляем transform полоски через ref (без re-render), state — только для подсветки, раз в 2 шага
+    let mobileStepCount = 0;
+    const applyMobileStripTransform = (position: number, offset: number) => {
+      mobileAnimationRef.current.position = position;
+      mobileAnimationRef.current.offset = offset;
+      if (mobileStripRef.current) {
+        const px = -(position + offset) * MOBILE_ITEM_WIDTH;
+        mobileStripRef.current.style.transform = `translate3d(${px}px,0,0)`;
+        mobileStripRef.current.style.webkitTransform = `translate3d(${px}px,0,0)`;
+      }
+    };
+
     const animateSlider = () => {
       // Проверка на остановку между предметами (за 1 позицию до выигрыша)
       if (useStopBetween && currentAvailablePosition === wonItemIndex - 1) {
@@ -416,6 +440,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         });
 
         setSliderPosition(currentItemInFullList);
+        if (isMobileOrTablet) mobileAnimationRef.current.position = currentItemInFullList;
 
         // Небольшая задержка перед началом wobbling для плавности
         trackTimeout(() => {
@@ -450,6 +475,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             }
 
             setSliderOffset(offset);
+            if (isMobileOrTablet) applyMobileStripTransform(mobileAnimationRef.current.position, offset);
 
             if (rollProgress >= rollSteps) {
               clearInterval(rollInterval);
@@ -465,6 +491,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               trackTimeout(() => {
                 const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
                 setSliderPosition(wonItemInFullList);
+                if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
                 setAnimationPhase('stopped');
 
                 // Крутая последовательность эффектов выигрыша
@@ -490,6 +517,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (currentAvailablePosition >= wonItemIndex) {
         const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
         setSliderPosition(wonItemInFullList);
+        if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
         setAnimationPhase('stopped');
 
         // Крутая последовательность эффектов выигрыша
@@ -520,7 +548,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         }
       }
 
-      setSliderPosition(fullListPosition);
+      // Мобильные: позиция полоски через ref (без re-render), state для подсветки — раз в 2 шага
+      if (isMobileOrTablet) {
+        applyMobileStripTransform(fullListPosition, 0);
+        if (mobileStepCount % 2 === 0) setSliderPosition(fullListPosition);
+        mobileStepCount++;
+      } else {
+        setSliderPosition(fullListPosition);
+      }
 
       // Воспроизводим звук при каждой смене предмета (ignoreThrottle = true для частого воспроизведения)
       soundManager.play('process', false, true);
@@ -564,7 +599,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     // На мобильных даём ещё 200–300 мс на догрузку картинок после preload
     const startDelay = isMobileOrTablet ? 700 : 500;
-    trackTimeout(() => animateSlider(), startDelay);
+    trackTimeout(() => {
+      if (isMobileOrTablet) applyMobileStripTransform(0, 0);
+      animateSlider();
+    }, startDelay);
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
 
   const handleBuyCase = async () => {
@@ -730,7 +768,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               showOpeningAnimation ? (
                 /* Мобильная анимация: полоска на transform (без скролла), плавно и без лагов */
                 (() => {
-                  const MOBILE_ITEM_WIDTH = 112; // 100px карточка + 12px gap
+                  // На мобильных transform задаётся через ref (без re-render на каждый шаг); иначе из state
                   const offsetPx = -(sliderPosition + sliderOffset) * MOBILE_ITEM_WIDTH;
                   return (
                     <div className="relative w-full h-full flex items-center min-h-0">
@@ -740,12 +778,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       />
                       <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
                         <div
-                          className="flex flex-nowrap items-center gap-3 py-4 will-change-transform case-open-strip"
+                          ref={mobileStripRef}
+                          className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
                           style={{
                             paddingLeft: 'calc(50% - 50px)',
                             paddingRight: 'calc(50% - 50px)',
-                            transform: `translate3d(${offsetPx}px, 0, 0)`,
-                            WebkitTransform: `translate3d(${offsetPx}px, 0, 0)`,
+                            // На мобильных transform обновляется через ref в анимации; иначе через state
+                            ...(isMobileOrTablet ? {} : { transform: `translate3d(${offsetPx}px, 0, 0)`, WebkitTransform: `translate3d(${offsetPx}px, 0, 0)` }),
                           }}
                         >
                           {itemsWithAdjustedChances.map((item: any, index: number) => (

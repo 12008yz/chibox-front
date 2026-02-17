@@ -590,6 +590,12 @@ export const strikeAnimationStyles = `
     contain: layout style;
   }
 
+  /* will-change только во время движения, чтобы не держать слой после остановки */
+  .case-open-strip.case-open-strip-moving {
+    will-change: transform;
+    -webkit-will-change: transform;
+  }
+
   /* Оптимизация изображений */
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;
