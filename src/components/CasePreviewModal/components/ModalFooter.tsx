@@ -20,8 +20,11 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   onBuyStatusClick,
   buyStatusLoading = false
 }) => {
-  const subscriptionBlocked = statusData?.data && !statusLoading && statusData.data.subscriptionRequired && !statusData.data.canOpen && !statusData.data.canBuy;
-  const requiredTier = statusData?.data?.minSubscriptionTier ?? 1;
+  const d = statusData?.data;
+  const hasSubscriptionIssue = d && d.subscriptionRequired && (d.userSubscriptionTier < d.minSubscriptionTier || (d.minSubscriptionTier > 0 && (d.subscriptionDaysLeft ?? 0) <= 0));
+  const subscriptionBlocked = d && !statusLoading && hasSubscriptionIssue && !d.canOpen && !d.canBuy;
+  const isCooldown = d && !statusLoading && !d.canOpen && !d.canBuy && !hasSubscriptionIssue && (d.reason === 'Кейс еще недоступен' || d.nextAvailableTime);
+  const requiredTier = d?.minSubscriptionTier ?? 1;
   const statusRequiredText = requiredTier > 0
     ? t('case_preview_modal.subscription_required', { defaultValue: 'Требуется статус уровня {{tier}}+', tier: requiredTier })
     : t('case_preview_modal.status_required_short', { defaultValue: 'Требуется статус' });
@@ -48,8 +51,24 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
             disabled={buyStatusLoading}
             className="mt-2 text-amber-400 hover:text-amber-300 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {buyStatusLoading ? t('case_preview_modal.going_to_payment', 'Переход к оплате...') : t('case_preview_modal.buy_status_link', 'Купить статус')}
+            {buyStatusLoading ? t('case_preview_modal.going_to_payment', { defaultValue: 'Переход к оплате...' }) : t('case_preview_modal.buy_status_link', { defaultValue: 'Купить статус' })}
           </button>
+        </div>
+      )}
+
+      {isCooldown && (
+        <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+          {d?.reason === 'Кейс еще недоступен' && d?.nextAvailableTime && (
+            <div>
+              {t('case_preview_modal.case_not_yet_available', { defaultValue: 'Кейс еще недоступен' })}
+              <span className="block mt-1 text-gray-500">
+                {t('case_preview_modal.next_available_at', { defaultValue: 'Следующий доступен' })}: {new Date(d.nextAvailableTime).toLocaleString()}
+              </span>
+            </div>
+          )}
+          {d?.reason === 'Кейс еще недоступен' && !d?.nextAvailableTime && (
+            <div>{t('case_preview_modal.case_not_yet_available', { defaultValue: 'Кейс еще недоступен' })}</div>
+          )}
         </div>
       )}
 
