@@ -208,11 +208,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     [showOpeningAnimation, animationPhase, isMobileOrTablet]
   );
 
-  // Автоскролл к выбранному элементу во время анимации
+  // Автоскролл к выбранному элементу во время анимации (только десктоп; на мобиле используется transform)
   useEffect(() => {
-    if (!showOpeningAnimation || animationPhase === 'idle') return;
+    if (!showOpeningAnimation || animationPhase === 'idle' || isMobileOrTablet) return;
     scrollToItem(sliderPosition);
-  }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem]);
+  }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem, isMobileOrTablet]);
 
   // Функция для определения мобильного устройства
   const isMobileDevice = () => {
@@ -336,12 +336,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     setSliderPosition(0);
-    if (scrollContainerRef.current) {
-      if (isMobileOrTablet) {
-        scrollContainerRef.current.scrollTo({ left: 0, behavior: 'auto' });
-      } else {
-        scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+    if (!isMobileOrTablet && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     let currentAvailablePosition = 0;
@@ -671,7 +667,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
         {/* Содержимое кейса: мобил/планшет — горизонтальный скролл + центральный квадрат; десктоп — сетка */}
         <div
-          className={`flex-1 relative virtualized-container ${
+          className={`flex-1 min-h-0 relative virtualized-container flex flex-col ${
             animationPhase === 'speeding-up' ? 'spinning-container' : ''
           }`}
           style={{ maxHeight: 'calc(90vh - 200px)', minHeight: isMobileOrTablet ? 180 : undefined }}
@@ -687,55 +683,132 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             </div>
           ) : itemsWithAdjustedChances.length > 0 ? (
             isMobileOrTablet ? (
-              /* Мобильная/планшетная версия: горизонтальная полоса + квадрат по центру */
-              <div className="relative w-full h-full flex items-center">
-                {/* Центральный квадрат — результат открытия */}
-                <div
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
-                  aria-hidden
-                />
-                {/* Горизонтальный скролл предметов */}
-                <div
-                  ref={scrollContainerRef}
-                  className="flex-1 overflow-x-auto overflow-y-hidden smooth-scroll py-4 hide-scrollbar"
-                  style={{
-                    scrollSnapType: 'x mandatory',
-                    WebkitOverflowScrolling: 'touch',
-                  }}
-                >
-                  <div
-                    className="flex flex-nowrap items-center gap-3"
-                    style={{ minWidth: 'max-content', paddingLeft: 'calc(50vw - 50px)', paddingRight: 'calc(50vw - 50px)' }}
-                  >
-                    {itemsWithAdjustedChances.map((item: any, index: number) => (
+              showOpeningAnimation ? (
+                /* Мобильная анимация: полоска на transform (без скролла), плавно и без лагов */
+                (() => {
+                  const MOBILE_ITEM_WIDTH = 112; // 100px карточка + 12px gap
+                  const offsetPx = -(sliderPosition + sliderOffset) * MOBILE_ITEM_WIDTH;
+                  return (
+                    <div className="relative w-full h-full flex items-center min-h-0">
                       <div
-                        key={item.id || index}
-                        className="flex-shrink-0 w-[100px] sm:w-[112px]"
-                        style={{ scrollSnapAlign: 'center' }}
-                      >
-                        <CaseItem
-                          item={item}
-                          index={index}
-                          animationIndex={index}
-                          showOpeningAnimation={showOpeningAnimation}
-                          sliderPosition={sliderPosition}
-                          sliderOffset={sliderOffset}
-                          openingResult={openingResult}
-                          animationPhase={animationPhase}
-                          caseData={caseData}
-                          showStrikeThrough={showStrikeThrough}
-                          showGoldenSparks={showGoldenSparks}
-                          showWinEffects={showWinEffects}
-                          getRarityColor={getRarityColor}
-                          generateGoldenSparks={generateGoldenSparks}
-                          t={t}
-                          onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                        />
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
+                        aria-hidden
+                      />
+                      <div className="flex-1 min-h-0 overflow-hidden flex items-center">
+                        <div
+                          className="flex flex-nowrap items-center gap-3 py-4 will-change-transform"
+                          style={{
+                            paddingLeft: 'calc(50% - 50px)',
+                            paddingRight: 'calc(50% - 50px)',
+                            transform: `translate3d(${offsetPx}px, 0, 0)`,
+                          }}
+                        >
+                          {itemsWithAdjustedChances.map((item: any, index: number) => (
+                            <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
+                              <CaseItem
+                                item={item}
+                                index={index}
+                                animationIndex={index}
+                                showOpeningAnimation={showOpeningAnimation}
+                                sliderPosition={sliderPosition}
+                                sliderOffset={sliderOffset}
+                                openingResult={openingResult}
+                                animationPhase={animationPhase}
+                                caseData={caseData}
+                                showStrikeThrough={showStrikeThrough}
+                                showGoldenSparks={showGoldenSparks}
+                                showWinEffects={showWinEffects}
+                                getRarityColor={getRarityColor}
+                                generateGoldenSparks={generateGoldenSparks}
+                                t={t}
+                                onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                /* Превью в стиле ggDrop: крупный кейс, алерт, кнопка, сетка 2 колонки */
+                <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll p-4">
+                  {/* Крупное изображение кейса */}
+                  <div className="flex justify-center mb-4">
+                    <img
+                      src={caseImageUrl}
+                      alt={caseData.name}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                  {/* Блок цены / предупреждение и главная кнопка */}
+                  {(() => {
+                    const price = getCasePrice(caseData);
+                    const balance = userData?.balance ?? 0;
+                    const hasEnough = balance >= price;
+                    const shortfall = Math.ceil(price - balance);
+                    return (
+                      <div className="space-y-3 mb-6">
+                        {!hasEnough && price > 0 ? (
+                          <div className="rounded-lg border-2 border-red-500/80 bg-red-950/50 p-4 text-center">
+                            <p className="text-white font-semibold">
+                              {price} ChiCoins — НЕ ХВАТАЕТ {shortfall} ChiCoins
+                            </p>
+                            <p className="text-red-200 text-sm mt-1">
+                              Недостаточно средств для открытия кейса
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onClose();
+                                window.dispatchEvent(new CustomEvent('openDepositModal'));
+                              }}
+                              className="mt-4 w-full py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg flex items-center justify-center gap-2"
+                            >
+                              <img src="/images/chiCoin.png" alt="" className="w-5 h-5" />
+                              ПОПОЛНИТЬ БАЛАНС
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <p className="text-orange-400 font-bold text-lg">{price} ChiCoins</p>
+                            <p className="text-gray-400 text-sm mt-1">
+                              {t('case_preview_modal.chance')} — {itemsWithAdjustedChances.length} {t('case_preview_modal.items', { defaultValue: 'предметов' })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                  {/* Заголовок и сетка содержимого */}
+                  <h3 className="text-lg font-bold text-white mb-3">
+                    {t('case_contents', { defaultValue: 'Содержимое кейса' })}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3 pb-4">
+                    {itemsWithAdjustedChances.map((item: any, index: number) => (
+                      <CaseItem
+                        key={item.id || index}
+                        item={item}
+                        index={index}
+                        animationIndex={index}
+                        showOpeningAnimation={false}
+                        sliderPosition={0}
+                        sliderOffset={0}
+                        openingResult={null}
+                        animationPhase="idle"
+                        caseData={caseData}
+                        showStrikeThrough={false}
+                        showGoldenSparks={false}
+                        showWinEffects={false}
+                        getRarityColor={getRarityColor}
+                        generateGoldenSparks={generateGoldenSparks}
+                        t={t}
+                        onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                      />
                     ))}
                   </div>
                 </div>
-              </div>
+              )
             ) : (
               /* Десктоп: вертикальный скролл и сетка */
               <div
