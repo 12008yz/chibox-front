@@ -162,6 +162,8 @@ export const casesApi = baseApi.injectEndpoints({
     >({
       query: (caseTemplateId) => `v1/case-templates/${caseTemplateId}/status`,
       providesTags: ['Cases', 'User'],
+      // Не кэшировать: при открытии превью всегда нужны актуальные подписка и доступ
+      keepUnusedDataFor: 0,
     }),
 
     // Получение статуса бесплатного кейса для новых пользователей
