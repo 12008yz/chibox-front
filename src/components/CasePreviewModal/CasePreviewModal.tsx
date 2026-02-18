@@ -827,7 +827,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                       className="w-full max-w-[280px] h-auto object-contain rounded-lg"
                     />
                   </div>
-                  {/* Блок цены / предупреждение и главная кнопка */}
+                  {/* Блок цены / предупреждение и главная кнопка — на мобильной версии цену и блок «Шанс / N предметов» не показываем */}
                   {(() => {
                     const price = getCasePrice(caseData);
                     const balance = userData?.balance ?? 0;
@@ -855,14 +855,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               ПОПОЛНИТЬ БАЛАНС
                             </button>
                           </div>
-                        ) : (
+                        ) : !isMobileOrTablet ? (
                           <div className="text-center">
                             <p className="text-orange-400 font-bold text-lg">{price} ChiCoins</p>
                             <p className="text-gray-400 text-sm mt-1">
                               {t('case_preview_modal.chance')} — {itemsWithAdjustedChances.length} {t('case_preview_modal.items', { defaultValue: 'предметов' })}
                             </p>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     );
                   })()}
