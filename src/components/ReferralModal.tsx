@@ -69,15 +69,12 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, referral
                     {(bonuses?.fixed_first_deposit ?? 0) > 0 && (
                       <li>• За первый депозит: +{bonuses?.fixed_first_deposit} ChiCoins</li>
                     )}
-                    {(bonuses?.percent_from_deposit ?? 0) > 0 && (
-                      <li>• +{bonuses?.percent_from_deposit}% к каждому пополнению</li>
-                    )}
                     <li>• Промокод DEPOSIT15 — бонус к депозиту</li>
                     {(bonuses?.promo_codes?.length ?? 0) > 0 &&
                       bonuses!.promo_codes!.map((p) => (
                         <li key={p.code}>• Промокод {p.code} — {p.value} ChiCoins</li>
                       ))}
-                    {(!bonuses || ((bonuses.fixed_registration ?? 0) === 0 && (bonuses.fixed_first_deposit ?? 0) === 0 && (bonuses.percent_from_deposit ?? 0) === 0 && (bonuses.promo_codes?.length ?? 0) === 0)) && (
+                    {(!bonuses || ((bonuses.fixed_registration ?? 0) === 0 && (bonuses.fixed_first_deposit ?? 0) === 0 && (bonuses.promo_codes?.length ?? 0) === 0)) && (
                       <li>• Специальные условия для приглашённых</li>
                     )}
                   </ul>
