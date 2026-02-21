@@ -9,7 +9,7 @@ import {
   useCreateStreamerPayoutMutation,
   useGetStreamerMaterialsQuery,
 } from '../features/streamer/streamerApi';
-import { Copy, Plus, Link2, BarChart3, Wallet } from 'lucide-react';
+import { Copy, Plus, Link2, BarChart3, Wallet, ExternalLink } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const StreamerCabinetPage: React.FC = () => {
@@ -135,10 +135,20 @@ const StreamerCabinetPage: React.FC = () => {
                 <span className="text-gray-500 text-sm">
                   клики: {link.clicks_count}, рег: {link.registrations_count}, деп: {link.first_deposits_count}
                 </span>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 inline-flex"
+                  title="Открыть ссылку (переход учтётся)"
+                >
+                  <ExternalLink size={16} />
+                </a>
                 <button
                   type="button"
                   onClick={() => handleCopyUrl(link.url)}
-                  className="ml-auto p-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30"
+                  className="p-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30"
+                  title="Скопировать"
                 >
                   <Copy size={16} />
                 </button>
