@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useGetReferralInfoQuery } from '../features/referral/referralApi';
 import { getPreferredAvatar } from '../utils/avatarUtils';
+import SteamLoginButton from './SteamLoginButton';
 
 interface ReferralModalProps {
   isOpen: boolean;
@@ -79,9 +80,10 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, referral
                     )}
                   </ul>
                 </div>
-                <p className="text-gray-400 text-xs text-center mt-4">
+                <p className="text-gray-400 text-xs text-center mt-4 mb-4">
                   Войдите через Steam, чтобы закрепить приглашение и получить бонусы.
                 </p>
+                <SteamLoginButton />
               </>
             ) : (
               <p className="text-gray-400 text-center py-4">Данные по ссылке недоступны.</p>
