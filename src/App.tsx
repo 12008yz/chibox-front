@@ -3,7 +3,7 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, lazy, Suspense, useCallback } from 'react';
+import { useEffect, lazy, Suspense, useCallback, useState } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 
@@ -17,7 +17,11 @@ import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
 import CookieBanner from './components/CookieBanner';
 import AuthModal from './components/AuthModal';
+import ReferralModal from './components/ReferralModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
+import { getReferralRefFromCookie, setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
+import { API_URL } from './utils/config';
+import { useTrackReferralClickMutation } from './features/referral/referralApi';
 
 // Lazy loading страниц
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -36,6 +40,7 @@ const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const RequisitesPage = lazy(() => import('./pages/RequisitesPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const StreamerCabinetPage = lazy(() => import('./pages/StreamerCabinetPage'));
 
 const ProtectedRoute: React.FC<{
   children: React.ReactElement;
@@ -49,6 +54,8 @@ const ProtectedRoute: React.FC<{
   return children;
 };
 
+const STREAMER_SUBDOMAIN_PREFIX = 'streamer.';
+
 const App: React.FC = () => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
@@ -59,6 +66,8 @@ const App: React.FC = () => {
   const showOnboarding = useAppSelector(state => state.ui.showOnboarding);
   const showAuthModal = useAppSelector(state => state.ui.showAuthModal);
   const onShowAuthModal = useCallback(() => dispatch(setShowAuthModal(true)), [dispatch]);
+  const [referralModalCode, setReferralModalCode] = useState<string | null>(null);
+  const [trackReferralClick] = useTrackReferralClickMutation();
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
@@ -121,6 +130,35 @@ const App: React.FC = () => {
     soundManager.setSoundsEnabled(soundsEnabled);
   }, [soundsEnabled]);
 
+  // Реферальная программа: редирект с поддомена streamer.*/CODE на основной сайт с ?ref=CODE
+  useEffect(() => {
+    const host = window.location.hostname;
+    const path = window.location.pathname;
+    if (host.startsWith(STREAMER_SUBDOMAIN_PREFIX) && path.length > 1) {
+      const code = path.slice(1).replace(/\/.*$/, '');
+      if (code) {
+        const mainHost = import.meta.env.VITE_MAIN_SITE_HOST || (host.includes('.') ? host.replace(/^streamer\./, '') : host);
+        const mainOrigin = `${window.location.protocol}//${mainHost}`;
+        window.location.replace(`${mainOrigin}?ref=${encodeURIComponent(code)}`);
+      }
+    }
+  }, []);
+
+  // Реферальная программа: при первом заходе с ?ref= — сохранить ref, учесть клик, показать модалку один раз
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const refFromUrl = params.get('ref')?.trim();
+    if (!refFromUrl) return;
+    setReferralCookie(refFromUrl);
+    trackReferralClick(refFromUrl).catch(() => {});
+    if (!wasReferralModalShownForCode(refFromUrl)) {
+      setReferralModalShownForCode(refFromUrl);
+      setReferralModalCode(refFromUrl);
+    }
+    window.history.replaceState({}, '', window.location.pathname + (window.location.hash || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Глобальный звук клика
   useEffect(() => {
     const handleGlobalClick = (event: MouseEvent) => {
@@ -168,6 +206,13 @@ const App: React.FC = () => {
             user={auth.user}
           />
 
+          {referralModalCode && (
+            <ReferralModal
+              isOpen={!!referralModalCode}
+              onClose={() => setReferralModalCode(null)}
+              referralCode={referralModalCode}
+            />
+          )}
           <main>
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
@@ -270,6 +315,14 @@ const App: React.FC = () => {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/requisites" element={<RequisitesPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route
+              path="/streamer-cabinet"
+              element={
+                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
+                  <StreamerCabinetPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />

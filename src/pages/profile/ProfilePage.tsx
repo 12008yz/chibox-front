@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../../features/cases/casesApi';
@@ -303,6 +304,14 @@ const ProfilePage: React.FC = () => {
             >
               {t('profile.purchase_button')}
             </button>
+
+            {/* Кабинет стримера (партнёрская программа) */}
+            <Link
+              to="/streamer-cabinet"
+              className="block w-full text-center bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 hover:from-cyan-500/30 hover:to-cyan-600/30 text-cyan-300 hover:text-cyan-200 font-semibold text-base py-4 rounded-xl border border-cyan-400/30 hover:border-cyan-400/50 transition-all duration-200"
+            >
+              Кабинет стримера
+            </Link>
 
             {/* Drop Rate Bonuses */}
             <DropRateBonuses user={user} />

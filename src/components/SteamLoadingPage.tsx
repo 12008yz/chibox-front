@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
 import { API_URL } from '../utils/config';
+import { getReferralRefFromCookie } from '../utils/referralUtils';
 
 const SteamLoadingPage: React.FC = () => {
   useEffect(() => {
     const serverUrl = API_URL;
-    const steamUrl = `${serverUrl}/v1/auth/steam`;
+    let steamUrl = `${serverUrl}/v1/auth/steam`;
+    const ref = getReferralRefFromCookie();
+    if (ref) {
+      steamUrl += (steamUrl.includes('?') ? '&' : '?') + 'ref=' + encodeURIComponent(ref);
+    }
 
     // Минимальная задержка только для показа экрана
     const timer = setTimeout(() => {
