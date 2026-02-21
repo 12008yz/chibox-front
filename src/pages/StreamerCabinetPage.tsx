@@ -3,19 +3,21 @@ import {
   useGetStreamerMeQuery,
   useGetStreamerLinksQuery,
   useCreateStreamerLinkMutation,
+  useDeleteStreamerLinkMutation,
   useGetStreamerStatsQuery,
   useGetStreamerEarningsQuery,
   useGetStreamerPayoutsQuery,
   useCreateStreamerPayoutMutation,
   useGetStreamerMaterialsQuery,
 } from '../features/streamer/streamerApi';
-import { Copy, Plus, Link2, BarChart3, Wallet, ExternalLink } from 'lucide-react';
+import { Copy, Plus, Link2, BarChart3, Wallet, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const StreamerCabinetPage: React.FC = () => {
   const [newLinkLabel, setNewLinkLabel] = useState('');
   const [payoutAmount, setPayoutAmount] = useState('');
   const [payoutMethod, setPayoutMethod] = useState<'balance' | 'card' | 'steam' | 'other'>('balance');
+  const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 
   const { data: meData, error: meError, isLoading: meLoading } = useGetStreamerMeQuery();
   const { data: linksData, refetch: refetchLinks } = useGetStreamerLinksQuery();
@@ -25,6 +27,7 @@ const StreamerCabinetPage: React.FC = () => {
   const { data: materialsData } = useGetStreamerMaterialsQuery();
 
   const [createLink, { isLoading: creatingLink }] = useCreateStreamerLinkMutation();
+  const [deleteLink] = useDeleteStreamerLinkMutation();
   const [createPayout, { isLoading: creatingPayout }] = useCreateStreamerPayoutMutation();
 
   const streamer = meData?.data;
@@ -49,6 +52,21 @@ const StreamerCabinetPage: React.FC = () => {
   const handleCopyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
     toast.success('Ссылка скопирована');
+  };
+
+  const handleDeleteLink = async (id: string) => {
+    if (!window.confirm('Удалить эту реферальную ссылку? Статистика по ней сохранится в общей.')) return;
+    setDeletingLinkId(id);
+    try {
+      await deleteLink(id).unwrap();
+      refetchLinks();
+      toast.success('Ссылка удалена');
+    } catch (e: unknown) {
+      const msg = e && typeof e === 'object' && 'data' in e && (e as { data?: { message?: string } }).data?.message;
+      toast.error(typeof msg === 'string' ? msg : 'Ошибка удаления');
+    } finally {
+      setDeletingLinkId(null);
+    }
   };
 
   const handleCreatePayout = async () => {
@@ -130,19 +148,11 @@ const StreamerCabinetPage: React.FC = () => {
                 key={link.id}
                 className="flex flex-wrap items-center gap-2 bg-white/5 border border-cyan-400/20 rounded-lg p-3"
               >
-                <span className="text-cyan-300 font-mono text-sm">{link.url}</span>
+                <span className="text-cyan-300 font-mono text-sm select-all">{link.url}</span>
                 {link.label && <span className="text-gray-400 text-sm">({link.label})</span>}
                 <span className="text-gray-500 text-sm">
                   клики: {link.clicks_count}, рег: {link.registrations_count}, деп: {link.first_deposits_count}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
-                  className="p-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 inline-flex"
-                  title="Открыть ссылку (переход учтётся)"
-                >
-                  <ExternalLink size={16} />
-                </button>
                 <button
                   type="button"
                   onClick={() => handleCopyUrl(link.url)}
@@ -150,6 +160,15 @@ const StreamerCabinetPage: React.FC = () => {
                   title="Скопировать"
                 >
                   <Copy size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteLink(link.id)}
+                  disabled={deletingLinkId === link.id}
+                  className="p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 disabled:opacity-50"
+                  title="Удалить ссылку"
+                >
+                  <Trash2 size={16} />
                 </button>
               </div>
             ))}

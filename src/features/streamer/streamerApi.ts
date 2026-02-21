@@ -76,6 +76,12 @@ export const streamerApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    deleteStreamerLink: builder.mutation<{ success: boolean }, string>({
+      query: (id) => ({
+        url: `v1/streamer/links/${id}`,
+        method: 'DELETE',
+      }),
+    }),
     getStreamerStats: builder.query<{ success: boolean; data: StreamerStats }, void>({
       query: () => ({ url: 'v1/streamer/stats', method: 'GET' }),
     }),
@@ -112,6 +118,7 @@ export const {
   useGetStreamerMeQuery,
   useGetStreamerLinksQuery,
   useCreateStreamerLinkMutation,
+  useDeleteStreamerLinkMutation,
   useGetStreamerStatsQuery,
   useGetStreamerEarningsQuery,
   useGetStreamerPayoutsQuery,
