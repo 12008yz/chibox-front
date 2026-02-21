@@ -20,7 +20,7 @@ import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
-import { useTrackReferralClickMutation } from './features/referral/referralApi';
+import { API_URL } from './utils/config';
 
 // Lazy loading страниц
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -66,7 +66,6 @@ const App: React.FC = () => {
   const showAuthModal = useAppSelector(state => state.ui.showAuthModal);
   const onShowAuthModal = useCallback(() => dispatch(setShowAuthModal(true)), [dispatch]);
   const [referralModalCode, setReferralModalCode] = useState<string | null>(null);
-  const [trackReferralClick] = useTrackReferralClickMutation();
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
@@ -129,7 +128,7 @@ const App: React.FC = () => {
     soundManager.setSoundsEnabled(soundsEnabled);
   }, [soundsEnabled]);
 
-  // Реферальная программа: редирект с поддомена streamer.*/CODE на основной сайт с ?ref=CODE
+  // Реферальная программа: редирект с поддомена streamer.*/CODE — сначала учёт перехода, потом редирект на основной сайт
   useEffect(() => {
     const host = window.location.hostname;
     const path = window.location.pathname;
@@ -138,18 +137,30 @@ const App: React.FC = () => {
       if (code) {
         const mainHost = import.meta.env.VITE_MAIN_SITE_HOST || (host.includes('.') ? host.replace(/^streamer\./, '') : host);
         const mainOrigin = `${window.location.protocol}//${mainHost}`;
-        window.location.replace(`${mainOrigin}?ref=${encodeURIComponent(code)}`);
+        const clickUrl = `${API_URL}/v1/referral/click?code=${encodeURIComponent(code)}`;
+        let redirected = false;
+        const doRedirect = () => {
+          if (redirected) return;
+          redirected = true;
+          window.location.replace(`${mainOrigin}?ref=${encodeURIComponent(code)}`);
+        };
+        // Учитываем переход до редиректа (важно для инкогнито и быстрого закрытия вкладки)
+        fetch(clickUrl, { method: 'GET', credentials: 'include' })
+          .then(() => {})
+          .catch(() => {})
+          .finally(doRedirect);
+        // Таймаут: редирект не позднее чем через 4 с, чтобы не зависнуть при недоступности API
+        setTimeout(doRedirect, 4000);
       }
     }
   }, []);
 
-  // Реферальная программа: при первом заходе с ?ref= — сохранить ref, учесть клик, показать модалку один раз
+  // Реферальная программа: при заходе с ?ref= — сохранить ref в cookie, показать модалку один раз. Клик учитывается на streamer до редиректа; при прямом заходе на main?ref= не дублируем учёт.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const refFromUrl = params.get('ref')?.trim();
     if (!refFromUrl) return;
     setReferralCookie(refFromUrl);
-    trackReferralClick(refFromUrl).catch(() => {});
     if (!wasReferralModalShownForCode(refFromUrl)) {
       setReferralModalShownForCode(refFromUrl);
       setReferralModalCode(refFromUrl);
