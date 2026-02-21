@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../../features/cases/casesApi';
+import { useGetStreamerMeQuery } from '../../features/streamer/streamerApi';
 import { useUserData } from '../../hooks/useUserData';
 import ScrollToTop from '../../components/ScrollToTop';
 import ScrollToTopOnMount from '../../components/ScrollToTopOnMount';
@@ -104,6 +105,9 @@ const ProfilePage: React.FC = () => {
 
   // Используем актуальные данные пользователя из currentUserData, fallback на auth.user
   const user = currentUserData || auth.user;
+
+  // Проверяем, является ли пользователь стримером (кабинет показываем только стримерам)
+  const { data: streamerMeData } = useGetStreamerMeQuery(undefined, { skip: !user });
 
   // Функция для перевода названий кейсов
   const translateCaseName = (caseName: string) => {
@@ -305,13 +309,15 @@ const ProfilePage: React.FC = () => {
               {t('profile.purchase_button')}
             </button>
 
-            {/* Кабинет стримера (партнёрская программа) */}
-            <Link
-              to="/streamer-cabinet"
-              className="block w-full text-center bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 hover:from-cyan-500/30 hover:to-cyan-600/30 text-cyan-300 hover:text-cyan-200 font-semibold text-base py-4 rounded-xl border border-cyan-400/30 hover:border-cyan-400/50 transition-all duration-200"
-            >
-              Кабинет стримера
-            </Link>
+            {/* Кабинет стримера — только для пользователей, назначенных стримерами */}
+            {streamerMeData?.success && streamerMeData?.data && (
+              <Link
+                to="/streamer-cabinet"
+                className="block w-full text-center bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 hover:from-cyan-500/30 hover:to-cyan-600/30 text-cyan-300 hover:text-cyan-200 font-semibold text-base py-4 rounded-xl border border-cyan-400/30 hover:border-cyan-400/50 transition-all duration-200"
+              >
+                Кабинет стримера
+              </Link>
+            )}
 
             {/* Drop Rate Bonuses */}
             <DropRateBonuses user={user} />
