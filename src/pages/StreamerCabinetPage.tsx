@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   useGetStreamerMeQuery,
   useGetStreamerLinksQuery,
@@ -13,11 +13,15 @@ import {
 import { Copy, Plus, Link2, BarChart3, Wallet, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+const SKIP_DELETE_CONFIRM_KEY = 'streamer_skip_delete_confirm';
+
 const StreamerCabinetPage: React.FC = () => {
   const [newLinkLabel, setNewLinkLabel] = useState('');
   const [payoutAmount, setPayoutAmount] = useState('');
   const [payoutMethod, setPayoutMethod] = useState<'balance' | 'card' | 'steam' | 'other'>('balance');
   const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
+  const [deleteConfirmLinkId, setDeleteConfirmLinkId] = useState<string | null>(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const { data: meData, error: meError, isLoading: meLoading } = useGetStreamerMeQuery();
   const { data: linksData, refetch: refetchLinks } = useGetStreamerLinksQuery();
@@ -54,19 +58,42 @@ const StreamerCabinetPage: React.FC = () => {
     toast.success('Ссылка скопирована');
   };
 
-  const handleDeleteLink = async (id: string) => {
-    if (!window.confirm('Удалить эту реферальную ссылку? Статистика по ней сохранится в общей.')) return;
-    setDeletingLinkId(id);
-    try {
-      await deleteLink(id).unwrap();
-      refetchLinks();
-      toast.success('Ссылка удалена');
-    } catch (e: unknown) {
-      const msg = e && typeof e === 'object' && 'data' in e && (e as { data?: { message?: string } }).data?.message;
-      toast.error(typeof msg === 'string' ? msg : 'Ошибка удаления');
-    } finally {
-      setDeletingLinkId(null);
+  const performDelete = useCallback(
+    async (id: string) => {
+      setDeletingLinkId(id);
+      try {
+        await deleteLink(id).unwrap();
+        refetchLinks();
+        toast.success('Ссылка удалена');
+      } catch (e: unknown) {
+        const msg = e && typeof e === 'object' && 'data' in e && (e as { data?: { message?: string } }).data?.message;
+        toast.error(typeof msg === 'string' ? msg : 'Ошибка удаления');
+      } finally {
+        setDeletingLinkId(null);
+      }
+    },
+    [deleteLink, refetchLinks]
+  );
+
+  const handleDeleteLink = (id: string) => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem(SKIP_DELETE_CONFIRM_KEY) === '1') {
+      performDelete(id);
+      return;
     }
+    setDeleteConfirmLinkId(id);
+    setDontShowAgain(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmLinkId) return;
+    if (dontShowAgain) {
+      try {
+        localStorage.setItem(SKIP_DELETE_CONFIRM_KEY, '1');
+      } catch (_) {}
+    }
+    const id = deleteConfirmLinkId;
+    setDeleteConfirmLinkId(null);
+    await performDelete(id);
   };
 
   const handleCreatePayout = async () => {
@@ -286,6 +313,55 @@ const StreamerCabinetPage: React.FC = () => {
               ))}
             </div>
           </section>
+        )}
+
+        {deleteConfirmLinkId && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setDeleteConfirmLinkId(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-confirm-title"
+          >
+            <div
+              className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-b from-violet-900/95 to-indigo-950/95 border border-violet-500/40"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <h2 id="delete-confirm-title" className="text-xl font-semibold text-white mb-2">
+                  Удалить реферальную ссылку?
+                </h2>
+                <p className="text-violet-200/90 text-sm mb-5">
+                  Статистика по ней сохранится в общей. Ссылка перестанет работать.
+                </p>
+                <label className="flex items-center gap-3 cursor-pointer mb-6 select-none">
+                  <input
+                    type="checkbox"
+                    checked={dontShowAgain}
+                    onChange={(e) => setDontShowAgain(e.target.checked)}
+                    className="w-4 h-4 rounded border-violet-400 bg-violet-900/50 text-violet-400 focus:ring-violet-400"
+                  />
+                  <span className="text-sm text-violet-200/90">Больше не показывать это окно</span>
+                </label>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmLinkId(null)}
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-violet-200 bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmDelete}
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-rose-500/80 hover:bg-rose-500 border border-rose-400/50 transition-colors"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
