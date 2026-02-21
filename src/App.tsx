@@ -20,7 +20,6 @@ import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
-import { useTrackReferralClickMutation } from './features/referral/referralApi';
 import { API_URL } from './utils/config';
 
 // Lazy loading страниц
@@ -67,7 +66,6 @@ const App: React.FC = () => {
   const showAuthModal = useAppSelector(state => state.ui.showAuthModal);
   const onShowAuthModal = useCallback(() => dispatch(setShowAuthModal(true)), [dispatch]);
   const [referralModalCode, setReferralModalCode] = useState<string | null>(null);
-  const [trackReferralClick] = useTrackReferralClickMutation();
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
@@ -143,13 +141,13 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Реферальная программа: при заходе с ?ref= — сохранить ref в cookie, учесть переход, показать модалку один раз
+  // Реферальная программа: при заходе с ?ref= — сохранить ref в cookie, показать модалку один раз.
+  // Учёт перехода уже сделан на бэкенде при редиректе (streamer.site/r/CODE → redirect).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const refFromUrl = params.get('ref')?.trim();
     if (!refFromUrl) return;
     setReferralCookie(refFromUrl);
-    trackReferralClick(refFromUrl).catch(() => {});
     if (!wasReferralModalShownForCode(refFromUrl)) {
       setReferralModalShownForCode(refFromUrl);
       setReferralModalCode(refFromUrl);
