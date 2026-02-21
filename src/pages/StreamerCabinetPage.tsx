@@ -135,15 +135,14 @@ const StreamerCabinetPage: React.FC = () => {
                 <span className="text-gray-500 text-sm">
                   клики: {link.clicks_count}, рег: {link.registrations_count}, деп: {link.first_deposits_count}
                 </span>
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
                   className="p-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 inline-flex"
                   title="Открыть ссылку (переход учтётся)"
                 >
                   <ExternalLink size={16} />
-                </a>
+                </button>
                 <button
                   type="button"
                   onClick={() => handleCopyUrl(link.url)}
