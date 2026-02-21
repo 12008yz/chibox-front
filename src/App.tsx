@@ -130,7 +130,7 @@ const App: React.FC = () => {
     soundManager.setSoundsEnabled(soundsEnabled);
   }, [soundsEnabled]);
 
-  // Реферальная программа: редирект с поддомена streamer.*/CODE — сначала учёт перехода, потом редирект на основной сайт
+  // Реферальная программа: редирект с поддомена streamer.*/CODE — учёт перехода (keepalive), затем редирект
   useEffect(() => {
     const host = window.location.hostname;
     const path = window.location.pathname;
@@ -146,13 +146,12 @@ const App: React.FC = () => {
           redirected = true;
           window.location.replace(`${mainOrigin}?ref=${encodeURIComponent(code)}`);
         };
-        // Учитываем переход до редиректа (важно для инкогнито и быстрого закрытия вкладки)
-        fetch(clickUrl, { method: 'GET', credentials: 'include' })
-          .then(() => {})
-          .catch(() => {})
-          .finally(doRedirect);
-        // Таймаут: редирект не позднее чем через 4 с, чтобы не зависнуть при недоступности API
-        setTimeout(doRedirect, 4000);
+        // keepalive: true — браузер дотянет запрос даже при редиректе/закрытии вкладки
+        fetch(clickUrl, { method: 'GET', credentials: 'include', keepalive: true });
+        // Небольшая задержка, чтобы запрос успел уйти до редиректа (особенно при CORS preflight)
+        setTimeout(doRedirect, 400);
+        // На случай если редирект не сработал — страховка через 5 с
+        setTimeout(doRedirect, 5000);
       }
     }
   }, []);
