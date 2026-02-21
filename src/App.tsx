@@ -130,28 +130,15 @@ const App: React.FC = () => {
     soundManager.setSoundsEnabled(soundsEnabled);
   }, [soundsEnabled]);
 
-  // Реферальная программа: редирект с поддомена streamer.*/CODE — учёт перехода (keepalive), затем редирект
+  // Реферальная программа: с поддомена streamer.*/CODE — сразу переход на бэкенд (учёт на сервере + редирект на main)
   useEffect(() => {
     const host = window.location.hostname;
     const path = window.location.pathname;
     if (host.startsWith(STREAMER_SUBDOMAIN_PREFIX) && path.length > 1) {
       const code = path.slice(1).replace(/\/.*$/, '');
       if (code) {
-        const mainHost = import.meta.env.VITE_MAIN_SITE_HOST || (host.includes('.') ? host.replace(/^streamer\./, '') : host);
-        const mainOrigin = `${window.location.protocol}//${mainHost}`;
-        const clickUrl = `${API_URL}/v1/referral/click?code=${encodeURIComponent(code)}`;
-        let redirected = false;
-        const doRedirect = () => {
-          if (redirected) return;
-          redirected = true;
-          window.location.replace(`${mainOrigin}?ref=${encodeURIComponent(code)}`);
-        };
-        // keepalive: true — браузер дотянет запрос даже при редиректе/закрытии вкладки
-        fetch(clickUrl, { method: 'GET', credentials: 'include', keepalive: true });
-        // Небольшая задержка, чтобы запрос успел уйти до редиректа (особенно при CORS preflight)
-        setTimeout(doRedirect, 400);
-        // На случай если редирект не сработал — страховка через 5 с
-        setTimeout(doRedirect, 5000);
+        const redirectUrl = `${API_URL}/v1/referral/redirect/${encodeURIComponent(code)}`;
+        window.location.replace(redirectUrl);
       }
     }
   }, []);
