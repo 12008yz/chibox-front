@@ -11,6 +11,7 @@ export interface ReferralInfo {
     percent_from_deposit: number;
     fixed_registration: number;
     fixed_first_deposit: number;
+    promo_codes?: { code: string; value: number }[];
   };
 }
 
