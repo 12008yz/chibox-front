@@ -19,8 +19,7 @@ import CookieBanner from './components/CookieBanner';
 import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
-import { getReferralRefFromCookie, setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
-import { API_URL } from './utils/config';
+import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { useTrackReferralClickMutation } from './features/referral/referralApi';
 
 // Lazy loading страниц

@@ -20,7 +20,7 @@ const StreamerCabinetPage: React.FC = () => {
   const { data: meData, error: meError, isLoading: meLoading } = useGetStreamerMeQuery();
   const { data: linksData, refetch: refetchLinks } = useGetStreamerLinksQuery();
   const { data: statsData } = useGetStreamerStatsQuery();
-  const { data: earningsData } = useGetStreamerEarningsQuery(undefined);
+  const { data: earningsData } = useGetStreamerEarningsQuery({});
   const { data: payoutsData } = useGetStreamerPayoutsQuery();
   const { data: materialsData } = useGetStreamerMaterialsQuery();
 
@@ -42,7 +42,7 @@ const StreamerCabinetPage: React.FC = () => {
       toast.success('Ссылка создана');
     } catch (e: unknown) {
       const msg = e && typeof e === 'object' && 'data' in e && (e as { data?: { message?: string } }).data?.message;
-      toast.error(msg || 'Ошибка создания ссылки');
+      toast.error(typeof msg === 'string' ? msg : 'Ошибка создания ссылки');
     }
   };
 
@@ -63,7 +63,7 @@ const StreamerCabinetPage: React.FC = () => {
       toast.success('Заявка на вывод создана');
     } catch (e: unknown) {
       const msg = e && typeof e === 'object' && 'data' in e && (e as { data?: { message?: string } }).data?.message;
-      toast.error(msg || 'Ошибка создания заявки');
+      toast.error(typeof msg === 'string' ? msg : 'Ошибка создания заявки');
     }
   };
 

@@ -63,16 +63,16 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, referral
                 <div className="bg-cyan-500/10 border border-cyan-400/20 rounded-lg p-4">
                   <p className="text-cyan-200 text-sm font-medium mb-2">Бонусы по реферальной ссылке:</p>
                   <ul className="space-y-1 text-gray-300 text-sm">
-                    {bonuses?.fixed_registration > 0 && (
-                      <li>• При регистрации: +{bonuses.fixed_registration} ChiCoins</li>
+                    {(bonuses?.fixed_registration ?? 0) > 0 && (
+                      <li>• При регистрации: +{bonuses?.fixed_registration} ChiCoins</li>
                     )}
-                    {bonuses?.fixed_first_deposit > 0 && (
-                      <li>• За первый депозит: +{bonuses.fixed_first_deposit} ChiCoins</li>
+                    {(bonuses?.fixed_first_deposit ?? 0) > 0 && (
+                      <li>• За первый депозит: +{bonuses?.fixed_first_deposit} ChiCoins</li>
                     )}
-                    {bonuses?.percent_from_deposit > 0 && (
-                      <li>• +{bonuses.percent_from_deposit}% к каждому пополнению</li>
+                    {(bonuses?.percent_from_deposit ?? 0) > 0 && (
+                      <li>• +{bonuses?.percent_from_deposit}% к каждому пополнению</li>
                     )}
-                    {(!bonuses || (bonuses.fixed_registration === 0 && bonuses.fixed_first_deposit === 0 && bonuses.percent_from_deposit === 0)) && (
+                    {(!bonuses || ((bonuses.fixed_registration ?? 0) === 0 && (bonuses.fixed_first_deposit ?? 0) === 0 && (bonuses.percent_from_deposit ?? 0) === 0)) && (
                       <li>• Специальные условия для приглашённых</li>
                     )}
                   </ul>
