@@ -62,7 +62,8 @@ export const CaseItem = memo(({
 
   // Предвычисляем все классы CSS с мемоизацией
   const itemClasses = useMemo(() => {
-    const baseClasses = `item-container bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative ${getRarityColor(item.rarity)}`;
+    const stripSizeClasses = suppressBetweenHighlight ? 'max-w-full max-h-full p-1' : '';
+    const baseClasses = `item-container bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative ${getRarityColor(item.rarity)} ${stripSizeClasses}`;
     const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
     // На мобильной полоске (suppressBetweenHighlight) — без ползунка по предметам, только центральный квадрат
     const highlightClasses = !suppressBetweenHighlight && isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
@@ -149,8 +150,8 @@ export const CaseItem = memo(({
     return <div className="bg-gray-800 rounded-lg p-2 border-2 border-gray-400 opacity-0" style={{ height: '200px' }} />;
   }
 
-  // Упрощённая заглушка только во время анимации для далёких от центра предметов; при превью — всегда полный вид, без мелькания
-  const shouldRenderSimplified = showOpeningAnimation && !inView && !isCurrentSliderPosition && !isWinningItemStopped;
+  // Упрощённая заглушка: не используем в превью (мелькание) и не в полоске (все 24 слота должны показывать картинки)
+  const shouldRenderSimplified = showOpeningAnimation && !suppressBetweenHighlight && !inView && !isCurrentSliderPosition && !isWinningItemStopped;
 
   // Обработчик клика на предмет только для мобильных устройств
   const handleClick = useCallback(() => {
@@ -172,14 +173,14 @@ export const CaseItem = memo(({
         // Упрощенная версия для элементов вне области видимости
         <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded" style={{ minHeight: '150px' }} />
       ) : (
-        <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative">
+        <div className={`aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative overflow-hidden ${suppressBetweenHighlight ? 'w-full min-h-0' : ''}`}>
           {adaptedImageUrl && !imageError ? (
             // Во время анимации открытия — обычный img (картинки уже в кэше после preload), без LazyLoad, чтобы на iPhone не было пустых слотов
             showOpeningAnimation ? (
               <img
                 src={adaptedImageUrl}
                 alt={item.name}
-                className={`max-w-full max-h-full object-contain optimized-image ${
+                className={`w-full h-full max-w-full max-h-full object-contain object-center optimized-image ${
                   item.isExcluded ? 'opacity-70' : ''
                 }`}
                 onError={handleImageError}

@@ -763,7 +763,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
           >
             {itemsForMobileStrip.map((item: any, index: number) => (
-              <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
+              <div key={item.id || index} className="flex-shrink-0 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] flex items-center justify-center overflow-hidden" data-item-index={index}>
                 <CaseItem
                   item={item}
                   index={index}
