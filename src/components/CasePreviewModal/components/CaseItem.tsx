@@ -64,7 +64,8 @@ export const CaseItem = memo(({
   const itemClasses = useMemo(() => {
     const baseClasses = `item-container bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative ${getRarityColor(item.rarity)}`;
     const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
-    const highlightClasses = isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
+    // На мобильной полоске (suppressBetweenHighlight) — без ползунка по предметам, только центральный квадрат
+    const highlightClasses = !suppressBetweenHighlight && isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
     const betweenClasses = isBetweenItems ? 'ring-4 ring-orange-500 z-10 border-orange-500 shadow-2xl shadow-orange-500/50' : '';
     const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
     const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';

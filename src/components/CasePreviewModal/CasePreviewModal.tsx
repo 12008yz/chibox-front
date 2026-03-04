@@ -391,15 +391,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
 
-    // На мобильных: только 12 предметов в полоске, результат — последний
+    // На мобильных: только 12 предметов в полоске, выигрышный — в случайной позиции (0..11)
     if (isMobileOrTablet) {
       if (availableItemsForAnimation.length > 12) {
         const others = availableItemsForAnimation.filter(item => item.id !== wonItem.id);
         const shuffled = [...others].sort(() => Math.random() - 0.5);
-        const twelve = [...shuffled.slice(0, 11), wonItem];
+        const eleven = shuffled.slice(0, 11);
+        const insertAt = Math.floor(Math.random() * 12); // случайная позиция 0..11
+        const twelve = [...eleven.slice(0, insertAt), wonItem, ...eleven.slice(insertAt)];
         setMobileAnimationItems(twelve);
         availableItemsForAnimation = twelve;
-        wonItemIndex = 11;
+        wonItemIndex = insertAt;
       } else {
         setMobileAnimationItems(availableItemsForAnimation);
       }
@@ -794,9 +796,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     <>
       {showWinEffects && <div className="win-flash-overlay" />}
 
-      {/* Мобильные: во время анимации — только фон и анимация, без кейсов и надписей. */}
+      {/* Мобильные: во время анимации — прозрачный фон (видна картинка страницы), только центральный квадрат и полоска. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-[#151225]">
+        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full" style={{ backgroundColor: 'transparent' }}>
           <div className="absolute inset-0 w-full h-full flex items-center justify-center">
             {mobileScrollOnlyContent}
           </div>
