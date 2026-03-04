@@ -338,8 +338,8 @@ export const strikeAnimationStyles = `
   @-webkit-keyframes mobile-win-reveal {
     0% {
       opacity: 0;
-      -webkit-transform: translate(-50%, -50%) scale(0.85);
-      transform: translate(-50%, -50%) scale(0.85);
+      -webkit-transform: translate(-50%, -50%) scale(0.92);
+      transform: translate(-50%, -50%) scale(0.92);
     }
     100% {
       opacity: 1;
@@ -350,8 +350,8 @@ export const strikeAnimationStyles = `
   @keyframes mobile-win-reveal {
     0% {
       opacity: 0;
-      -webkit-transform: translate(-50%, -50%) scale(0.85);
-      transform: translate(-50%, -50%) scale(0.85);
+      -webkit-transform: translate(-50%, -50%) scale(0.92);
+      transform: translate(-50%, -50%) scale(0.92);
     }
     100% {
       opacity: 1;
@@ -360,8 +360,11 @@ export const strikeAnimationStyles = `
     }
   }
   .mobile-win-reveal {
-    -webkit-animation: mobile-win-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    animation: mobile-win-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    -webkit-animation: mobile-win-reveal 1s ease-out forwards;
+    animation: mobile-win-reveal 1s ease-out forwards;
+    -webkit-animation-delay: 0.25s;
+    animation-delay: 0.25s;
+    opacity: 0;
   }
 
   .win-shake {

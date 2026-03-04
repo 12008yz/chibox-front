@@ -96,6 +96,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       mobileStripRef.current.style.webkitTransform = 'translate3d(0,0,0)';
     }
   }, [showOpeningAnimation, isMobileOrTablet]);
+
+  // Звук взрыва при показе выигрыша на мобильной
+  const prevMobileRevealRef = useRef(false);
+  useEffect(() => {
+    const showing = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && !!openingResult?.item;
+    if (showing && !prevMobileRevealRef.current) {
+      soundManager.play('endProcess');
+    }
+    prevMobileRevealRef.current = !!showing;
+  }, [showOpeningAnimation, isMobileOrTablet, animationPhase, openingResult]);
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
@@ -796,12 +806,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           </div>
         </div>
 
-        {/* Мобильный показ выигрыша: карточка по центру с изящным появлением */}
+        {/* Мобильный показ выигрыша: карточка по центру с плавным появлением */}
         {showMobileWinReveal && (
-          <div
-            className="absolute left-1/2 top-1/2 z-20 mobile-win-reveal w-[180px] sm:w-[200px] pointer-events-none"
-            style={{ opacity: 0 }}
-          >
+          <div className="absolute left-1/2 top-1/2 z-20 mobile-win-reveal w-[180px] sm:w-[200px] pointer-events-none">
             <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${getRarityColor(wonItem.rarity)}`}>
               <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
                 <img
