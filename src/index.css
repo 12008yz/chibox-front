@@ -281,48 +281,9 @@ html, body {
   }
 }
 
-/* ПОЛНОЕ ОТКЛЮЧЕНИЕ АНИМАЦИЙ НА СЛАБЫХ УСТРОЙСТВАХ */
+/* На мобильных анимации работают как на десктопе (блок принудительного отключения удалён) */
 @media (max-width: 768px), (max-height: 600px) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.15s !important; /* Быстрые переходы вместо анимаций */
-  }
-
-  /* ИСКЛЮЧЕНИЯ: Разрешаем анимации для важных элементов */
-  .upgrade-wheel-animation,
-  .upgrade-wheel-animation *,
-  .upgrade-wheel-animation *::before,
-  .upgrade-wheel-animation *::after,
-  .animate-spin-slow,
-  .animate-spin-fast,
-  .logo-star,
-  .item-glow-pulse,
-  .victory-glow,
-  .win-effects *,
-  .golden-spark,
-  .expanding-ring,
-  .particle-burst,
-  .light-ray {
-    animation-duration: revert !important;
-    animation-iteration-count: revert !important;
-    transition-duration: revert !important;
-    animation: revert !important;
-    transform: revert !important;
-    -webkit-animation-duration: revert !important;
-    -webkit-animation-iteration-count: revert !important;
-    -webkit-transform: revert !important;
-  }
-
-  /* Принудительное включение transform анимации для рулетки */
-  .upgrade-wheel-animation [style*="transform"] {
-    transform: revert !important;
-    transition: revert !important;
-  }
-
-  /* Отключаем backdrop-filter на мобильных */
+  /* Отключаем только backdrop-filter на мобильных для экономии GPU */
   .modern-header,
   .modern-navbar,
   .gaming-balance-container,
@@ -1050,31 +1011,8 @@ html, body {
   transform: none !important;
 }
 
-/* Принудительное отключение анимаций на очень слабых устройствах */
+/* На маленьких экранах анимации тоже работают как на десктопе */
 @media (max-width: 480px), (max-height: 480px) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.1s !important;
-  }
-
-  /* ИСКЛЮЧЕНИЯ для важных анимаций */
-  .animate-spin-slow,
-  .animate-spin-fast,
-  .logo-star {
-    animation-duration: revert !important;
-    animation-iteration-count: revert !important;
-    animation: revert !important;
-    -webkit-animation: revert !important;
-  }
-
-  .animate-pulse,
-  .animate-ping,
-  .animate-bounce,
-  .animate-spin {
-    animation: none !important;
-  }
-
   .backdrop-filter,
   .backdrop-blur {
     backdrop-filter: none !important;
