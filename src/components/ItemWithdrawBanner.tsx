@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWithdrawItemMutation } from '../features/user/userApi';
 import { useAppSelector } from '../store/hooks';
 import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUtils';
 import type { UserInventoryItem } from '../types/api';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
 import { getApiErrorMessage } from '../utils/config';
 import NoStatusWithdrawModal from './NoStatusWithdrawModal';
 
@@ -20,10 +20,9 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   onError,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [steamTradeUrl, setSteamTradeUrl] = useState('');
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [showNoStatusModal, setShowNoStatusModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -55,7 +54,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
 
 
 
-  const handleWithdraw = async (useCustomUrl = false) => {
+  const handleWithdraw = async () => {
     // Проверяем подписку перед выводом
     if (!withdrawPermission.canWithdraw) {
       if (withdrawPermission.requiresSubscription) {
@@ -79,9 +78,10 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       return;
     }
 
-    // Если у пользователя нет trade URL и он не указал кастомный - показываем форму
-    if (!userHasTradeUrl && !useCustomUrl) {
-      setShowConfirm(true);
+    // Если Trade URL не указан — переходим в настройки профиля
+    if (!userHasTradeUrl) {
+      onError(t('profile.item_withdraw.need_trade_url_go_settings'));
+      navigate('/profile', { state: { openSettings: true } });
       return;
     }
 
@@ -89,12 +89,10 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
     try {
       const result = await withdrawItem({
         inventoryItemId: item.id,
-        steamTradeUrl: useCustomUrl ? steamTradeUrl || undefined : undefined,
       }).unwrap();
 
       if (result.success) {
         onWithdrawSuccess();
-        setShowConfirm(false);
       } else {
         onError(result.message || t('profile.item_withdraw.error_withdrawal_failed'));
       }
@@ -126,15 +124,12 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
 
   const closeMobileModal = () => {
     setShowMobileModal(false);
-    setShowConfirm(false);
   };
 
   // Контент для модального окна/overlay
   const withdrawContent = (
     <>
-      {!showConfirm ? (
-        <>
-          <div className="text-center mb-2">
+      <div className="text-center mb-2">
             <p className="text-white text-[10px] font-medium mb-1 line-clamp-2">{item.item.name}</p>
             <p className="text-green-400 text-xs font-bold inline-flex items-center gap-1 justify-center">
               {Number(item.item.price).toFixed(2)}
@@ -175,51 +170,6 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
               </p>
             )}
           </div>
-        </>
-      ) : (
-        <>
-          <div className="text-center mb-2">
-            <p className="text-white text-[10px] font-medium mb-1">{t('profile.item_withdraw.provide_trade_url')}</p>
-            <p className="text-gray-300 text-[10px] line-clamp-1">{item.item.name}</p>
-          </div>
-
-          <div className="space-y-2">
-            <input
-              type="url"
-              placeholder="https://steamcommunity.com/tradeoffer/new/..."
-              value={steamTradeUrl}
-              onChange={(e) => setSteamTradeUrl(e.target.value)}
-              className="w-full px-2 py-1.5 bg-black/50 border border-gray-600/50 rounded text-white text-[10px] placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            <div className="flex gap-1">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleWithdraw(true);
-                }}
-                disabled={isWithdrawing || !steamTradeUrl.trim()}
-                className="flex-1 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-1.5 px-2 rounded text-[10px] transition-all duration-200"
-              >
-                {isWithdrawing
-                  ? 'Вывод...'
-                  : 'OK'}
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowConfirm(false);
-                }}
-                disabled={isWithdrawing}
-                className="px-2 py-1.5 bg-gray-600/50 hover:bg-gray-600/70 disabled:opacity-50 text-gray-300 rounded text-[10px] transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </>
   );
 

@@ -283,6 +283,7 @@
       "withdraw_to_steam": "Withdraw to Steam",
       "subscription_required": "Subscription required",
       "need_trade_url": "Need Steam Trade URL",
+      "need_trade_url_go_settings": "Set your trade URL in profile settings",
       "cannot_withdraw": "Cannot withdraw to Steam",
       "provide_trade_url": "Provide Steam Trade URL",
       "ok": "OK",

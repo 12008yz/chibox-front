@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/hooks';
 import { useGetUserInventoryQuery, useGetAchievementsProgressQuery, useGetUserAchievementsQuery } from '../../features/user/userApi';
 import { useGetCaseTemplatesQuery, useOpenCaseMutation } from '../../features/cases/casesApi';
@@ -28,8 +28,8 @@ import { getApiErrorMessage } from '../../utils/config';
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuth();
-
-
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // State для модальных окон
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -44,6 +44,14 @@ const ProfilePage: React.FC = () => {
   const { userData: currentUserData, isLoading: userLoading, refetch: refetchUser } = useUserData({
     refetchOnMount: true, // Всегда запрашиваем актуальные данные при заходе на страницу
   });
+
+  // Открытие настроек при переходе с state.openSettings (например, из вывода предмета)
+  useEffect(() => {
+    if (location.state?.openSettings) {
+      setIsSettingsOpen(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   // Обработка результатов Steam привязки из URL параметров
   useEffect(() => {
