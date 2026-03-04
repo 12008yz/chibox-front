@@ -93,11 +93,16 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
       <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap overflow-visible">
         {(() => {
-          // Скрываем кейс «бонус после регистрации», если пользователь уже получил все 2 кейса
+          // Скрываем кейс «бонус после регистрации», если пользователь исчерпал лимит:
+          // - получил все 2 кейса (claimCount >= maxClaims), или
+          // - прошло более 2 дней с первого открытия (canClaim === false и nextAvailableTime === null)
           const visibleCases = (cases || []).filter((caseItem) => {
             if (!caseItem.id) return false;
             const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
-            if (isFreeCase && freeCaseStatus && freeCaseStatus.claimCount >= freeCaseStatus.maxClaims) return false;
+            if (isFreeCase && freeCaseStatus) {
+              if (freeCaseStatus.claimCount >= freeCaseStatus.maxClaims) return false;
+              if (freeCaseStatus.canClaim === false && freeCaseStatus.nextAvailableTime == null) return false;
+            }
             return true;
           });
           return visibleCases.length > 0 ? (

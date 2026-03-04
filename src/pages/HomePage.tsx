@@ -427,10 +427,13 @@ const HomePage: React.FC = () => {
 
                   const subscriptionCases = getSubscriptionCases();
                   const fs = freeCaseStatus?.data;
-                  // Убираем кейс «бонус после регистрации» из списка, если пользователь уже получил все 2 кейса (секцию не показываем, если нечего показать)
-                  const subscriptionCasesVisible = (subscriptionCases || []).filter(
-                    (c) => !(c.id && fs && c.id === fs.caseTemplateId && fs.claimCount >= fs.maxClaims)
-                  );
+                  // Убираем кейс «бонус после регистрации», если пользователь исчерпал лимит (2 кейса или прошло >2 дней)
+                  const subscriptionCasesVisible = (subscriptionCases || []).filter((c) => {
+                    if (!c.id || !fs || c.id !== fs.caseTemplateId) return true;
+                    if (fs.claimCount >= fs.maxClaims) return false;
+                    if (fs.canClaim === false && fs.nextAvailableTime == null) return false;
+                    return true;
+                  });
                   const hasActiveSubscription = userSubscriptionTier > 0 && subscriptionDaysLeft > 0;
                   const hasSubscriptionCaseInInventory = subscriptionCaseStatus?.data?.has_subscription_case_in_inventory === true;
 
