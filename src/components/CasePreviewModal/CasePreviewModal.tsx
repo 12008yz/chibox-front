@@ -752,13 +752,21 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const wonItem = openingResult?.item;
   const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
 
+  const isSlowingPhase = animationPhase === 'slowing' || animationPhase === 'wobbling' || animationPhase === 'falling';
+
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
     <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
       <div className="relative w-full h-full flex items-center min-h-0">
+        {/* Центральная зона результата: рамка + уголки «здесь результат» + zoom/glow при замедлении */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)]"
+          className={`case-open-viewport-frame absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)] ${isSlowingPhase ? 'case-open-viewport-frame--highlight' : ''}`}
           aria-hidden
-        />
+        >
+          <span className="case-open-viewport-corner case-open-viewport-corner--tl" />
+          <span className="case-open-viewport-corner case-open-viewport-corner--tr" />
+          <span className="case-open-viewport-corner case-open-viewport-corner--bl" />
+          <span className="case-open-viewport-corner case-open-viewport-corner--br" />
+        </div>
         <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
           <div
             ref={mobileStripRef}

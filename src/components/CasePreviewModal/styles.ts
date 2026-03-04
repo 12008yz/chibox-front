@@ -615,6 +615,54 @@ export const strikeAnimationStyles = `
     display: none;
   }
 
+  /* Центральная зона: только transform (zoom), без анимации теней — меньше нагрузка на GPU */
+  .case-open-viewport-frame {
+    transition: transform 0.5s ease-out;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+  }
+  .case-open-viewport-frame--highlight {
+    transform: translate(-50%, -50%) scale(1.04);
+    -webkit-transform: translate(-50%, -50%) scale(1.04);
+    /* Одна тень без анимации — смена при добавлении класса, без transition */
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 146, 60, 0.35);
+  }
+
+  /* Уголки «здесь результат» — статичные границы, без анимации */
+  .case-open-viewport-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: rgba(251, 191, 36, 0.85);
+    border-style: solid;
+    border-width: 0;
+    pointer-events: none;
+  }
+  .case-open-viewport-corner--tl {
+    top: 4px;
+    left: 4px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .case-open-viewport-corner--tr {
+    top: 4px;
+    right: 4px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+  }
+  .case-open-viewport-corner--bl {
+    bottom: 4px;
+    left: 4px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+  .case-open-viewport-corner--br {
+    bottom: 4px;
+    right: 4px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+
   /* Полоска предметов при открытии кейса — снижает лаги на iPhone */
   .case-open-strip {
     -webkit-backface-visibility: hidden;
