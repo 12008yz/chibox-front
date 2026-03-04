@@ -6,9 +6,11 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
   caseData,
   caseImageUrl,
   fixedPrices,
+  resolvedPrice,
   onClose,
   t
 }) => {
+  const isFree = resolvedPrice !== undefined ? resolvedPrice === 0 : (parseFloat(caseData.price) === 0 || isNaN(parseFloat(caseData.price)));
   return (
     <div className="flex justify-between items-center p-3 sm:p-4 md:p-6 border-b border-gray-700">
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
@@ -27,12 +29,10 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
                   : <Monetary value={99} />
                 }
               </span>
+            ) : isFree ? (
+              <span>{t('case_preview_modal.free_case')}</span>
             ) : (
-              parseFloat(caseData.price) === 0 || isNaN(parseFloat(caseData.price)) ? (
-                <span>{t('case_preview_modal.free_case')}</span>
-              ) : (
-                <Monetary value={parseFloat(caseData.price)} />
-              )
+              <Monetary value={resolvedPrice !== undefined ? resolvedPrice : parseFloat(caseData.price)} />
             )}
           </p>
         </div>

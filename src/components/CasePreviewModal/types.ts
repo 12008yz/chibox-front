@@ -49,6 +49,8 @@ export interface ModalHeaderProps {
   caseData: CaseTemplate;
   caseImageUrl: string;
   fixedPrices: boolean;
+  /** Фактическая цена с бэка (0 = бесплатный кейс); при переданном значении используется вместо caseData.price */
+  resolvedPrice?: number;
   onClose: () => void;
   t: (key: string, options?: any) => string;
 }

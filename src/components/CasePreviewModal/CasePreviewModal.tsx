@@ -109,9 +109,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
-  // Функция для получения цены кейса
+  // Функция для получения цены кейса (0 — бесплатный кейс; проверяем явно, т.к. 0 в if даёт false)
   const getCasePrice = useCallback((caseData: CaseTemplate): number => {
-    if (statusData?.data?.price) {
+    if (statusData?.data != null && typeof statusData.data.price === 'number') {
       return statusData.data.price;
     }
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
@@ -862,6 +862,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 caseData={caseData}
                 caseImageUrl={caseImageUrl}
                 fixedPrices={fixedPrices}
+                resolvedPrice={getCasePrice(caseData)}
                 onClose={handleClose}
                 t={t}
               />
@@ -923,7 +924,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                           </div>
                         ) : !isMobileOrTablet ? (
                           <div className="text-center">
-                            <p className="text-orange-400 font-bold text-lg">{price} ChiCoins</p>
+                            {price > 0 ? (
+                              <p className="text-orange-400 font-bold text-lg">{price} ChiCoins</p>
+                            ) : (
+                              <p className="text-green-400 font-bold text-lg">{t('case_preview_modal.free_case')}</p>
+                            )}
                             <p className="text-gray-400 text-sm mt-1">
                               {t('case_preview_modal.chance')} — {itemsWithAdjustedChances.length} {t('case_preview_modal.items', { defaultValue: 'предметов' })}
                             </p>

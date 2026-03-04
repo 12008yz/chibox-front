@@ -124,11 +124,13 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                         <span>💳 Пополнить на</span>
                         <span className="text-yellow-400 font-bold"><Monetary value={price - (userData?.balance || 0)} /></span>
                       </>
-                    ) : (
+                    ) : price > 0 ? (
                       <>
                         <span>{t('case_preview_modal.open')}</span>
                         <span className="text-yellow-400 font-bold"><Monetary value={price} /></span>
                       </>
+                    ) : (
+                      <span>{t('case_preview_modal.open_case')}</span>
                     )}
                   </button>
                 </div>
