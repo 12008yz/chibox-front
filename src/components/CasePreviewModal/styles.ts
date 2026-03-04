@@ -362,8 +362,8 @@ export const strikeAnimationStyles = `
   .mobile-win-reveal {
     -webkit-animation: mobile-win-reveal 1s ease-out forwards;
     animation: mobile-win-reveal 1s ease-out forwards;
-    -webkit-animation-delay: 0.25s;
-    animation-delay: 0.25s;
+    -webkit-animation-delay: 0.6s;
+    animation-delay: 0.6s;
     opacity: 0;
   }
 

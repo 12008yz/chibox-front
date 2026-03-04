@@ -97,15 +97,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   }, [showOpeningAnimation, isMobileOrTablet]);
 
-  // Звук взрыва при показе выигрыша на мобильной
-  const prevMobileRevealRef = useRef(false);
-  useEffect(() => {
-    const showing = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && !!openingResult?.item;
-    if (showing && !prevMobileRevealRef.current) {
-      soundManager.play('endProcess');
-    }
-    prevMobileRevealRef.current = !!showing;
-  }, [showOpeningAnimation, isMobileOrTablet, animationPhase, openingResult]);
+  // Звук взрыва на мобильной теперь в trackTimeout вместе с setShowWinEffects (как на десктопе)
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
   const [buySubscription, { isLoading: buySubscriptionLoading }] = useBuySubscriptionMutation();
 
@@ -525,14 +517,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
                 setAnimationPhase('stopped');
 
-                // Эффекты выигрыша: на мобильной без взрыва
+                // Эффекты выигрыша: взрыв и искры и на мобильной, как на десктопе
                 trackTimeout(() => {
-                  if (!isMobileOrTablet) {
-                    soundManager.play('endProcess');
-                    setShowWinEffects(true);
-                  }
+                  soundManager.play('endProcess');
+                  setShowWinEffects(true);
                 }, 300);
-                trackTimeout(() => { if (!isMobileOrTablet) setShowGoldenSparks(true); }, 800);
+                trackTimeout(() => setShowGoldenSparks(true), 800);
                 trackTimeout(() => {
                   if (caseData.id === "44444444-4444-4444-4444-444444444444") {
                     setShowStrikeThrough(true);
@@ -553,14 +543,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
         setAnimationPhase('stopped');
 
-        // Эффекты выигрыша: на мобильной без взрыва
+        // Эффекты выигрыша: взрыв и искры и на мобильной, как на десктопе
         trackTimeout(() => {
-          if (!isMobileOrTablet) {
-            soundManager.play('endProcess');
-            setShowWinEffects(true);
-          }
+          soundManager.play('endProcess');
+          setShowWinEffects(true);
         }, 300);
-        trackTimeout(() => { if (!isMobileOrTablet) setShowGoldenSparks(true); }, 800); // Золотые искры
+        trackTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
         trackTimeout(() => {
           if (caseData.id === "44444444-4444-4444-4444-444444444444") {
             setShowStrikeThrough(true);
@@ -832,11 +820,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   const modalContent = (
     <>
-      {showWinEffects && !isMobileOrTablet && <div className="win-flash-overlay" />}
+      {showWinEffects && <div className="win-flash-overlay" />}
 
-      {/* Мобильные: во время анимации — прозрачный фон (видна картинка страницы), только центральный квадрат и полоска. */}
+      {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full" style={{ backgroundColor: 'transparent' }}>
+        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
+          {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center">
             {mobileScrollOnlyContent}
           </div>
