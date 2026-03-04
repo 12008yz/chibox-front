@@ -91,7 +91,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
       <Title title={name} />
       {description && <div className="text-gray-300 mb-8">{description}</div>}
 
-      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap">
+      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap overflow-visible">
         {(() => {
           // Скрываем кейс «бонус после регистрации», если пользователь уже получил все 2 кейса
           const visibleCases = (cases || []).filter((caseItem) => {
@@ -123,7 +123,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <div
                     key={caseItem.id}
                     id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="cursor-pointer rounded-lg"
+                    className="cursor-pointer rounded-lg overflow-visible"
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
                       if (!(e.target as HTMLElement).closest('button')) {
@@ -152,7 +152,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
                     id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="rounded-lg"
+                    className="rounded-lg overflow-visible"
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >
                     <Case

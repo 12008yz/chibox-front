@@ -54,12 +54,9 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
     return getCaseImageUrl(image);
   }, [image, imageError, defaultImage]);
 
-  // Проверяем, является ли это "Ледяным кейсом" (цена 2499)
-  const isIceCase = parseFloat(price) === 2499 || title.toLowerCase().includes('ледяной');
-
   return (
     <div
-      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer group"
+      className="flex flex-col w-full md:w-64 items-center rounded cursor-pointer group overflow-visible"
     >
       {!loaded && (
         <div className="flex w-full h-64 items-center justify-center">
@@ -67,12 +64,12 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         </div>
       )}
 
-      <div className="relative w-full flex items-center justify-center">
+      <div className="relative w-full flex items-center justify-center overflow-visible">
         <img
           src={caseImageUrl}
           alt={title}
           draggable="false"
-          className={`case-image w-full h-32 ${isIceCase ? 'md:h-52' : 'md:h-64'} object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{
             pointerEvents: 'none',
             userSelect: 'none'

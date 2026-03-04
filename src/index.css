@@ -1898,6 +1898,7 @@ html::-webkit-scrollbar-thumb,
 .case-item-wrapper {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  overflow: visible;
 }
 
 .case-item-wrapper:hover {
@@ -1913,6 +1914,7 @@ html::-webkit-scrollbar-thumb,
 
 .case-image {
   transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
 }
 
 /* Отключаем hover-эффекты на мобильных устройствах для экономии ресурсов */
@@ -2070,6 +2072,7 @@ img[alt*="Case"] {
   /* Оптимизация рендеринга */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  contain: layout style paint;
+  contain: layout style;
+  overflow: visible;
   transition: transform 0.2s ease;
 }
