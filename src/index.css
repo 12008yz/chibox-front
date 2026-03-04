@@ -102,40 +102,16 @@ html, body, #root {
   -o-filter: none !important;
 }
 
-/* Главный фон приложения — выразительный градиент + узор */
+/* Главный фон — сплошной цвет (без сетки и анимации для снижения GPU) */
 .app-bg {
   position: fixed;
   inset: 0;
   z-index: -100;
-  background-color: #0a0812;
-  background-image:
-    /* Сетка (лёгкая) */
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: 0 0, 0 0;
+  background-color: #0d0b14;
 }
 
 .app-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 100% 70% at 50% -20%, rgba(140, 80, 220, 0.45) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 50% at 95% 80%, rgba(255, 120, 60, 0.25) 0%, transparent 45%),
-    radial-gradient(ellipse 60% 60% at 5% 60%, rgba(60, 120, 220, 0.2) 0%, transparent 45%),
-    linear-gradient(180deg, #0a0812 0%, #0e0c18 25%, #12101f 60%, #0c0a14 100%);
-  pointer-events: none;
-}
-
-/* Лёгкое «дыхание» градиента */
-@keyframes app-bg-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.92; }
-}
-
-.app-bg::before {
-  animation: app-bg-pulse 8s ease-in-out infinite;
+  display: none;
 }
 
 /* Принудительно тёмный фон для html/body (фоллбэк) */
@@ -162,10 +138,10 @@ html, body {
   }
 }
 
-/* CSS переменные для динамического управления производительности */
+/* CSS переменные — backdrop-filter отключён глобально для снижения GPU */
 :root {
-  --animation-duration: 0.3s;
-  --enable-backdrop-filter: blur(5px);
+  --animation-duration: 0.25s;
+  --enable-backdrop-filter: none;
   --enable-animations: 1;
 
   /* Принудительные значения для одинакового отображения */
@@ -271,17 +247,16 @@ html, body {
 }
 
 .performance-high {
-  --animation-duration: 0.3s;
-  --enable-backdrop-filter: blur(5px);
+  --animation-duration: 0.25s;
+  --enable-backdrop-filter: none;
   --enable-animations: 1;
 }
 
-/* GPU оптимизация для анимированных элементов */
+/* Без will-change для снижения числа композитных слоёв и нагрузки на GPU */
 .animate-pulse,
 .animate-ping,
 .animate-bounce,
 .animate-spin {
-  will-change: transform;
   transform: translateZ(0);
 }
 
@@ -477,10 +452,9 @@ html, body {
   }
 }
 
+/* Анимация вращения отключена для снижения нагрузки на GPU */
 .logo-star {
-  -webkit-animation: rotate-star 3s linear infinite;
-  -moz-animation: rotate-star 3s linear infinite;
-  animation: rotate-star 3s linear infinite;
+  animation: none;
   display: inline-block;
 }
 
@@ -803,11 +777,6 @@ html, body {
   z-index: 99999999 !important;
 }
 
-@media (min-width: 769px) {
-  .gaming-notifications-container {
-    backdrop-filter: blur(10px);
-  }
-}
 
 @media (max-width: 768px) {
   .gaming-notifications-container {
@@ -1041,10 +1010,8 @@ html, body {
   transition: none !important;
 }
 
-/* Контейнер для GPU оптимизированных элементов */
+/* Контейнер без will-change для снижения нагрузки на GPU */
 .gpu-optimized {
-  transform: translateZ(0);
-  will-change: transform;
   contain: layout style paint;
 }
 
@@ -1067,7 +1034,6 @@ html, body {
 
 /* Оптимизация для уведомлений */
 .notification-optimized {
-  will-change: transform, opacity;
   contain: layout style;
 }
 
@@ -1348,41 +1314,21 @@ img.live-drop-item {
 }
 
 ::-webkit-scrollbar-track {
-  background: linear-gradient(135deg, rgba(21, 18, 37, 0.4) 0%, rgba(25, 23, 45, 0.6) 100%);
+  background: rgba(21, 18, 37, 0.6);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 0.8) 0%,
-    rgba(139, 92, 246, 0.9) 50%,
-    rgba(168, 85, 247, 0.8) 100%
-  );
+  background: rgba(99, 102, 241, 0.7);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 1) 0%,
-    rgba(139, 92, 246, 1) 50%,
-    rgba(168, 85, 247, 1) 100%
-  );
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.9);
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(135deg,
-    rgba(79, 70, 229, 1) 0%,
-    rgba(124, 58, 237, 1) 50%,
-    rgba(147, 51, 234, 1) 100%
-  );
-  transform: scale(0.95);
+  background: rgba(79, 70, 229, 0.9);
 }
 
 ::-webkit-scrollbar-corner {
@@ -1406,13 +1352,8 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar-thumb,
 html::-webkit-scrollbar-thumb,
 #root::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 0.9) 0%,
-    rgba(139, 92, 246, 1) 50%,
-    rgba(168, 85, 247, 0.9) 100%
-  );
+  background: rgba(99, 102, 241, 0.8);
   border-radius: 7px;
-  border: 2px solid rgba(21, 18, 37, 0.3);
 }
 
 /* Стили для модальных окон и попапов */
@@ -1426,12 +1367,8 @@ html::-webkit-scrollbar-thumb,
 .modal::-webkit-scrollbar-thumb,
 .popup::-webkit-scrollbar-thumb,
 .dropdown::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 0.7) 0%,
-    rgba(139, 92, 246, 0.8) 100%
-  );
+  background: rgba(99, 102, 241, 0.7);
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Стили для инвентаря и списков */
@@ -1444,22 +1381,14 @@ html::-webkit-scrollbar-thumb,
 .inventory::-webkit-scrollbar-thumb,
 .list-container::-webkit-scrollbar-thumb,
 .chat::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(34, 197, 94, 0.7) 0%,
-    rgba(16, 185, 129, 0.8) 100%
-  );
+  background: rgba(34, 197, 94, 0.7);
   border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .inventory::-webkit-scrollbar-thumb:hover,
 .list-container::-webkit-scrollbar-thumb:hover,
 .chat::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg,
-    rgba(34, 197, 94, 0.9) 0%,
-    rgba(16, 185, 129, 1) 100%
-  );
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.9);
 }
 
 /* Горизонтальный скролл */
@@ -1468,11 +1397,7 @@ html::-webkit-scrollbar-thumb,
 }
 
 ::-webkit-scrollbar-thumb:horizontal {
-  background: linear-gradient(90deg,
-    rgba(99, 102, 241, 0.8) 0%,
-    rgba(139, 92, 246, 0.9) 50%,
-    rgba(168, 85, 247, 0.8) 100%
-  );
+  background: rgba(99, 102, 241, 0.7);
 }
 
 /* Обновляем стили для уведомлений */
@@ -1481,26 +1406,17 @@ html::-webkit-scrollbar-thumb,
 }
 
 .gaming-notifications-list::-webkit-scrollbar-track {
-  background: linear-gradient(135deg, rgba(21, 18, 37, 0.6) 0%, rgba(25, 23, 45, 0.8) 100%);
+  background: rgba(21, 18, 37, 0.7);
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .gaming-notifications-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 0.8) 0%,
-    rgba(139, 92, 246, 0.9) 100%
-  );
+  background: rgba(99, 102, 241, 0.7);
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .gaming-notifications-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg,
-    rgba(99, 102, 241, 1) 0%,
-    rgba(139, 92, 246, 1) 100%
-  );
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.9);
 }
 
 /* Адаптивные стили для мобильных устройств */
@@ -1535,43 +1451,20 @@ html::-webkit-scrollbar-thumb,
   }
 }
 
-/* Анимации для скроллбара */
-@keyframes scrollbar-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
-  }
-}
-
-::-webkit-scrollbar-thumb:hover {
-  animation: scrollbar-glow 2s ease-in-out infinite;
-}
-
-/* Специальные цвета для разных секций */
+/* Специальные цвета для разных секций — сплошные цвета без градиентов */
 .profile-section::-webkit-scrollbar-thumb,
 .user-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(139, 92, 246, 0.8) 0%,
-    rgba(168, 85, 247, 0.9) 100%
-  );
+  background: rgba(139, 92, 246, 0.8);
 }
 
 .cases-section::-webkit-scrollbar-thumb,
 .game-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(249, 115, 22, 0.8) 0%,
-    rgba(234, 88, 12, 0.9) 100%
-  );
+  background: rgba(249, 115, 22, 0.8);
 }
 
 .leaderboard::-webkit-scrollbar-thumb,
 .stats-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg,
-    rgba(34, 197, 94, 0.8) 0%,
-    rgba(16, 185, 129, 0.9) 100%
-  );
+  background: rgba(34, 197, 94, 0.8);
 }
 
 /* Универсальный класс для красивого скролла */
@@ -1935,8 +1828,7 @@ html::-webkit-scrollbar-thumb,
   padding: 1.5rem;
   border-radius: 24px;
   background: rgba(14, 12, 26, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 @media (min-width: 768px) {
@@ -1948,11 +1840,10 @@ html::-webkit-scrollbar-thumb,
 /* Заголовки секций — современный акцент для молодой аудитории */
 .section-title {
   letter-spacing: 0.02em;
-  text-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
 }
 
 .section-title-line {
-  transition: max-width 0.35s ease;
+  transition: max-width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .cases-section:hover .section-title-line {
