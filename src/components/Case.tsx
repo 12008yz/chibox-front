@@ -69,7 +69,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
           src={caseImageUrl}
           alt={title}
           draggable="false"
-          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`case-image w-full h-44 min-h-[180px] md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{
             pointerEvents: 'none',
             userSelect: 'none'

@@ -95,7 +95,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
         </p>
       )}
 
-      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-5 md:gap-8 md:flex-wrap overflow-visible">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-5 md:gap-8 md:flex-wrap overflow-visible">
         {(() => {
           // Скрываем кейс «бонус после регистрации», если пользователь исчерпал лимит:
           // - получил все 2 кейса (claimCount >= maxClaims), или

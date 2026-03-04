@@ -1876,7 +1876,8 @@ html::-webkit-scrollbar-thumb,
   border-radius: 0;
 }
 
-.case-item-wrapper [class*="rounded"] {
+/* Не трогаем rounded-full (индикатор-точка «Кейсы доступны»), обнуляем только скругления карточки */
+.case-item-wrapper [class*="rounded"]:not([class*="rounded-full"]) {
   border-radius: 0 !important;
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Check } from 'lucide-react';
 
 interface CaseTimerProps {
   nextAvailableTime?: string | null;
@@ -75,8 +76,8 @@ const CaseTimer: React.FC<CaseTimerProps> = ({ nextAvailableTime, className = ''
 
   if (isAvailable) {
     return (
-      <div ref={containerRef} className={`inline-flex items-center space-x-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30 ${className}`}>
-        <div className="w-2 h-2 bg-green-500 rounded-full pulse-dot" />
+      <div ref={containerRef} className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30 ${className}`}>
+        <Check className="w-5 h-5 flex-shrink-0 text-green-500" strokeWidth={2.5} aria-hidden />
         <span className="text-green-400 text-sm font-medium">{t('common.cases_available')}</span>
       </div>
     );
