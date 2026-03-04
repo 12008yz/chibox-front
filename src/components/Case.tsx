@@ -69,7 +69,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
           src={caseImageUrl}
           alt={title}
           draggable="false"
-          className={`case-image w-full h-52 min-h-[200px] md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{
             pointerEvents: 'none',
             userSelect: 'none'
@@ -84,7 +84,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       </div>
 
       <div className="flex flex-col gap-2 p-2 md:p-4 items-center">
-        <div className="font-bold text-base md:text-lg text-white text-center">{translateCaseName(title)}</div>
+        <div className="font-bold text-sm md:text-lg text-white text-center">{translateCaseName(title)}</div>
         <div className="font-medium text-sm md:text-lg lg:text-xl text-green-400">
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
