@@ -13,13 +13,15 @@ interface CaseProps {
   description?: string;
   nextCaseAvailableTime?: string | null;
   isBonusCase?: boolean;
+  /** Кейс «бонус после регистрации» (2 кейса в первые дни) — показываем подпись «Бонус после регистрации» вместо «ежедневно» */
+  isRegistrationBonusCase?: boolean;
   onPlayBonusGame?: () => void;
   isTicTacToeCase?: boolean;
   isAuthenticated?: boolean;
   onAuthRequired?: () => void;
 }
 
-const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, onPlayBonusGame, isTicTacToeCase = false, isAuthenticated = false, onAuthRequired }) => {
+const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, description, nextCaseAvailableTime, isBonusCase = false, isRegistrationBonusCase = false, onPlayBonusGame, isTicTacToeCase = false, isAuthenticated = false, onAuthRequired }) => {
   const { t } = useTranslation();
 
   // Функция для перевода названий кейсов
@@ -96,7 +98,9 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
             </span>
           ) : (
             parseFloat(price) === 0 || isNaN(parseFloat(price)) ? (
-              <span className="text-sm md:text-base lg:text-lg">{t('common.daily')}</span>
+              <span className="text-sm md:text-base lg:text-lg">
+                {isRegistrationBonusCase ? t('common.registration_bonus') : t('common.daily')}
+              </span>
             ) : (
               <Monetary value={parseFloat(price)} iconSize="lg" />
             )

@@ -26,6 +26,7 @@
     "open": "打开",
     "play": "开始游戏",
     "daily": "每日",
+    "registration_bonus": "注册后奖励",
     "online": "在线：{{count}}",
     "balance": "余额",
     "currency_suffix": " CR",

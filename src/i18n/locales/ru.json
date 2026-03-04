@@ -15,6 +15,7 @@
     "open": "Открыть",
     "play": "Играть",
     "daily": "ежедневно",
+    "registration_bonus": "Бонус после регистрации",
     "online": "Онлайн: {{count}}",
     "balance": "Баланс",
     "currency_suffix": " КР",

@@ -26,6 +26,7 @@
     "open": "Abrir",
     "play": "Jugar",
     "daily": "diario",
+    "registration_bonus": "Bonificación tras registrarse",
     "online": "En línea: {{count}}",
     "balance": "Saldo",
     "currency_suffix": " CR",

@@ -92,12 +92,20 @@ const CaseListing: React.FC<CaseListingProps> = ({
       {description && <div className="text-gray-300 mb-8">{description}</div>}
 
       <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap">
-        {cases && cases.length > 0 ? (
-          cases.map((caseItem) => {
+        {(() => {
+          // Скрываем кейс «бонус после регистрации», если пользователь уже получил все 2 кейса
+          const visibleCases = (cases || []).filter((caseItem) => {
+            if (!caseItem.id) return false;
+            const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
+            if (isFreeCase && freeCaseStatus && freeCaseStatus.claimCount >= freeCaseStatus.maxClaims) return false;
+            return true;
+          });
+          return visibleCases.length > 0 ? (
+          visibleCases.map((caseItem) => {
             if (caseItem.id) {
               const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
 
-              // Проверяем, является ли это бесплатным кейсом для новых пользователей
+              // Проверяем, является ли это бесплатным кейсом для новых пользователей (2 кейса в первые дни после регистрации)
               const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
 
               // Проверяем, является ли это кейсом крестиков-ноликов (бонусный кейс)
@@ -152,6 +160,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                       image={caseItem.image_url}
                       price={caseItem.price}
                       fixedPrices={fixedPrices}
+                      isRegistrationBonusCase={!!isFreeCase}
                       description={caseItem.name?.toLowerCase().includes('бонус') ? t('homepage.win_bonus_game') : undefined}
                       nextCaseAvailableTime={caseNextAvailableTime}
                       isBonusCase={false}
@@ -165,11 +174,12 @@ const CaseListing: React.FC<CaseListingProps> = ({
               return null;
             }
           })
-        ) : (
+          ) : (
           <div className="text-gray-400 text-center py-8">
             {t('homepage.cases_not_found')}
           </div>
-        )}
+        );
+        })()}
       </div>
 
       {/* Модальное окно превью кейса */}

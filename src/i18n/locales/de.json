@@ -26,6 +26,7 @@
     "open": "Öffnen",
     "play": "Spielen",
     "daily": "täglich",
+    "registration_bonus": "Bonus nach Registrierung",
     "online": "Online: {{count}}",
     "balance": "Guthaben",
     "currency_suffix": " CR",

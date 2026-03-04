@@ -26,6 +26,7 @@
     "open": "Ouvrir",
     "play": "Jouer",
     "daily": "quotidien",
+    "registration_bonus": "Bonus après inscription",
     "online": "En ligne : {{count}}",
     "balance": "Solde",
     "currency_suffix": " CR",
