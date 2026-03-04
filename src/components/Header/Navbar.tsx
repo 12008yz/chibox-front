@@ -232,7 +232,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 openNotifications={openNotifications}
                 setOpenNotifications={setOpenNotifications}
                 user={user}
-                isMobileMenu={true}
               />
             </div>
           </div>

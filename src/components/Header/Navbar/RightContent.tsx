@@ -16,14 +16,12 @@ interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   user?: any; // TODO: заменить на правильный тип
-  isMobileMenu?: boolean;
 }
 
 const RightContent: React.FC<RightContentProps> = ({
   openNotifications,
   setOpenNotifications,
   user,
-  isMobileMenu = false
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
