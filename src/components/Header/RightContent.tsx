@@ -11,7 +11,6 @@ import { performFullLogout } from "../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery } from "../../features/user/userApi";
 import Notifications from './Navbar/Notifications';
 import DepositModal from '../DepositModal';
-import LanguageSwitcher from '../LanguageSwitcher';
 
 interface RightContentProps {
   openNotifications: boolean;
@@ -124,9 +123,6 @@ const RightContent: React.FC<RightContentProps> = ({
           />
         )}
       </div>
-
-      {/* Переключатель языков */}
-      <LanguageSwitcher />
 
       {/* Профиль пользователя */}
       <div

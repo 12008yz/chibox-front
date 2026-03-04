@@ -15,6 +15,7 @@ import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import SafeCrackerGame from '../components/SafeCrackerGame';
 import OnboardingTour from '../components/OnboardingTour';
+import DepositModal from '../components/DepositModal';
 import { formatDaysI18n } from '../utils/declension';
 import { BACKGROUNDS } from '../utils/config';
 
@@ -79,6 +80,16 @@ const HomePage: React.FC = () => {
 
   // Состояние игр
   const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
+
+  // Модалка покупки статуса (при переходе из профиля «Купить статус»)
+  const [showStatusPurchaseModal, setShowStatusPurchaseModal] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.openStatusModal) {
+      setShowStatusPurchaseModal(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   // Логирование изменений состояния игры
   useEffect(() => {
@@ -577,6 +588,13 @@ const HomePage: React.FC = () => {
       <OnboardingTour
         isActive={showOnboarding}
         onComplete={handleOnboardingComplete}
+      />
+
+      {/* Модалка покупки статуса (при переходе из профиля) */}
+      <DepositModal
+        isOpen={showStatusPurchaseModal}
+        onClose={() => setShowStatusPurchaseModal(false)}
+        initialTab="subscription"
       />
 
     </div>

@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../store/hooks';
 import {
   useGetUserInventoryQuery,
@@ -179,9 +180,17 @@ const ItemCard: React.FC<{
 const ExchangePage: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuth();
+  const [searchParams] = useSearchParams();
   const [selectedTab, setSelectedTab] = useState<'sell' | 'exchange'>('sell');
   const [searchTerm, setSearchTerm] = useState('');
   const [rarityFilter, setRarityFilter] = useState<string>('all');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'exchange') {
+      setSelectedTab('exchange');
+    }
+  }, [searchParams]);
 
   // API hooks
   const {

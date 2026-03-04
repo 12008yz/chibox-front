@@ -272,6 +272,12 @@
       "withdrawn": "Withdrawn",
       "sold": "Sold"
     },
+    "no_status_withdraw_modal": {
+      "title": "Status required for withdrawal",
+      "description": "You can buy status with ChiCoins or exchange the item for status days for free in the exchange shop.",
+      "buy_status": "Buy status",
+      "exchange_free": "Exchange in the shop"
+    },
     "item_withdraw": {
       "withdrawing": "Withdrawing...",
       "withdraw_to_steam": "Withdraw to Steam",

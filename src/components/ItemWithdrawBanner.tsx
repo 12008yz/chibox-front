@@ -6,6 +6,7 @@ import type { UserInventoryItem } from '../types/api';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { getApiErrorMessage } from '../utils/config';
+import NoStatusWithdrawModal from './NoStatusWithdrawModal';
 
 interface ItemWithdrawBannerProps {
   item: UserInventoryItem;
@@ -24,6 +25,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [steamTradeUrl, setSteamTradeUrl] = useState('');
   const [showMobileModal, setShowMobileModal] = useState(false);
+  const [showNoStatusModal, setShowNoStatusModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [withdrawItem] = useWithdrawItemMutation();
 
@@ -114,7 +116,11 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const handleMobileClick = (e: React.MouseEvent) => {
     if (isMobile) {
       e.stopPropagation();
-      setShowMobileModal(true);
+      if (!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription) {
+        setShowNoStatusModal(true);
+      } else {
+        setShowMobileModal(true);
+      }
     }
   };
 
@@ -171,7 +177,7 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
               </p>
             </div>
           ) : (
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-[10px] text-gray-400 bg-gray-700/50 rounded py-1.5 px-2 leading-tight">
                 {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription
                   ? t('profile.item_withdraw.subscription_required')
@@ -179,9 +185,21 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
                 }
               </p>
               {!withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription && (
-                <p className="text-[10px] text-orange-400 mt-1 leading-tight">
-                  {subscriptionStatus.statusText}
-                </p>
+                <>
+                  <p className="text-[10px] text-orange-400 leading-tight">
+                    {subscriptionStatus.statusText}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowNoStatusModal(true);
+                    }}
+                    className="text-[10px] font-semibold text-purple-300 hover:text-purple-200 underline underline-offset-1"
+                  >
+                    {t('profile.no_status_withdraw_modal.buy_status')}
+                  </button>
+                </>
               )}
             </div>
           )}
@@ -258,11 +276,23 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       )}
       {!canWithdraw && !withdrawPermission.canWithdraw && withdrawPermission.requiresSubscription && (
         <div className="lg:hidden absolute bottom-2 left-2 right-2 z-20">
-          <div className="w-full bg-gray-700/90 text-gray-300 font-medium py-1.5 px-2 rounded-lg text-[9px] text-center shadow-lg">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowNoStatusModal(true);
+            }}
+            className="w-full bg-gray-700/90 hover:bg-gray-600/90 text-gray-300 font-medium py-1.5 px-2 rounded-lg text-[9px] text-center shadow-lg transition-colors"
+          >
             {t('profile.item_withdraw.subscription_required')}
-          </div>
+          </button>
         </div>
       )}
+
+      <NoStatusWithdrawModal
+        isOpen={showNoStatusModal}
+        onClose={() => setShowNoStatusModal(false)}
+      />
 
       {/* Mobile Modal */}
       {showMobileModal && isMobile && (

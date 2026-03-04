@@ -272,6 +272,12 @@
     "weapon_type": "Тип:",
     "weapon_type_default": "Оружие",
 
+    "no_status_withdraw_modal": {
+      "title": "Для вывода нужен статус",
+      "description": "Вы можете купить статус за ChiCoins или обменять предмет на дни статуса бесплатно в лавке обмена.",
+      "buy_status": "Купить статус",
+      "exchange_free": "Обменять в лавке обмена"
+    },
     "item_withdraw": {
       "withdrawing": "Выводим...",
       "withdraw_to_steam": "Вывести в Steam",

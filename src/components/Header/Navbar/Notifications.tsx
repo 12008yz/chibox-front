@@ -7,7 +7,6 @@ import { useGetUserNotificationsQuery, useMarkNotificationAsReadMutation, useMar
 import { updateBalance } from '../../../features/auth/authSlice';
 import type { Notification } from '../../../types/api';
 import { CheckCircle, Info, AlertTriangle, XCircle, Settings, Users, MessageSquare, Gift, Package, X, Coins, Clock } from 'lucide-react';
-import LanguageSwitcher from '../../LanguageSwitcher';
 
 export interface WithdrawalNoStockData {
   subtype: string;
@@ -440,7 +439,6 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             )}
                         </div>
                         <div className="flex items-center space-x-2">
-                            <LanguageSwitcher />
                             <button
                                 onClick={handleCloseNotifications}
                                 className="gaming-close-button"

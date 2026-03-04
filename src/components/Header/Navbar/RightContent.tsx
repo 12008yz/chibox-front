@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
 import DepositModal from '../../DepositModal';
-import LanguageSwitcher from '../../LanguageSwitcher';
 import SafeCrackerButton from '../SafeCrackerButton';
 import { useAppDispatch } from '../../../store/hooks';
 import { setShowAuthModal } from '../../../store/slices/uiSlice';
@@ -73,7 +72,6 @@ const RightContent: React.FC<RightContentProps> = ({
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <LanguageSwitcher />
         <button
           onClick={() => dispatch(setShowAuthModal(true))}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40"
@@ -147,11 +145,6 @@ const RightContent: React.FC<RightContentProps> = ({
             setOpenNotifications={setOpenNotifications}
           />
         )}
-      </div>
-
-      {/* Переключатель языков */}
-      <div className={isMobileMenu ? "block" : "hidden md:block"}>
-        <LanguageSwitcher />
       </div>
 
       {/* Бонус Safe Cracker - показываем на всех размерах экрана */}
