@@ -335,6 +335,35 @@ export const strikeAnimationStyles = `
     animation: win-flash 0.6s ease-out forwards;
   }
 
+  @-webkit-keyframes mobile-win-reveal {
+    0% {
+      opacity: 0;
+      -webkit-transform: translate(-50%, -50%) scale(0.85);
+      transform: translate(-50%, -50%) scale(0.85);
+    }
+    100% {
+      opacity: 1;
+      -webkit-transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  @keyframes mobile-win-reveal {
+    0% {
+      opacity: 0;
+      -webkit-transform: translate(-50%, -50%) scale(0.85);
+      transform: translate(-50%, -50%) scale(0.85);
+    }
+    100% {
+      opacity: 1;
+      -webkit-transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  .mobile-win-reveal {
+    -webkit-animation: mobile-win-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: mobile-win-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
   .win-shake {
     -webkit-animation: win-shake 0.5s ease-in-out forwards;
     animation: win-shake 0.5s ease-in-out forwards;

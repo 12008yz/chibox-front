@@ -15,7 +15,7 @@ import ItemInfoModal from './components/ItemInfoModal';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
-import { getCaseImageUrl, preloadItemImages } from '../../utils/steamImageUtils';
+import { getCaseImageUrl, getItemImageUrl, adaptImageSize, preloadItemImages } from '../../utils/steamImageUtils';
 import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
 
@@ -515,12 +515,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
                 setAnimationPhase('stopped');
 
-                // Крутая последовательность эффектов выигрыша
+                // Эффекты выигрыша: на мобильной без взрыва
                 trackTimeout(() => {
-                  soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
-                  setShowWinEffects(true);
+                  if (!isMobileOrTablet) {
+                    soundManager.play('endProcess');
+                    setShowWinEffects(true);
+                  }
                 }, 300);
-                trackTimeout(() => setShowGoldenSparks(true), 800);
+                trackTimeout(() => { if (!isMobileOrTablet) setShowGoldenSparks(true); }, 800);
                 trackTimeout(() => {
                   if (caseData.id === "44444444-4444-4444-4444-444444444444") {
                     setShowStrikeThrough(true);
@@ -541,12 +543,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
         setAnimationPhase('stopped');
 
-        // Крутая последовательность эффектов выигрыша
+        // Эффекты выигрыша: на мобильной без взрыва
         trackTimeout(() => {
-          soundManager.play('endProcess'); // Звук синхронно с анимацией взрыва
-          setShowWinEffects(true);
-        }, 300); // Вспышка и круги
-        trackTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
+          if (!isMobileOrTablet) {
+            soundManager.play('endProcess');
+            setShowWinEffects(true);
+          }
+        }, 300);
+        trackTimeout(() => { if (!isMobileOrTablet) setShowGoldenSparks(true); }, 800); // Золотые искры
         trackTimeout(() => {
           if (caseData.id === "44444444-4444-4444-4444-444444444444") {
             setShowStrikeThrough(true);
@@ -747,6 +751,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // На мобильных во время анимации: полоска из 12 предметов (или всех, если меньше 12)
   const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
+  const wonItem = openingResult?.item;
+  const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
+
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
     <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
       <div className="relative w-full h-full flex items-center min-h-0">
@@ -788,13 +795,37 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Мобильный показ выигрыша: карточка по центру с изящным появлением */}
+        {showMobileWinReveal && (
+          <div
+            className="absolute left-1/2 top-1/2 z-20 mobile-win-reveal w-[180px] sm:w-[200px] pointer-events-none"
+            style={{ opacity: 0 }}
+          >
+            <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${getRarityColor(wonItem.rarity)}`}>
+              <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+                <img
+                  src={adaptImageSize(getItemImageUrl(wonItem.image_url, wonItem.name)) || getItemImageUrl(wonItem.image_url, wonItem.name)}
+                  alt={wonItem.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <p className="text-white font-semibold text-xs sm:text-sm text-center line-clamp-2 mb-1" title={wonItem.name}>
+                {wonItem.name}
+              </p>
+              <p className="text-green-400 text-xs font-bold text-center">
+                {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 
   const modalContent = (
     <>
-      {showWinEffects && <div className="win-flash-overlay" />}
+      {showWinEffects && !isMobileOrTablet && <div className="win-flash-overlay" />}
 
       {/* Мобильные: во время анимации — прозрачный фон (видна картинка страницы), только центральный квадрат и полоска. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (

@@ -954,6 +954,7 @@
     "loading_items": "Загрузка предметов...",
     "loading_error": "Ошибка загрузки предметов",
     "no_items": "Предметы не найдены",
+    "you_won": "Вы выиграли!",
     "close": "Закрыть",
     "payment_method": "Оплата:",
     "balance_payment": "Баланс",
