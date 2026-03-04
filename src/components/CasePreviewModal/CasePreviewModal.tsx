@@ -780,6 +780,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   generateGoldenSparks={generateGoldenSparks}
                   t={t}
                   onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                  suppressBetweenHighlight={true}
                 />
               </div>
             ))}
@@ -895,7 +896,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   <h3 className="text-lg font-bold text-white mb-3">
                     {t('case_contents', { defaultValue: 'Содержимое кейса' })}
                   </h3>
-                  <div className="grid grid-cols-2 gap-3 pb-4">
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3 pb-4">
                     {itemsWithAdjustedChances.map((item: any, index: number) => (
                       <CaseItem
                         key={item.id || index}

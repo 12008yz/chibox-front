@@ -24,7 +24,8 @@ export const CaseItem = memo(({
   generateGoldenSparks,
   t,
   isVisible = true,
-  onItemClick
+  onItemClick,
+  suppressBetweenHighlight = false
 }: CaseItemProps) => {
   const [imageError, setImageError] = useState(false);
 
@@ -39,8 +40,9 @@ export const CaseItem = memo(({
   // Рассчитываем состояния предмета
   const isCurrentSliderPosition = showOpeningAnimation && sliderPosition === animationIndex;
   const isNextSliderPosition = showOpeningAnimation && sliderPosition + 1 === animationIndex;
-  const isBetweenItems = (animationPhase === 'wobbling' || animationPhase === 'falling') &&
-                         (isCurrentSliderPosition || isNextSliderPosition);
+  const isBetweenItems = !suppressBetweenHighlight &&
+    (animationPhase === 'wobbling' || animationPhase === 'falling') &&
+    (isCurrentSliderPosition || isNextSliderPosition);
   const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
   const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
   const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
@@ -73,7 +75,7 @@ export const CaseItem = memo(({
     return `${baseClasses} ${animationClasses} ${highlightClasses} ${betweenClasses} ${winningClasses} ${glowClasses} ${excludedClasses} ${performanceClass} ${winEffectClass}`;
   }, [
     item.rarity, item.isExcluded, isCurrentSliderPosition, isBetweenItems, isWinningItem, isWinningItemStopped,
-    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU, showWinEffects, animationPhase
+    showOpeningAnimation, showGoldenSparks, showStrikeThrough, isDailyCase, getRarityColor, shouldUseGPU, showWinEffects, animationPhase, suppressBetweenHighlight
   ]);
 
   // Динамические стили для визуальных эффектов в зависимости от фазы анимации

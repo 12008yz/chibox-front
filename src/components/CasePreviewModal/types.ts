@@ -27,6 +27,8 @@ export interface CaseItemProps {
   t: (key: string, options?: any) => string;
   isVisible?: boolean;
   onItemClick?: (item: any) => void;
+  /** На мобильных во время анимации — не показывать оранжевую обводку «между предметами» */
+  suppressBetweenHighlight?: boolean;
 }
 
 export interface StaticCaseItemProps {
