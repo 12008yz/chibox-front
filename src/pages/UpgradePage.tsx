@@ -53,6 +53,7 @@ const SelectedItemsDisplay: React.FC<{
   onRemoveSourceItem,
   onRemoveTargetItem
 }) => {
+  const { t } = useTranslation();
   const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
 
   const getChanceColor = (chance: number) => {
@@ -229,7 +230,7 @@ const SelectedItemsDisplay: React.FC<{
                 <div className="bg-black/50 rounded-lg p-4 border border-gray-600/30 h-24 sm:h-32 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-gray-400 text-xs sm:text-sm">Не выбран</div>
-                    <div className="text-gray-500 text-xs">Выберите целевой предмет</div>
+                    <div className="text-gray-500 text-xs">{t('upgrade.step_2_title')}</div>
                   </div>
                 </div>
               )}
