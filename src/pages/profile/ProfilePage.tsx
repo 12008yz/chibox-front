@@ -250,7 +250,7 @@ const ProfilePage: React.FC = () => {
   const openedCasesCount = user?.total_cases_opened || 0;
 
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative" data-play-click-sound-mobile>
       {/* Фиксированный фон на весь экран */}
       <div
         className="fixed inset-0 -z-50"

@@ -154,6 +154,7 @@ const RightContent: React.FC<RightContentProps> = ({
       <div
         className="gaming-profile-container cursor-pointer flex-shrink-0"
         onClick={handleProfileClick}
+        data-play-click-sound-mobile
       >
         <div className="flex items-center gap-1 md:gap-2 xl:gap-3">
           <div className="gaming-avatar-wrapper">

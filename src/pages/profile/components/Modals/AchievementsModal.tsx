@@ -85,6 +85,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
       <div
         className="relative w-full max-w-6xl max-h-[90vh] bg-[#0f0f0f] border border-gray-800 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        data-play-click-sound-mobile
       >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[#0f0f0f] border-b border-gray-800 px-6 py-4">

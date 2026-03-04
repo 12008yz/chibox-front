@@ -37,9 +37,12 @@ interface MainButtonProps {
 
    const pulseClass = pulse ? "animate-bounce " : "";
 
-   const handleClick = () => {
+   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
      if (!disabled && !loading) {
-       soundManager.play('click');
+       const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+       if (!isMobile || (e.currentTarget && e.currentTarget.closest('[data-play-click-sound-mobile]'))) {
+         soundManager.play('click');
+       }
        onClick();
      }
    };
@@ -51,7 +54,7 @@ interface MainButtonProps {
        text-white font-medium ${disabled ? "opacity-50 cursor-not-allowed" : pulseClass} ${
          textSize ? textSize : "md:text-lg"
        }`}
-       onClick={handleClick}
+       onClick={(e) => handleClick(e)}
        disabled={disabled}
        type={submit ? "submit" : "button"}
      >

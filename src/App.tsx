@@ -156,19 +156,19 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Глобальный звук клика
+  // Глобальный звук клика (на мобильных — только в зонах с data-play-click-sound-mobile)
   useEffect(() => {
     const handleGlobalClick = (event: MouseEvent) => {
-      // Проверяем, что клик был по интерактивному элементу
       const target = event.target as HTMLElement;
       const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [onclick]');
 
-      // Исключаем элементы, которые воспроизводят свои собственные звуки
       const hasNoClickSound = target.closest('[data-no-click-sound]');
+      if (!isInteractive || !soundsEnabled || hasNoClickSound) return;
 
-      if (isInteractive && soundsEnabled && !hasNoClickSound) {
-        soundManager.play('uiClick');
-      }
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+      if (isMobile && !target.closest('[data-play-click-sound-mobile]')) return;
+
+      soundManager.play('uiClick');
     };
 
     document.addEventListener('click', handleGlobalClick);

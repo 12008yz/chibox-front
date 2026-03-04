@@ -120,7 +120,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
     setSelectedCell(position);
     setAnimatingCells([position]);
 
-    // Звук клика
+    // Звук клика по клетке
     soundManager.play('click');
 
     try {
