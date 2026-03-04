@@ -563,7 +563,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       currentAvailablePosition++;
       let fullListPosition = 0;
       if (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) {
-        // Полоска из 12 предметов: позиция = шаг анимации (0..11)
+        // Полоска из 24 предметов: позиция = шаг анимации (0..23)
         fullListPosition = currentAvailablePosition;
       } else {
         let availableCount = 0;
@@ -749,7 +749,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  // На мобильных во время анимации: полоска из 12 предметов (или всех, если меньше)
+  // На мобильных во время анимации: полоска из 24 предметов (или всех, если меньше)
   const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
   const wonItem = openingResult?.item;
   const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
