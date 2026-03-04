@@ -62,7 +62,7 @@ export const CaseItem = memo(({
 
   // Предвычисляем все классы CSS с мемоизацией
   const itemClasses = useMemo(() => {
-    const stripSizeClasses = suppressBetweenHighlight ? 'max-w-full max-h-full p-1' : '';
+    const stripSizeClasses = suppressBetweenHighlight ? 'w-full h-full max-w-full max-h-full p-1 box-border' : '';
     const baseClasses = `item-container bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative ${getRarityColor(item.rarity)} ${stripSizeClasses}`;
     const animationClasses = !showOpeningAnimation ? 'hover:scale-105 transition-transform duration-200' : '';
     // На мобильной полоске (suppressBetweenHighlight) — без ползунка по предметам, только центральный квадрат
