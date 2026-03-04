@@ -51,6 +51,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showDropChance, setShowDropChance] = useState(false);
+  // На мобильных: только 12 предметов в анимации (полоска + результат)
+  const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -322,6 +324,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowWinEffects(false);
     setShouldStopBetween(false);
     setIsProcessing(false);
+    setMobileAnimationItems([]);
 
     // Останавливаем все звуки
     soundManager.stopAll();
@@ -379,13 +382,29 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const useStopBetween = false;
     setShouldStopBetween(useStopBetween);
 
-    const availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
-    const wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
+    let availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
+    let wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
 
     if (wonItemIndex === -1) {
       setAnimationPhase('stopped');
       setTimeout(() => handleAnimationComplete(), 1500);
       return;
+    }
+
+    // На мобильных: только 12 предметов в полоске, результат — последний
+    if (isMobileOrTablet) {
+      if (availableItemsForAnimation.length > 12) {
+        const others = availableItemsForAnimation.filter(item => item.id !== wonItem.id);
+        const shuffled = [...others].sort(() => Math.random() - 0.5);
+        const twelve = [...shuffled.slice(0, 11), wonItem];
+        setMobileAnimationItems(twelve);
+        availableItemsForAnimation = twelve;
+        wonItemIndex = 11;
+      } else {
+        setMobileAnimationItems(availableItemsForAnimation);
+      }
+    } else {
+      setMobileAnimationItems([]);
     }
 
     setSliderPosition(0);
@@ -489,7 +508,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
               // Быстрое падение на выигрышный предмет
               trackTimeout(() => {
-                const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+                const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= 12) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
                 setSliderPosition(wonItemInFullList);
                 if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
                 setAnimationPhase('stopped');
@@ -515,7 +534,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
 
       if (currentAvailablePosition >= wonItemIndex) {
-        const wonItemInFullList = itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+        const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= 12) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
         setSliderPosition(wonItemInFullList);
         if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
         setAnimationPhase('stopped');
@@ -537,14 +556,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       currentAvailablePosition++;
       let fullListPosition = 0;
-      let availableCount = 0;
-      for (let i = 0; i < itemsWithAdjustedChances.length; i++) {
-        if (!itemsWithAdjustedChances[i].isExcluded) {
-          if (availableCount === currentAvailablePosition) {
-            fullListPosition = i;
-            break;
+      if (isMobileOrTablet && availableItemsForAnimation.length <= 12) {
+        // Полоска из 12 предметов: позиция = шаг анимации (0..11)
+        fullListPosition = currentAvailablePosition;
+      } else {
+        let availableCount = 0;
+        for (let i = 0; i < itemsWithAdjustedChances.length; i++) {
+          if (!itemsWithAdjustedChances[i].isExcluded) {
+            if (availableCount === currentAvailablePosition) {
+              fullListPosition = i;
+              break;
+            }
+            availableCount++;
           }
-          availableCount++;
         }
       }
 
@@ -719,8 +743,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  // Только на мобильных во время анимации — один скролл на весь экран (без шапки, кнопок, фона)
-  const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsWithAdjustedChances.length > 0 && (
+  // На мобильных во время анимации: полоска из 12 предметов (или всех, если меньше 12)
+  const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
+  const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
     <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
       <div className="relative w-full h-full flex items-center min-h-0">
         <div
@@ -736,7 +761,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               paddingRight: 'calc(50% - 50px)',
             }}
           >
-            {itemsWithAdjustedChances.map((item: any, index: number) => (
+            {itemsForMobileStrip.map((item: any, index: number) => (
               <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
                 <CaseItem
                   item={item}
@@ -768,9 +793,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     <>
       {showWinEffects && <div className="win-flash-overlay" />}
 
-      {/* Мобильные: во время анимации — только скролл, без модалки. Десктоп — без изменений. */}
+      {/* Мобильные: во время анимации — только фон и анимация, без кейсов и надписей. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full" style={{ backgroundColor: 'transparent' }}>
+        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-[#151225]">
           <div className="absolute inset-0 w-full h-full flex items-center justify-center">
             {mobileScrollOnlyContent}
           </div>
