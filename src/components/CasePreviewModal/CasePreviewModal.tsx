@@ -820,8 +820,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
         <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
-          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
-            {mobileScrollOnlyContent}
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
+            {/* Горизонтальный блок во всю ширину: «рельс» с обводкой, анимация внутри */}
+            <div className="w-full case-open-rail min-h-[180px] sm:min-h-[200px] flex items-center justify-center">
+              {mobileScrollOnlyContent}
+            </div>
           </div>
         </div>
       ) : (

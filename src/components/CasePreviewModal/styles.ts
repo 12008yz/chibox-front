@@ -679,6 +679,14 @@ export const strikeAnimationStyles = `
     }
   }
 
+  /* Горизонтальный «рельс» анимации: обводка во всю ширину, один слой тени, без градиентов/блюра */
+  .case-open-rail {
+    border-top: 2px solid rgba(251, 191, 36, 0.6);
+    border-bottom: 2px solid rgba(251, 191, 36, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.15);
+    background-color: rgba(0, 0, 0, 0.25);
+  }
+
   /* will-change только во время движения, чтобы не держать слой после остановки */
   .case-open-strip.case-open-strip-moving {
     will-change: transform;
