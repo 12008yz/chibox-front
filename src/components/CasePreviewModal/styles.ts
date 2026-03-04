@@ -668,6 +668,15 @@ export const strikeAnimationStyles = `
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     contain: layout style;
+    /* Центр первого слота совпадает с центром окна: 50% минус половина ширины карточки */
+    padding-left: calc(50% - 50px);
+    padding-right: calc(50% - 50px);
+  }
+  @media (min-width: 640px) {
+    .case-open-strip {
+      padding-left: calc(50% - 56px);
+      padding-right: calc(50% - 56px);
+    }
   }
 
   /* will-change только во время движения, чтобы не держать слой после остановки */

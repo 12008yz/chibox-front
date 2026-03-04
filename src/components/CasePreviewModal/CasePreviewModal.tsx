@@ -51,8 +51,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showDropChance, setShowDropChance] = useState(false);
-  // На мобильных: только 12 предметов в анимации (полоска + результат)
+  // На мобильных: 24 предмета в анимации (полоска + результат)
   const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
+  const MOBILE_STRIP_SIZE = 24;
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,7 +64,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Мобильная оптимизация: позиция полоски через ref, без лишних re-render на каждый шаг
   const mobileStripRef = useRef<HTMLDivElement>(null);
   const mobileAnimationRef = useRef<{ position: number; offset: number }>({ position: 0, offset: 0 });
-  const MOBILE_ITEM_WIDTH = 112; // 100px карточка + 12px gap
+  // Шаг полоски: mobile 100px+12px=112, sm 112px+12px=124 (совпадает с w-[100px]/sm:w-[112px] + gap-3)
+  const getMobileStepPx = () => (typeof window !== 'undefined' && window.innerWidth >= 640 ? 124 : 112);
 
   // Мобильная/планшетная версия: горизонтальный скролл + центральный квадрат (breakpoint lg 1024px)
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
@@ -393,16 +395,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
 
-    // На мобильных: только 12 предметов в полоске, выигрышный — в случайной позиции (0..11)
+    // На мобильных: 24 предмета в полоске, выигрышный — в случайной позиции (0..23)
     if (isMobileOrTablet) {
-      if (availableItemsForAnimation.length > 12) {
+      if (availableItemsForAnimation.length > MOBILE_STRIP_SIZE) {
         const others = availableItemsForAnimation.filter(item => item.id !== wonItem.id);
         const shuffled = [...others].sort(() => Math.random() - 0.5);
-        const eleven = shuffled.slice(0, 11);
-        const insertAt = Math.floor(Math.random() * 12); // случайная позиция 0..11
-        const twelve = [...eleven.slice(0, insertAt), wonItem, ...eleven.slice(insertAt)];
-        setMobileAnimationItems(twelve);
-        availableItemsForAnimation = twelve;
+        const rest = shuffled.slice(0, MOBILE_STRIP_SIZE - 1);
+        const insertAt = Math.floor(Math.random() * MOBILE_STRIP_SIZE);
+        const stripItems = [...rest.slice(0, insertAt), wonItem, ...rest.slice(insertAt)];
+        setMobileAnimationItems(stripItems);
+        availableItemsForAnimation = stripItems;
         wonItemIndex = insertAt;
       } else {
         setMobileAnimationItems(availableItemsForAnimation);
@@ -440,7 +442,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       mobileAnimationRef.current.position = position;
       mobileAnimationRef.current.offset = offset;
       if (mobileStripRef.current) {
-        const px = -(position + offset) * MOBILE_ITEM_WIDTH;
+        const px = -(position + offset) * getMobileStepPx();
         mobileStripRef.current.style.transform = `translate3d(${px}px,0,0)`;
         mobileStripRef.current.style.webkitTransform = `translate3d(${px}px,0,0)`;
       }
@@ -512,7 +514,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
               // Быстрое падение на выигрышный предмет
               trackTimeout(() => {
-                const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= 12) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+                const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
                 setSliderPosition(wonItemInFullList);
                 if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
                 setAnimationPhase('stopped');
@@ -538,7 +540,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
 
       if (currentAvailablePosition >= wonItemIndex) {
-        const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= 12) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
+        const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
         setSliderPosition(wonItemInFullList);
         if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
         setAnimationPhase('stopped');
@@ -560,8 +562,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       currentAvailablePosition++;
       let fullListPosition = 0;
-      if (isMobileOrTablet && availableItemsForAnimation.length <= 12) {
-        // Полоска из 12 предметов: позиция = шаг анимации (0..11)
+      if (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) {
+        // Полоска из 24 предметов: позиция = шаг анимации (0..23)
         fullListPosition = currentAvailablePosition;
       } else {
         let availableCount = 0;
@@ -747,7 +749,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  // На мобильных во время анимации: полоска из 12 предметов (или всех, если меньше 12)
+  // На мобильных во время анимации: полоска из 24 предметов (или всех, если меньше)
   const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
   const wonItem = openingResult?.item;
   const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
@@ -755,26 +757,23 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const isSlowingPhase = animationPhase === 'slowing' || animationPhase === 'wobbling' || animationPhase === 'falling';
 
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
-    <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
-      <div className="relative w-full h-full flex items-center min-h-0">
-        {/* Центральная зона результата: рамка + уголки «здесь результат» + zoom/glow при замедлении */}
-        <div
-          className={`case-open-viewport-frame absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-32 sm:h-32 rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)] ${isSlowingPhase ? 'case-open-viewport-frame--highlight' : ''}`}
-          aria-hidden
-        >
-          <span className="case-open-viewport-corner case-open-viewport-corner--tl" />
-          <span className="case-open-viewport-corner case-open-viewport-corner--tr" />
-          <span className="case-open-viewport-corner case-open-viewport-corner--bl" />
-          <span className="case-open-viewport-corner case-open-viewport-corner--br" />
-        </div>
-        <div className="flex-1 min-h-0 overflow-hidden flex items-center" style={{ contain: 'layout paint' }}>
+    <div className={`w-full h-full flex flex-col items-center justify-center ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
+      <div className="relative w-full h-full flex items-center justify-center min-h-0 max-w-full">
+        {/* Контейнер полоски: relative, чтобы центральная рамка была по центру именно «окна» полоски */}
+        <div className="flex-1 min-h-0 overflow-hidden flex items-center relative" style={{ contain: 'layout paint' }}>
+          {/* Центральная зона результата: по центру видимой области полоски, размер под один слот */}
+          <div
+            className={`case-open-viewport-frame absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)] ${isSlowingPhase ? 'case-open-viewport-frame--highlight' : ''}`}
+            aria-hidden
+          >
+            <span className="case-open-viewport-corner case-open-viewport-corner--tl" />
+            <span className="case-open-viewport-corner case-open-viewport-corner--tr" />
+            <span className="case-open-viewport-corner case-open-viewport-corner--bl" />
+            <span className="case-open-viewport-corner case-open-viewport-corner--br" />
+          </div>
           <div
             ref={mobileStripRef}
             className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
-            style={{
-              paddingLeft: 'calc(50% - 50px)',
-              paddingRight: 'calc(50% - 50px)',
-            }}
           >
             {itemsForMobileStrip.map((item: any, index: number) => (
               <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
@@ -832,10 +831,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
+        <div className="fixed inset-0 z-[99999998] flex flex-col items-center justify-center w-full h-full bg-black">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
-          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
-            {mobileScrollOnlyContent}
+          {/* Горизонтальный блок во всю ширину экрана: анимация полоски ровно по центру */}
+          <div className="w-full flex-1 min-h-0 flex items-center justify-center">
+            <div className="w-full h-[220px] sm:h-[240px] flex items-center justify-center border-y border-white/10 bg-black/30">
+              {mobileScrollOnlyContent}
+            </div>
           </div>
         </div>
       ) : (
