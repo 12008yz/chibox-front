@@ -758,9 +758,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
     <div className={`w-full h-full flex flex-col items-center justify-center ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
-      <div className="relative w-full h-full flex items-center justify-center min-h-0 max-w-full">
-        {/* Контейнер полоски: relative, чтобы центральная рамка была по центру именно «окна» полоски */}
-        <div className="flex-1 min-h-0 overflow-hidden flex items-center relative" style={{ contain: 'layout paint' }}>
+      <div className="relative w-full h-full flex min-h-0 max-w-full">
+        {/* Контейнер полоски на всю высоту блока: рамка 50% от него = по центру предметов */}
+        <div className="flex-1 min-h-0 h-full overflow-hidden flex items-center justify-center relative" style={{ contain: 'layout paint' }}>
           {/* Центральная зона результата: по центру видимой области полоски, размер под один слот */}
           <div
             className={`case-open-viewport-frame absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] rounded-lg border-2 border-orange-400 pointer-events-none z-10 bg-black/30 shadow-[0_0_0_4px_rgba(0,0,0,0.5)] ${isSlowingPhase ? 'case-open-viewport-frame--highlight' : ''}`}
