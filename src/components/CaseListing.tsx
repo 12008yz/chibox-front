@@ -87,11 +87,15 @@ const CaseListing: React.FC<CaseListingProps> = ({
 
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-[1600px] w-full">
+    <div className="cases-section flex flex-col items-center justify-center max-w-[1600px] w-full">
       <Title title={name} />
-      {description && <div className="text-gray-300 mb-8">{description}</div>}
+      {description && (
+        <p className="text-gray-400/90 mb-8 text-center max-w-xl text-sm sm:text-base leading-relaxed">
+          {description}
+        </p>
+      )}
 
-      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-4 md:gap-8 md:flex-wrap overflow-visible">
+      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-5 md:gap-8 md:flex-wrap overflow-visible">
         {(() => {
           // Скрываем кейс «бонус после регистрации», если пользователь исчерпал лимит:
           // - получил все 2 кейса (claimCount >= maxClaims), или
@@ -128,7 +132,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                   <div
                     key={caseItem.id}
                     id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="cursor-pointer rounded-lg overflow-visible"
+                    className="case-item-wrapper cursor-pointer overflow-visible"
                     onClick={(e) => {
                       // Проверяем, был ли клик по кнопке "Играть"
                       if (!(e.target as HTMLElement).closest('button')) {
@@ -157,7 +161,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
                     to={`/case/${caseItem.id}`}
                     key={caseItem.id}
                     id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="rounded-lg overflow-visible"
+                    className="case-item-wrapper overflow-visible block"
                     onClick={(e) => handleCaseClick(caseItem, e)}
                   >
                     <Case

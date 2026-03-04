@@ -17,8 +17,6 @@ import SafeCrackerGame from '../components/SafeCrackerGame';
 import OnboardingTour from '../components/OnboardingTour';
 import DepositModal from '../components/DepositModal';
 import { formatDaysI18n } from '../utils/declension';
-import { BACKGROUNDS } from '../utils/config';
-
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
@@ -335,30 +333,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen text-white relative">
-      {/* Фиксированный фон на весь экран */}
-      <div
-        className="fixed inset-0 -z-50"
-        style={{
-          backgroundImage: `url(${BACKGROUNDS.home})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          imageRendering: 'auto',
-          WebkitPrintColorAdjust: 'exact',
-          colorScheme: 'only light',
-        }}
-      />
-      {/* Затемняющий оверлей - с точными значениями для консистентности */}
-      <div
-        className="fixed inset-0 -z-40"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)',
-          WebkitPrintColorAdjust: 'exact',
-          printColorAdjust: 'exact',
-          forcedColorAdjust: 'none',
-        }}
-      ></div>
-
       <div className="relative z-10">
         <ScrollToTopOnMount />
 

@@ -102,22 +102,58 @@ html, body, #root {
   -o-filter: none !important;
 }
 
-/* Принудительно устанавливаем тёмный фон */
+/* Главный фон приложения — выразительный градиент + узор */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -100;
+  background-color: #0a0812;
+  background-image:
+    /* Сетка (лёгкая) */
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: 0 0, 0 0;
+}
+
+.app-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 70% at 50% -20%, rgba(140, 80, 220, 0.45) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 50% at 95% 80%, rgba(255, 120, 60, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 60% at 5% 60%, rgba(60, 120, 220, 0.2) 0%, transparent 45%),
+    linear-gradient(180deg, #0a0812 0%, #0e0c18 25%, #12101f 60%, #0c0a14 100%);
+  pointer-events: none;
+}
+
+/* Лёгкое «дыхание» градиента */
+@keyframes app-bg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
+
+.app-bg::before {
+  animation: app-bg-pulse 8s ease-in-out infinite;
+}
+
+/* Принудительно тёмный фон для html/body (фоллбэк) */
 html, body {
-  background-color: #151225 !important;
-  background: #151225 !important;
+  background-color: #0d0b14 !important;
+  background: #0d0b14 !important;
 }
 
 #root {
-  background-color: #151225 !important;
-  background: #151225 !important;
+  background-color: transparent !important;
+  background: transparent !important;
 }
 
 /* Блокируем медиа-запросы темы для основного контента */
 @media (prefers-color-scheme: light), (prefers-color-scheme: dark) {
   html, body, #root {
-    background-color: #151225 !important;
-    background: #151225 !important;
+    background-color: #0d0b14 !important;
+    background: #0d0b14 !important;
     color: white !important;
     filter: none !important;
     -webkit-filter: none !important;
@@ -173,18 +209,18 @@ html, body {
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #151225;
+    background-color: #0d0b14;
     color: white;
   }
 
   #root {
     min-height: 100vh;
-    background-color: #151225;
+    background-color: transparent;
     color: white;
   }
 
   body {
-    background: #151225; /* Убираем градиент для снижения нагрузки */
+    background: #0d0b14;
     overflow-x: hidden;
     position: relative;
   }
@@ -1894,37 +1930,83 @@ html::-webkit-scrollbar-thumb,
   background: radial-gradient(circle, var(--tw-gradient-stops));
 }
 
-/* Case hover effects - оптимизировано для производительности */
+/* Секция кейсов — без backdrop-filter для снижения нагрузки на GPU */
+.cases-section {
+  padding: 1.5rem;
+  border-radius: 24px;
+  background: rgba(14, 12, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 768px) {
+  .cases-section {
+    padding: 2rem 2.5rem;
+  }
+}
+
+/* Заголовки секций — современный акцент для молодой аудитории */
+.section-title {
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
+}
+
+.section-title-line {
+  transition: max-width 0.35s ease;
+}
+
+.cases-section:hover .section-title-line {
+  max-width: 180px;
+}
+
+/* Карточка кейса — без обводки вообще (прозрачный фон, без рамки и скруглений) */
 .case-item-wrapper {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: visible;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  transition: transform 0.2s ease;
+}
+
+.case-item-wrapper::before {
+  display: none;
+}
+
+.case-item-wrapper > * {
+  position: relative;
+  z-index: 1;
+  padding: 10px;
+  border: none !important;
+  outline: none !important;
+  border-radius: 0;
+}
+
+.case-item-wrapper [class*="rounded"] {
+  border-radius: 0 !important;
 }
 
 .case-item-wrapper:hover {
-  transform: scale(1.05);
-  will-change: transform;
-}
-
-.case-item-wrapper:hover .case-image {
-  filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.6))
-          drop-shadow(0 0 30px rgba(96, 165, 250, 0.4))
-          drop-shadow(0 0 45px rgba(96, 165, 250, 0.2));
+  transform: scale(1.02) translateY(-2px);
 }
 
 .case-image {
-  transition: filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
+  border-radius: 0;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Отключаем hover-эффекты на мобильных устройствах для экономии ресурсов */
 @media (max-width: 768px) {
-  .case-item-wrapper:hover {
-    transform: scale(1.03);
+  .case-item-wrapper > * {
+    padding: 8px;
   }
 
-  .case-item-wrapper:hover .case-image {
-    filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5));
+  .case-item-wrapper:hover {
+    transform: scale(1.01) translateY(-1px);
   }
 }
 
@@ -1943,7 +2025,7 @@ body[data-ya-mode="dark"] {
 /* Отключение режима чтения Safari */
 @media print {
   html, body {
-    background-color: #151225 !important;
+    background-color: #0d0b14 !important;
     color: white !important;
   }
 }
@@ -1951,7 +2033,7 @@ body[data-ya-mode="dark"] {
 /* Отключение инверсии цветов в Windows High Contrast */
 @media (prefers-contrast: high) {
   html, body {
-    background-color: #151225 !important;
+    background-color: #0d0b14 !important;
     forced-color-adjust: none !important;
   }
 }
@@ -1966,7 +2048,7 @@ body::before,
   left: 0;
   width: 100%;
   height: 100%;
-  background: #151225;
+  background: #0d0b14;
   z-index: -9999;
   pointer-events: none;
 }
@@ -1977,7 +2059,7 @@ body::before,
 :root[data-theme="dark"],
 :root[data-theme="light"] {
   color-scheme: dark !important;
-  background-color: #151225 !important;
+  background-color: #0d0b14 !important;
 }
 
 /* Отключение автоматической темы в Chrome/Edge */
@@ -2031,48 +2113,4 @@ img[alt*="Case"] {
   }
 }
 
-/* Анимация цвета обводки по контуру изображения */
-@keyframes caseGlow {
-  0% {
-    filter: drop-shadow(0 0 3px rgba(255, 107, 107, 0.8))
-            drop-shadow(0 0 6px rgba(255, 107, 107, 0.6))
-            drop-shadow(0 0 9px rgba(255, 107, 107, 0.4));
-  }
-  25% {
-    filter: drop-shadow(0 0 3px rgba(78, 205, 196, 0.8))
-            drop-shadow(0 0 6px rgba(78, 205, 196, 0.6))
-            drop-shadow(0 0 9px rgba(78, 205, 196, 0.4));
-  }
-  50% {
-    filter: drop-shadow(0 0 3px rgba(69, 183, 209, 0.8))
-            drop-shadow(0 0 6px rgba(69, 183, 209, 0.6))
-            drop-shadow(0 0 9px rgba(69, 183, 209, 0.4));
-  }
-  75% {
-    filter: drop-shadow(0 0 3px rgba(249, 202, 36, 0.8))
-            drop-shadow(0 0 6px rgba(249, 202, 36, 0.6))
-            drop-shadow(0 0 9px rgba(249, 202, 36, 0.4));
-  }
-  100% {
-    filter: drop-shadow(0 0 3px rgba(255, 107, 107, 0.8))
-            drop-shadow(0 0 6px rgba(255, 107, 107, 0.6))
-            drop-shadow(0 0 9px rgba(255, 107, 107, 0.4));
-  }
-}
-
-/* Стиль для изображений кейсов с обводкой при наведении */
-.group:hover .case-image {
-  /* steps(6) = переключение 6 раз за анимацию (вместо 60fps) = 90% меньше нагрузки */
-  animation: caseGlow 4s steps(6) infinite;
-  /* GPU ускорение через 3D трансформацию */
-  transform: scale(1.01) translate3d(0, 0, 0);
-}
-
-.case-image {
-  /* Оптимизация рендеринга */
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  contain: layout style;
-  overflow: visible;
-  transition: transform 0.2s ease;
-}
+/* Анимация caseGlow и filter на .case-image отключены для снижения нагрузки на GPU */
