@@ -563,7 +563,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       currentAvailablePosition++;
       let fullListPosition = 0;
       if (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) {
-        // Полоска из 24 предметов: позиция = шаг анимации (0..23)
+        // Полоска из 12 предметов: позиция = шаг анимации (0..11)
         fullListPosition = currentAvailablePosition;
       } else {
         let availableCount = 0;
@@ -749,21 +749,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  // На мобильных во время анимации: полоска из 24 предметов (или всех, если меньше)
+  // На мобильных во время анимации: полоска из 12 предметов (или всех, если меньше)
   const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
   const wonItem = openingResult?.item;
   const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
 
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
-    <div className={`w-full h-full flex flex-col items-center justify-center ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
-      <div className="relative w-full h-full flex min-h-0 max-w-full">
-        {/* Контейнер полоски на всю высоту блока: рамка 50% от него = по центру предметов */}
-        <div className="flex-1 min-h-0 h-full overflow-hidden flex items-center justify-center" style={{ contain: 'layout paint' }}>
-          <div className="relative w-full overflow-hidden flex flex-col items-stretch self-center">
-            <div
-              ref={mobileStripRef}
-              className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
-            >
+    <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
+      <div className="relative w-full h-full flex items-center min-h-0">
+        <div className="flex-1 min-h-0 overflow-hidden flex items-center relative" style={{ contain: 'layout paint' }}>
+          <div
+            ref={mobileStripRef}
+            className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
+          >
             {itemsForMobileStrip.map((item: any, index: number) => (
               <div key={item.id || index} className="flex-shrink-0 w-[100px] sm:w-[112px]" data-item-index={index}>
                 <CaseItem
@@ -787,7 +785,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 />
               </div>
             ))}
-            </div>
           </div>
         </div>
 
@@ -821,13 +818,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex flex-col items-center justify-center w-full h-full bg-black">
+        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
-          {/* Горизонтальный блок во всю ширину экрана: анимация полоски ровно по центру */}
-          <div className="w-full flex-1 min-h-0 flex items-center justify-center">
-            <div className="w-full h-[220px] sm:h-[240px] flex items-center justify-center border-y border-white/10 bg-black/30">
-              {mobileScrollOnlyContent}
-            </div>
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+            {mobileScrollOnlyContent}
           </div>
         </div>
       ) : (
@@ -875,12 +869,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             isMobileOrTablet ? (
               /* Превью мобильный: крупный кейс, алерт, кнопка, сетка 2 колонки */
               <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll p-4">
-                  {/* Крупное изображение кейса */}
+                  {/* Крупное изображение кейса — размер как на десктопе по ощущениям */}
                   <div className="flex justify-center mb-4">
                     <img
                       src={caseImageUrl}
                       alt={caseData.name}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                      className="w-full max-w-[340px] sm:max-w-[380px] h-auto object-contain rounded-lg"
                     />
                   </div>
                   {/* Блок цены / предупреждение и главная кнопка — на мобильной версии цену и блок «Шанс / N предметов» не показываем */}
