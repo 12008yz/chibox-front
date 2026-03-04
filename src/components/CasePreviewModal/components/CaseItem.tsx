@@ -29,12 +29,12 @@ export const CaseItem = memo(({
 }: CaseItemProps) => {
   const [imageError, setImageError] = useState(false);
 
-  // Intersection Observer для оптимизации рендеринга
+  // Intersection Observer: при превью — triggerOnce, чтобы не переключать вид при скролле (нет мелькания)
   const { ref: inViewRef, inView } = useInView({
     threshold: 0,
-    triggerOnce: false,
-    rootMargin: '200px', // Загружаем элементы за 200px до появления
-    skip: showOpeningAnimation // Отключаем во время анимации
+    triggerOnce: true, // один раз «в зоне» — не сбрасываем, меньше re-render при листании
+    rootMargin: '300px',
+    skip: showOpeningAnimation
   });
 
   // Рассчитываем состояния предмета
@@ -149,8 +149,8 @@ export const CaseItem = memo(({
     return <div className="bg-gray-800 rounded-lg p-2 border-2 border-gray-400 opacity-0" style={{ height: '200px' }} />;
   }
 
-  // Рендерим упрощенную версию для элементов вне области видимости (если не в анимации)
-  const shouldRenderSimplified = !inView && !showOpeningAnimation && !isCurrentSliderPosition && !isWinningItemStopped;
+  // Упрощённая заглушка только во время анимации для далёких от центра предметов; при превью — всегда полный вид, без мелькания
+  const shouldRenderSimplified = showOpeningAnimation && !inView && !isCurrentSliderPosition && !isWinningItemStopped;
 
   // Обработчик клика на предмет только для мобильных устройств
   const handleClick = useCallback(() => {
