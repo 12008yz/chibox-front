@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const BANNER_IMAGES = [
-  '/images/banners/tma.png',
+  '/images/banners/tma.jpg',
   '/images/banners/календарь.png',
   '/images/banners/Карта.png',
   '/images/banners/линия.png',
