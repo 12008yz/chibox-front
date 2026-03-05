@@ -45,6 +45,14 @@ export const BANNER_SLIDE_CONTENT: Record<
     subtitle: 'Ты в плюсе.',
     cta: { label: 'Оформить статус', url: '/upgrade' },
   },
+  2: {
+    title: 'Собери сеты. Апгрейдни. Забирай топ-дроп.',
+    cta: { label: 'В апгрейд', url: '/upgrade' },
+  },
+  3: {
+    title: 'Забрал дроп — решай сам',
+    subtitle: 'в инвентарь, в обмен или на вывод.',
+  },
 };
 
 const CAROUSEL_GLOW_STYLE = {
