@@ -16,6 +16,7 @@ import TicTacToeGame from '../components/TicTacToeGame';
 import SafeCrackerGame from '../components/SafeCrackerGame';
 import OnboardingTour from '../components/OnboardingTour';
 import DepositModal from '../components/DepositModal';
+import BannerCarousel from '../components/BannerCarousel';
 import { formatDaysI18n } from '../utils/declension';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
@@ -338,6 +339,11 @@ const HomePage: React.FC = () => {
 
       <div className="flex justify-center">
         <div className="flex-col w-full max-w-[1920px]">
+
+          {/* Баннеры-карусель */}
+          <div className="container mx-auto px-4 pt-2 pb-6">
+            <BannerCarousel />
+          </div>
 
           {/* Кейсы секция */}
           <div className="container mx-auto px-4 py-8">
