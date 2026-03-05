@@ -70,7 +70,7 @@ interface BannerCarouselProps {
 const BannerCarousel: React.FC<BannerCarouselProps> = ({
   images = BANNER_IMAGES,
   autoPlayInterval = 5000,
-  height = 'h-screen min-h-[280px] md:h-[380px]',
+  height = 'h-[42vh] min-h-[220px] md:h-[380px]',
 }) => {
   const [current, setCurrent] = useState(0);
   const items = images.filter(Boolean);
