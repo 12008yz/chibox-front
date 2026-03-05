@@ -341,7 +341,7 @@ const HomePage: React.FC = () => {
         <div className="flex-col w-full max-w-[1920px]">
 
           {/* Баннеры-карусель */}
-          <div className="container mx-auto px-0 md:px-4 pt-0 md:pt-2 pb-6">
+          <div className="container mx-auto px-[15px] md:px-4 pt-[15px] md:pt-2 pb-6">
             <BannerCarousel />
           </div>
 

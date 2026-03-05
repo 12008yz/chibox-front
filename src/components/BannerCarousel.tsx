@@ -94,7 +94,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-none md:rounded-xl ${height} relative bg-dark-800 border-0 md:border border-white/5`}
+      className={`w-full overflow-hidden rounded-xl ${height} relative bg-dark-800 border border-white/5`}
       style={CAROUSEL_GLOW_STYLE}
     >
       <AnimatePresence mode="wait" initial={false}>
