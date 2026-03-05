@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const BANNER_IMAGES = [
@@ -213,25 +212,6 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
 
       {items.length > 1 && (
         <>
-          <button
-            type="button"
-            onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-dark-800/90 border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:border-indigo-500/50 hover:bg-dark-700/95"
-            style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}
-            aria-label="Предыдущий баннер"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            type="button"
-            onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-dark-800/90 border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:border-orange-400/50 hover:bg-dark-700/95"
-            style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}
-            aria-label="Следующий баннер"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
             {items.map((_, i) => (
               <button
