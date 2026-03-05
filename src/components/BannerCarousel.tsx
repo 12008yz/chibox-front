@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,10 +22,15 @@ const IconVK = () => (
   </svg>
 );
 
-/** Контент поверх слайда: заголовок слева сверху, подпись + кнопки справа внизу */
+/** Контент поверх слайда: заголовок слева сверху, подпись справа внизу, опционально links или cta */
 export const BANNER_SLIDE_CONTENT: Record<
   number,
-  { title: string; subtitle?: string; links?: { label: string; url: string; icon: 'vk' | 'telegram' }[] }
+  {
+    title: string;
+    subtitle?: string;
+    links?: { label: string; url: string; icon: 'vk' | 'telegram' }[];
+    cta?: { label: string; url: string };
+  }
 > = {
   0: {
     title: 'Мы там, где всё происходит.',
@@ -33,6 +39,11 @@ export const BANNER_SLIDE_CONTENT: Record<
       { label: 'ВКонтакте', url: 'https://vk.com/chibox_game', icon: 'vk' },
       { label: 'Telegram', url: 'https://t.me/chibox_official', icon: 'telegram' },
     ],
+  },
+  1: {
+    title: 'Один статус — все привилегии сервиса.',
+    subtitle: 'Ты в плюсе.',
+    cta: { label: 'Оформить статус', url: '/upgrade' },
   },
 };
 
@@ -108,47 +119,84 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           {/* Текст и кнопки для слайда (индекс из BANNER_SLIDE_CONTENT) */}
           {BANNER_SLIDE_CONTENT[current] && (
             <>
-              {/* Заголовок и иконки — слева сверху, иконки под первым слоганом */}
-              <div className="absolute top-6 md:top-8 lg:top-10 left-6 md:left-10 z-10 pointer-events-none">
-                <div className="pointer-events-auto">
-                  <p
-                    className="text-white text-xl md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
-                    style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
-                  >
-                    {BANNER_SLIDE_CONTENT[current].title}
-                  </p>
-                  {BANNER_SLIDE_CONTENT[current].links && BANNER_SLIDE_CONTENT[current].links!.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-3">
-                      {BANNER_SLIDE_CONTENT[current].links!.map((link, i) => (
-                        <a
-                          key={i}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
-                        >
-                          {link.icon === 'telegram' && <IconTelegram />}
-                          {link.icon === 'vk' && <IconVK />}
-                          {link.label}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* Второй слоган — справа внизу, 40px от низа */}
-              {BANNER_SLIDE_CONTENT[current].subtitle && (
+              {/* Слайд с cta: текст слева внизу, кнопка справа внизу, косые углы у кнопки */}
+              {BANNER_SLIDE_CONTENT[current].cta ? (
                 <div
-                  className="absolute right-6 md:right-10 z-10 text-right pointer-events-none"
+                  className="absolute left-6 right-6 md:left-10 md:right-10 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none"
                   style={{ bottom: 40 }}
                 >
-                  <p
-                    className="text-white text-lg md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
-                    style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
+                  <div className="pointer-events-auto flex flex-wrap items-center gap-2 md:gap-3">
+                    <span
+                      className="text-white text-lg md:text-xl lg:text-2xl font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
+                    >
+                      {BANNER_SLIDE_CONTENT[current].title}
+                    </span>
+                    {BANNER_SLIDE_CONTENT[current].subtitle && (
+                      <>
+                        <span className="text-white/90 text-lg md:text-xl lg:text-2xl font-semibold">—</span>
+                        <span
+                          className="text-white text-lg md:text-xl lg:text-2xl font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                          style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
+                        >
+                          {BANNER_SLIDE_CONTENT[current].subtitle}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <Link
+                    to={BANNER_SLIDE_CONTENT[current].cta!.url}
+                    className="pointer-events-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300 shrink-0"
+                    style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                   >
-                    {BANNER_SLIDE_CONTENT[current].subtitle}
-                  </p>
+                    {BANNER_SLIDE_CONTENT[current].cta!.label}
+                  </Link>
                 </div>
+              ) : (
+                <>
+                  {/* Заголовок и иконки — слева сверху, иконки под первым слоганом */}
+                  <div className="absolute top-6 md:top-8 lg:top-10 left-6 md:left-10 z-10 pointer-events-none">
+                    <div className="pointer-events-auto">
+                      <p
+                        className="text-white text-xl md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
+                      >
+                        {BANNER_SLIDE_CONTENT[current].title}
+                      </p>
+                      {BANNER_SLIDE_CONTENT[current].links && BANNER_SLIDE_CONTENT[current].links!.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-3">
+                          {BANNER_SLIDE_CONTENT[current].links!.map((link, i) => (
+                            <a
+                              key={i}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
+                            >
+                              {link.icon === 'telegram' && <IconTelegram />}
+                              {link.icon === 'vk' && <IconVK />}
+                              {link.label}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Второй слоган — справа внизу, 40px от низа */}
+                  {BANNER_SLIDE_CONTENT[current].subtitle && (
+                    <div
+                      className="absolute right-6 md:right-10 z-10 text-right pointer-events-none"
+                      style={{ bottom: 40 }}
+                    >
+                      <p
+                        className="text-white text-lg md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
+                      >
+                        {BANNER_SLIDE_CONTENT[current].subtitle}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
