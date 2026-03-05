@@ -70,7 +70,7 @@ interface BannerCarouselProps {
 const BannerCarousel: React.FC<BannerCarouselProps> = ({
   images = BANNER_IMAGES,
   autoPlayInterval = 5000,
-  height = 'h-[280px] md:h-[380px]',
+  height = 'h-screen min-h-[280px] md:h-[380px]',
 }) => {
   const [current, setCurrent] = useState(0);
   const items = images.filter(Boolean);
@@ -83,7 +83,6 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
   );
 
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
-  const prev = useCallback(() => goTo(current - 1), [current, goTo]);
 
   useEffect(() => {
     if (items.length <= 1 || autoPlayInterval <= 0) return;
@@ -95,7 +94,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-xl ${height} relative bg-dark-800 border border-white/5`}
+      className={`w-full overflow-hidden rounded-none md:rounded-xl ${height} relative bg-dark-800 border-0 md:border border-white/5`}
       style={CAROUSEL_GLOW_STYLE}
     >
       <AnimatePresence mode="wait" initial={false}>
