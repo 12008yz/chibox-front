@@ -128,21 +128,21 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               {/* Слайд с cta: текст слева внизу, кнопка справа внизу, косые углы у кнопки */}
               {BANNER_SLIDE_CONTENT[current].cta ? (
                 <div
-                  className="absolute left-6 right-6 md:left-10 md:right-10 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none"
+                  className="absolute left-4 right-4 md:left-10 md:right-10 z-10 flex flex-wrap items-center justify-between gap-2 md:gap-3 pointer-events-none"
                   style={{ bottom: 40 }}
                 >
-                  <div className="pointer-events-auto flex flex-wrap items-center gap-2 md:gap-3">
+                  <div className="pointer-events-auto flex flex-wrap items-center gap-1.5 md:gap-3">
                     <span
-                      className="text-white text-lg md:text-xl lg:text-2xl font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      className="text-white text-sm md:text-xl lg:text-2xl font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                       style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                     >
                       {BANNER_SLIDE_CONTENT[current].title}
                     </span>
                     {BANNER_SLIDE_CONTENT[current].subtitle && (
                       <>
-                        <span className="text-white/90 text-lg md:text-xl lg:text-2xl font-semibold">—</span>
+                        <span className="text-white/90 text-sm md:text-xl lg:text-2xl font-semibold">—</span>
                         <span
-                          className="text-white text-lg md:text-xl lg:text-2xl font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                          className="text-white text-sm md:text-xl lg:text-2xl font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                           style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                         >
                           {BANNER_SLIDE_CONTENT[current].subtitle}
@@ -152,7 +152,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                   </div>
                   <Link
                     to={BANNER_SLIDE_CONTENT[current].cta!.url}
-                    className="pointer-events-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300 shrink-0"
+                    className="pointer-events-auto inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300 shrink-0"
                     style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                   >
                     {BANNER_SLIDE_CONTENT[current].cta!.label}
@@ -161,23 +161,23 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               ) : (
                 <>
                   {/* Заголовок и иконки — слева сверху, иконки под первым слоганом */}
-                  <div className="absolute top-6 md:top-8 lg:top-10 left-6 md:left-10 z-10 pointer-events-none">
+                  <div className="absolute top-4 md:top-8 lg:top-10 left-4 md:left-10 z-10 pointer-events-none">
                     <div className="pointer-events-auto">
                       <p
-                        className="text-white text-xl md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-base md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].title}
                       </p>
                       {BANNER_SLIDE_CONTENT[current].links && BANNER_SLIDE_CONTENT[current].links!.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-3">
+                        <div className="mt-2 md:mt-3 flex flex-wrap gap-2 md:gap-3">
                           {BANNER_SLIDE_CONTENT[current].links!.map((link, i) => (
                             <a
                               key={i}
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
+                              className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
                             >
                               {link.icon === 'telegram' && <IconTelegram />}
                               {link.icon === 'vk' && <IconVK />}
@@ -191,11 +191,11 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                   {/* Второй слоган — справа внизу, 40px от низа */}
                   {BANNER_SLIDE_CONTENT[current].subtitle && (
                     <div
-                      className="absolute right-6 md:right-10 z-10 text-right pointer-events-none"
+                      className="absolute right-4 md:right-10 z-10 text-right pointer-events-none"
                       style={{ bottom: 40 }}
                     >
                       <p
-                        className="text-white text-lg md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-sm md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].subtitle}
