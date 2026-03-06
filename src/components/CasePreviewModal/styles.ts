@@ -335,6 +335,21 @@ export const strikeAnimationStyles = `
     animation: win-flash 0.6s ease-out forwards;
   }
 
+  /* Оверлей модалки кейса — всегда на весь экран (избегаем «половинного» фона при скролле) */
+  .case-preview-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100vw !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    isolation: isolate;
+  }
+
   @-webkit-keyframes mobile-win-reveal {
     0% {
       opacity: 0;

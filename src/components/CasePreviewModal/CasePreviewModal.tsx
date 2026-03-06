@@ -154,8 +154,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowGoldenSparks(false);
       setShowWinEffects(false);
       setShouldStopBetween(false);
-      // Полная блокировка скролла фона: html, body и фиксация позиции (надёжно на мобиле)
+      // Полная блокировка скролла фона: html, body, #root и фиксация позиции (надёжно на мобиле и при скролле внутри #root)
       const scrollY = window.scrollY;
+      const root = document.getElementById('root');
+      const rootScrollTop = root ? root.scrollTop : 0;
       scrollLockRef.current = scrollY;
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.touchAction = 'none';
@@ -165,6 +167,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = `-${scrollY}px`;
       document.body.style.left = '0';
       document.body.style.right = '0';
+      if (root) {
+        (root as HTMLElement).dataset.caseModalScrollTop = String(rootScrollTop);
+        root.style.overflow = 'hidden';
+        root.style.touchAction = 'none';
+      }
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -179,6 +186,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       animationIntervalsRef.current = [];
       // Восстановление скролла и позиции
       const savedScroll = scrollLockRef.current;
+      const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
@@ -187,6 +195,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      if (root) {
+        root.style.overflow = '';
+        root.style.touchAction = '';
+        const savedRootScroll = root.dataset.caseModalScrollTop;
+        if (savedRootScroll !== undefined) {
+          root.scrollTop = Number(savedRootScroll);
+          delete root.dataset.caseModalScrollTop;
+        }
+      }
       if (savedScroll !== null) {
         window.scrollTo(0, savedScroll);
         scrollLockRef.current = null;
@@ -199,6 +216,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Cleanup при размонтировании
   useEffect(() => {
     return () => {
+      const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
@@ -207,6 +225,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      if (root) {
+        root.style.overflow = '';
+        root.style.touchAction = '';
+        const savedRootScroll = root.dataset.caseModalScrollTop;
+        if (savedRootScroll !== undefined) {
+          root.scrollTop = Number(savedRootScroll);
+          delete root.dataset.caseModalScrollTop;
+        }
+      }
       if (scrollLockRef.current !== null) {
         window.scrollTo(0, scrollLockRef.current);
         scrollLockRef.current = null;
@@ -828,7 +855,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
+        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
             {/* Горизонтальный блок во всю ширину: «рельс» с обводкой, анимация внутри */}
@@ -840,7 +867,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       ) : (
         <>
           <div
-            className={`fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
+            className={`case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
               isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
             }`}
             onClick={handleClose}
