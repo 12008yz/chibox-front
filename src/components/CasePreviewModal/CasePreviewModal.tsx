@@ -161,12 +161,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       scrollLockRef.current = scrollY;
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.touchAction = 'none';
+      document.documentElement.style.setProperty('background', 'transparent', 'important');
+      document.documentElement.style.setProperty('background-color', 'transparent', 'important');
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.left = '0';
       document.body.style.right = '0';
+      document.body.style.width = '100vw';
+      document.body.style.minWidth = '100vw';
       document.body.style.setProperty('background', 'transparent', 'important');
       document.body.style.setProperty('background-color', 'transparent', 'important');
       if (root) {
@@ -192,12 +196,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
+      document.documentElement.style.removeProperty('background');
+      document.documentElement.style.removeProperty('background-color');
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.minWidth = '';
       document.body.style.removeProperty('background');
       document.body.style.removeProperty('background-color');
       if (root) {
@@ -225,12 +233,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
+      document.documentElement.style.removeProperty('background');
+      document.documentElement.style.removeProperty('background-color');
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.minWidth = '';
       document.body.style.removeProperty('background');
       document.body.style.removeProperty('background-color');
       if (root) {
