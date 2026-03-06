@@ -855,7 +855,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
+        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-transparent">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
             {/* Горизонтальный блок во всю ширину: «рельс» с обводкой, анимация внутри */}
@@ -867,13 +867,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       ) : (
         <>
           <div
-            className={`case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
-              isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
-            }`}
+            className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 bg-transparent"
             onClick={handleClose}
-            style={{
-              backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
-            }}
           >
             <div
               className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
