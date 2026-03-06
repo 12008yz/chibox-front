@@ -40,10 +40,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <X size={20} />
             </button>
 
+            {/* 18+ */}
+            <div
+              className="absolute top-4 left-4 z-10 flex items-center justify-center w-10 h-10 rounded-lg bg-red-500/15 border border-red-400/50 text-red-400 font-bold text-sm shadow-[0_0_12px_rgba(248,113,113,0.25)]"
+              title="Сервис для лиц старше 18 лет"
+            >
+              18+
+            </div>
+
             {/* Content */}
             <div className="p-8">
               {/* Logo */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-8 pt-6">
                 <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6">
                   <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain" />
                 </div>
@@ -53,6 +61,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <p className="text-gray-400 text-base">
                   Войдите через Steam, чтобы продолжить
                 </p>
+                <p className="text-red-400/90 text-xs mt-2">Сервис для лиц старше 18 лет</p>
               </div>
 
               {/* Steam Info Card */}

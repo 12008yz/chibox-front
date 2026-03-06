@@ -697,6 +697,9 @@ const TermsPage = () => {
                   <li><strong className="text-white">Статус+</strong> — продвинутый уровень</li>
                   <li><strong className="text-white">Статус++</strong> — премиум уровень</li>
                 </ul>
+                <p className="mt-3 text-sm text-gray-300">
+                  <strong className="text-orange-300">Бесплатное получение Статуса:</strong> пользователь может оформить Статус на период без оплаты, обменяв виртуальные предметы в разделе «Обмен» на время действия статуса, в соответствии с правилами, действующими на платформе.
+                </p>
               </div>
               <div className="bg-gray-800/30 p-4 rounded-lg">
                 <h3 className="text-xl font-semibold text-orange-300 mb-2">Условия подписки</h3>
@@ -796,6 +799,10 @@ const TermsPage = () => {
                 <li className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <span>Вы обязуетесь соблюдать правила использования платформы</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Вы понимаете, что <strong className="text-white">Статус</strong> можно получить бесплатно, обменяв предметы в разделе «Обмен» на период действия статуса</span>
                 </li>
               </ul>
             </div>
