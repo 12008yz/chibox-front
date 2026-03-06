@@ -335,7 +335,7 @@ export const strikeAnimationStyles = `
     animation: win-flash 0.6s ease-out forwards;
   }
 
-  /* Оверлей модалки кейса — всегда на весь экран, без заливки (прозрачный) */
+  /* Оверлей модалки кейса — всегда на весь экран */
   .case-preview-backdrop {
     position: fixed !important;
     top: 0 !important;
@@ -347,7 +347,6 @@ export const strikeAnimationStyles = `
     min-width: 100vw !important;
     min-height: 100vh !important;
     min-height: 100dvh !important;
-    background: transparent !important;
     isolation: isolate;
   }
 

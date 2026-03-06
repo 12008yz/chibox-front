@@ -161,24 +161,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       scrollLockRef.current = scrollY;
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.touchAction = 'none';
-      document.documentElement.style.setProperty('background', 'transparent', 'important');
-      document.documentElement.style.setProperty('background-color', 'transparent', 'important');
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.left = '0';
       document.body.style.right = '0';
-      document.body.style.width = '100vw';
-      document.body.style.minWidth = '100vw';
-      document.body.style.setProperty('background', 'transparent', 'important');
-      document.body.style.setProperty('background-color', 'transparent', 'important');
       if (root) {
         (root as HTMLElement).dataset.caseModalScrollTop = String(rootScrollTop);
         root.style.overflow = 'hidden';
         root.style.touchAction = 'none';
       }
-      document.documentElement.dataset.caseModalOpen = '1';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -196,18 +189,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
-      document.documentElement.style.removeProperty('background');
-      document.documentElement.style.removeProperty('background-color');
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
-      document.body.style.width = '';
-      document.body.style.minWidth = '';
-      document.body.style.removeProperty('background');
-      document.body.style.removeProperty('background-color');
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
@@ -217,7 +204,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           delete root.dataset.caseModalScrollTop;
         }
       }
-      delete document.documentElement.dataset.caseModalOpen;
       if (savedScroll !== null) {
         window.scrollTo(0, savedScroll);
         scrollLockRef.current = null;
@@ -233,18 +219,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
-      document.documentElement.style.removeProperty('background');
-      document.documentElement.style.removeProperty('background-color');
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
-      document.body.style.width = '';
-      document.body.style.minWidth = '';
-      document.body.style.removeProperty('background');
-      document.body.style.removeProperty('background-color');
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
@@ -254,7 +234,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           delete root.dataset.caseModalScrollTop;
         }
       }
-      delete document.documentElement.dataset.caseModalOpen;
       if (scrollLockRef.current !== null) {
         window.scrollTo(0, scrollLockRef.current);
         scrollLockRef.current = null;
@@ -876,7 +855,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-transparent">
+        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
             {/* Горизонтальный блок во всю ширину: «рельс» с обводкой, анимация внутри */}
@@ -888,8 +867,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       ) : (
         <>
           <div
-            className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 bg-transparent"
+            className={`case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
+              isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
+            }`}
             onClick={handleClose}
+            style={{
+              backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
+            }}
           >
             <div
               className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
