@@ -125,7 +125,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           {/* Текст и кнопки для слайда (индекс из BANNER_SLIDE_CONTENT) */}
           {BANNER_SLIDE_CONTENT[current] && (
             <>
-              {/* Слайд с cta и titleOnTop (второй — статус): заголовок слева сверху, кнопка справа сверху, подпись справа внизу */}
+              {/* Слайд с cta и titleOnTop (второй — статус): заголовок слева сверху, справа внизу — кнопка, затем подпись */}
               {BANNER_SLIDE_CONTENT[current].cta && current === 1 ? (
                 <>
                   <div className="absolute top-4 md:top-8 lg:top-10 left-4 md:left-10 z-10 pointer-events-none">
@@ -138,29 +138,27 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                       </p>
                     </div>
                   </div>
-                  <div className="absolute top-4 md:top-8 lg:top-10 right-4 md:right-10 z-10 pointer-events-auto">
+                  <div
+                    className="absolute right-4 md:right-10 z-10 text-right flex flex-col items-end gap-2 md:gap-3"
+                    style={{ bottom: 40 }}
+                  >
                     <button
                       type="button"
                       onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
-                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-red-400 bg-red-500/15 border border-red-400/50 hover:bg-red-500/25 hover:border-red-400 hover:text-red-300 transition-all duration-300 shadow-[0_0_12px_rgba(248,113,113,0.25)]"
+                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-red-400 bg-red-500/15 border border-red-400/50 hover:bg-red-500/25 hover:border-red-400 hover:text-red-300 transition-all duration-300 shadow-[0_0_12px_rgba(248,113,113,0.25)] pointer-events-auto"
                       style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                     >
                       {BANNER_SLIDE_CONTENT[current].cta!.label}
                     </button>
-                  </div>
-                  {BANNER_SLIDE_CONTENT[current].subtitle && (
-                    <div
-                      className="absolute right-4 md:right-10 z-10 text-right pointer-events-none"
-                      style={{ bottom: 40 }}
-                    >
+                    {BANNER_SLIDE_CONTENT[current].subtitle && (
                       <p
-                        className="text-white text-sm md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-sm md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] pointer-events-none"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].subtitle}
                       </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </>
               ) : BANNER_SLIDE_CONTENT[current].cta ? (
                 /* Слайд с cta в одну строку внизу (третий — апгрейд) */
