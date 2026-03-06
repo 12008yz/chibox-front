@@ -103,26 +103,48 @@ export const CaseItem = memo(({
         styles.transition = 'filter 0.3s ease-out';
         break;
       case 'wobbling':
-        // Эффект перекатывания между предметами (умеренный scale, чтобы блоки не «сужались»)
+        // Эффект перекатывания: на десктопе — умеренный scale (без сильного сужения), на мобилке — без изменений
         if (isCurrentSliderPosition) {
           const progress = sliderOffset / 0.3;
-          const brightness = 1 + (0.2 * (1 - progress)) - (0.35 * progress);
-          const scale = 1 + (0.05 * (1 - progress)) - (0.05 * progress); // 1.05 -> 0.95 (без сильного сужения)
-          const opacity = 1 - (0.2 * progress);
-          const rotation = -2 * progress;
-          styles.filter = `brightness(${brightness})`;
-          styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-          styles.opacity = opacity;
+          if (suppressBetweenHighlight) {
+            // Мобилка: прежние значения
+            const brightness = 1 + (0.3 * (1 - progress)) - (0.5 * progress);
+            const scale = 1 + (0.15 * (1 - progress)) - (0.1 * progress);
+            const opacity = 1 - (0.3 * progress);
+            const rotation = -3 * progress;
+            styles.filter = `brightness(${brightness})`;
+            styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            styles.opacity = opacity;
+          } else {
+            // Десктоп: мягче, чтобы блоки не сужались
+            const brightness = 1 + (0.2 * (1 - progress)) - (0.35 * progress);
+            const scale = 1 + (0.05 * (1 - progress)) - (0.05 * progress);
+            const opacity = 1 - (0.2 * progress);
+            const rotation = -2 * progress;
+            styles.filter = `brightness(${brightness})`;
+            styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            styles.opacity = opacity;
+          }
           styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
         } else if (isNextSliderPosition) {
           const progress = sliderOffset / 0.3;
-          const brightness = 1 - (0.15 * (1 - progress)) + (0.25 * progress);
-          const scale = 1 - (0.05 * (1 - progress)) + (0.05 * progress); // 0.95 -> 1.05
-          const opacity = 1 - (0.2 * (1 - progress));
-          const rotation = 2 * progress;
-          styles.filter = `brightness(${brightness})`;
-          styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-          styles.opacity = opacity;
+          if (suppressBetweenHighlight) {
+            const brightness = 1 - (0.2 * (1 - progress)) + (0.3 * progress);
+            const scale = 1 - (0.1 * (1 - progress)) + (0.15 * progress);
+            const opacity = 1 - (0.3 * (1 - progress));
+            const rotation = 3 * progress;
+            styles.filter = `brightness(${brightness})`;
+            styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            styles.opacity = opacity;
+          } else {
+            const brightness = 1 - (0.15 * (1 - progress)) + (0.25 * progress);
+            const scale = 1 - (0.05 * (1 - progress)) + (0.05 * progress);
+            const opacity = 1 - (0.2 * (1 - progress));
+            const rotation = 2 * progress;
+            styles.filter = `brightness(${brightness})`;
+            styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            styles.opacity = opacity;
+          }
           styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
         }
         break;
@@ -139,7 +161,7 @@ export const CaseItem = memo(({
     }
 
     return styles;
-  }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isNextSliderPosition, isWinningItemStopped, sliderOffset]);
+  }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isNextSliderPosition, isWinningItemStopped, sliderOffset, suppressBetweenHighlight]);
 
   // Рендерим заглушку для невидимых элементов
   if (!isVisible) {
