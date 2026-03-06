@@ -101,6 +101,13 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
     }
   }, [initialSelectedSubscription]);
 
+  // При открытии модалки выставляем таб из initialTab (например, со статусами по клику с баннера)
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
+
   // Блокировка прокрутки страницы при открытом модальном окне
   useEffect(() => {
     if (!isOpen) return;

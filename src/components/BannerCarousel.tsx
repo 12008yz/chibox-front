@@ -142,7 +142,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                     <button
                       type="button"
                       onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
-                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
+                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-red-400 bg-red-500/15 border border-red-400/50 hover:bg-red-500/25 hover:border-red-400 hover:text-red-300 transition-all duration-300 shadow-[0_0_12px_rgba(248,113,113,0.25)]"
                       style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                     >
                       {BANNER_SLIDE_CONTENT[current].cta!.label}
