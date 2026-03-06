@@ -1521,45 +1521,41 @@ const UpgradePage: React.FC = () => {
           onAnimationComplete={handleAnimationComplete}
         />
 
-        {/* Панель управления */}
-        <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
-
-          {/* Кнопка улучшения для мобильных устройств */}
-          <div className="lg:hidden mt-4">
-            {selectedInventoryIds.length > 0 && selectedTargetItem && (
-              <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <div className="text-cyan-300 text-sm">Выбрано предметов: {selectedInventoryIds.length}/10</div>
-                    <div className="text-purple-300 text-sm">Общая стоимость: <Monetary value={totalSelectedPrice} /></div>
-                  </div>
-                  {upgradeChance > 0 && (
-                    <div className="text-center">
-                      <div className={`text-2xl font-bold ${upgradeChance >= 40 ? 'text-green-400' : upgradeChance >= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
-                        {upgradeChance}%
-                      </div>
-                      <div className="text-gray-400 text-xs">Шанс</div>
-                    </div>
-                  )}
+        {/* Кнопка улучшения для мобильных — показывается только при выборе предметов и цели */}
+        {selectedInventoryIds.length > 0 && selectedTargetItem && (
+          <div className="lg:hidden mb-4 sm:mb-6 md:mb-8">
+            <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-cyan-300 text-sm">Выбрано предметов: {selectedInventoryIds.length}/10</div>
+                  <div className="text-purple-300 text-sm">Общая стоимость: <Monetary value={totalSelectedPrice} /></div>
                 </div>
-                <button
-                  onClick={handlePerformUpgrade}
-                  disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
-                  className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-lg font-semibold text-base transition-all duration-200 disabled:cursor-not-allowed active:scale-95 shadow-lg hover:shadow-xl"
-                >
-                  {isUpgrading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      <span>Улучшение...</span>
+                {upgradeChance > 0 && (
+                  <div className="text-center">
+                    <div className={`text-2xl font-bold ${upgradeChance >= 40 ? 'text-green-400' : upgradeChance >= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
+                      {upgradeChance}%
                     </div>
-                  ) : (
-                    'УЛУЧШИТЬ'
-                  )}
-                </button>
+                    <div className="text-gray-400 text-xs">Шанс</div>
+                  </div>
+                )}
               </div>
-            )}
+              <button
+                onClick={handlePerformUpgrade}
+                disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
+                className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-lg font-semibold text-base transition-all duration-200 disabled:cursor-not-allowed active:scale-95 shadow-lg hover:shadow-xl"
+              >
+                {isUpgrading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    <span>Улучшение...</span>
+                  </div>
+                ) : (
+                  'УЛУЧШИТЬ'
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Выбор исходных предметов */}
