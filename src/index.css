@@ -1931,6 +1931,11 @@ body::before,
   pointer-events: none;
 }
 
+/* При открытом превью кейса убираем тёмный слой #root::before, чтобы не было заливки наполовину экрана */
+html[data-case-modal-open] #root::before {
+  opacity: 0;
+}
+
 /* Фиксация цветовой схемы для всех состояний */
 :root,
 :root:not([data-theme]),

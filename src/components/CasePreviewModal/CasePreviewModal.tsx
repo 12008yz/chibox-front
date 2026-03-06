@@ -172,6 +172,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         root.style.overflow = 'hidden';
         root.style.touchAction = 'none';
       }
+      document.documentElement.dataset.caseModalOpen = '1';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -204,6 +205,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           delete root.dataset.caseModalScrollTop;
         }
       }
+      delete document.documentElement.dataset.caseModalOpen;
       if (savedScroll !== null) {
         window.scrollTo(0, savedScroll);
         scrollLockRef.current = null;
@@ -234,6 +236,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           delete root.dataset.caseModalScrollTop;
         }
       }
+      delete document.documentElement.dataset.caseModalOpen;
       if (scrollLockRef.current !== null) {
         window.scrollTo(0, scrollLockRef.current);
         scrollLockRef.current = null;
