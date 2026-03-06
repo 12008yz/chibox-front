@@ -76,7 +76,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   const paymentHistory = paymentHistoryData?.success ? paymentHistoryData.data?.items ?? [] : [];
   const previewCount = 8;
   const paymentHistoryPreview = paymentHistory.slice(0, previewCount);
-  const hasMoreHistory = paymentHistory.length > previewCount;
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
 
   type HistoryItem = { id: string; purpose: string; amount: number; description: string; completed_at: string | null };
