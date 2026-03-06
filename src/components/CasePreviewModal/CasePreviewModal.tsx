@@ -787,14 +787,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             ))}
           </div>
 
-          {/* Указатель центра: треугольник на верхней линии рельса, рамка слота под ним */}
+          {/* Указатель центра: только стрелка вниз на линии, без рамки */}
           {animationPhase !== 'stopped' && animationPhase !== 'idle' && (
             <div
-              className="absolute left-1/2 top-0 -translate-x-1/2 z-10 w-[100px] sm:w-[112px] h-[116px] sm:h-[128px] pointer-events-none case-mobile-center-pointer"
+              className="absolute left-1/2 top-0 -translate-x-1/2 z-10 pointer-events-none case-mobile-center-pointer"
               aria-hidden
             >
-              <div className="absolute -top-px left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-amber-400/80" />
-              <div className="absolute top-[10px] left-0 right-0 rounded-lg border-2 border-amber-400/80 bg-amber-400/5 shadow-[0_0_12px_rgba(251,191,36,0.25)] w-full h-[100px] sm:h-[112px]" />
+              <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-amber-400/90" />
             </div>
           )}
         </div>
