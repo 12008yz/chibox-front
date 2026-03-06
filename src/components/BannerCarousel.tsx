@@ -40,8 +40,8 @@ export const BANNER_SLIDE_CONTENT: Record<
     ],
   },
   1: {
-    title: 'Один статус — все привилегии сервиса.',
-    subtitle: 'Ты в плюсе.',
+    title: 'Один статус — все привилегии твои.',
+    subtitle: 'Залетай и будь в плюсе.',
     cta: { label: 'Оформить статус', url: '/profile' },
   },
   2: {
@@ -125,7 +125,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           {/* Текст и кнопки для слайда (индекс из BANNER_SLIDE_CONTENT) */}
           {BANNER_SLIDE_CONTENT[current] && (
             <>
-              {/* Слайд с cta и titleOnTop (второй — статус): заголовок и кнопка сверху, подпись справа внизу */}
+              {/* Слайд с cta и titleOnTop (второй — статус): заголовок слева сверху, кнопка справа сверху, подпись справа внизу */}
               {BANNER_SLIDE_CONTENT[current].cta && current === 1 ? (
                 <>
                   <div className="absolute top-4 md:top-8 lg:top-10 left-4 md:left-10 z-10 pointer-events-none">
@@ -136,15 +136,17 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                       >
                         {BANNER_SLIDE_CONTENT[current].title}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
-                        className="mt-2 md:mt-3 inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
-                        style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
-                      >
-                        {BANNER_SLIDE_CONTENT[current].cta!.label}
-                      </button>
                     </div>
+                  </div>
+                  <div className="absolute top-4 md:top-8 lg:top-10 right-4 md:right-10 z-10 pointer-events-auto">
+                    <button
+                      type="button"
+                      onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
+                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
+                      style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
+                    >
+                      {BANNER_SLIDE_CONTENT[current].cta!.label}
+                    </button>
                   </div>
                   {BANNER_SLIDE_CONTENT[current].subtitle && (
                     <div

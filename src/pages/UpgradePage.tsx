@@ -13,7 +13,7 @@ import { getItemImageUrl } from '../utils/steamImageUtils';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
 import { getApiErrorMessage } from '../utils/config';
-import { Search, Zap, Target, Sparkles } from 'lucide-react';
+import { Zap, Target, Sparkles } from 'lucide-react';
 import { CelebrateIcon, SadIcon, ReceivedIcon, CancelIcon } from '../components/icons';
 
 // Создаем SVG заглушку для изображений
@@ -37,8 +37,6 @@ const SelectedItemsDisplay: React.FC<{
   showAnimation: boolean;
   upgradeResult: UpgradeResult | null;
   onAnimationComplete: () => void;
-  onRemoveSourceItem?: (itemId: string) => void;
-  onRemoveTargetItem?: () => void;
 }> = ({
   selectedItems,
   targetItem,
@@ -50,8 +48,6 @@ const SelectedItemsDisplay: React.FC<{
   showAnimation,
   upgradeResult,
   onAnimationComplete,
-  onRemoveSourceItem,
-  onRemoveTargetItem
 }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState<{[key: string]: boolean}>({});
@@ -103,9 +99,7 @@ const SelectedItemsDisplay: React.FC<{
                 {selectedItems.map((item, index) => (
                   <div
                     key={`${item.id}-${index}`}
-                    className="bg-black/50 rounded-lg p-2 sm:p-3 border border-cyan-500/30 transition-all duration-200 hover:bg-black/60 active:scale-95 cursor-pointer group"
-                    onClick={() => onRemoveSourceItem && onRemoveSourceItem(item.id)}
-                    title="Кликните для удаления"
+                    className="bg-black/50 rounded-lg p-2 sm:p-3 border border-cyan-500/30 transition-all duration-200"
                   >
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
@@ -120,12 +114,6 @@ const SelectedItemsDisplay: React.FC<{
                         ) : (
                           <PlaceholderImage className="w-full h-full" />
                         )}
-                        {/* Иконка удаления */}
-                        <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-4 h-4 sm:w-5 sm:h-5 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-white font-medium text-xs sm:text-sm truncate">{item.name}</div>
@@ -182,11 +170,7 @@ const SelectedItemsDisplay: React.FC<{
               <h3 className="text-base sm:text-lg font-semibold text-purple-400 mb-3 sm:mb-4 flex-shrink-0">Целевой предмет</h3>
               <div className="overflow-y-auto flex-1 pr-2">
               {targetItem ? (
-                <div
-                  className="bg-black/50 rounded-lg p-3 sm:p-4 border border-purple-500/30 transition-all duration-200 hover:bg-black/60 active:scale-95 cursor-pointer group"
-                  onClick={() => onRemoveTargetItem && onRemoveTargetItem()}
-                  title="Кликните для отмены выбора"
-                >
+                <div className="bg-black/50 rounded-lg p-3 sm:p-4 border border-purple-500/30 transition-all duration-200">
                   <div className="flex items-center space-x-3 sm:space-x-4">
                     <div className="relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
                       <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(targetItem.rarity)} opacity-20`}></div>
@@ -200,12 +184,6 @@ const SelectedItemsDisplay: React.FC<{
                       ) : (
                         <PlaceholderImage className="w-full h-full" />
                       )}
-                      {/* Иконка удаления */}
-                      <div className="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-white font-semibold text-sm sm:text-base mb-2 truncate">{targetItem.name}</div>
@@ -1164,7 +1142,6 @@ const UpgradePage: React.FC = () => {
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
   const [selectedTargetItem, setSelectedTargetItem] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
   const [showAnimation, setShowAnimation] = useState(false);
   const [upgradeResult, setUpgradeResult] = useState<UpgradeResult | null>(null);
   const [isProcessingUpgrade, setIsProcessingUpgrade] = useState(false);
@@ -1244,15 +1221,10 @@ const UpgradePage: React.FC = () => {
     }
   }, [upgradeableItems, selectedInventoryIds, selectedItemIds, showAnimation, isUpgrading, isProcessingUpgrade]);
 
-  // Фильтрация предметов (убираем ограничение по минимальной цене)
+  // Список предметов для выбора (без поиска)
   const filteredItems = React.useMemo(() => {
-    if (!upgradeableItems?.data?.items) return [];
-
-    return upgradeableItems.data.items.filter(itemGroup =>
-      itemGroup.item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      // Убрали: && itemGroup.item.price >= 10 - теперь можно улучшать любые предметы
-    );
-  }, [upgradeableItems, searchTerm]);
+    return upgradeableItems?.data?.items ?? [];
+  }, [upgradeableItems]);
 
   // Получаем выбранные предметы для отображения
   const selectedItemsDetails = React.useMemo(() => {
@@ -1335,13 +1307,6 @@ const UpgradePage: React.FC = () => {
     // Сбрасываем выбранный целевой предмет при изменении исходных предметов
     setSelectedTargetItem('');
   }, [filteredItems, selectedInventoryIds, selectedItemIds]);
-
-  // Обработчик сброса выбора
-  const handleClearSelection = useCallback(() => {
-    setSelectedItemIds([]);
-    setSelectedInventoryIds([]);
-    setSelectedTargetItem('');
-  }, []);
 
   // Обработчик выбора целевого предмета
   const handleSelectTargetItem = useCallback((itemId: string) => {
@@ -1554,34 +1519,10 @@ const UpgradePage: React.FC = () => {
           showAnimation={showAnimation}
           upgradeResult={upgradeResult}
           onAnimationComplete={handleAnimationComplete}
-          onRemoveSourceItem={handleSelectSourceItem}
-          onRemoveTargetItem={() => setSelectedTargetItem('')}
         />
 
         {/* Панель управления */}
         <div className="bg-gradient-to-r from-[#1a1426] to-[#2a1a3a] rounded-xl border border-purple-500/30 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 md:mb-8">
-
-          {/* Поиск и кнопки */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('upgrade.search_placeholder')}
-                className="w-full bg-black/60 border border-gray-600 rounded-lg pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none transition-colors"
-              />
-            </div>
-
-            <button
-              onClick={handleClearSelection}
-              disabled={selectedInventoryIds.length === 0}
-              className="bg-red-600 hover:bg-red-700 active:scale-95 disabled:bg-gray-600 text-white py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 rounded-lg text-sm sm:text-base transition-all disabled:cursor-not-allowed shadow-lg"
-            >
-              Сбросить выбор ({selectedInventoryIds.length})
-            </button>
-          </div>
 
           {/* Кнопка улучшения для мобильных устройств */}
           <div className="lg:hidden mt-4">
