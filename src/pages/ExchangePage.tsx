@@ -424,7 +424,7 @@ const ExchangePage: React.FC = () => {
             <div className="rounded-lg p-2 md:p-4 border border-green-500/50">
               <div className="flex items-center space-x-2 md:space-x-3">
                 <div className="text-green-400 text-xl md:text-2xl">
-                  <img src="/images/chiCoin.png" alt="chiCoin" className="w-6 h-6 md:w-8 md:h-8" />
+                  <img src="/images/chiCoinFull.png" alt="chiCoin" className="w-6 h-6 md:w-8 md:h-8 inline-block object-contain align-middle self-center" />
                 </div>
                 <div>
                   <div className="text-green-400 text-xs md:text-sm font-medium">{t('exchange.balance')}</div>
@@ -458,7 +458,7 @@ const ExchangePage: React.FC = () => {
                   <div className="text-orange-400 text-xs md:text-sm font-medium">{t('exchange.exchange_rate')}</div>
                   <div className="text-white text-sm md:text-xl font-bold flex items-center gap-1">
                     {pricePerDay}
-                    <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 md:w-5 md:h-5 inline-block" />
+                    <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 md:w-5 md:h-5 inline-block object-contain align-middle self-center" />
                     /{t('time.day')}
                   </div>
                   <div className="text-gray-500 text-[10px] md:text-xs">{t('exchange.tier', { tier: subscriptionData?.data?.subscription_tier || 1 })}</div>

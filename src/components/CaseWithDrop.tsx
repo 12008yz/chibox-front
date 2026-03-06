@@ -117,9 +117,9 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
           <p className="text-yellow-400 text-sm font-bold inline-flex items-center gap-1">
             {Number(caseTemplate?.price || '0').toFixed(2)}
             <img
-              src="/images/chiCoin.png"
+              src="/images/chiCoinFull.png"
               alt="currency"
-              className="w-4 h-4 inline-block object-contain"
+              className="w-4 h-4 inline-block object-contain align-middle self-center"
             />
           </p>
         ) : (

@@ -344,7 +344,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                         <Coins className="w-8 h-8 sm:w-10 sm:h-10" />
                         <span className="flex items-center gap-1">
                           +{prizeValue}
-                          <img src="/images/chiCoin.png" alt="ChiCoins" className="w-5 h-5 inline-block" />
+                          <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-5 h-5 inline-block object-contain align-middle self-center" />
                         </span>
                       </div>
                     </div>
@@ -397,7 +397,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                           <p className="text-yellow-300 font-bold text-xs sm:text-sm text-center">
                             <span className="flex items-center gap-1">
                               {wonItem.price}
-                              <img src="/images/chiCoin.png" alt="ChiCoins" className="w-4 h-4 inline-block" />
+                              <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
                             </span>
                           </p>
                         </div>

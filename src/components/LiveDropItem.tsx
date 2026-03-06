@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
-import Monetary from './Monetary';
 import { Flame, Star } from 'lucide-react';
 
 interface LiveDropItemProps {
@@ -180,15 +179,8 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
 
         {/* Информация о предмете (низ) */}
         <div className="absolute bottom-0 left-0 right-0 p-3">
-          <div className="text-xs text-white font-medium truncate mb-2" title={drop.item.name}>
+          <div className="text-xs text-white font-medium truncate" title={drop.item.name}>
             {drop.item.name}
-          </div>
-
-          {/* Цена */}
-          <div className="flex items-center justify-center">
-            <span className="text-sm font-bold text-green-400">
-              <Monetary value={drop.item.price} iconSize="xxxs" />
-            </span>
           </div>
         </div>
 

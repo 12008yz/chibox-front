@@ -294,7 +294,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 : 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
             }`}
           >
-            <img src="/images/chiCoin.png" alt="chiCoin" className="w-4 h-4 sm:w-5 sm:h-5" />
+            <img src="/images/chiCoinFull.png" alt="chiCoin" className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center" />
             <span>Баланс</span>
           </button>
           <button

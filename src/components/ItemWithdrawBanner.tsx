@@ -134,9 +134,9 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
             <p className="text-green-400 text-xs font-bold inline-flex items-center gap-1 justify-center">
               {Number(item.item.price).toFixed(2)}
               <img
-                src="/images/chiCoin.png"
+                src="/images/chiCoinFull.png"
                 alt="currency"
-                className="w-3 h-3 inline-block object-contain"
+                className="w-3 h-3 inline-block object-contain align-middle self-center"
               />
             </p>
           </div>

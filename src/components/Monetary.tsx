@@ -41,14 +41,14 @@ const Monetary: React.FC<MonetaryProps> = ({
   const size = sizePixels[iconSize];
 
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className="font-semibold">{formattedValue}</span>
+    <span className="inline-flex items-center justify-center gap-1">
+      <span className="font-semibold leading-none">{formattedValue}</span>
       <img
-        src="/images/chiCoin.png"
+        src="/images/chiCoinFull.png"
         alt={currency === 'chicoins' ? 'chicoins' : currency}
         width={size}
         height={size}
-        className={`${sizeClasses[iconSize]} inline-block object-contain`}
+        className={`${sizeClasses[iconSize]} inline-block object-contain align-middle shrink-0`}
         style={{ maxWidth: `${size}px`, maxHeight: `${size}px` }}
       />
     </span>

@@ -401,9 +401,9 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 <p className="text-lg sm:text-xl font-bold text-white inline-flex items-center gap-1">
                   <span className="truncate">{(Number(user.totalItemsValue) || 0).toFixed(2)}</span>
                   <img
-                    src="/images/chiCoin.png"
+                    src="/images/chiCoinFull.png"
                     alt="currency"
-                    className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain flex-shrink-0"
+                    className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain flex-shrink-0 align-middle self-center"
                   />
                 </p>
               </div>
@@ -539,9 +539,9 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                     <span className="text-green-400 font-bold text-base sm:text-lg inline-flex items-center gap-1">
                       {Number(bestWeapon.price || 0).toFixed(2)}
                       <img
-                        src="/images/chiCoin.png"
+                        src="/images/chiCoinFull.png"
                         alt="currency"
-                        className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain"
+                        className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center"
                       />
                     </span>
                     {(bestWeapon as any).isRecord && (
