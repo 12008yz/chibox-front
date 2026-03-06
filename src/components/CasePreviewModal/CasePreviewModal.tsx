@@ -787,14 +787,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             ))}
           </div>
 
-          {/* Указатель центра: рамка слота по центру, виден только во время прокрутки */}
+          {/* Указатель центра: треугольник на верхней линии рельса, рамка слота под ним */}
           {animationPhase !== 'stopped' && animationPhase !== 'idle' && (
             <div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] pointer-events-none case-mobile-center-pointer"
+              className="absolute left-1/2 top-0 -translate-x-1/2 z-10 w-[100px] sm:w-[112px] h-[116px] sm:h-[128px] pointer-events-none case-mobile-center-pointer"
               aria-hidden
             >
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-amber-400/80" />
-              <div className="absolute inset-0 rounded-lg border-2 border-amber-400/80 bg-amber-400/5 shadow-[0_0_12px_rgba(251,191,36,0.25)]" />
+              <div className="absolute -top-px left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-amber-400/80" />
+              <div className="absolute top-[10px] left-0 right-0 rounded-lg border-2 border-amber-400/80 bg-amber-400/5 shadow-[0_0_12px_rgba(251,191,36,0.25)] w-full h-[100px] sm:h-[112px]" />
             </div>
           )}
         </div>
