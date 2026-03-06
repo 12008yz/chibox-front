@@ -3,6 +3,33 @@ import Title from './Title';
 import { useTranslation } from 'react-i18next';
 import { formatDaysI18n } from '../utils/declension';
 import DepositModal from './DepositModal';
+import {
+  TrendingUp,
+  Gift,
+  Star,
+  Grid3X3,
+  KeyRound,
+  Dices,
+  ArrowLeftRight,
+  Package,
+  ShieldCheck,
+  Check,
+} from 'lucide-react';
+
+const iconSize = 16;
+
+function getFeatureIcon(feature: string) {
+  if (feature.includes('шансу выпадения')) return <TrendingUp size={iconSize} className="text-emerald-400 shrink-0" />;
+  if (feature.includes('ежедневный кейс')) return <Gift size={iconSize} className="text-amber-400 shrink-0" />;
+  if (feature.includes('бонусам')) return <Star size={iconSize} className="text-yellow-400 shrink-0" />;
+  if (feature.includes('Крестики')) return <Grid3X3 size={iconSize} className="text-cyan-400 shrink-0" />;
+  if (feature.includes('сейфа')) return <KeyRound size={iconSize} className="text-orange-400 shrink-0" />;
+  if (feature.includes('Слот')) return <Dices size={iconSize} className="text-purple-400 shrink-0" />;
+  if (feature.includes('обмена')) return <ArrowLeftRight size={iconSize} className="text-blue-400 shrink-0" />;
+  if (feature.includes('Вывод')) return <Package size={iconSize} className="text-green-400 shrink-0" />;
+  if (feature.includes('повторные')) return <ShieldCheck size={iconSize} className="text-indigo-400 shrink-0" />;
+  return <Check size={iconSize} className="text-green-400 shrink-0" />;
+}
 
 interface StatusTier {
   name: string;
@@ -156,11 +183,14 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                 </div>
               </div>
 
-              {/* Особенности */}
-              <div className="space-y-2 mb-6">
+              {/* Особенности — главные привилегии статуса */}
+              <div className="space-y-2 mb-6 flex flex-col items-center text-center">
                 {tier.features.map((feature, featureIndex) => (
-                  <div key={featureIndex} className="flex items-center text-sm text-gray-300">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-3 flex-shrink-0"></div>
+                  <div
+                    key={featureIndex}
+                    className="flex items-center justify-center gap-2.5 text-sm font-medium text-gray-200 py-2 px-3 rounded-lg bg-gray-800/50 border border-gray-700/50 w-full max-w-[240px]"
+                  >
+                    {getFeatureIcon(feature)}
                     <span>{feature}</span>
                   </div>
                 ))}
