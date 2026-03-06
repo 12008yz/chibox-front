@@ -167,6 +167,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = `-${scrollY}px`;
       document.body.style.left = '0';
       document.body.style.right = '0';
+      document.body.style.setProperty('background', 'transparent', 'important');
+      document.body.style.setProperty('background-color', 'transparent', 'important');
       if (root) {
         (root as HTMLElement).dataset.caseModalScrollTop = String(rootScrollTop);
         root.style.overflow = 'hidden';
@@ -196,6 +198,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      document.body.style.removeProperty('background');
+      document.body.style.removeProperty('background-color');
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
@@ -227,6 +231,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
+      document.body.style.removeProperty('background');
+      document.body.style.removeProperty('background-color');
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
