@@ -693,6 +693,15 @@ export const strikeAnimationStyles = `
     -webkit-will-change: transform;
   }
 
+  /* Указатель центра на мобильной анимации: лёгкая пульсация */
+  @keyframes case-mobile-pointer-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
+  .case-mobile-center-pointer {
+    animation: case-mobile-pointer-pulse 1.5s ease-in-out infinite;
+  }
+
   /* Оптимизация изображений */
   .optimized-image {
     image-rendering: -webkit-optimize-contrast;
