@@ -114,6 +114,34 @@ html, body, #root {
   display: none;
 }
 
+/* Фон только для главной (HomePage): mesh-градиент + лёгкая зернистость */
+.home-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #080610;
+  background-image:
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(249, 115, 22, 0.07), transparent 55%),
+    radial-gradient(ellipse 70% 90% at 85% 75%, rgba(139, 92, 246, 0.15), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 15% 85%, rgba(6, 182, 212, 0.12), transparent 50%),
+    radial-gradient(ellipse 90% 50% at 75% 15%, rgba(99, 102, 241, 0.18), transparent 50%),
+    radial-gradient(ellipse 60% 80% at 10% 25%, rgba(139, 92, 246, 0.1), transparent 50%),
+    linear-gradient(180deg, #080610 0%, #0d0b18 15%, #12102a 40%, #0f0d20 65%, #0a0814 85%, #06050c 100%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.home-page-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.06;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
 /* Принудительно тёмный фон для html/body (фоллбэк) */
 html, body {
   background-color: #0d0b14 !important;
@@ -1278,6 +1306,26 @@ img.live-drop-item {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(99, 102, 241, 0.8) rgba(21, 18, 37, 0.4);
+}
+
+/* Скрыть полосу прокрутки (прокрутка колёсиком/тачем сохраняется) */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+body.scrollbar-hide,
+html.scrollbar-hide,
+#root.scrollbar-hide {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+}
+body.scrollbar-hide::-webkit-scrollbar,
+html.scrollbar-hide::-webkit-scrollbar,
+#root.scrollbar-hide::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Стили для основного контента */

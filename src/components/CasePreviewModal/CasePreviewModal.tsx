@@ -881,7 +881,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           ) : itemsWithAdjustedChances.length > 0 ? (
             isMobileOrTablet ? (
               /* Превью мобильный: крупный кейс, алерт, кнопка, сетка 2 колонки */
-              <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll p-4">
+              <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll scrollbar-hide p-4">
                   {/* Крупное изображение кейса — размер как на десктопе по ощущениям */}
                   <div className="flex justify-center mb-4">
                     <img
@@ -965,7 +965,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               /* Десктоп: вертикальный скролл и сетка */
               <div
                 ref={scrollContainerRef}
-                className={`flex-1 p-6 overflow-y-auto smooth-scroll`}
+                className={`flex-1 p-6 overflow-y-auto smooth-scroll scrollbar-hide`}
                 style={{ maxHeight: 'calc(90vh - 200px)' }}
               >
                 <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
