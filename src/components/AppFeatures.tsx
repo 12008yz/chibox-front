@@ -188,10 +188,10 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
                 {tier.features.map((feature, featureIndex) => (
                   <div
                     key={featureIndex}
-                    className="flex items-center justify-center gap-2.5 text-sm font-medium text-gray-200 py-2 px-3 rounded-lg bg-gray-800/50 border border-gray-700/50 w-full max-w-[240px]"
+                    className="flex items-start justify-center gap-2 text-sm font-medium text-gray-200 py-2 px-3 rounded-lg bg-gray-800/50 border border-gray-700/50 w-full max-w-[240px]"
                   >
-                    {getFeatureIcon(feature)}
-                    <span>{feature}</span>
+                    <span className="mt-0.5 flex-shrink-0">{getFeatureIcon(feature)}</span>
+                    <span className="leading-snug flex-1 min-w-0 text-center">{feature}</span>
                   </div>
                 ))}
               </div>
