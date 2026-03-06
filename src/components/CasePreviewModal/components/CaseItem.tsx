@@ -103,27 +103,23 @@ export const CaseItem = memo(({
         styles.transition = 'filter 0.3s ease-out';
         break;
       case 'wobbling':
-        // Эффект перекатывания между предметами
+        // Эффект перекатывания между предметами (умеренный scale, чтобы блоки не «сужались»)
         if (isCurrentSliderPosition) {
-          // Текущий предмет: уменьшаем яркость и масштаб, как будто уходим от него
-          const progress = sliderOffset / 0.3; // 0 -> 1
-          // Начинаем с нормальных значений (1.0) и плавно переходим
-          const brightness = 1 + (0.3 * (1 - progress)) - (0.5 * progress); // 1.3 -> 0.8
-          const scale = 1 + (0.15 * (1 - progress)) - (0.1 * progress); // 1.15 -> 0.9
-          const opacity = 1 - (0.3 * progress); // 1 -> 0.7
-          const rotation = -3 * progress; // 0 -> -3
+          const progress = sliderOffset / 0.3;
+          const brightness = 1 + (0.2 * (1 - progress)) - (0.35 * progress);
+          const scale = 1 + (0.05 * (1 - progress)) - (0.05 * progress); // 1.05 -> 0.95 (без сильного сужения)
+          const opacity = 1 - (0.2 * progress);
+          const rotation = -2 * progress;
           styles.filter = `brightness(${brightness})`;
           styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
           styles.opacity = opacity;
           styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
         } else if (isNextSliderPosition) {
-          // Следующий предмет: увеличиваем яркость и масштаб, как будто приближаемся к нему
-          const progress = sliderOffset / 0.3; // 0 -> 1
-          // Начинаем с нормальных значений и плавно увеличиваем
-          const brightness = 1 - (0.2 * (1 - progress)) + (0.3 * progress); // 0.8 -> 1.3
-          const scale = 1 - (0.1 * (1 - progress)) + (0.15 * progress); // 0.9 -> 1.15
-          const opacity = 1 - (0.3 * (1 - progress)); // 0.7 -> 1
-          const rotation = 3 * progress; // 0 -> 3
+          const progress = sliderOffset / 0.3;
+          const brightness = 1 - (0.15 * (1 - progress)) + (0.25 * progress);
+          const scale = 1 - (0.05 * (1 - progress)) + (0.05 * progress); // 0.95 -> 1.05
+          const opacity = 1 - (0.2 * (1 - progress));
+          const rotation = 2 * progress;
           styles.filter = `brightness(${brightness})`;
           styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
           styles.opacity = opacity;
@@ -150,8 +146,11 @@ export const CaseItem = memo(({
     return <div className="bg-gray-800 rounded-lg p-2 border-2 border-gray-400 opacity-0" style={{ height: '200px' }} />;
   }
 
-  // Упрощённая заглушка: не используем в превью (мелькание) и не в полоске (все 24 слота должны показывать картинки)
-  const shouldRenderSimplified = showOpeningAnimation && !suppressBetweenHighlight && !inView && !isCurrentSliderPosition && !isWinningItemStopped;
+  // Во время анимации открытия всегда рендерим полный предмет (все картинки), иначе на десктопе
+  // предметы вне зоны видимости до старта анимации оставались бы пустыми (inView не обновляется при skip)
+  const shouldRenderSimplified = showOpeningAnimation
+    ? false
+    : (false); // упрощённый рендер не используется вне анимации
 
   // Обработчик клика на предмет только для мобильных устройств
   const handleClick = useCallback(() => {
