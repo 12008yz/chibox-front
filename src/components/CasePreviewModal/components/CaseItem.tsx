@@ -30,7 +30,7 @@ export const CaseItem = memo(({
   const [imageError, setImageError] = useState(false);
 
   // Intersection Observer: при превью — triggerOnce, чтобы не переключать вид при скролле (нет мелькания)
-  const { ref: inViewRef, inView } = useInView({
+  const { ref: inViewRef } = useInView({
     threshold: 0,
     triggerOnce: true, // один раз «в зоне» — не сбрасываем, меньше re-render при листании
     rootMargin: '300px',
