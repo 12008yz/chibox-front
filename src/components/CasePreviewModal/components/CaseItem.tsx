@@ -68,7 +68,7 @@ export const CaseItem = memo(({
     // На мобильной полоске (suppressBetweenHighlight) — без ползунка по предметам, только центральный квадрат
     const highlightClasses = !suppressBetweenHighlight && isCurrentSliderPosition && animationPhase !== 'wobbling' ? 'ring-2 ring-yellow-400 z-10 border-yellow-400' : '';
     const betweenClasses = isBetweenItems ? 'ring-4 ring-orange-500 z-10 border-orange-500 shadow-2xl shadow-orange-500/50' : '';
-    const winningClasses = isWinningItemStopped ? `ring-2 ring-green-400 z-20 border-green-400 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
+    const winningClasses = isWinningItemStopped ? `z-20 ${showGoldenSparks ? 'victory-glow' : ''}` : '';
     const glowClasses = isWinningItemStopped && showStrikeThrough && isDailyCase ? 'animate-item-glow' : '';
     const excludedClasses = (item.isExcluded && !isWinningItem) || (isWinningItemStopped && showStrikeThrough && isDailyCase) ? 'opacity-50 grayscale' : '';
     const performanceClass = shouldUseGPU ? 'gpu-layer' : 'no-gpu-layer';
