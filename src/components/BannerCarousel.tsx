@@ -42,7 +42,7 @@ export const BANNER_SLIDE_CONTENT: Record<
   1: {
     title: 'Один статус — все привилегии сервиса.',
     subtitle: 'Ты в плюсе.',
-    cta: { label: 'Оформить статус', url: '/upgrade' },
+    cta: { label: 'Оформить статус', url: '/profile' },
   },
   2: {
     title: 'Собери сеты. Апгрейдни. Забирай топ-дроп.',
@@ -69,7 +69,7 @@ interface BannerCarouselProps {
 
 const BannerCarousel: React.FC<BannerCarouselProps> = ({
   images = BANNER_IMAGES,
-  autoPlayInterval = 5000,
+  autoPlayInterval = 7000,
   height = 'h-[42vh] min-h-[220px] md:h-[380px]',
 }) => {
   const [current, setCurrent] = useState(0);
@@ -136,13 +136,14 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                       >
                         {BANNER_SLIDE_CONTENT[current].title}
                       </p>
-                      <Link
-                        to={BANNER_SLIDE_CONTENT[current].cta!.url}
+                      <button
+                        type="button"
+                        onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
                         className="mt-2 md:mt-3 inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
                         style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].cta!.label}
-                      </Link>
+                      </button>
                     </div>
                   </div>
                   {BANNER_SLIDE_CONTENT[current].subtitle && (
