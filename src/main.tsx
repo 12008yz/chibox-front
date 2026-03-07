@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
-import { Toaster } from "react-hot-toast";
+import { Toaster, ToastBar, toast } from "react-hot-toast";
 import { store, persistor } from "./store/index";
 import "./index.css";
 import "./i18n";
@@ -78,7 +78,19 @@ const AppWithToaster = () => (
             },
           },
         }}
-      />
+      >
+        {(t) => (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => toast.dismiss(t.id)}
+            onKeyDown={(e) => e.key === 'Enter' && toast.dismiss(t.id)}
+            style={{ cursor: 'pointer', outline: 'none' }}
+          >
+            <ToastBar toast={t} position={t.position || 'top-right'} />
+          </div>
+        )}
+      </Toaster>
     </PersistGate>
   </Provider>
 );
