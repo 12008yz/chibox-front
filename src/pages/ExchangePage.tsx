@@ -354,7 +354,7 @@ const ExchangePage: React.FC = () => {
           <div>
             <div className="font-semibold">{t('common.success')}!</div>
             <div className="text-sm">{t('exchange.exchange_for', { days: formatDaysI18n(result.data.subscription_days_added, t) })} - "{itemName}"</div>
-            <div className="text-xs text-gray-300">{t('exchange.tier')} {formatDaysI18n(result.data.subscription_days_left, t)}</div>
+            <div className="text-xs text-gray-300">{t('exchange.tier', { tier: currentTier })} {formatDaysI18n(result.data.subscription_days_left, t)}</div>
           </div>
         );
         // Принудительно обновляем инвентарь для ProfilePage
