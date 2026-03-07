@@ -3,9 +3,10 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, lazy, Suspense, useCallback, useState } from 'react';
+import { useEffect, Suspense, useCallback, useState } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
+import { lazyWithChunkError } from './utils/lazyWithChunkError';
 
 // Импорты компонентов (всегда загружаемые)
 import Header from './components/Header';
@@ -22,24 +23,24 @@ import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { API_URL } from './utils/config';
 
-// Lazy loading страниц
-const HomePage = lazy(() => import('./pages/HomePage'));
-const SteamAuthPage = lazy(() => import('./pages/SteamAuthPage'));
-const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
-const PublicProfilePage = lazy(() => import('./pages/PublicProfilePage'));
-const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
-const ExchangePage = lazy(() => import('./pages/ExchangePage'));
-const UpgradePage = lazy(() => import('./pages/UpgradePage'));
-const TowerDefensePage = lazy(() => import('./pages/TowerDefensePage'));
-const TermsPage = lazy(() => import('./pages/TermsPage'));
-const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
-const ResponsibleGamingPage = lazy(() => import('./pages/ResponsibleGamingPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
-const ContactsPage = lazy(() => import('./pages/ContactsPage'));
-const FAQPage = lazy(() => import('./pages/FAQPage'));
-const RequisitesPage = lazy(() => import('./pages/RequisitesPage'));
-const ServicesPage = lazy(() => import('./pages/ServicesPage'));
-const StreamerCabinetPage = lazy(() => import('./pages/StreamerCabinetPage'));
+// Lazy loading страниц: при 404 чанка после деплоя — авто-перезагрузка
+const HomePage = lazyWithChunkError(() => import('./pages/HomePage'));
+const SteamAuthPage = lazyWithChunkError(() => import('./pages/SteamAuthPage'));
+const ProfilePage = lazyWithChunkError(() => import('./pages/profile/ProfilePage'));
+const PublicProfilePage = lazyWithChunkError(() => import('./pages/PublicProfilePage'));
+const LeaderboardPage = lazyWithChunkError(() => import('./pages/LeaderboardPage'));
+const ExchangePage = lazyWithChunkError(() => import('./pages/ExchangePage'));
+const UpgradePage = lazyWithChunkError(() => import('./pages/UpgradePage'));
+const TowerDefensePage = lazyWithChunkError(() => import('./pages/TowerDefensePage'));
+const TermsPage = lazyWithChunkError(() => import('./pages/TermsPage'));
+const PrivacyPage = lazyWithChunkError(() => import('./pages/PrivacyPage'));
+const ResponsibleGamingPage = lazyWithChunkError(() => import('./pages/ResponsibleGamingPage'));
+const AboutPage = lazyWithChunkError(() => import('./pages/AboutPage'));
+const ContactsPage = lazyWithChunkError(() => import('./pages/ContactsPage'));
+const FAQPage = lazyWithChunkError(() => import('./pages/FAQPage'));
+const RequisitesPage = lazyWithChunkError(() => import('./pages/RequisitesPage'));
+const ServicesPage = lazyWithChunkError(() => import('./pages/ServicesPage'));
+const StreamerCabinetPage = lazyWithChunkError(() => import('./pages/StreamerCabinetPage'));
 
 const ProtectedRoute: React.FC<{
   children: React.ReactElement;

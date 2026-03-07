@@ -14,6 +14,20 @@ import { initAnalytics } from "./utils/analytics";
 // Подключаем Яндекс.Метрику / Google Analytics при наличии ID в переменных окружения
 initAnalytics();
 
+// При 404 чанка после деплоя (старый кэш) — перезагрузка, чтобы подтянуть новые скрипты
+window.addEventListener('error', (event) => {
+  const msg = event.message || '';
+  if (
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('Importing a module script failed') ||
+    (event.filename && /[-][A-Za-z0-9]+\.js$/.test(event.filename) && event.message?.includes('fetch'))
+  ) {
+    event.preventDefault();
+    window.location.reload();
+    return true;
+  }
+});
+
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Failed to find root element");
