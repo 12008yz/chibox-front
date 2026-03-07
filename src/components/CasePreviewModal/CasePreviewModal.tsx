@@ -159,24 +159,26 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowGoldenSparks(false);
       setShowWinEffects(false);
       setShouldStopBetween(false);
-      // Блокировка скролла и фиксация позиции: body сдвигаем на -scrollY, модалка в портале documentElement — фон не страдает
+      // Блокировка скролла: сдвигаем только #root (не body), чтобы подложка модалки не ломалась
       const scrollY = window.scrollY;
       const root = document.getElementById('root');
       const rootScrollTop = root ? root.scrollTop : 0;
       scrollLockRef.current = scrollY;
       if (root) {
-        (root as HTMLElement).dataset.caseModalScrollTop = String(rootScrollTop);
-        root.style.overflow = 'hidden';
-        root.style.touchAction = 'none';
+        const r = root as HTMLElement;
+        r.dataset.caseModalScrollTop = String(rootScrollTop);
+        r.style.overflow = 'hidden';
+        r.style.touchAction = 'none';
+        r.style.position = 'fixed';
+        r.style.top = `-${scrollY}px`;
+        r.style.left = '0';
+        r.style.right = '0';
+        r.style.width = '100%';
       }
       document.documentElement.style.overflow = 'hidden';
       document.documentElement.style.touchAction = 'none';
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -189,24 +191,26 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       animationTimoutsRef.current = [];
       animationIntervalsRef.current.forEach(interval => clearInterval(interval));
       animationIntervalsRef.current = [];
-      // Восстановление скролла и позиции окна
+      // Восстановление скролла и позиции
       const savedScroll = scrollLockRef.current;
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
       if (root) {
-        root.style.overflow = '';
-        root.style.touchAction = '';
-        const savedRootScroll = root.dataset.caseModalScrollTop;
+        const r = root as HTMLElement;
+        r.style.overflow = '';
+        r.style.touchAction = '';
+        r.style.position = '';
+        r.style.top = '';
+        r.style.left = '';
+        r.style.right = '';
+        r.style.width = '';
+        const savedRootScroll = r.dataset.caseModalScrollTop;
         if (savedRootScroll !== undefined) {
-          root.scrollTop = Number(savedRootScroll);
-          delete root.dataset.caseModalScrollTop;
+          r.scrollTop = Number(savedRootScroll);
+          delete r.dataset.caseModalScrollTop;
         }
       }
       if (savedScroll !== null) {
@@ -226,17 +230,19 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
       if (root) {
-        root.style.overflow = '';
-        root.style.touchAction = '';
-        const savedRootScroll = root.dataset.caseModalScrollTop;
+        const r = root as HTMLElement;
+        r.style.overflow = '';
+        r.style.touchAction = '';
+        r.style.position = '';
+        r.style.top = '';
+        r.style.left = '';
+        r.style.right = '';
+        r.style.width = '';
+        const savedRootScroll = r.dataset.caseModalScrollTop;
         if (savedRootScroll !== undefined) {
-          root.scrollTop = Number(savedRootScroll);
-          delete root.dataset.caseModalScrollTop;
+          r.scrollTop = Number(savedRootScroll);
+          delete r.dataset.caseModalScrollTop;
         }
       }
       if (scrollLockRef.current !== null) {
