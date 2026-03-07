@@ -15,7 +15,7 @@ function isChunkLoadError(error: unknown): boolean {
   );
 }
 
-export function lazyWithChunkError<T extends ComponentType<unknown>>(
+export function lazyWithChunkError<T extends ComponentType<any>>(
   factory: () => Promise<{ default: T }>
 ): LazyExoticComponent<T> {
   return lazy(async () => {
