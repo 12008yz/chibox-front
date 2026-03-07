@@ -88,6 +88,18 @@ const HomePage: React.FC = () => {
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
   const closeCasePreview = () => setPreviewCase(null);
 
+  const handleDataUpdate = () => {
+    refetchUser();
+    refetchCases();
+    refetchFreeCaseStatus();
+  };
+
+  const handleDataUpdate = () => {
+    refetchUser();
+    refetchCases();
+    refetchFreeCaseStatus();
+  };
+
   useEffect(() => {
     if (location.state?.openStatusModal) {
       setShowStatusPurchaseModal(true);
@@ -468,10 +480,8 @@ const HomePage: React.FC = () => {
                             name={getSectionTitle()}
                             description={getSectionDescription()}
                             cases={subscriptionCases}
-                            onBuyAndOpenCase={handleBuyAndOpenCase}
                             nextCaseAvailableTime={nextCaseAvailableTime}
                             hideSubscriptionDailyCaseTimer={hasSubscriptionCaseInInventory}
-                            onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             freeCaseStatus={freeCaseStatus?.data}
                             isAuthenticated={!!userData?.id}
@@ -488,9 +498,7 @@ const HomePage: React.FC = () => {
                             name={t('homepage.premium_cases')}
                             description={t('homepage.premium_cases_description')}
                             cases={paidCases}
-                            onBuyAndOpenCase={handleBuyAndOpenCase}
                             fixedPrices={false}
-                            onDataUpdate={handleDataUpdate}
                             onPlayBonusGame={handlePlayBonusGame}
                             isAuthenticated={!!userData?.id}
                             onAuthRequired={handleAuthRequired}

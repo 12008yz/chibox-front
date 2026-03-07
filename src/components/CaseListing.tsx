@@ -10,12 +10,10 @@ interface CaseListingProps {
   name: string;
   description?: string;
   cases: CaseTemplate[];
-  onBuyAndOpenCase?: (caseTemplate: CaseTemplate) => Promise<any>;
   fixedPrices?: boolean;
   nextCaseAvailableTime?: string;
   /** Если true, у ежедневного подписного кейса (не бонусного) не показываем таймер — кейс доступен для открытия */
   hideSubscriptionDailyCaseTimer?: boolean;
-  onDataUpdate?: () => void;
   onPlayBonusGame?: (caseTemplate: CaseTemplate) => void;
   freeCaseStatus?: {
     canClaim: boolean;
@@ -37,11 +35,9 @@ const CaseListing: React.FC<CaseListingProps> = ({
   name,
   description,
   cases,
-  onBuyAndOpenCase,
   fixedPrices = false,
   nextCaseAvailableTime,
   hideSubscriptionDailyCaseTimer = false,
-  onDataUpdate,
   onPlayBonusGame,
   freeCaseStatus,
   isAuthenticated = false,
