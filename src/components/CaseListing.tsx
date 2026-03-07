@@ -55,13 +55,7 @@ const CaseListing: React.FC<CaseListingProps> = ({
     // Предотвращаем переход по ссылке
     event.preventDefault();
 
-    // Проверяем авторизацию пользователя
-    if (!isAuthenticated && onAuthRequired) {
-      onAuthRequired();
-      return;
-    }
-
-    // Показываем превью (модалка одна на странице, рендерится в HomePage)
+    // Всегда открываем превью кейса. Для гостей внутри модалки показывается «Войдите, чтобы открыть» и кнопка входа.
     onOpenPreview(caseItem);
   };
 

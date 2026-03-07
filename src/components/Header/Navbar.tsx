@@ -62,11 +62,16 @@ const Navbar: React.FC<NavbarProps> = ({
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Обработчик клика по ссылкам с проверкой авторизации
+  // Показываем модалку входа только для защищённых маршрутов; на остальные (upgrade, leaderboard) пускаем без авторизации
+  const PROTECTED_PATHS = ['/exchange', '/profile', '/tower-defense', '/streamer-cabinet'];
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!user) {
-      e.preventDefault();
-      dispatch(setShowAuthModal(true));
+      const href = e.currentTarget.getAttribute('href') ?? '';
+      const path = href.replace(window.location.origin, '').split('?')[0];
+      if (PROTECTED_PATHS.some((p) => path === p || path.startsWith(p + '/'))) {
+        e.preventDefault();
+        dispatch(setShowAuthModal(true));
+      }
     }
   };
 
