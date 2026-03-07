@@ -287,9 +287,6 @@ const Footer = () => {
             </div>
             <div className="flex flex-col items-center gap-1 text-xs text-gray-500">
               <span>{t('footer.age_restriction')}</span>
-              <span className="text-gray-600 max-w-md text-center">
-                Статус++: повторы отключены только в ежедневном бесплатном кейсе, в остальных — возможны.
-              </span>
             </div>
           </div>
         </div>
