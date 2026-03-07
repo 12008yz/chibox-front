@@ -94,12 +94,6 @@ const HomePage: React.FC = () => {
     refetchFreeCaseStatus();
   };
 
-  const handleDataUpdate = () => {
-    refetchUser();
-    refetchCases();
-    refetchFreeCaseStatus();
-  };
-
   useEffect(() => {
     if (location.state?.openStatusModal) {
       setShowStatusPurchaseModal(true);
