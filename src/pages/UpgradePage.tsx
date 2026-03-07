@@ -13,6 +13,8 @@ import { getItemImageUrl } from '../utils/steamImageUtils';
 import { soundManager } from '../utils/soundManager';
 import { getRarityColor } from '../utils/rarityColors';
 import { getApiErrorMessage } from '../utils/config';
+import { useAppDispatch, useAuth } from '../store/hooks';
+import { setShowAuthModal } from '../store/slices/uiSlice';
 import { Zap, Target, Sparkles } from 'lucide-react';
 import { CelebrateIcon, SadIcon, ReceivedIcon, CancelIcon } from '../components/icons';
 
@@ -1138,6 +1140,9 @@ const TargetItemCard: React.FC<{
 
 const UpgradePage: React.FC = () => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const auth = useAuth();
+  const isGuest = !auth.isAuthenticated || !auth.user?.id;
 
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
@@ -1147,20 +1152,20 @@ const UpgradePage: React.FC = () => {
   const [isProcessingUpgrade, setIsProcessingUpgrade] = useState(false);
   const animationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // API queries
+  // API queries — для гостей не запрашиваем инвентарь
   const {
     data: upgradeableItems,
     isLoading: isLoadingItems,
     error: itemsError,
     refetch: refetchItems
-  } = useGetUserUpgradeableItemsQuery();
+  } = useGetUserUpgradeableItemsQuery(undefined, { skip: isGuest });
 
   // ИСПРАВЛЕНО: Теперь передаем selectedInventoryIds вместо selectedItemIds
   const {
     data: upgradeOptions,
     isLoading: isLoadingOptions,
   } = useGetUpgradeOptionsQuery(selectedInventoryIds, {
-    skip: selectedInventoryIds.length === 0 || showAnimation || isProcessingUpgrade
+    skip: isGuest || selectedInventoryIds.length === 0 || showAnimation || isProcessingUpgrade
   });
 
   const [performUpgrade, { isLoading: isUpgrading }] = usePerformUpgradeMutation();
@@ -1340,8 +1345,14 @@ const UpgradePage: React.FC = () => {
     return total;
   }, [upgradeableItems, selectedInventoryIds]);
 
+  const handleShowAuth = () => dispatch(setShowAuthModal(true));
+
   // Обработчик выполнения апгрейда
   const handlePerformUpgrade = async () => {
+    if (isGuest) {
+      handleShowAuth();
+      return;
+    }
     try {
       if (selectedInventoryIds.length === 0 || !selectedTargetItem) {
         toast.error('Выберите предметы для улучшения и целевой предмет');
@@ -1486,6 +1497,22 @@ const UpgradePage: React.FC = () => {
           <p className="text-gray-400 text-sm sm:text-base md:text-lg px-4">{t('upgrade.subtitle')}</p>
         </div>
 
+        {/* Баннер для гостей: войдите чтобы делать апгрейд */}
+        {isGuest && (
+          <div className="mb-4 sm:mb-6 rounded-lg border-2 border-amber-500/50 bg-amber-950/30 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-white font-semibold text-center sm:text-left">
+              {t('upgrade.login_to_upgrade', { defaultValue: 'Войдите в аккаунт, чтобы улучшать предметы' })}
+            </p>
+            <button
+              type="button"
+              onClick={handleShowAuth}
+              className="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors shrink-0"
+            >
+              {t('upgrade.login', { defaultValue: 'Войти' })}
+            </button>
+          </div>
+        )}
+
         {/* НОВОЕ: Предупреждения и информация */}
         <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3">
           {/* Предупреждение о минимальной стоимости */}
@@ -1515,7 +1542,7 @@ const UpgradePage: React.FC = () => {
           totalValue={totalSelectedPrice}
           onUpgrade={handlePerformUpgrade}
           isUpgrading={isUpgrading}
-          canUpgrade={selectedInventoryIds.length > 0 && selectedTargetItem !== ''}
+          canUpgrade={!isGuest && selectedInventoryIds.length > 0 && selectedTargetItem !== ''}
           showAnimation={showAnimation}
           upgradeResult={upgradeResult}
           onAnimationComplete={handleAnimationComplete}
@@ -1541,7 +1568,7 @@ const UpgradePage: React.FC = () => {
               </div>
               <button
                 onClick={handlePerformUpgrade}
-                disabled={selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
+                disabled={isGuest || selectedInventoryIds.length === 0 || !selectedTargetItem || isUpgrading}
                 className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-700 text-white py-3 px-6 rounded-lg font-semibold text-base transition-all duration-200 disabled:cursor-not-allowed active:scale-95 shadow-lg hover:shadow-xl"
               >
                 {isUpgrading ? (
@@ -1574,7 +1601,23 @@ const UpgradePage: React.FC = () => {
               )}
             </div>
 
-            {isLoadingItems ? (
+            {isGuest ? (
+              <div className="text-center py-8 sm:py-10 md:py-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 bg-amber-500/20 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-sm sm:text-base md:text-lg mb-2">{t('upgrade.login_to_see_items', { defaultValue: 'Войдите, чтобы видеть предметы для улучшения' })}</p>
+                <button
+                  type="button"
+                  onClick={handleShowAuth}
+                  className="mt-3 px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
+                >
+                  {t('upgrade.login', { defaultValue: 'Войти' })}
+                </button>
+              </div>
+            ) : isLoadingItems ? (
               <div className="flex items-center justify-center py-8 sm:py-10 md:py-12">
                 <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-cyan-500"></div>
                 <span className="ml-2 sm:ml-3 text-gray-400 text-sm sm:text-base">{t('upgrade.loading_items')}</span>

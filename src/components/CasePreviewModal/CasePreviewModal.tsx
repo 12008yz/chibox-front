@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { throttle } from 'lodash-es';
 import toast from 'react-hot-toast';
@@ -18,6 +17,8 @@ import { injectStyles } from './styles';
 import { getCaseImageUrl, getItemImageUrl, adaptImageSize, preloadItemImages } from '../../utils/steamImageUtils';
 import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
+import { useAppDispatch } from '../../store/hooks';
+import { setShowAuthModal } from '../../store/slices/uiSlice';
 
 // Добавляем стили в head только один раз
 injectStyles();
@@ -34,8 +35,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   onDataUpdate
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { userData } = useUserData();
+  const isGuest = !userData;
 
   const paymentMethod = 'balance' as const; // Всегда используем только баланс
   const [isVisible, setIsVisible] = useState(false);
@@ -81,7 +83,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   }, []);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
-  const { data: statusData, isLoading: statusLoading, refetch: refetchCaseStatus } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen });
+  const { data: statusData, isLoading: statusLoading, refetch: refetchCaseStatus } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen || isGuest });
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
 
   // Всегда подтягивать свежий статус при открытии модалки (подписка могла измениться — покупка или выдача через скрипт)
@@ -137,13 +139,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   }, [buySubscription, onClose, onDataUpdate]);
 
-  // Проверяем авторизацию пользователя
-  useEffect(() => {
-    if (isOpen && !userData) {
-      onClose();
-      navigate('/login');
-    }
-  }, [isOpen, userData, navigate, onClose]);
+  // Гости могут просматривать превью — редирект убран
 
   // Обработка открытия/закрытия модала
   useEffect(() => {
@@ -673,7 +669,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }, startDelay);
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
 
+  const handleShowAuth = useCallback(() => {
+    onClose();
+    dispatch(setShowAuthModal(true));
+  }, [onClose, dispatch]);
+
   const handleBuyCase = async () => {
+    if (isGuest) {
+      handleShowAuth();
+      return;
+    }
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
       return;
     }
@@ -735,6 +740,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   const handleOpenCase = async (caseId?: string, inventoryItemId?: string) => {
+    if (isGuest) {
+      handleShowAuth();
+      return;
+    }
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
       return;
     }
@@ -954,6 +963,22 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   </div>
                   {/* Блок цены / предупреждение и главная кнопка — на мобильной версии цену и блок «Шанс / N предметов» не показываем */}
                   {(() => {
+                    if (isGuest) {
+                      return (
+                        <div className="rounded-lg border-2 border-amber-500/50 bg-amber-950/30 p-4 text-center mb-6">
+                          <p className="text-white font-semibold">
+                            {t('case_preview_modal.login_to_open', { defaultValue: 'Войдите, чтобы открыть кейс' })}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleShowAuth}
+                            className="mt-4 w-full py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg"
+                          >
+                            {t('case_preview_modal.login', { defaultValue: 'Войти' })}
+                          </button>
+                        </div>
+                      );
+                    }
                     const price = getCasePrice(caseData);
                     const balance = userData?.balance ?? 0;
                     const hasEnough = balance >= price;
@@ -1079,6 +1104,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           t={t}
           onBuyStatusClick={handleBuyStatusClick}
           buyStatusLoading={buySubscriptionLoading}
+          isGuest={isGuest}
+          onLoginRequest={handleShowAuth}
         />
         </div>
       )}

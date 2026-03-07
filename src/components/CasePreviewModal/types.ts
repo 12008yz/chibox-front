@@ -73,6 +73,9 @@ export interface ModalFooterProps {
   /** При клике «Купить статус» — вызывается с требуемым tier (1/2/3); при отсутствии открывается модалка пополнения */
   onBuyStatusClick?: (tier: number) => void | Promise<void>;
   buyStatusLoading?: boolean;
+  /** Гость: показывать только «Закрыть» и «Войти чтобы открыть» */
+  isGuest?: boolean;
+  onLoginRequest?: () => void;
 }
 
 export type AnimationPhase = 'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped';

@@ -18,9 +18,35 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   getCasePrice,
   t,
   onBuyStatusClick,
-  buyStatusLoading = false
+  buyStatusLoading = false,
+  isGuest = false,
+  onLoginRequest,
 }) => {
   const d = statusData?.data;
+
+  if (isGuest) {
+    return (
+      <div className="flex-shrink-0 p-3 sm:p-4 md:p-6 border-t border-gray-700 bg-[#1a1629]">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-between items-stretch sm:items-center">
+          <button
+            onClick={handleClose}
+            className="px-4 py-2 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
+          >
+            {t('case_preview_modal.close')}
+          </button>
+          {onLoginRequest && (
+            <button
+              type="button"
+              onClick={onLoginRequest}
+              className="px-4 py-2 sm:px-6 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white rounded transition-colors duration-200"
+            >
+              {t('case_preview_modal.login_to_open', { defaultValue: 'Войти чтобы открыть кейс' })}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
   const hasSubscriptionIssue = d && d.subscriptionRequired && (d.userSubscriptionTier < d.minSubscriptionTier || (d.minSubscriptionTier > 0 && (d.subscriptionDaysLeft ?? 0) <= 0));
   const subscriptionBlocked = d && !statusLoading && hasSubscriptionIssue && !d.canOpen && !d.canBuy;
   const isCooldown = d && !statusLoading && !d.canOpen && !d.canBuy && !hasSubscriptionIssue && (d.reason === 'Кейс еще недоступен' || d.nextAvailableTime);

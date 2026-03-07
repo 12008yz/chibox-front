@@ -289,14 +289,7 @@ const App: React.FC = () => {
                 </div>
               }
             />
-            <Route
-              path="/upgrade"
-              element={
-                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
-                  <UpgradePage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/upgrade" element={<UpgradePage />} />
             <Route
               path="/tower-defense"
               element={
