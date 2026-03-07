@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
 import { Flame, Star } from 'lucide-react';
@@ -32,6 +32,11 @@ const getRarityColor = (rarity: string) => {
 const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
   const rarityColor = getRarityColor(drop.item.rarity);
   const isHighValue = drop.item.price >= 100;
+  // Fallback при 404 кастомного аватара (например после смены аватара)
+  const [avatarError, setAvatarError] = useState(false);
+  const avatarSrc = drop.user.avatar && !avatarError
+    ? drop.user.avatar
+    : drop.user.steam_avatar_url || null;
 
   return (
     <Link
@@ -73,12 +78,12 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           </div>
         )}
 
-        {/* Аватар пользователя (сверху слева) */}
+        {/* Аватар пользователя (сверху слева); при 404 кастомного аватара — fallback на Steam */}
         <div className="absolute top-3 left-3 z-10 w-7 h-7 flex-shrink-0">
           <div className="w-7 h-7" title={`${drop.user.username} (Ур. ${drop.user.level})`}>
-            {drop.user.avatar ? (
+            {avatarSrc ? (
               <img
-                src={drop.user.avatar}
+                src={avatarSrc}
                 alt={drop.user.username}
                 className="user-avatar-live-drop w-7 h-7 rounded-full border-2 border-gray-600 hover:border-white transition-colors object-cover"
                 style={{
@@ -89,6 +94,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
                   width: '28px !important',
                   height: '28px !important'
                 }}
+                onError={() => setAvatarError(true)}
               />
             ) : (
               <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-gray-600 hover:border-white transition-colors">

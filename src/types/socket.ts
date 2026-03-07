@@ -7,6 +7,7 @@ export interface LiveDropData {
     username: string;
     level: number;
     avatar: string | null;
+    steam_avatar_url?: string | null;
   };
   item: {
     id: string;
