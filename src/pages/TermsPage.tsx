@@ -824,4 +824,3 @@ const TermsPage = () => {
 };
 
 export default TermsPage;
-ge;
