@@ -900,12 +900,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       className="flex items-center justify-center min-h-[100dvh] bg-black/60"
       onClick={handleClose}
     >
-      {showWinEffects && <div className="win-flash-overlay" />}
-
       {/* Мобильные: во время анимации — тёмный фон, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
         <div className="absolute inset-0 flex items-center justify-center w-full h-full bg-black/80">
-          {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
             <div className="w-full case-open-rail min-h-[180px] sm:min-h-[200px] flex items-center justify-center">
               {mobileScrollOnlyContent}
