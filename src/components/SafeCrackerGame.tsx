@@ -27,11 +27,11 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
   const [wonItem, setWonItem] = useState<any>(null);
   const [showPrizeAnimation, setShowPrizeAnimation] = useState(false);
 
-  const { data: status, refetch: refetchStatus } = useGetSafeCrackerStatusQuery();
-  const [playSafeCracker, { isLoading }] = usePlaySafeCrackerMutation();
-
-  // Проверка подписки
   const user = useAppSelector(state => state.auth.user);
+  const { data: status, refetch: refetchStatus } = useGetSafeCrackerStatusQuery(undefined, {
+    skip: !user, // Только для авторизованных
+  });
+  const [playSafeCracker, { isLoading }] = usePlaySafeCrackerMutation();
   const hasSubscription = hasActiveSubscription(user);
 
   // Используем can_play с бэкенда, который уже учитывает и бесплатные попытки, и подписку

@@ -89,7 +89,7 @@ const HomePage: React.FC = () => {
   const closeCasePreview = () => setPreviewCase(null);
 
   const handleDataUpdate = () => {
-    refetchUser();
+    if (userData?.id) refetchUser(); // Только для авторизованных — у гостей запрос skip, refetch вызовет RTK error #38
     refetchCases();
     refetchFreeCaseStatus();
   };
@@ -123,17 +123,14 @@ const HomePage: React.FC = () => {
   const handleTicTacToeGameClose = () => {
     setShowTicTacToeGame(false);
     setBonusCase(null);
-    // Обновляем данные после закрытия игры
-    refetchUser();
+    if (userData?.id) refetchUser();
     refetchCases();
   };
 
   const handleTicTacToeWin = async () => {
     setShowTicTacToeGame(false);
     setBonusCase(null);
-
-    // Просто обновляем данные, чтобы показать новый кейс в инвентаре
-    refetchUser();
+    if (userData?.id) refetchUser();
     refetchCases();
   };
 
@@ -227,8 +224,7 @@ const HomePage: React.FC = () => {
         }, 500);
       }
 
-      // Обновляем данные пользователя
-      refetchUser();
+      if (userData?.id) refetchUser();
     } catch (err) {
     }
   };
@@ -283,9 +279,8 @@ const HomePage: React.FC = () => {
 
 
         if (openResult.success && openResult.data?.item) {
-          // Принудительно обновляем данные пользователя и кейсов
           setTimeout(() => {
-            refetchUser();
+            if (userData?.id) refetchUser();
             refetchCases();
           }, 500);
 
@@ -309,12 +304,10 @@ const HomePage: React.FC = () => {
         throw new Error('Ошибка покупки кейса');
       }
 
-      // Принудительно обновляем данные пользователя для обновления баланса
       setTimeout(() => {
-        refetchUser();
+        if (userData?.id) refetchUser();
       }, 100);
 
-      // Проверяем наличие inventory_cases в ответе
       const inventoryCases = buyResult.data?.inventory_cases;
 
       if (!inventoryCases || inventoryCases.length === 0) {
@@ -330,9 +323,8 @@ const HomePage: React.FC = () => {
 
 
       if (openResult.success && openResult.data?.item) {
-        // Принудительно обновляем данные пользователя и кейсов для обновления баланса в navbar
         setTimeout(() => {
-          refetchUser();
+          if (userData?.id) refetchUser();
           refetchCases();
         }, 500);
 

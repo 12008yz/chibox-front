@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { updateUser } from '../features/auth/authSlice';
 import { useGetCurrentUserQuery } from '../features/auth/authApi';
 
 /**
  * Кастомный хук для автоматического обновления данных пользователя
- * Можно использовать на любой странице где нужны актуальные данные
+ * Можно использовать на любой странице где нужны актуальные данные.
+ * Для гостей запрос /profile не выполняется (skip), чтобы не получать 401.
  */
 export const useUserData = (options: {
   autoRefresh?: boolean;
@@ -13,6 +14,7 @@ export const useUserData = (options: {
 } = {}) => {
   const { autoRefresh = false, refetchOnMount = true } = options;
   const dispatch = useAppDispatch();
+  const authUser = useAppSelector(state => state.auth.user);
   const lastUserIdRef = useRef<string | null>(null);
 
   const {
@@ -21,8 +23,8 @@ export const useUserData = (options: {
     error: userError,
     refetch: refetchUser
   } = useGetCurrentUserQuery(undefined, {
+    skip: !authUser, // Не дергать /profile для гостей — только для уже авторизованных (обновление данных)
     refetchOnMountOrArgChange: refetchOnMount,
-    // Периодическое обновление каждые 5 минут если autoRefresh включен
     pollingInterval: autoRefresh ? 5 * 60 * 1000 : 0,
   });
 

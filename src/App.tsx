@@ -3,7 +3,7 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, Suspense, useCallback, useState } from 'react';
+import { useEffect, Suspense, useCallback, useState, useRef } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 import { lazyWithChunkError } from './utils/lazyWithChunkError';
@@ -70,16 +70,15 @@ const App: React.FC = () => {
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
+  const hasCheckedSession = useRef(false);
 
-  // БЕЗОПАСНОСТЬ: Токены теперь в httpOnly cookies, auth.token используется только для миграции старых сессий
-  // Автоматически получаем данные пользователя если:
-  // 1. Есть старый токен в Redux (для миграции) ИЛИ
-  // 2. Нет данных пользователя (проверим cookies на сервере)
-  // НО НЕ загружаем если мы на странице Steam авторизации (там загрузка идет отдельно)
+  // БЕЗОПАСНОСТЬ: Токены в httpOnly cookies. Запрашиваем профиль только:
+  // 1. Есть старый токен (миграция), 2. Уже есть user (обновление), 3. Ещё не проверяли сессию (одна попытка с cookies).
+  // После 401 для гостя больше не дергаем /profile — убираем лишние 401 в консоли и каскад refetch.
   const shouldFetchUser = !isSteamAuthPage && (
-    auth.token || // Старый токен для миграции
-    !auth.user || // Нет данных пользователя (проверим httpOnly cookies)
-    !auth.user.id
+    auth.token ||
+    (auth.user != null && auth.user.id) ||
+    !hasCheckedSession.current
   );
 
   const {
@@ -115,6 +114,11 @@ const App: React.FC = () => {
       }));
     }
   }, [userData, auth.token, dispatch]);
+
+  // После первого ответа getCurrentUser (успех или 401) помечаем сессию проверенной — гостям больше не запрашиваем /profile
+  useEffect(() => {
+    if (userData?.success || userError) hasCheckedSession.current = true;
+  }, [userData?.success, userError]);
 
   // Logout ТОЛЬКО при ошибке getCurrentUser (не при других API вызовах)
   useEffect(() => {

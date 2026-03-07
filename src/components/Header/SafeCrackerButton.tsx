@@ -6,12 +6,12 @@ import { hasActiveSubscription } from "../../utils/subscriptionUtils";
 
 const SafeCrackerButton = () => {
   const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
+  const user = useAppSelector(state => state.auth.user);
 
   const { data: status } = useGetSafeCrackerStatusQuery(undefined, {
-    pollingInterval: 30000, // Обновляем каждые 30 секунд
+    skip: !user, // Только для авторизованных — не дергать /games/safe-cracker-status для гостей (401)
+    pollingInterval: 30000,
   });
-
-  const user = useAppSelector(state => state.auth.user);
   const hasSubscription = hasActiveSubscription(user);
 
   // Можно играть если есть обычные попытки ИЛИ бесплатные попытки, и пользователь еще не выигрывал
