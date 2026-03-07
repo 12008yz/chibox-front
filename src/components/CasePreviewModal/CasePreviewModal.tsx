@@ -70,12 +70,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Шаг полоски: mobile 100px+12px=112, sm 112px+12px=124 (совпадает с w-[100px]/sm:w-[112px] + gap-3)
   const getMobileStepPx = () => (typeof window !== 'undefined' && window.innerWidth >= 640 ? 124 : 112);
 
-  // Мобильная/планшетная версия: горизонтальный скролл + центральный квадрат (breakpoint lg 1024px)
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(() => typeof window !== 'undefined' && window.innerWidth < 1024);
+  // Мобильная/планшетная версия: по умолчанию false (десктоп), чтобы при открытии с десктопа не показывалась мобильная подложка
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
   useEffect(() => {
-    const check = () => setIsMobileOrTablet(window.innerWidth < 1024);
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    const media = window.matchMedia('(max-width: 1023px)');
+    const check = () => setIsMobileOrTablet(media.matches);
+    check(); // сразу при монтировании
+    media.addEventListener('change', check);
+    return () => media.removeEventListener('change', check);
   }, []);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
