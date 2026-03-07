@@ -86,10 +86,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const { data: statusData, isLoading: statusLoading, refetch: refetchCaseStatus } = useGetCaseStatusQuery(caseData.id, { skip: !isOpen || isGuest });
   const [buyCase, { isLoading: buyLoading }] = useBuyCaseMutation();
 
-  // Всегда подтягивать свежий статус при открытии модалки (подписка могла измениться — покупка или выдача через скрипт)
+  // Подтягивать статус при открытии только для авторизованных (у гостей запрос skip — refetch вызовет RTK #38)
   useEffect(() => {
-    if (isOpen && caseData?.id) refetchCaseStatus();
-  }, [isOpen, caseData?.id, refetchCaseStatus]);
+    if (isOpen && caseData?.id && !isGuest) refetchCaseStatus();
+  }, [isOpen, caseData?.id, isGuest, refetchCaseStatus]);
 
   // Предзагрузка изображений предметов при открытии модалки — чтобы на iPhone картинки успевали прогрузиться до анимации
   useEffect(() => {
