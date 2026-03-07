@@ -63,7 +63,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const animationTimoutsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех таймаутов анимации
   const animationIntervalsRef = useRef<NodeJS.Timeout[]>([]); // Массив всех интервалов анимации
-  const scrollLockRef = useRef<number | null>(null); // Позиция скролла при открытии модалки (для восстановления)
   // Мобильная оптимизация: позиция полоски через ref, без лишних re-render на каждый шаг
   const mobileStripRef = useRef<HTMLDivElement>(null);
   const mobileAnimationRef = useRef<{ position: number; offset: number }>({ position: 0, offset: 0 });
@@ -159,24 +158,18 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowGoldenSparks(false);
       setShowWinEffects(false);
       setShouldStopBetween(false);
-      // Полная блокировка скролла фона: html, body, #root и фиксация позиции (надёжно на мобиле и при скролле внутри #root)
-      const scrollY = window.scrollY;
+      // Блокировка скролла без сдвига body (top: -scrollY ломает полупрозрачный фон модалки)
       const root = document.getElementById('root');
       const rootScrollTop = root ? root.scrollTop : 0;
-      scrollLockRef.current = scrollY;
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.touchAction = 'none';
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
       if (root) {
         (root as HTMLElement).dataset.caseModalScrollTop = String(rootScrollTop);
         root.style.overflow = 'hidden';
         root.style.touchAction = 'none';
       }
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.touchAction = 'none';
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
       const timer = setTimeout(() => setIsAnimating(true), 16);
       return () => clearTimeout(timer);
     } else {
@@ -189,17 +182,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       animationTimoutsRef.current = [];
       animationIntervalsRef.current.forEach(interval => clearInterval(interval));
       animationIntervalsRef.current = [];
-      // Восстановление скролла и позиции
-      const savedScroll = scrollLockRef.current;
+      // Восстановление скролла
       const root = document.getElementById('root');
       document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
@@ -208,10 +196,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           root.scrollTop = Number(savedRootScroll);
           delete root.dataset.caseModalScrollTop;
         }
-      }
-      if (savedScroll !== null) {
-        window.scrollTo(0, savedScroll);
-        scrollLockRef.current = null;
       }
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -226,10 +210,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       document.documentElement.style.touchAction = '';
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
       if (root) {
         root.style.overflow = '';
         root.style.touchAction = '';
@@ -238,10 +218,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           root.scrollTop = Number(savedRootScroll);
           delete root.dataset.caseModalScrollTop;
         }
-      }
-      if (scrollLockRef.current !== null) {
-        window.scrollTo(0, scrollLockRef.current);
-        scrollLockRef.current = null;
       }
       soundManager.stopAll(); // Останавливаем все звуки при размонтировании
       if (animationTimeoutRef.current) {
