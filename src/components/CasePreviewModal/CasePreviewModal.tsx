@@ -22,6 +22,9 @@ import { soundManager } from '../../utils/soundManager';
 // Добавляем стили в head только один раз
 injectStyles();
 
+// Портал в documentElement, чтобы подложка (fixed) не привязывалась к body с position:fixed — иначе чёрный фон только в нижней части экрана
+const MODAL_PORTAL_TARGET = typeof document !== 'undefined' ? document.documentElement : null;
+
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   isOpen,
   onClose,
@@ -770,7 +773,27 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
   };
 
-  if (!isVisible) return null;
+  // При закрытии обязательно очищаем портал (null), иначе подложка остаётся в DOM
+  if (!isVisible) {
+    return (
+      <>
+        {MODAL_PORTAL_TARGET && createPortal(null, MODAL_PORTAL_TARGET)}
+        {selectedItem && (
+          <ItemInfoModal
+            isOpen={showItemInfoModal}
+            onClose={() => {
+              setShowItemInfoModal(false);
+              setSelectedItem(null);
+            }}
+            item={selectedItem}
+            showDropChance={showDropChance}
+            getRarityColor={getRarityColor}
+            t={t}
+          />
+        )}
+      </>
+    );
+  }
 
   const caseImageUrl = caseData.image_url && caseData.image_url.trim() !== ''
     ? getCaseImageUrl(caseData.image_url)
@@ -1052,10 +1075,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     </>
   );
 
-  // Рендерим модальное окно в body через портал
+  // Рендерим модальное окно в documentElement, чтобы fixed-подложка всегда на весь viewport
   return (
     <>
-      {createPortal(modalContent, document.body)}
+      {MODAL_PORTAL_TARGET && createPortal(modalContent, MODAL_PORTAL_TARGET)}
       {selectedItem && (
         <ItemInfoModal
           isOpen={showItemInfoModal}
