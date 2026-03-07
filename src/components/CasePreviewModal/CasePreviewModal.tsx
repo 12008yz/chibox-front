@@ -872,38 +872,45 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     </div>
   );
 
+  // Обёртка с явным viewport: избегаем бага, когда подложка рисуется «в полэкрана» из-за body position:fixed
+  const viewportWrapperStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100vw',
+    height: '100vh',
+    minHeight: '100vh',
+    zIndex: 99999998,
+    isolation: 'isolate',
+  };
+
   const modalContent = (
-    <>
+    <div
+      style={viewportWrapperStyle}
+      className="flex items-center justify-center min-h-[100dvh] bg-black/60"
+      onClick={handleClose}
+    >
       {showWinEffects && <div className="win-flash-overlay" />}
 
-      {/* Мобильные: во время анимации — тёмный фон (ничего кроме анимации), взрыв как на десктопе, затем показ выигрыша. */}
+      {/* Мобильные: во время анимации — тёмный фон, затем показ выигрыша. */}
       {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center w-full h-full bg-black">
+        <div className="absolute inset-0 flex items-center justify-center w-full h-full bg-black/80">
           {showWinEffects && <div className="win-flash-overlay" style={{ zIndex: 99999999 }} />}
           <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
-            {/* Горизонтальный блок во всю ширину: «рельс» с обводкой, анимация внутри */}
             <div className="w-full case-open-rail min-h-[180px] sm:min-h-[200px] flex items-center justify-center">
               {mobileScrollOnlyContent}
             </div>
           </div>
         </div>
       ) : (
-        <>
-          <div
-            className={`case-preview-backdrop fixed inset-0 z-[99999998] flex items-center justify-center transition-all duration-300 ${
-              isAnimating ? 'bg-black bg-opacity-75' : 'bg-black bg-opacity-0'
-            }`}
-            onClick={handleClose}
-            style={{
-              backgroundColor: isAnimating ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
-            }}
-          >
-            <div
-              className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl transition-all duration-1000 flex flex-col ${
-                isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
-              } ${showWinEffects ? 'win-shake' : ''}`}
-              onClick={(e) => e.stopPropagation()}
-            >
+        <div
+          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl flex flex-col transition-all duration-300 ${
+            isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'
+          } ${showWinEffects ? 'win-shake' : ''}`}
+          onClick={(e) => e.stopPropagation()}
+        >
               <ModalHeader
                 caseData={caseData}
                 caseImageUrl={caseImageUrl}
@@ -1068,11 +1075,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           onBuyStatusClick={handleBuyStatusClick}
           buyStatusLoading={buySubscriptionLoading}
         />
-            </div>
-          </div>
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 
   // Рендерим модальное окно в documentElement, чтобы fixed-подложка всегда на весь viewport
