@@ -89,9 +89,11 @@ const HomePage: React.FC = () => {
   const closeCasePreview = () => setPreviewCase(null);
 
   const handleDataUpdate = () => {
-    if (userData?.id) refetchUser(); // Только для авторизованных — у гостей запрос skip, refetch вызовет RTK error #38
+    if (userData?.id) {
+      refetchUser();
+      refetchFreeCaseStatus();
+    }
     refetchCases();
-    refetchFreeCaseStatus();
   };
 
   useEffect(() => {
@@ -255,8 +257,7 @@ const HomePage: React.FC = () => {
       // Проверяем, является ли это бонусным кейсом
       const isBonusCase = caseTemplate.name?.toLowerCase().includes('бонус');
 
-      if (isBonusCase) {
-        // Проверяем, выиграл ли пользователь в крестики-нолики за последние 24 часа
+      if (isBonusCase && userData?.id) {
         await refetchTicTacToe();
         const hasWonRecently = ticTacToeData?.game?.result === 'win' && ticTacToeData?.game?.reward_given;
 
