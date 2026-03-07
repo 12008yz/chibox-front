@@ -144,8 +144,16 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab);
+      setHistoryModalOpen(false); // сброс вложенной модалки «История», чтобы не показывать её поверх при повторном открытии
     }
   }, [isOpen, initialTab]);
+
+  // При закрытии основной модалки сбрасываем вложенную «История» — иначе при следующем открытии остаётся два слоя затемнения
+  useEffect(() => {
+    if (!isOpen) {
+      setHistoryModalOpen(false);
+    }
+  }, [isOpen]);
 
   // Блокировка прокрутки страницы при открытом модальном окне
   useEffect(() => {
