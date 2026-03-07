@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import Avatar from "../../Avatar";
 import { Bell, BellRing, Plus, Crown } from "lucide-react";
@@ -7,7 +7,6 @@ import Monetary from "../../Monetary";
 import { useNavigate } from "react-router-dom";
 import { useGetUnreadNotificationsCountQuery } from "../../../features/user/userApi";
 import Notifications from './Notifications';
-import DepositModal from '../../DepositModal';
 import SafeCrackerButton from '../SafeCrackerButton';
 import { useAppDispatch } from '../../../store/hooks';
 import { setShowAuthModal } from '../../../store/slices/uiSlice';
@@ -16,28 +15,18 @@ interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
   user?: any; // TODO: заменить на правильный тип
+  onOpenDepositModal?: (tab: 'balance' | 'subscription') => void;
 }
 
 const RightContent: React.FC<RightContentProps> = ({
   openNotifications,
   setOpenNotifications,
   user,
+  onOpenDepositModal,
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [depositModalInitialTab, setDepositModalInitialTab] = useState<'balance' | 'subscription'>('balance');
-
-  // Открытие модалки пополнения из других мест (например, из превью кейса — «Купить статус»)
-  useEffect(() => {
-    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription' }>) => {
-      setDepositModalInitialTab(e.detail?.tab || 'balance');
-      setIsDepositModalOpen(true);
-    };
-    window.addEventListener('openDepositModal', handler as EventListener);
-    return () => window.removeEventListener('openDepositModal', handler as EventListener);
-  }, []);
 
   // Получаем количество непрочитанных уведомлений
   // Polling отключен, т.к. обновления приходят через WebSocket в реальном времени
@@ -102,10 +91,7 @@ const RightContent: React.FC<RightContentProps> = ({
           </div>
           <button
             id="onboarding-deposit-button"
-            onClick={() => {
-              setDepositModalInitialTab('balance');
-              setIsDepositModalOpen(true);
-            }}
+            onClick={() => onOpenDepositModal?.('balance')}
             className="gaming-balance-add-button group"
             title={t('header.top_up_balance')}
           >
@@ -174,13 +160,6 @@ const RightContent: React.FC<RightContentProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Deposit Modal */}
-      <DepositModal
-        isOpen={isDepositModalOpen}
-        onClose={() => setIsDepositModalOpen(false)}
-        initialTab={depositModalInitialTab}
-      />
     </div>
   );
 };

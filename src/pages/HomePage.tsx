@@ -11,6 +11,7 @@ import SteamTradeUrlModal from '../components/SteamTradeUrlModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
+import CasePreviewModal from '../components/CasePreviewModal';
 import StatusDashboard from '../components/StatusDashboard';
 import TicTacToeGame from '../components/TicTacToeGame';
 import SafeCrackerGame from '../components/SafeCrackerGame';
@@ -82,6 +83,10 @@ const HomePage: React.FC = () => {
 
   // Модалка покупки статуса (при переходе из профиля «Купить статус»)
   const [showStatusPurchaseModal, setShowStatusPurchaseModal] = useState(false);
+
+  // Одна модалка превью кейса на всю страницу (из любой секции кейсов)
+  const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
+  const closeCasePreview = () => setPreviewCase(null);
 
   useEffect(() => {
     if (location.state?.openStatusModal) {
@@ -471,6 +476,7 @@ const HomePage: React.FC = () => {
                             freeCaseStatus={freeCaseStatus?.data}
                             isAuthenticated={!!userData?.id}
                             onAuthRequired={handleAuthRequired}
+                            onOpenPreview={setPreviewCase}
                           />
                         </div>
                       )}
@@ -488,6 +494,7 @@ const HomePage: React.FC = () => {
                             onPlayBonusGame={handlePlayBonusGame}
                             isAuthenticated={!!userData?.id}
                             onAuthRequired={handleAuthRequired}
+                            onOpenPreview={setPreviewCase}
                           />
                         </div>
                       )}
@@ -598,6 +605,18 @@ const HomePage: React.FC = () => {
         onClose={() => setShowStatusPurchaseModal(false)}
         initialTab="subscription"
       />
+
+      {/* Одна модалка превью кейса (из любой секции) */}
+      {previewCase && (
+        <CasePreviewModal
+          isOpen={true}
+          onClose={closeCasePreview}
+          caseData={previewCase}
+          onBuyAndOpenCase={handleBuyAndOpenCase}
+          fixedPrices={false}
+          onDataUpdate={handleDataUpdate}
+        />
+      )}
 
     </div>
   );

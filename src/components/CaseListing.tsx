@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Case from './Case';
 import Title from './Title';
-import CasePreviewModal from './CasePreviewModal';
 
 import { CaseTemplate } from '../types/api';
 
@@ -30,6 +29,8 @@ interface CaseListingProps {
   };
   isAuthenticated?: boolean;
   onAuthRequired?: () => void;
+  /** Открыть превью кейса (модалка рендерится одним экземпляром на странице) */
+  onOpenPreview: (caseTemplate: CaseTemplate) => void;
 }
 
 const CaseListing: React.FC<CaseListingProps> = ({
@@ -44,17 +45,12 @@ const CaseListing: React.FC<CaseListingProps> = ({
   onPlayBonusGame,
   freeCaseStatus,
   isAuthenticated = false,
-  onAuthRequired
+  onAuthRequired,
+  onOpenPreview
 }) => {
   const { t } = useTranslation();
-  const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-
-
 
   const handleCaseClick = (caseItem: CaseTemplate, event: React.MouseEvent) => {
-
     // Проверяем, если нажали с Ctrl/Cmd, то открываем в новой вкладке как раньше
     if (event.ctrlKey || event.metaKey) {
       return; // Позволяем стандартному поведению Link сработать
@@ -69,14 +65,8 @@ const CaseListing: React.FC<CaseListingProps> = ({
       return;
     }
 
-    // Иначе показываем превью
-    setPreviewCase(caseItem);
-    setIsPreviewOpen(true);
-  };
-
-  const closePreview = () => {
-    setIsPreviewOpen(false);
-    setPreviewCase(null);
+    // Показываем превью (модалка одна на странице, рендерится в HomePage)
+    onOpenPreview(caseItem);
   };
 
   const handlePlayBonusGame = (caseTemplate: CaseTemplate) => {
@@ -190,19 +180,6 @@ const CaseListing: React.FC<CaseListingProps> = ({
         );
         })()}
       </div>
-
-      {/* Модальное окно превью кейса */}
-      {previewCase && (
-        <CasePreviewModal
-          isOpen={isPreviewOpen}
-          onClose={closePreview}
-          caseData={previewCase}
-          onBuyAndOpenCase={onBuyAndOpenCase}
-          fixedPrices={fixedPrices}
-          onDataUpdate={onDataUpdate}
-        />
-      )}
-
 
     </div>
   );

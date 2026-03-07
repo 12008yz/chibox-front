@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
+import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
 
@@ -24,6 +25,23 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useAppDispatch();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [depositModalInitialTab, setDepositModalInitialTab] = useState<'balance' | 'subscription'>('balance');
+
+  // Один общий слушатель openDepositModal — модалка рендерится только здесь, иначе два RightContent открывали бы две модалки
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription' }>) => {
+      setDepositModalInitialTab(e.detail?.tab || 'balance');
+      setIsDepositModalOpen(true);
+    };
+    window.addEventListener('openDepositModal', handler as EventListener);
+    return () => window.removeEventListener('openDepositModal', handler as EventListener);
+  }, []);
+
+  const openDepositModal = useCallback((tab: 'balance' | 'subscription' = 'balance') => {
+    setDepositModalInitialTab(tab);
+    setIsDepositModalOpen(true);
+  }, []);
 
   // Отслеживание скролла для изменения стиля навбара
   useEffect(() => {
@@ -154,6 +172,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   openNotifications={openNotifications}
                   setOpenNotifications={setOpenNotifications}
                   user={user}
+                  onOpenDepositModal={openDepositModal}
                 />
               </div>
 
@@ -234,11 +253,19 @@ const Navbar: React.FC<NavbarProps> = ({
                 openNotifications={openNotifications}
                 setOpenNotifications={setOpenNotifications}
                 user={user}
+                onOpenDepositModal={openDepositModal}
               />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Одна модалка пополнения на всё приложение (из баннера, кейса, хедера) */}
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
+        initialTab={depositModalInitialTab}
+      />
 
       {/* Spacer для контента под фиксированным навбаром */}
       <div className="h-16 lg:h-20"></div>
