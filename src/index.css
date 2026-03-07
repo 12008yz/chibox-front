@@ -754,7 +754,15 @@ html, body {
   transform: none;
 }
 
-/* Gaming Notifications Container */
+/* Gaming Notifications — плавное появление */
+.gaming-notifications-backdrop {
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+.gaming-notifications-backdrop.gaming-notifications-backdrop-visible {
+  opacity: 1;
+}
+
 .gaming-notifications-container {
   @apply fixed overflow-hidden rounded-xl;
   width: 380px;
@@ -764,8 +772,14 @@ html, body {
   background: rgba(17, 24, 39, 0.98);
   @apply border border-gray-700/50;
   z-index: 99999999 !important;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
-
+.gaming-notifications-container.gaming-notifications-container-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 @media (max-width: 768px) {
   .gaming-notifications-container {

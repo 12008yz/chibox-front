@@ -25,6 +25,19 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const notificationsRef = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    // Плавное появление панели и бэкдропа (класс добавляется после монтирования)
+    useEffect(() => {
+        if (!openNotifications) {
+            setVisible(false);
+            return;
+        }
+        const frameId = requestAnimationFrame(() => {
+            requestAnimationFrame(() => setVisible(true));
+        });
+        return () => cancelAnimationFrame(frameId);
+    }, [openNotifications]);
 
     // Получаем уведомления из API
     const {
@@ -417,14 +430,14 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 z-[99999998]"
+                className={`gaming-notifications-backdrop fixed inset-0 z-[99999998] bg-black/50 ${visible ? 'gaming-notifications-backdrop-visible' : ''}`}
                 onClick={handleCloseNotifications}
             />
 
             {/* Notifications Container */}
             <div
                 ref={notificationsRef}
-                className="gaming-notifications-container"
+                className={`gaming-notifications-container ${visible ? 'gaming-notifications-container-visible' : ''}`}
             >
                 {/* Заголовок */}
                 <div className="gaming-notifications-header">

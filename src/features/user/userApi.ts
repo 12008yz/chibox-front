@@ -104,7 +104,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         body: withdrawData,
       }),
-      invalidatesTags: ['Inventory', 'Balance', 'User'],
+      invalidatesTags: ['Inventory', 'Balance', 'User', 'Notifications'],
       // Оптимистичное обновление инвентаря
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         // Оптимистичное обновление основного инвентаря - меняем статус предмета

@@ -28,11 +28,12 @@ const RightContent: React.FC<RightContentProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // Получаем количество непрочитанных уведомлений
-  // Polling отключен, т.к. обновления приходят через WebSocket в реальном времени
+  // Получаем количество непрочитанных уведомлений: поллинг + при фокусе окна, чтобы счётчик обновлялся без перезагрузки
   const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadNotificationsCountQuery(undefined, {
     skip: !user,
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    pollingInterval: 25000, // каждые 25 сек, чтобы подхватить новые уведомления (например, при ошибке вывода)
   });
 
   const notificationCount = unreadCountData?.data?.count || 0;

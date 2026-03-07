@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWithdrawItemMutation } from '../features/user/userApi';
-import { useAppSelector } from '../store/hooks';
+import { useWithdrawItemMutation, userApi } from '../features/user/userApi';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { canWithdrawItems, getSubscriptionStatus } from '../utils/subscriptionUtils';
 import type { UserInventoryItem } from '../types/api';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,8 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
   const [showNoStatusModal, setShowNoStatusModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [withdrawItem] = useWithdrawItemMutation();
+  const dispatch = useAppDispatch();
+  const refetchNotificationsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Определяем мобильное устройство (включая планшеты)
   useEffect(() => {
@@ -36,6 +38,12 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (refetchNotificationsTimerRef.current) clearTimeout(refetchNotificationsTimerRef.current);
+    };
   }, []);
 
   // Получаем данные пользователя из store
@@ -106,6 +114,12 @@ const ItemWithdrawBanner: React.FC<ItemWithdrawBannerProps> = ({
       }
     } finally {
       setIsWithdrawing(false);
+      // Бэкенд может создать уведомление асинхронно (например, при ошибке вывода) — обновляем счётчик с задержкой
+      if (refetchNotificationsTimerRef.current) clearTimeout(refetchNotificationsTimerRef.current);
+      refetchNotificationsTimerRef.current = setTimeout(() => {
+        dispatch(userApi.util.invalidateTags(['Notifications']));
+        refetchNotificationsTimerRef.current = null;
+      }, 3000);
     }
   };
 
