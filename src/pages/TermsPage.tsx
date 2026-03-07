@@ -698,6 +698,9 @@ const TermsPage = () => {
                   <li><strong className="text-white">Статус++</strong> — премиум уровень</li>
                 </ul>
                 <p className="mt-3 text-sm text-gray-300">
+                  В тарифе <strong className="text-white">Статус++</strong> повторы предметов отключены лишь в ежедневном бесплатном кейсе; в остальных кейсах дубликаты возможны.
+                </p>
+                <p className="mt-3 text-sm text-gray-300">
                   <strong className="text-orange-300">Бесплатное получение Статуса:</strong> пользователь может оформить Статус на период без оплаты, обменяв виртуальные предметы в разделе «Обмен» на время действия статуса, в соответствии с правилами, действующими на платформе.
                 </p>
               </div>
@@ -821,3 +824,4 @@ const TermsPage = () => {
 };
 
 export default TermsPage;
+ge;

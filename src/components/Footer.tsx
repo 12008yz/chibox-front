@@ -285,8 +285,11 @@ const Footer = () => {
                 ИП Чикасов Денис Владимирович, ИНН 711204279301, ОГРНИП 325710000086112, г. Богородицк
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+            <div className="flex flex-col items-center gap-1 text-xs text-gray-500">
               <span>{t('footer.age_restriction')}</span>
+              <span className="text-gray-600 max-w-md text-center">
+                Статус++: повторы отключены только в ежедневном бесплатном кейсе, в остальных — возможны.
+              </span>
             </div>
           </div>
         </div>

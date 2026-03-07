@@ -125,15 +125,13 @@ const LeaderboardPage: React.FC = () => {
     <div className="text-white relative min-h-screen bg-[#0a0a0f]">
       <ScrollToTopOnMount />
 
-      {/* Фон */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Фон — fixed, чтобы не прыгал при смене табов и появлении/скрытии скроллбара */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <img
           src={BACKGROUNDS.leaderboard}
           alt=""
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover"
-          style={{
-            opacity: 0.3,
-          }}
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.3 }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
       </div>
