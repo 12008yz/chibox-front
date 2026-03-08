@@ -83,9 +83,9 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         />
       </div>
 
-      <div className="flex flex-col gap-2 p-2 md:p-4 items-center">
-        <div className="font-bold text-sm md:text-lg text-white text-center">{translateCaseName(title)}</div>
-        <div className="font-medium text-sm md:text-lg lg:text-xl text-green-400">
+      <div className="flex flex-col gap-2 p-2 md:p-4 items-center w-full min-w-0">
+        <div className="font-bold text-sm md:text-lg text-white text-center w-full break-words">{translateCaseName(title)}</div>
+        <div className="font-medium text-sm md:text-lg lg:text-xl text-green-400 text-center w-full break-words">
           {fixedPrices ? (
             <span className="text-yellow-400 font-bold">
               {title.toLowerCase().includes('premium') || title.toLowerCase().includes('премиум')

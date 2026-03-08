@@ -1885,9 +1885,8 @@ html::-webkit-scrollbar-thumb,
   transform: scale(1.02) translateY(-2px);
 }
 
-/* overflow: clip — избегаем предупреждения View Transitions про img (overflow: visible) */
 .case-image {
-  overflow: clip;
+  overflow: visible;
   border-radius: 0;
   border: none !important;
   outline: none !important;
