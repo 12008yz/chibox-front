@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, X, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowDown, X, ArrowLeft, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { CelebrateIcon, GiftIcon, TicTacToeIcon, BalanceIcon } from './icons';
 
 interface OnboardingStep {
@@ -43,7 +43,17 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       position: 'bottom',
       arrowDirection: 'down',
       mobileTitle: 'Крестики-нолики',
-      mobileDescription: 'Найдите кейс с кнопкой "Играть". Победите компьютер, чтобы получить награду!'
+      mobileDescription: 'Найдите кейс с кнопкой «Играть». Победи, чтобы получить награду!'
+    },
+    {
+      id: 'safe',
+      targetId: 'onboarding-safe-button',
+      title: t('onboarding.safe_title', 'Взлом Сейфа'),
+      description: t('onboarding.safe_description', 'Подберите правильный код и откройте сейф! У новых пользователей есть бесплатные попытки взлома — не упустите шанс получить награду!'),
+      position: 'bottom',
+      arrowDirection: 'down',
+      mobileTitle: 'Взлом Сейфа',
+      mobileDescription: 'В меню найдите «Сейф». У вас есть бесплатные попытки взлома — подберите код и заберите награду!'
     },
     {
       id: 'free_cases',
@@ -54,6 +64,16 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       arrowDirection: 'down',
       mobileTitle: 'Бесплатные Кейсы',
       mobileDescription: 'Прокрутите вниз и найдите бесплатные кейсы. У вас есть 2 попытки открыть их!'
+    },
+    {
+      id: 'status_dashboard',
+      targetId: 'onboarding-status-dashboard',
+      title: t('onboarding.status_dashboard_title', 'Доска статусов'),
+      description: t('onboarding.status_dashboard_description', 'Здесь ваш статус подписки, бонусные активности и статистика. Отслеживайте прогресс и пользуйтесь бонусами по крестикам-ноликам, сейфу и обмену!'),
+      position: 'bottom',
+      arrowDirection: 'down',
+      mobileTitle: 'Доска статусов',
+      mobileDescription: 'Прокрутите до блока со статусами. Там отображаются подписка, бонусные игры и ваша статистика.'
     },
     {
       id: 'balance',
@@ -81,6 +101,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
         return <TicTacToeIcon className={`${iconClass} w-6 h-6`} />;
       case 'balance':
         return <BalanceIcon className={`${iconClass} w-6 h-6`} />;
+      case 'status_dashboard':
+        return <LayoutDashboard className={`${iconClass} w-6 h-6 text-cyan-400`} />;
       default:
         return null;
     }
