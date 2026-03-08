@@ -104,13 +104,12 @@ const App: React.FC = () => {
     dispatch(checkSessionValidity());
   }, [dispatch]);
 
-  // Обновляем данные пользователя когда получаем ответ от API
+  // Обновляем данные пользователя когда получаем ответ от API (в т.ч. после сохранения профиля / Trade URL)
   useEffect(() => {
-    if (userData?.success && userData.user && auth.token) {
-
+    if (userData?.success && userData.user) {
       dispatch(loginSuccess({
         user: userData.user,
-        token: auth.token
+        token: auth.token ?? undefined
       }));
     }
   }, [userData, auth.token, dispatch]);
