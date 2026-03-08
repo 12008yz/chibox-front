@@ -382,7 +382,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-gray-400 text-xs sm:text-sm truncate">{t('public_profile.items_in_inventory')}</p>
-                <p className="text-lg sm:text-xl font-bold text-white">{getActiveInventory().length}</p>
+                <p className="text-lg sm:text-xl font-bold text-white">{totalCounts?.inventory ?? profileData?.user?.inventoryPagination?.total ?? 0}</p>
               </div>
             </div>
           </div>

@@ -44,6 +44,7 @@ export interface User {
   auth_provider?: 'local' | 'steam';
   is_email_verified?: boolean;
   role?: string;
+  is_bot?: boolean;
   created_at?: string;
   updated_at?: string;
   // Дополнительные поля для данных профиля

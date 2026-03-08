@@ -78,10 +78,10 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
           </div>
         )}
 
-        {/* Аватар пользователя (сверху слева); при 404 кастомного аватара — fallback на Steam */}
+        {/* Аватар пользователя (сверху слева); при 404 или битой ссылке — инициалы */}
         <div className="absolute top-3 left-3 z-10 w-7 h-7 flex-shrink-0">
           <div className="w-7 h-7" title={`${drop.user.username} (Ур. ${drop.user.level})`}>
-            {avatarSrc ? (
+            {avatarSrc && !avatarError ? (
               <img
                 src={avatarSrc}
                 alt={drop.user.username}
@@ -99,7 +99,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
             ) : (
               <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-gray-600 hover:border-white transition-colors">
                 <span className="text-white text-xs font-bold">
-                  {drop.user.username.charAt(0).toUpperCase()}
+                  {(drop.user.username || '?').charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
