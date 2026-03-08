@@ -29,7 +29,7 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
 
   if (!isOpen) return null;
 
-  const StatusLink = ({ children }: { children: React.ReactNode }) => (
+  const StatusLink = ({ children }: { children?: React.ReactNode }) => (
     <button
       type="button"
       onClick={goToStatusBoard}
