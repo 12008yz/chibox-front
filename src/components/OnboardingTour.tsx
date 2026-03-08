@@ -119,6 +119,20 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Автоскролл к целевому элементу при смене шага (десктоп и мобилка)
+  useEffect(() => {
+    if (!isActive) return;
+    const step = steps[currentStep];
+    if (!step?.targetId) return;
+    const el = document.getElementById(step.targetId);
+    if (el) {
+      const timer = setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, currentStep]);
+
   useEffect(() => {
     if (!isActive || isMobile) return;
 
