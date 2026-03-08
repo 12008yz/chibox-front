@@ -83,6 +83,8 @@ const HomePage: React.FC = () => {
 
   // Модалка покупки статуса (при переходе из профиля «Купить статус»)
   const [showStatusPurchaseModal, setShowStatusPurchaseModal] = useState(false);
+  // Подсветка первого статуса (за 1911) при переходе из модалки «Для вывода нужен статус»
+  const [highlightFirstStatus, setHighlightFirstStatus] = useState(false);
 
   // Одна модалка превью кейса на всю страницу (из любой секции кейсов)
   const [previewCase, setPreviewCase] = useState<CaseTemplate | null>(null);
@@ -102,6 +104,18 @@ const HomePage: React.FC = () => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, location.pathname, navigate]);
+
+  // Переход на доску статусов с подсветкой первого статуса (из модалки вывода)
+  useEffect(() => {
+    if (location.state?.scrollToStatusBoard && location.state?.highlightFirstStatus) {
+      setHighlightFirstStatus(true);
+      navigate(location.pathname, { replace: true, state: {} });
+      const t1 = setTimeout(() => document.getElementById('onboarding-status-dashboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+      const t2 = setTimeout(() => document.getElementById('status-tier-first')?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' }), 550);
+      const t3 = setTimeout(() => setHighlightFirstStatus(false), 8000);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    }
+  }, [location.state?.scrollToStatusBoard, location.state?.highlightFirstStatus, location.pathname, navigate]);
 
   /* Скрыть полосу прокрутки только на главной (html, body и #root — скролл может быть на любом) */
   useEffect(() => {
@@ -530,6 +544,7 @@ const HomePage: React.FC = () => {
                 openedCasesCount={openedCasesCount}
                 onPlayTicTacToe={handlePlayTicTacToe}
                 onPlaySafeCracker={handlePlaySafeCracker}
+                highlightFirstStatus={highlightFirstStatus}
               />
             </div>
           </div>

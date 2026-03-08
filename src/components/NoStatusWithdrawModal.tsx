@@ -15,7 +15,7 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
   const goToStatusBoard = (e: React.MouseEvent) => {
     e.preventDefault();
     onClose();
-    navigate('/', { state: { openStatusModal: true } });
+    navigate('/', { state: { scrollToStatusBoard: true, highlightFirstStatus: true } });
   };
 
   const handleBuyStatus = () => {

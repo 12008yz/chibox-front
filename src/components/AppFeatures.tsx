@@ -48,9 +48,11 @@ interface StatusTier {
 interface AppFeaturesProps {
   name: string;
   description: string;
+  /** Подсветить карточку первого статуса (Статус за 1911) */
+  highlightFirstStatus?: boolean;
 }
 
-const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
+const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description, highlightFirstStatus }) => {
   const { t } = useTranslation();
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [selectedTierId, setSelectedTierId] = useState<number | undefined>(undefined);
@@ -124,6 +126,17 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
 
   return (
     <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none z-50">
+      {highlightFirstStatus && (
+        <style>{`
+          @keyframes status-first-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.4), 0 0 20px rgba(34, 211, 238, 0.2); }
+            50% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.3), 0 0 28px rgba(34, 211, 238, 0.35); }
+          }
+          .status-first-highlight {
+            animation: status-first-glow 1.8s ease-in-out infinite;
+          }
+        `}</style>
+      )}
       <Title title={name} />
 
       <div className="text-center mb-8">
@@ -134,11 +147,12 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
         {statusTiers.map((tier, index) => (
           <div
             key={index}
+            id={index === 0 ? 'status-tier-first' : undefined}
             className={`group relative bg-gray-900/40 border rounded-xl p-6 transition-all duration-300 hover:transform hover:scale-105 cursor-pointer ${
               tier.popular
                 ? 'border-purple-500/50 hover:border-purple-400/70 ring-2 ring-purple-500/20'
                 : 'border-gray-700/50 hover:border-gray-600/70'
-            }`}
+            } ${index === 0 && highlightFirstStatus ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-gray-900 status-first-highlight' : ''}`}
           >
 
             {/* Градиентный фон при наведении */}
