@@ -17,8 +17,6 @@ interface StatusDashboardProps {
   onPlayTicTacToe?: () => void;
   onPlaySafeCracker?: () => void;
   onOpenSlots?: () => void;
-  /** Подсветить первый статус (Статус за 1911) при переходе из модалки вывода */
-  highlightFirstStatus?: boolean;
 }
 
 interface BonusActivity {
@@ -40,7 +38,6 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   openedCasesCount = 0,
   onPlayTicTacToe,
   onPlaySafeCracker,
-  highlightFirstStatus,
   // onOpenSlots
 }) => {
   const navigate = useNavigate();
@@ -53,7 +50,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   // Если нет активной подписки, показываем стандартный компонент покупки статусов
   if (!hasActiveSubscription) {
-    return <AppFeatures name={name} description={description} highlightFirstStatus={highlightFirstStatus} />;
+    return <AppFeatures name={name} description={description} />;
   }
 
   const subscriptionTier = user.subscription_tier;
