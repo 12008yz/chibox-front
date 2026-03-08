@@ -110,8 +110,12 @@ const HomePage: React.FC = () => {
     if (location.state?.scrollToStatusBoard && location.state?.highlightFirstStatus) {
       setHighlightFirstStatus(true);
       navigate(location.pathname, { replace: true, state: {} });
-      const t1 = setTimeout(() => document.getElementById('onboarding-status-dashboard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
-      const t2 = setTimeout(() => document.getElementById('status-tier-first')?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' }), 550);
+      const t1 = setTimeout(() => {
+        document.getElementById('onboarding-status-dashboard')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+      const t2 = setTimeout(() => {
+        document.getElementById('status-tier-first')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1000);
       const t3 = setTimeout(() => setHighlightFirstStatus(false), 8000);
       return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
     }
@@ -366,6 +370,17 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen text-white relative">
       <div className="home-page-bg" aria-hidden="true" />
+      {/* Затемнение при подсветке первого статуса; клик в пустоту завершает показ */}
+      {highlightFirstStatus && (
+        <div
+          className="fixed inset-0 bg-black/65 z-[100] cursor-pointer"
+          onClick={() => setHighlightFirstStatus(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setHighlightFirstStatus(false)}
+          role="button"
+          tabIndex={0}
+          aria-label={t('common.close')}
+        />
+      )}
       <div className="relative z-10">
         <ScrollToTopOnMount />
 
@@ -536,7 +551,10 @@ const HomePage: React.FC = () => {
             )}
 
             {/* Статусы подписки */}
-            <div id="onboarding-status-dashboard" className="mb-12">
+            <div
+              id="onboarding-status-dashboard"
+              className={`mb-12 ${highlightFirstStatus ? 'relative z-[101]' : ''}`}
+            >
               <StatusDashboard
                 name={t('homepage.chibox_statuses')}
                 description={t('homepage.chibox_statuses_description')}
