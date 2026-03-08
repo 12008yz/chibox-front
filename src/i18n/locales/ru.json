@@ -275,7 +275,9 @@
 
     "no_status_withdraw_modal": {
       "title": "Для вывода нужен статус",
-      "description": "Вы можете купить <link>статус</link> за ChiCoins или обменять предмет на дни статуса бесплатно в лавке обмена.",
+      "description_before": "Вы можете купить ",
+      "description_link": "статус",
+      "description_after": " за ChiCoins или обменять предмет на дни статуса бесплатно в лавке обмена.",
       "buy_status": "Купить статус",
       "exchange_free": "Обменять в лавке обмена"
     },

@@ -275,7 +275,9 @@
     },
     "no_status_withdraw_modal": {
       "title": "Status required for withdrawal",
-      "description": "You can buy <link>status</link> with ChiCoins or exchange the item for status days for free in the exchange shop.",
+      "description_before": "You can buy ",
+      "description_link": "status",
+      "description_after": " with ChiCoins or exchange the item for status days for free in the exchange shop.",
       "buy_status": "Buy status",
       "exchange_free": "Exchange in the shop"
     },

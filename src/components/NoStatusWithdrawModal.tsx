@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation, Trans } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { X, Crown, RefreshCw } from 'lucide-react';
 
 interface NoStatusWithdrawModalProps {
@@ -12,7 +12,8 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const goToStatusBoard = () => {
+  const goToStatusBoard = (e: React.MouseEvent) => {
+    e.preventDefault();
     onClose();
     navigate('/', { state: { openStatusModal: true } });
   };
@@ -28,16 +29,6 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
   };
 
   if (!isOpen) return null;
-
-  const StatusLink = ({ children }: { children?: React.ReactNode }) => (
-    <button
-      type="button"
-      onClick={goToStatusBoard}
-      className="text-cyan-400 font-semibold underline decoration-cyan-400/90 underline-offset-1 hover:text-cyan-300 hover:decoration-cyan-300 inline align-baseline bg-transparent border-none p-0 cursor-pointer status-link-pulse"
-    >
-      {children}
-    </button>
-  );
 
   return (
     <div
@@ -71,10 +62,15 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
         </div>
 
         <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-          <Trans
-            i18nKey="profile.no_status_withdraw_modal.description"
-            components={{ link: <StatusLink /> }}
-          />
+          {t('profile.no_status_withdraw_modal.description_before')}
+          <button
+            type="button"
+            onClick={goToStatusBoard}
+            className="text-cyan-400 font-semibold underline decoration-cyan-400/90 underline-offset-1 hover:text-cyan-300 hover:decoration-cyan-300 inline align-baseline bg-transparent border-none p-0 cursor-pointer status-link-pulse"
+          >
+            {t('profile.no_status_withdraw_modal.description_link')}
+          </button>
+          {t('profile.no_status_withdraw_modal.description_after')}
         </p>
 
         <div className="space-y-3">
