@@ -275,9 +275,8 @@
     },
     "no_status_withdraw_modal": {
       "title": "Status required for withdrawal",
-      "description_before": "You can buy ",
-      "description_link": "status",
-      "description_after": " with ChiCoins or exchange the item for status days for free in the exchange shop.",
+      "description": "You can buy status with ChiCoins or exchange the item for status days for free in the exchange shop.",
+      "description_note": "Exchanging without a status only gives you the basic status. Better to buy a proper status first, then exchange items.",
       "buy_status": "Buy status",
       "exchange_free": "Exchange in the shop"
     },

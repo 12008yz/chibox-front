@@ -12,12 +12,6 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const goToStatusBoard = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onClose();
-    navigate('/', { state: { openStatusModal: true } });
-  };
-
   const handleBuyStatus = () => {
     onClose();
     navigate('/', { state: { openStatusModal: true } });
@@ -35,15 +29,6 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
       className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <style>{`
-        @keyframes status-link-pulse {
-          0%, 100% { opacity: 1; filter: brightness(1); }
-          50% { opacity: 0.92; filter: brightness(1.15); }
-        }
-        .status-link-pulse {
-          animation: status-link-pulse 2s ease-in-out infinite;
-        }
-      `}</style>
       <div
         className="bg-gray-900 border border-gray-600/50 rounded-2xl p-6 max-w-md w-full shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -61,16 +46,11 @@ const NoStatusWithdrawModal: React.FC<NoStatusWithdrawModalProps> = ({ isOpen, o
           </button>
         </div>
 
-        <p className="text-gray-300 text-sm mb-6 leading-relaxed">
-          {t('profile.no_status_withdraw_modal.description_before')}
-          <button
-            type="button"
-            onClick={goToStatusBoard}
-            className="text-cyan-400 font-semibold underline decoration-cyan-400/90 underline-offset-1 hover:text-cyan-300 hover:decoration-cyan-300 inline align-baseline bg-transparent border-none p-0 cursor-pointer status-link-pulse"
-          >
-            {t('profile.no_status_withdraw_modal.description_link')}
-          </button>
-          {t('profile.no_status_withdraw_modal.description_after')}
+        <p className="text-gray-300 text-sm mb-3 leading-relaxed">
+          {t('profile.no_status_withdraw_modal.description')}
+        </p>
+        <p className="text-gray-400 text-xs mb-6 leading-relaxed italic">
+          {t('profile.no_status_withdraw_modal.description_note')}
         </p>
 
         <div className="space-y-3">
