@@ -271,7 +271,8 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </button>
         </div>
 
-        {hasWonToday ? (
+        {/* «Ждём завтра» только если уже выиграли сегодня и нет попыток. Если после обмена на статус есть попытки — разрешаем играть снова */}
+        {hasWonToday && !canPlay ? (
           <div className="text-center">
             <img
               src="/images/caseWin.png"
