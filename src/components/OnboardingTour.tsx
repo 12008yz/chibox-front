@@ -69,7 +69,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       id: 'status_dashboard',
       targetId: 'onboarding-status-dashboard',
       title: t('onboarding.status_dashboard_title', 'Доска статусов'),
-      description: t('onboarding.status_dashboard_description', 'Здесь ваш статус подписки, бонусные активности и статистика. Отслеживайте прогресс и пользуйтесь бонусами по крестикам-ноликам, сейфу и обмену!'),
+      description: t('onboarding.status_dashboard_description', 'Здесь ваш статус, бонусные активности и статистика. Отслеживайте прогресс, повышай шанс дропа и получай ежедневные бесплатные кейсы!'),
       position: 'bottom',
       arrowDirection: 'down',
       mobileTitle: 'Доска статусов',
