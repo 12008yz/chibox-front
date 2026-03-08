@@ -146,15 +146,41 @@ const createGlobalSocket = () => {
   return globalSocket;
 };
 
+const SMOOTH_ONLINE_INTERVAL_MS = 350; // плавное приближение счётчика онлайна к значению с сервера
+
 export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   const subscribeToLiveDrops = options?.subscribeToLiveDrops ?? false;
-  const [onlineUsers, setOnlineUsers] = useState<number>(0);
+  const [onlineUsersTarget, setOnlineUsersTarget] = useState<number>(0);
+  const [displayOnline, setDisplayOnline] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() =>
     subscribeToLiveDrops ? loadLiveDropsFromStorage() : []
   );
   const initialized = useRef(false);
+  const onlineTargetRef = useRef(0);
+  const isFirstOnlineValue = useRef(true);
   const dispatch = useAppDispatch();
+
+  // Плавное изменение счётчика онлайна (без скачка при обновлении страницы)
+  useEffect(() => {
+    onlineTargetRef.current = onlineUsersTarget;
+    if (isFirstOnlineValue.current && onlineUsersTarget > 0) {
+      setDisplayOnline(onlineUsersTarget);
+      isFirstOnlineValue.current = false;
+    }
+  }, [onlineUsersTarget]);
+
+  useEffect(() => {
+    const tid = setInterval(() => {
+      const target = onlineTargetRef.current;
+      setDisplayOnline((prev) => {
+        if (prev < target) return Math.min(prev + 1, target);
+        if (prev > target) return Math.max(prev - 1, target);
+        return prev;
+      });
+    }, SMOOTH_ONLINE_INTERVAL_MS);
+    return () => clearInterval(tid);
+  }, []);
 
   useEffect(() => {
     // Предотвращаем повторную инициализацию в React Strict Mode
@@ -165,7 +191,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     const socket = createGlobalSocket();
 
     // Функции-слушатели для этого компонента
-    const onlineUsersListener = (count: number) => setOnlineUsers(count);
+    const onlineUsersListener = (count: number) => setOnlineUsersTarget(count);
     const connectionListener = (connected: boolean) => setIsConnected(connected);
     const liveDropListener = subscribeToLiveDrops
       ? (drop: LiveDropData) => {
@@ -250,7 +276,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
 
   return {
     socket: globalSocket,
-    onlineUsers,
+    onlineUsers: displayOnline,
     isConnected,
     liveDrops
   };
