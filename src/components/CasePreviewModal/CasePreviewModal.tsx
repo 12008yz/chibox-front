@@ -999,7 +999,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               }}
                               className="mt-4 w-full py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg flex items-center justify-center gap-2"
                             >
-                              <img loading="lazy" src="/images/chiCoinFull.webp" alt="" className="w-5 h-5 inline-block object-contain align-middle self-center" />
+                              <img loading="lazy" src="/images/chiCoinFull.webp" alt="" className="w-5 h-5 inline-block object-contain align-middle self-center" width="20" height="20" />
                               ПОПОЛНИТЬ БАЛАНС
                             </button>
                           </div>

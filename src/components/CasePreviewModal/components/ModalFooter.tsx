@@ -114,7 +114,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
             {!showOpeningAnimation && !isProcessing && userData && (
               <div className="flex items-center space-x-1 text-xs">
                 <span className="text-gray-400 flex items-center gap-1">
-                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="chiCoin" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="chiCoin" className="w-4 h-4 inline-block object-contain align-middle self-center" width="16" height="16" />
                   Баланс:
                 </span>
                 <span className={`font-bold ${(userData.balance || 0) < getCasePrice(caseData) ? 'text-red-400' : 'text-green-400'}`}>

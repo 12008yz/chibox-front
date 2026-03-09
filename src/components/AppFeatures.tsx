@@ -164,7 +164,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center text-3xl font-bold text-white mb-1 gap-1">
                   {tier.price}
-                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-10 h-10 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-10 h-10 inline-block object-contain align-middle self-center" width="40" height="40" />
                 </div>
                 <div className="text-gray-400 text-sm">
                   за {formatDaysI18n(tier.days, t)}

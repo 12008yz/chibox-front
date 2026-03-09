@@ -54,7 +54,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               {/* Logo */}
               <div className="text-center mb-8 pt-6">
                 <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                  <img src="/images/logo.webp" alt="Logo" className="w-full h-full object-contain" />
+                  <img src="/images/logo.webp" alt="Logo" className="w-full h-full object-contain" width="200" height="40" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-3">
                   {t('auth.welcome')}
