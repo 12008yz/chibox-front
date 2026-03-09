@@ -46,7 +46,11 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   // Проверяем активность подписки
-  const hasActiveSubscription = user && user.subscription_tier > 0 && user.subscription_days_left > 0;
+  const now = new Date();
+  const hasActiveSubscription = user && 
+    user.subscription_tier > 0 && 
+    user.subscription_expiry_date && 
+    new Date(user.subscription_expiry_date) > now;
 
   // Если нет активной подписки, показываем стандартный компонент покупки статусов
   if (!hasActiveSubscription) {
@@ -54,7 +58,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   }
 
   const subscriptionTier = user.subscription_tier;
-  const daysLeft = user.subscription_days_left;
+  const daysLeft = user.subscription_days_left || 0; // fallback to 0
 
   // Конфигурация статусов
   const statusConfig = {
