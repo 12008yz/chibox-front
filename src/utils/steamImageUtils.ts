@@ -107,7 +107,7 @@ const CACHE_VERSION = '2';
 export function getCaseImageUrl(imageUrl: string | null | undefined): string {
   if (!imageUrl) {
     // Дефолтное изображение для кейса
-    return getBackendImageUrl('/images/cases/free.webp') || '/images/cases/free.webp';
+    return getBackendImageUrl('/images/cases/free.png') || '/images/cases/free.png';
   }
 
   // Если это полный URL, возвращаем как есть
