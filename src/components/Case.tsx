@@ -64,9 +64,11 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         </div>
       )}
 
-      <div className="relative w-full flex items-center justify-center overflow-visible">
+      <div className="relative w-full flex items-center justify-center overflow-visible aspect-square md:aspect-[3/4]">
         <img loading="lazy" src={caseImageUrl}
           alt={title}
+          width="256"
+          height="256"
           draggable="false"
           className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{

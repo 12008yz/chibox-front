@@ -109,6 +109,8 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           <img
             src={items[current]}
             alt=""
+            width="1920"
+            height="1080"
             className="w-full h-full object-cover object-center block"
             loading={current === 0 ? 'eager' : 'lazy'}
             onError={(e) => {
