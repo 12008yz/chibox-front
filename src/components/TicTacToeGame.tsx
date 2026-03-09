@@ -271,19 +271,19 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
           </button>
         </div>
 
-        {/* «Ждём завтра» только если уже выиграли сегодня и нет попыток. Если после обмена на статус есть попытки — разрешаем играть снова */}
-        {hasWonToday && !canPlay ? (
+        {/* «Ждём завтра» если уже выиграли сегодня */}
+        {hasWonToday ? (
           <div className="text-center">
             <img
               src="/images/caseWin.png"
               alt="Bonus Case"
               className="w-32 h-32 mx-auto mb-6 object-contain"
             />
-            <p className="text-green-400 mb-4 text-lg font-bold">{t('tic_tac_toe_game.already_won_title') || 'Вы уже победили сегодня!'}</p>
-            <p className="text-gray-400 mb-8">{t('tic_tac_toe_game.already_won_message') || 'Вы уже получили бонусный кейс сегодня. Возвращайтесь завтра в 16:00 МСК за новой игрой!'}</p>
+            <p className="text-green-400 mb-4 text-2xl font-bold">Вы победили!</p>
+            <p className="text-gray-400 mb-8 text-lg">Вы герой сегодняшнего дня! Ждём вас завтра</p>
             <button
               onClick={onClose}
-              className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105"
+              className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-500 transition-all duration-300 transform hover:scale-105 font-semibold"
             >
               {t('tic_tac_toe_game.close')}
             </button>
@@ -362,15 +362,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             )}
 
             <div className="flex gap-4">
-              {game?.attempts_left && game.attempts_left > 0 && (
-                <button
-                  onClick={handleStartNewGame}
-                  disabled={isCreatingGame}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-500 hover:to-green-400 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 font-semibold"
-                >
-                  {isCreatingGame ? t('tic_tac_toe_game.creating') : t('tic_tac_toe_game.play_again')}
-                </button>
-              )}
+              {/* Кнопка "Играть снова" убрана, так как после победы играть в этот день больше нельзя */}
 
               <button
                 onClick={() => {
@@ -380,7 +372,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
                   }
                   onClose();
                 }}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-500 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 font-semibold"
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-500 hover:to-purple-400 transition-all duration-300 transform hover:scale-105 font-semibold"
               >
 {t('tic_tac_toe_game.claim_prize')}
               </button>
