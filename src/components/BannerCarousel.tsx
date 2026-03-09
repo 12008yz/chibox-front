@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const BANNER_IMAGES = [
-  '/images/banners/tma.jpg',
-  '/images/banners/календарь.png',
-  '/images/banners/Карта.png',
-  '/images/banners/линия.png',
+  '/images/banners/tma.webp',
+  '/images/banners/календарь.webp',
+  '/images/banners/Карта.webp',
+  '/images/banners/линия.webp',
 ];
 
 /** Иконки соцсетей (как в подвале) */

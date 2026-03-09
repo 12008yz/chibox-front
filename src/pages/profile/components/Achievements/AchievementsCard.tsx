@@ -186,8 +186,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
                           }`}
                         >
                           {achievement.icon_url ? (
-                            <img
-                              src={(() => {
+                            <img loading="lazy" src={(() => {
                                 const url = getImageUrl(achievement.icon_url);
                                 return url;
                               })()}

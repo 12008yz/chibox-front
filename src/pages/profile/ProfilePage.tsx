@@ -255,7 +255,7 @@ const ProfilePage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(/images/profile.png)',
+          backgroundImage: 'url(/images/profile.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

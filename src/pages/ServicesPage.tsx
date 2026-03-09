@@ -36,7 +36,7 @@ const ServicesPage = () => {
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
                 1 911
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
@@ -68,7 +68,7 @@ const ServicesPage = () => {
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
                 3 499
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
@@ -104,7 +104,7 @@ const ServicesPage = () => {
               </div>
               <div className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
                 6 310
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-8 h-8 inline-block object-contain align-middle self-center" />
               </div>
               <div className="text-sm text-gray-400 mb-6">на 30 дней</div>
 
@@ -159,7 +159,7 @@ const ServicesPage = () => {
                 <h3 className="text-xl font-bold text-white">Стандартный кейс</h3>
                 <div className="text-2xl font-bold text-orange-400 flex items-center gap-1">
                   99
-                  <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
                 </div>
               </div>
               <p className="text-gray-300 text-sm">
@@ -172,7 +172,7 @@ const ServicesPage = () => {
                 <h3 className="text-xl font-bold text-purple-300">Премиум кейс</h3>
                 <div className="text-2xl font-bold text-purple-400 flex items-center gap-1">
                   499
-                  <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
                 </div>
               </div>
               <p className="text-gray-300 text-sm">
@@ -185,63 +185,63 @@ const ServicesPage = () => {
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 17
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Ночной дозор</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 49
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Пушистый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 101
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Санитарный набор</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 250
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Платиновый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 601
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Космический кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 998
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Морской кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 2 499
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Ледяной кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 5 000
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Бурый кейс</p>
             </div>
             <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center">
               <div className="text-lg font-bold text-orange-400 mb-1 flex items-center justify-center gap-1">
                 10 000
-                <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
               </div>
               <p className="text-xs text-gray-400">Демонический кейс</p>
             </div>
@@ -409,7 +409,7 @@ const ServicesPage = () => {
               <div key={amount} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30 text-center hover:border-orange-500/50 transition-all">
                 <div className="text-2xl font-bold text-orange-400 mb-1 flex items-center gap-1">
                   {amount}
-                  <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-6 h-6 inline-block object-contain align-middle self-center" />
                 </div>
                 <div className="text-xs text-gray-400">≈ {amount * 10} chiCoins</div>
               </div>

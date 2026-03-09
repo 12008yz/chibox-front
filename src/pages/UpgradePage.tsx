@@ -107,8 +107,7 @@ const SelectedItemsDisplay: React.FC<{
                       <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
                         <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20`}></div>
                         {!imageError[item.id] ? (
-                          <img
-                            src={getItemImageUrl(item.image_url, item.name)}
+                          <img loading="lazy" src={getItemImageUrl(item.image_url, item.name)}
                             alt={item.name}
                             className="absolute inset-0 w-full h-full object-contain z-10"
                             onError={() => setImageError(prev => ({...prev, [item.id]: true}))}
@@ -177,8 +176,7 @@ const SelectedItemsDisplay: React.FC<{
                     <div className="relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-black/20 rounded-lg overflow-hidden flex-shrink-0">
                       <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(targetItem.rarity)} opacity-20`}></div>
                       {!imageError[targetItem.id] ? (
-                        <img
-                          src={getItemImageUrl(targetItem.image_url, targetItem.name)}
+                        <img loading="lazy" src={getItemImageUrl(targetItem.image_url, targetItem.name)}
                           alt={targetItem.name}
                           className="absolute inset-0 w-full h-full object-contain z-10"
                           onError={() => setImageError(prev => ({...prev, [targetItem.id]: true}))}
@@ -973,8 +971,7 @@ const SourceItemCard: React.FC<{
         <div className="relative mb-1.5 sm:mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '60px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
-            <img
-              src={getItemImageUrl(item.image_url, item.name)}
+            <img loading="lazy" src={getItemImageUrl(item.image_url, item.name)}
               alt={item.name}
               className="absolute inset-0 w-full h-full object-contain z-10"
               onError={() => setImageError(true)}
@@ -1072,8 +1069,7 @@ const TargetItemCard: React.FC<{
         <div className="relative mb-1.5 sm:mb-2 aspect-square bg-black/10 rounded-lg overflow-hidden" style={{ height: '60px' }}>
           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity)} opacity-20 rounded-lg`}></div>
           {!imageError ? (
-            <img
-              src={getItemImageUrl(item.image_url, item.name)}
+            <img loading="lazy" src={getItemImageUrl(item.image_url, item.name)}
               alt={item.name}
               className="absolute inset-0 w-full h-full object-contain z-10"
               onError={() => setImageError(true)}
@@ -1458,7 +1454,7 @@ const UpgradePage: React.FC = () => {
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(/images/upgrade.png)',
+          backgroundImage: 'url(/images/upgrade.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

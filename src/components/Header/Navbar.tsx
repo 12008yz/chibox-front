@@ -115,7 +115,7 @@ const Navbar: React.FC<NavbarProps> = ({
             >
               <div className="relative">
                 <img
-                  src="/images/logo.png"
+                  src="/images/logo.webp"
                   alt="ChiBox Logo"
                   className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain"
                   onError={(e) => {

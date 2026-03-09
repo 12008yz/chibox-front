@@ -100,7 +100,7 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               <img
-                src="/images/logo.png"
+                src="/images/logo.webp"
                 alt="ChiBox Logo"
                 className="w-16 h-16 md:w-20 md:h-20 object-contain"
               />
@@ -256,8 +256,7 @@ const Footer = () => {
       <div className="border-t border-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <img
-              src="/images/chiCoinFull.png"
+            <img loading="lazy" src="/images/chiCoinFull.webp"
               alt="ChiCoin"
               className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain object-center animate-spin-slow"
             />

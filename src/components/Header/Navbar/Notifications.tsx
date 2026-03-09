@@ -455,6 +455,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             <button
                                 onClick={handleCloseNotifications}
                                 className="gaming-close-button"
+                                aria-label="Закрыть"
                             >
                                 <X className="w-5 h-5" />
                             </button>

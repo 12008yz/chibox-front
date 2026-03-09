@@ -139,8 +139,7 @@ const Avatar: React.FC<AvatarProps> = memo(({
                                 className={`${sizeClasses} rounded-full overflow-hidden border-2 ${forceShowBorder ? '' : 'max-lg:border-0'} flex items-center justify-center`}
                                 style={{ borderColor: getLevelColor() }}
                             >
-                                <img
-                                    src={getImageSrc()}
+                                <img loading="lazy" src={getImageSrc()}
                                     alt="avatar"
                                     className="w-full h-full object-cover"
                                     onLoad={handleImageLoad}

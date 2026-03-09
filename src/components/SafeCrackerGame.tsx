@@ -292,8 +292,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
           <div className="mb-6 flex justify-center px-4">
             <div className={`relative w-full max-w-[500px] ${isSpinning ? 'safe-shake' : ''}`}>
               {/* Изображение сейфа */}
-              <img
-                src="/images/bonus-safe.png"
+              <img loading="lazy" src="/images/bonus-safe.webp"
                 alt="Safe"
                 className="w-full h-auto select-none pointer-events-none"
                 draggable={false}
@@ -344,7 +343,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                         <Coins className="w-8 h-8 sm:w-10 sm:h-10" />
                         <span className="flex items-center gap-1">
                           +{prizeValue}
-                          <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-5 h-5 inline-block object-contain align-middle self-center" />
+                          <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-5 h-5 inline-block object-contain align-middle self-center" />
                         </span>
                       </div>
                     </div>
@@ -383,8 +382,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
                       {/* Предмет */}
                       <div className="relative bg-gradient-to-br from-yellow-600/90 to-orange-600/90 p-4 rounded-xl border-4 border-yellow-400 shadow-2xl">
-                        <img
-                          src={wonItem.image_url}
+                        <img loading="lazy" src={wonItem.image_url}
                           alt={wonItem.name}
                           className="w-32 h-32 sm:w-40 sm:h-40 object-contain select-none pointer-events-none"
                           draggable={false}
@@ -397,7 +395,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
                           <p className="text-yellow-300 font-bold text-xs sm:text-sm text-center">
                             <span className="flex items-center gap-1">
                               {wonItem.price}
-                              <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
+                              <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-4 h-4 inline-block object-contain align-middle self-center" />
                             </span>
                           </p>
                         </div>

@@ -870,8 +870,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           <div className="absolute left-1/2 top-1/2 z-20 mobile-win-reveal w-[180px] sm:w-[200px] pointer-events-none">
             <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${getRarityColor(wonItem.rarity)}`}>
               <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
-                <img
-                  src={adaptImageSize(getItemImageUrl(wonItem.image_url, wonItem.name)) || getItemImageUrl(wonItem.image_url, wonItem.name)}
+                <img loading="lazy" src={adaptImageSize(getItemImageUrl(wonItem.image_url, wonItem.name)) || getItemImageUrl(wonItem.image_url, wonItem.name)}
                   alt={wonItem.name}
                   className="w-full h-full object-contain"
                 />
@@ -955,8 +954,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden smooth-scroll scrollbar-hide p-4">
                   {/* Крупное изображение кейса — размер как на десктопе по ощущениям */}
                   <div className="flex justify-center mb-4">
-                    <img
-                      src={caseImageUrl}
+                    <img loading="lazy" src={caseImageUrl}
                       alt={caseData.name}
                       className="w-full max-w-[340px] sm:max-w-[380px] h-auto object-contain rounded-lg"
                     />
@@ -1001,7 +999,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                               }}
                               className="mt-4 w-full py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg flex items-center justify-center gap-2"
                             >
-                              <img src="/images/chiCoinFull.png" alt="" className="w-5 h-5 inline-block object-contain align-middle self-center" />
+                              <img loading="lazy" src="/images/chiCoinFull.webp" alt="" className="w-5 h-5 inline-block object-contain align-middle self-center" />
                               ПОПОЛНИТЬ БАЛАНС
                             </button>
                           </div>

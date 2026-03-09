@@ -39,6 +39,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, referral
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+            aria-label="Закрыть"
           >
             <X size={20} />
           </button>
@@ -54,8 +55,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, referral
                   Вас пригласил
                 </h2>
                 <div className="flex flex-col items-center mb-6">
-                  <img
-                    src={getPreferredAvatar(streamer.avatar_url, streamer.avatar_url, streamer.id)}
+                  <img loading="lazy" src={getPreferredAvatar(streamer.avatar_url, streamer.avatar_url, streamer.id)}
                     alt={streamer.username}
                     className="w-16 h-16 rounded-full border-2 border-cyan-400/50 object-cover"
                   />

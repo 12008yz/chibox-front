@@ -70,8 +70,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
         {/* Case Image */}
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg p-1 transition-all duration-300 group-hover:-translate-y-8 group-hover:opacity-0">
           {caseImageUrl ? (
-            <img
-              src={caseImageUrl}
+            <img loading="lazy" src={caseImageUrl}
               alt={caseName}
               className="w-full h-full object-contain rounded item-image"
               onError={(e) => {
@@ -90,8 +89,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
 
         {/* Dropped Item Image (appears on hover) */}
         <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(droppedItem.item.rarity)} rounded-lg p-1 transition-all duration-300 opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0`}>
-          <img
-            src={itemImageUrl}
+          <img loading="lazy" src={itemImageUrl}
             alt={droppedItem.item.name}
             className="w-full h-full object-contain rounded item-image"
             onError={(e) => {
@@ -116,8 +114,7 @@ const CaseWithDrop: React.FC<CaseWithDropProps> = ({ droppedItem, caseTemplate }
         {Number(caseTemplate?.price || '0') > 0 ? (
           <p className="text-yellow-400 text-sm font-bold inline-flex items-center gap-1">
             {Number(caseTemplate?.price || '0').toFixed(2)}
-            <img
-              src="/images/chiCoinFull.png"
+            <img loading="lazy" src="/images/chiCoinFull.webp"
               alt="currency"
               className="w-4 h-4 inline-block object-contain align-middle self-center"
             />

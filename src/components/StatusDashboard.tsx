@@ -62,9 +62,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
   // Конфигурация статусов
   const statusConfig = {
-    1: { name: t('homepage.status_tier_1'), icon: <img src="/images/status.png" alt="Статус" className="w-full h-full object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 2 },
-    2: { name: t('homepage.status_tier_2'), icon: <img src="/images/status+.png" alt="Статус+" className="w-full h-full object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 3 },
-    3: { name: t('homepage.status_tier_3'), icon: <img src="/images/status++.png" alt="Статус++" className="w-full h-full object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 5 }
+    1: { name: t('homepage.status_tier_1'), icon: <img loading="lazy" src="/images/status.webp" alt="Статус" className="w-full h-full object-contain" />, color: 'from-gray-400 to-gray-600', bonus: 2 },
+    2: { name: t('homepage.status_tier_2'), icon: <img loading="lazy" src="/images/status+.webp" alt="Статус+" className="w-full h-full object-contain" />, color: 'from-blue-400 to-purple-600', bonus: 3 },
+    3: { name: t('homepage.status_tier_3'), icon: <img loading="lazy" src="/images/status++.webp" alt="Статус++" className="w-full h-full object-contain" />, color: 'from-yellow-400 to-red-500', bonus: 5 }
   };
 
   const currentStatus = statusConfig[subscriptionTier as keyof typeof statusConfig] || statusConfig[1];
@@ -77,7 +77,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'tic-tac-toe',
       name: t('tic_tac_toe.title'),
       description: `Выиграй бонусный кейс`,
-      icon: <img src="/images/status1.png" alt="Крестики-нолики" className="w-full h-full object-contain"/>,
+      icon: <img loading="lazy" src="/images/status1.webp" alt="Крестики-нолики" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
       action: () => onPlayTicTacToe?.()
@@ -86,7 +86,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'safe-cracker',
       name: 'Взлом сейфа',
       description: `Подбери код и получи награду`,
-      icon: <img src="/images/bonus-safe.png" alt="Сейф" className="w-full h-full object-contain"/>,
+      icon: <img loading="lazy" src="/images/bonus-safe.webp" alt="Сейф" className="w-full h-full object-contain"/>,
       color: '',
       available: true,
       action: () => onPlaySafeCracker?.()
@@ -95,7 +95,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
       id: 'exchange',
       name: t('exchange.title'),
       description: t('exchange.subtitle'),
-      icon: <img src="/images/status4.png" alt="Обмен предметов" className="w-full h-full object-contain"/>,
+      icon: <img loading="lazy" src="/images/status4.webp" alt="Обмен предметов" className="w-full h-full object-contain"/>,
       color: '',
       available: subscriptionTier >= 1,
       action: () => navigate('/exchange')

@@ -209,8 +209,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
               <>
                 <div className="relative mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
                   <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item.rarity)} opacity-20 rounded-lg`}></div>
-                  <img
-                    src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
+                  <img loading="lazy" src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                     alt={inventoryItem.item.name}
                     className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                     onError={(e) => {
@@ -307,8 +306,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                         }
                       }}
                     >
-                      <img
-                        src={caseImageUrl}
+                      <img loading="lazy" src={caseImageUrl}
                         alt={caseName}
                         className="w-full h-full object-contain rounded item-image"
                         onError={(e) => {

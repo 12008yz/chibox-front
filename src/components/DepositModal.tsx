@@ -191,7 +191,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
       name: 'СБП',
       icon: (
         <div className="flex items-center justify-center w-full h-full">
-          <img src={SBP_LOGO_URL} alt="СБП" className="max-w-[160px] w-full h-full object-contain mt-[10px]" />
+          <img loading="lazy" src={SBP_LOGO_URL} alt="СБП" className="max-w-[160px] w-full h-full object-contain mt-[10px]" />
         </div>
       ),
       badge: 'СИСТЕМА БЫСТРЫХ ПЛАТЕЖЕЙ',
@@ -333,6 +333,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
           <button
             onClick={onClose}
             className="p-1.5 sm:p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+            aria-label="Закрыть"
           >
             <X className="text-lg sm:text-xl" />
           </button>
@@ -348,7 +349,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
                 : 'bg-transparent text-gray-400 hover:text-white hover:bg-gray-800/50'
             }`}
           >
-            <img src="/images/chiCoinFull.png" alt="chiCoin" className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center" />
+            <img loading="lazy" src="/images/chiCoinFull.webp" alt="chiCoin" className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center" />
             <span>Баланс</span>
           </button>
           <button
@@ -740,8 +741,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
                       {/* Header */}
                       <div className="flex items-center gap-3 mb-4">
-                        <img
-                          src={isPremium ? '/images/status++.png' : isPro ? '/images/status+.png' : '/images/status.png'}
+                        <img loading="lazy" src={isPremium ? '/images/status++.webp' : isPro ? '/images/status+.webp' : '/images/status.webp'}
                           alt={tier.name}
                           className="w-12 h-12 object-contain"
                         />

@@ -103,8 +103,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
 
       {/* Информация о пользователе */}
       <div className="flex items-center space-x-2 mb-3">
-        <img
-          src={user.avatar_url || user.steam_avatar_url || '/images/default-avatar.png'}
+        <img loading="lazy" src={user.avatar_url || user.steam_avatar_url || '/images/default-avatar.webp'}
           alt={user.name}
           className="w-8 h-8 rounded-full"
          //  onError={(e) => {
@@ -122,12 +121,11 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
 
       {/* Изображение кейса */}
       <div className="flex justify-center mb-3">
-        <img
-          src={caseImage}
+        <img loading="lazy" src={caseImage}
           alt="Case"
           className="w-16 h-16 object-contain"
           onError={(e) => {
-            e.currentTarget.src = '/images/default-case.png';
+            e.currentTarget.src = '/images/default-case.webp';
           }}
         />
       </div>
@@ -142,12 +140,11 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
         </div>
 
         <div className="flex items-center justify-center space-x-2 mb-2">
-          <img
-            src={item.image}
+          <img loading="lazy" src={item.image}
             alt={item.name}
             className="w-12 h-12 object-contain"
             onError={(e) => {
-              e.currentTarget.src = '/images/default-item.png';
+              e.currentTarget.src = '/images/default-item.webp';
             }}
           />
           <div>

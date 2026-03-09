@@ -93,13 +93,12 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
                     }
                   `}
                 >
-                  <img
-                    src={avatar.fullUrl}
+                  <img loading="lazy" src={avatar.fullUrl}
                     alt={avatar.filename}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/images/default-avatar.png';
+                      target.src = '/images/default-avatar.webp';
                     }}
                   />
                   {selectedAvatar === avatar.url && (

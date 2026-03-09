@@ -225,7 +225,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
       <div
         className="fixed inset-0 -z-50"
         style={{
-          backgroundImage: 'url(/images/public_profile.jpg)',
+          backgroundImage: 'url(/images/public_profile.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -400,8 +400,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 <p className="text-gray-400 text-xs sm:text-sm truncate">{t('public_profile.total_value')}</p>
                 <p className="text-lg sm:text-xl font-bold text-white inline-flex items-center gap-1">
                   <span className="truncate">{(Number(user.totalItemsValue) || 0).toFixed(2)}</span>
-                  <img
-                    src="/images/chiCoinFull.png"
+                  <img loading="lazy" src="/images/chiCoinFull.webp"
                     alt="currency"
                     className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain flex-shrink-0 align-middle self-center"
                   />
@@ -450,8 +449,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${getAchievementCategoryColor(achievement.category)} p-1 flex items-center justify-center flex-shrink-0`}>
                       <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center overflow-hidden">
                         {achievement.icon_url ? (
-                          <img
-                            src={getImageUrl(achievement.icon_url)}
+                          <img loading="lazy" src={getImageUrl(achievement.icon_url)}
                             alt={achievement.name}
                             className="w-full h-full object-contain p-0.5"
                             onError={(e) => {
@@ -509,8 +507,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
               <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-xl bg-black/10 overflow-hidden shadow-lg item-image-container flex-shrink-0">
                   <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(bestWeapon.rarity || '')} opacity-20 rounded-lg sm:rounded-xl`}></div>
-                  <img
-                    src={adaptImageSize(getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')) || getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
+                  <img loading="lazy" src={adaptImageSize(getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')) || getItemImageUrl(bestWeapon.image_url || '', bestWeapon.name || '')}
                     alt={bestWeapon.name || ''}
                     className="absolute inset-0 w-full h-full object-contain rounded-lg z-10 item-image"
                     onError={(e) => {
@@ -538,8 +535,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-1.5 sm:mb-2">
                     <span className="text-green-400 font-bold text-base sm:text-lg inline-flex items-center gap-1">
                       {Number(bestWeapon.price || 0).toFixed(2)}
-                      <img
-                        src="/images/chiCoinFull.png"
+                      <img loading="lazy" src="/images/chiCoinFull.webp"
                         alt="currency"
                         className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center"
                       />
@@ -666,8 +662,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                           <div className="relative mb-2 sm:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
                             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-600 opacity-20 rounded-lg"></div>
                             {caseTemplate?.image_url ? (
-                              <img
-                                src={getCaseImageUrl(caseTemplate.image_url)}
+                              <img loading="lazy" src={getCaseImageUrl(caseTemplate.image_url)}
                                 alt={caseTemplate.name}
                                 className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                                 onError={(e) => {
@@ -711,8 +706,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                         <div className="relative mb-2 sm:mb-3 aspect-square bg-black/10 rounded-lg overflow-hidden item-image-container">
                           <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(inventoryItem.item?.rarity)} opacity-20 rounded-lg`}></div>
                           {inventoryItem.item?.image_url ? (
-                            <img
-                              src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
+                            <img loading="lazy" src={adaptImageSize(getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)) || getItemImageUrl(inventoryItem.item.image_url, inventoryItem.item.name)}
                               alt={inventoryItem.item.name}
                               className="absolute inset-0 w-full h-full object-contain z-10 item-image"
                               onError={(e) => {

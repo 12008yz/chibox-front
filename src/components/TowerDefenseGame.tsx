@@ -128,6 +128,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Закрыть"
           >
             <X size={24} />
           </button>
@@ -154,8 +155,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
                   }`}
                 >
                   {item.item?.image_url && (
-                    <img
-                      src={item.item.image_url}
+                    <img loading="lazy" src={item.item.image_url}
                       alt={item.item.name}
                       className="w-full h-24 object-contain mb-2"
                     />
@@ -223,8 +223,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
                 <p className="text-white mb-2">Вы получили предмет-награду:</p>
                 <div className="inline-block p-4 bg-purple-900 rounded-lg">
                   {rewardItem.image_url && (
-                    <img
-                      src={rewardItem.image_url}
+                    <img loading="lazy" src={rewardItem.image_url}
                       alt={rewardItem.name}
                       className="w-32 h-32 object-contain mx-auto mb-2"
                     />

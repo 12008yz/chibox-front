@@ -64,6 +64,7 @@ const SteamTradeUrlModal: React.FC<SteamTradeUrlModalProps> = ({
           <button
             onClick={handleSkip}
             className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors z-10"
+            aria-label="Закрыть"
           >
             <X className="w-5 h-5" />
           </button>

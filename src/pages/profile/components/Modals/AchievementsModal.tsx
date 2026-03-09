@@ -149,8 +149,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
                           }}
                         >
                           {achievement.icon_url ? (
-                            <img
-                              src={getImageUrl(achievement.icon_url)}
+                            <img loading="lazy" src={getImageUrl(achievement.icon_url)}
                               alt={achievement.name}
                               className="w-full h-full object-contain p-2"
                               onError={(e) => {
@@ -222,8 +221,7 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
             }}
           >
             <div className="bg-black border border-gray-700 p-4">
-              <img
-                src={getImageUrl(achievements.find(a => a.id === hoveredIcon)?.icon_url || '')}
+              <img loading="lazy" src={getImageUrl(achievements.find(a => a.id === hoveredIcon)?.icon_url || '')}
                 alt="Preview"
                 className="w-48 h-48 object-contain"
               />

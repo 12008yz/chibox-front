@@ -82,8 +82,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
         <div className="absolute top-3 left-3 z-10 w-7 h-7 flex-shrink-0">
           <div className="w-7 h-7" title={`${drop.user.username} (Ур. ${drop.user.level})`}>
             {avatarSrc && !avatarError ? (
-              <img
-                src={avatarSrc}
+              <img loading="lazy" src={avatarSrc}
                 alt={drop.user.username}
                 className="user-avatar-live-drop w-7 h-7 rounded-full border-2 border-gray-600 hover:border-white transition-colors object-cover"
                 style={{
@@ -129,8 +128,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
               maxHeight: '80px'
             }}
           >
-            <img
-              src={drop.item.image}
+            <img loading="lazy" src={drop.item.image}
               alt={drop.item.name}
               className="live-drop-item"
               style={{

@@ -283,6 +283,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             <button
               onClick={handleSkip}
               className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors p-2"
+              aria-label="Закрыть"
             >
               <X className="w-5 h-5" />
             </button>
@@ -566,6 +567,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
             <button
               onClick={handleSkip}
               className="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
+              aria-label="Закрыть"
             >
               <X className="w-5 h-5" />
             </button>

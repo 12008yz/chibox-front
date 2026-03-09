@@ -65,8 +65,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
             <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(
               weaponData?.rarity || ''
             )} opacity-20 rounded-xl`}></div>
-            <img
-              src={adaptImageSize(getItemImageUrl(
+            <img loading="lazy" src={adaptImageSize(getItemImageUrl(
                 weaponData?.image_url || '',
                 weaponData?.name || ''
               )) || getItemImageUrl(

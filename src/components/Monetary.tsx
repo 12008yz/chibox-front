@@ -43,8 +43,7 @@ const Monetary: React.FC<MonetaryProps> = ({
   return (
     <span className="inline-flex items-center justify-center gap-1">
       <span className="font-semibold leading-none">{formattedValue}</span>
-      <img
-        src="/images/chiCoinFull.png"
+      <img loading="lazy" src="/images/chiCoinFull.webp"
         alt={currency === 'chicoins' ? 'chicoins' : currency}
         width={size}
         height={size}

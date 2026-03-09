@@ -1,6 +1,6 @@
 export const DEFAULT_CASE_IMAGES = [
-   'https://bitskins.com/blog/content/images/2023/12/what_cs2_cases_have_knives--2-.jpg',
-   'https://bitskins.com/blog/content/images/2024/04/cheapest-cs2-cases.jpg',
+   'https://bitskins.com/blog/content/images/2023/12/what_cs2_cases_have_knives--2-.webp',
+   'https://bitskins.com/blog/content/images/2024/04/cheapest-cs2-cases.webp',
    'https://cs2pulse.com/wp-content/uploads/2023/11/CS2-Case-Opening-Guide-6.png',
    'https://skinsmonkey.com/blog/wp-content/uploads/sites/2/htgcs2c.jpg',
    'https://files.bo3.gg/uploads/image/28483/image/webp-3fbd14fff1cf0a506fba0427d5ab423c.webp',

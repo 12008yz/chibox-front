@@ -82,8 +82,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
           {/* Item Image */}
           <div className={`mb-4 rounded-lg p-4 border-2 ${rarityColorClass} bg-gray-900`}>
             <div className="aspect-square flex items-center justify-center">
-              <img
-                src={highQualityImageUrl}
+              <img loading="lazy" src={highQualityImageUrl}
                 alt={item.name}
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => {

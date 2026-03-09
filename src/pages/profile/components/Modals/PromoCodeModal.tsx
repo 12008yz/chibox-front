@@ -56,6 +56,7 @@ const PromoCodeModal: React.FC<PromoCodeModalProps> = ({ isOpen, onClose }) => {
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors z-10"
+          aria-label="Закрыть"
         >
           <X className="w-5 h-5" />
         </button>

@@ -14,8 +14,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
   return (
     <div className="flex justify-between items-center p-3 sm:p-4 md:p-6 border-b border-gray-700">
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
-        <img
-          src={caseImageUrl}
+        <img loading="lazy" src={caseImageUrl}
           alt={caseData.name}
           className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-cover rounded flex-shrink-0"
         />

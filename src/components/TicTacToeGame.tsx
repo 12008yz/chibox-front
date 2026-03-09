@@ -274,8 +274,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
         {/* «Ждём завтра» если уже выиграли сегодня */}
         {hasWonToday ? (
           <div className="text-center">
-            <img
-              src="/images/caseWin.png"
+            <img loading="lazy" src="/images/caseWin.webp"
               alt="Bonus Case"
               className="w-32 h-32 mx-auto mb-6 object-contain"
             />
@@ -330,8 +329,7 @@ const TicTacToeGame: React.FC<TicTacToeGameProps> = ({ isOpen, onClose, onReward
             {/* Экран победы */}
             <div className="mb-8">
               <div className="animate-bounce">
-                <img
-                  src="/images/caseWin.png"
+                <img loading="lazy" src="/images/caseWin.webp"
                   alt="Bonus Case"
                   className="w-48 h-48 mx-auto mb-6 object-contain"
                 />

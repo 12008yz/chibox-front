@@ -88,7 +88,7 @@ export function getItemImageUrl(imageUrl: string | null | undefined, fallbackNam
     return imageUrl;
   }
 
-  // Если это относительный путь (например /images/cases/free.png), получаем с бэкенда
+  // Если это относительный путь (например /images/cases/free.webp), получаем с бэкенда
   if (imageUrl.startsWith('/')) {
     const backendUrl = getBackendImageUrl(imageUrl);
     if (backendUrl) {
@@ -107,7 +107,7 @@ const CACHE_VERSION = '2';
 export function getCaseImageUrl(imageUrl: string | null | undefined): string {
   if (!imageUrl) {
     // Дефолтное изображение для кейса
-    return getBackendImageUrl('/images/cases/free.png') || '/images/cases/free.png';
+    return getBackendImageUrl('/images/cases/free.webp') || '/images/cases/free.webp';
   }
 
   // Если это полный URL, возвращаем как есть

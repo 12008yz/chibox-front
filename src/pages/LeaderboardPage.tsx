@@ -48,19 +48,19 @@ const LeaderboardPage: React.FC = () => {
       id: 'cases_opened',
       name: t('leaderboard_page.cases_opened_tab'),
       description: t('leaderboard_page.cases_opened_description'),
-      icon: '/images/1.png'
+      icon: '/images/1.webp'
     },
     {
       id: 'level',
       name: t('leaderboard_page.level_tab'),
       description: t('leaderboard_page.level_description'),
-      icon: '/images/2.png'
+      icon: '/images/2.webp'
     },
     {
       id: 'most_expensive_item',
       name: t('leaderboard_page.best_drop_tab'),
       description: t('leaderboard_page.best_drop_description'),
-      icon: '/images/3.png'
+      icon: '/images/3.webp'
     }
   ];
 
@@ -127,8 +127,7 @@ const LeaderboardPage: React.FC = () => {
 
       {/* Фон — fixed, чтобы не прыгал при смене табов и появлении/скрытии скроллбара */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <img
-          src={BACKGROUNDS.leaderboard}
+        <img loading="lazy" src={BACKGROUNDS.leaderboard}
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ opacity: 0.3 }}
@@ -144,7 +143,7 @@ const LeaderboardPage: React.FC = () => {
           {currentTab && (
             <div className="text-center mb-6 sm:mb-8">
               <div className="flex justify-center mb-2">
-                <img src={currentTab.icon} alt={currentTab.name} className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
+                <img loading="lazy" src={currentTab.icon} alt={currentTab.name} className="w-12 h-12 sm:w-16 sm:h-16 object-contain" />
               </div>
               <p className="text-gray-400 text-sm sm:text-base px-4">{currentTab.description}</p>
             </div>
@@ -165,7 +164,7 @@ const LeaderboardPage: React.FC = () => {
                 `}
               >
                 <div className="flex flex-col items-center gap-0.5 sm:gap-1">
-                  <img src={tab.icon} alt={tab.name} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
+                  <img loading="lazy" src={tab.icon} alt={tab.name} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
                   <span className="text-[0.65rem] sm:text-xs md:text-sm">{tab.name}</span>
                 </div>
                 {activeTab === tab.id && (

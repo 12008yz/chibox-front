@@ -15,8 +15,8 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
 
 // URL для фоновых изображений
 export const BACKGROUNDS = {
-  home: '/images/home.jpg',
-  exchange: '/images/exscange.png',
-  upgrade: '/images/upgrade.png',
-  leaderboard: '/images/liders.png',
+  home: '/images/home.webp',
+  exchange: '/images/exscange.webp',
+  upgrade: '/images/upgrade.webp',
+  leaderboard: '/images/liders.webp',
 };

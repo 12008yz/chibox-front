@@ -276,7 +276,7 @@ const StreamerCabinetPage: React.FC = () => {
                   {m.type === 'banner' && m.url && (
                     <div>
                       {m.title && <p className="text-gray-400 text-sm mb-2">{m.title}</p>}
-                      <img src={m.url} alt={m.title || 'Banner'} className="max-h-24 rounded" />
+                      <img loading="lazy" src={m.url} alt={m.title || 'Banner'} className="max-h-24 rounded" />
                       <a href={m.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 text-sm mt-2 inline-block">
                         Ссылка
                       </a>

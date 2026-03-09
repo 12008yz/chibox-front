@@ -110,8 +110,7 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
               {isUserItem(inventoryItem) ? (
                 <>
                   <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor?.(inventoryItem.item.rarity) || 'from-gray-500 to-gray-600'} p-1 mb-3 flex items-center justify-center item-image-container`}>
-                    <img
-                      src={getItemImageUrl?.(inventoryItem.item.image_url, inventoryItem.item.name) || inventoryItem.item.image_url}
+                    <img loading="lazy" src={getItemImageUrl?.(inventoryItem.item.image_url, inventoryItem.item.name) || inventoryItem.item.image_url}
                       alt={inventoryItem.item.name}
                       className="w-full h-full object-contain rounded item-image"
                       onError={(e) => {
@@ -183,8 +182,7 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
                         }}
                       >
                         {caseImageUrl ? (
-                          <img
-                            src={caseImageUrl}
+                          <img loading="lazy" src={caseImageUrl}
                             alt={caseName}
                             className="w-full h-full object-contain rounded item-image"
                             onError={(e) => {

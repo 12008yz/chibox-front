@@ -62,7 +62,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 2.0,
       max_daily_cases: 1,
-      icon: '/images/status.png',
+      icon: '/images/status.webp',
       color: 'from-gray-400 to-gray-600',
       badge: 'Базовый',
       features: [
@@ -83,7 +83,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 3.0,
       max_daily_cases: 1,
-      icon: '/images/status+.png',
+      icon: '/images/status+.webp',
       color: 'from-blue-400 to-purple-600',
       badge: 'Популярный',
       features: [
@@ -105,7 +105,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       days: 30,
       bonus_percentage: 5.0,
       max_daily_cases: 1,
-      icon: '/images/status++.png',
+      icon: '/images/status++.webp',
       color: 'from-yellow-400 to-red-500',
       badge: 'Премиум',
       features: [
@@ -153,7 +153,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               {/* Иконка и название */}
               <div className="text-center mb-6">
                 <div className="mb-3 group-hover:scale-110 transition-transform duration-300 flex justify-center">
-                  <img src={tier.icon} alt={tier.name} className="w-20 h-20 object-contain" />
+                  <img loading="lazy" src={tier.icon} alt={tier.name} className="w-20 h-20 object-contain" />
                 </div>
                 <h3 className="text-white font-bold text-2xl mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
                   {tier.name}
@@ -164,7 +164,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center text-3xl font-bold text-white mb-1 gap-1">
                   {tier.price}
-                  <img src="/images/chiCoinFull.png" alt="ChiCoins" className="w-10 h-10 inline-block object-contain align-middle self-center" />
+                  <img loading="lazy" src="/images/chiCoinFull.webp" alt="ChiCoins" className="w-10 h-10 inline-block object-contain align-middle self-center" />
                 </div>
                 <div className="text-gray-400 text-sm">
                   за {formatDaysI18n(tier.days, t)}

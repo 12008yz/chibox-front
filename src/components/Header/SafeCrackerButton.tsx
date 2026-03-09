@@ -42,8 +42,7 @@ const SafeCrackerButton = () => {
             : 'Нет доступных попыток'
         }
       >
-        <img
-          src="/images/bonus-safe.png"
+        <img loading="lazy" src="/images/bonus-safe.webp"
           alt="Safe"
           className={`w-full h-full object-contain ${canPlay ? 'animate-pulse' : ''}`}
         />

@@ -36,6 +36,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              aria-label="Закрыть"
             >
               <X size={20} />
             </button>
@@ -53,7 +54,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               {/* Logo */}
               <div className="text-center mb-8 pt-6">
                 <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                  <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                  <img src="/images/logo.webp" alt="Logo" className="w-full h-full object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-3">
                   {t('auth.welcome')}
