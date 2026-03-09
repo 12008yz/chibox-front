@@ -522,7 +522,7 @@ const HomePage: React.FC = () => {
             )}
 
             {/* Статусы подписки */}
-            <div id="onboarding-status-dashboard" className="mb-12">
+            <div id="onboarding-status-dashboard" className="mb-12 min-h-[500px]">
               <StatusDashboard
                 name={t('homepage.chibox_statuses')}
                 description={t('homepage.chibox_statuses_description')}
