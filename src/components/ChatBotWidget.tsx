@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import { Headphones, X, Send, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import { useSendBotMessageMutation } from '../features/bot/botApi';
 
 // Иконки соцсетей (как в Footer)
@@ -36,12 +37,26 @@ const SUPPORT_TELEGRAM = 'https://t.me/chibox_official';
 const SUPPORT_VK = 'https://vk.com/chibox_game';
 
 export default function ChatBotWidget() {
+  const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [sendMessage, { isLoading }] = useSendBotMessageMutation();
+
+  const isHomePage = pathname === '/';
+
+  // Отключаем скролл главной страницы, когда открыта модалка поддержки
+  useEffect(() => {
+    if (isHomePage && open) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+    document.body.style.overflow = '';
+  }, [isHomePage, open]);
 
   useEffect(() => {
     if (messages.length === 0 && open) {
@@ -96,14 +111,29 @@ export default function ChatBotWidget() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 left-5 z-[9990] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 transition hover:from-orange-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-        aria-label={open ? 'Закрыть чат' : 'Открыть чат с ботом'}
-      >
-        {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-      </button>
+      <div className="fixed bottom-5 left-5 z-[9990] flex items-center justify-center">
+        {/* Две волны, расходящиеся от иконки кругами — только когда чат закрыт */}
+        {!open && (
+          <>
+            <span
+              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-[3px] border-orange-400 animate-support-wave"
+              aria-hidden
+            />
+            <span
+              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-[3px] border-orange-400 animate-support-wave animate-support-wave-delay"
+              aria-hidden
+            />
+          </>
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 transition hover:from-orange-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+          aria-label={open ? 'Закрыть чат' : 'Открыть чат с ботом'}
+        >
+          {open ? <X className="h-6 w-6" /> : <Headphones className="h-6 w-6" />}
+        </button>
+      </div>
 
       <AnimatePresence>
         {open && (
