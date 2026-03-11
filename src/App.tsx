@@ -17,7 +17,7 @@ import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
 import CookieBanner from './components/CookieBanner';
-import ChatBotWidget from './components/ChatBotWidget';
+import ChatBotWidgetBoundary from './components/ChatBotWidgetBoundary';
 import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
@@ -329,7 +329,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <DiagnosticOverlay />
-      <ChatBotWidget />
+      <ChatBotWidgetBoundary />
       {/* Скрываем cookie banner во время онбординга */}
       {!showIntroVideo && !showTradeUrlModal && !showOnboarding && <CookieBanner />}
 
