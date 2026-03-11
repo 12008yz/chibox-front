@@ -6,10 +6,15 @@ export interface BotChatResponse {
   message?: string;
 }
 
+export interface BotChatRequest {
+  message: string;
+  history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+}
+
 // Эндпоинт бота: POST /api/v1/bot/chat (прокси на Node, Node дергает Python-сервис)
 export const botApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    sendBotMessage: builder.mutation<BotChatResponse, { message: string }>({
+    sendBotMessage: builder.mutation<BotChatResponse, BotChatRequest>({
       query: (body) => ({
         url: 'v1/bot/chat',
         method: 'POST',
