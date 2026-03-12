@@ -144,14 +144,6 @@ export default function ChatBotWidget() {
             transition={{ duration: 0.2 }}
             className="fixed bottom-24 left-5 z-[9989] flex h-[540px] max-h-[calc(100vh-7rem)] w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-700/50 bg-gray-900/98 shadow-2xl shadow-black/40 backdrop-blur"
           >
-            {/* Шапка */}
-            <div className="border-b border-gray-700/50 bg-gradient-to-r from-gray-800/90 to-gray-800/70 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-semibold text-white">Поддержка Chibox</span>
-              </div>
-            </div>
-
             {/* Сообщения — основная высота под ленту, скролл при нехватке места */}
             <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
               {messages.map((m, i) => (

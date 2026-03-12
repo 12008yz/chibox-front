@@ -46,9 +46,6 @@ export interface ServerToClientEvents {
  }
 
  export interface ClientToServerEvents {
-   // Пока нет событий от клиента к серверу
-   // Можно добавить в будущем, например:
-   // joinRoom: (roomId: string) => void;
  }
 
  export interface SocketData {

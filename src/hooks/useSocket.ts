@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents, LiveDropData, NotificationData } from '../types/socket';
+import { BACKEND_URL } from '../utils/config';
 import { useAppDispatch } from '../store/hooks';
 import { userApi } from '../features/user/userApi';
 import { toastWithSound } from '../utils/toastWithSound';
@@ -14,6 +15,8 @@ interface UseSocketReturn {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
   onlineUsers: number;
   isConnected: boolean;
+  /** Сообщение об ошибке подключения (CORS, cookie и т.д.) */
+  connectionError: string | null;
   liveDrops: LiveDropData[];
 }
 
@@ -22,8 +25,12 @@ const MAX_LIVE_DROPS = 17;
 
 // Глобальное подключение к сокету (синглтон)
 let globalSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
+/** Повтор без cookie (для Opera и браузеров с блокировкой) */
+let tryWithoutCredentials = false;
 let onlineUsersListeners = new Set<(count: number) => void>();
 let connectionListeners = new Set<(isConnected: boolean) => void>();
+let connectionErrorListeners = new Set<(err: string | null) => void>();
+let lastConnectionError: string | null = null;
 let liveDropListeners = new Set<(drop: LiveDropData) => void>();
 let notificationListeners = new Set<(notification: NotificationData) => void>();
 
@@ -65,9 +72,7 @@ const createGlobalSocket = () => {
     return globalSocket;
   }
 
-  const serverUrl = process.env.NODE_ENV === 'production'
-    ? 'https://chibox-game.ru'
-    : 'http://localhost:3000';
+  const serverUrl = BACKEND_URL.replace(/\/$/, '');
 
   globalSocket = io(serverUrl, {
     transports: ['polling', 'websocket'],
@@ -75,18 +80,41 @@ const createGlobalSocket = () => {
     forceNew: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
+    withCredentials: !tryWithoutCredentials,
   });
 
   // Обработчик успешного подключения
   globalSocket.on('connect', () => {
-
+    lastConnectionError = null;
+    connectionErrorListeners.forEach(listener => listener(null));
     connectionListeners.forEach(listener => listener(true));
   });
 
   // Обработчик отключения
   globalSocket.on('disconnect', () => {
-
     connectionListeners.forEach(listener => listener(false));
+  });
+
+  // Ошибка подключения (CORS, блокировка cookie/рекламы в Opera и т.д.)
+  globalSocket.on('connect_error', (err) => {
+    lastConnectionError = err?.message || 'Ошибка подключения';
+    connectionErrorListeners.forEach(listener => listener(lastConnectionError));
+    connectionListeners.forEach(listener => listener(false));
+    // Один раз повторяем без cookie — часто помогает в Opera
+    if (!tryWithoutCredentials && globalSocket) {
+      tryWithoutCredentials = true;
+      const failed = globalSocket;
+      setTimeout(() => {
+        if (globalSocket === failed && !failed.connected) {
+          failed.removeAllListeners();
+          failed.disconnect();
+          globalSocket = null;
+          lastConnectionError = null;
+          connectionErrorListeners.forEach(listener => listener(null));
+          createGlobalSocket();
+        }
+      }, 2500);
+    }
   });
 
   // Обработчик приветственного сообщения
@@ -137,12 +165,6 @@ const createGlobalSocket = () => {
     notificationListeners.forEach(listener => listener(data));
   });
 
-  // Обработчик ошибок
-  globalSocket.on('connect_error', () => {
-
-    connectionListeners.forEach(listener => listener(false));
-  });
-
   return globalSocket;
 };
 
@@ -153,6 +175,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   const [onlineUsersTarget, setOnlineUsersTarget] = useState<number>(0);
   const [displayOnline, setDisplayOnline] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [connectionError, setConnectionError] = useState<string | null>(() => lastConnectionError);
   const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() =>
     subscribeToLiveDrops ? loadLiveDropsFromStorage() : []
   );
@@ -193,6 +216,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     // Функции-слушатели для этого компонента
     const onlineUsersListener = (count: number) => setOnlineUsersTarget(count);
     const connectionListener = (connected: boolean) => setIsConnected(connected);
+    const connectionErrorListener = (err: string | null) => setConnectionError(err);
     const liveDropListener = subscribeToLiveDrops
       ? (drop: LiveDropData) => {
           setLiveDrops(prevDrops => {
@@ -250,6 +274,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     // Регистрируем слушатели (liveDrops только если нужен — меньше ре-рендеров App/Header)
     onlineUsersListeners.add(onlineUsersListener);
     connectionListeners.add(connectionListener);
+    connectionErrorListeners.add(connectionErrorListener);
     if (liveDropListener) liveDropListeners.add(liveDropListener);
     notificationListeners.add(notificationListener);
 
@@ -260,6 +285,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     return () => {
       onlineUsersListeners.delete(onlineUsersListener);
       connectionListeners.delete(connectionListener);
+      connectionErrorListeners.delete(connectionErrorListener);
       if (liveDropListener) liveDropListeners.delete(liveDropListener);
       notificationListeners.delete(notificationListener);
 
@@ -278,6 +304,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     socket: globalSocket,
     onlineUsers: displayOnline,
     isConnected,
-    liveDrops
+    connectionError,
+    liveDrops,
   };
 };
