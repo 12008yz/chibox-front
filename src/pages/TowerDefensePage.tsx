@@ -41,8 +41,7 @@ const TowerDefensePage: React.FC = () => {
             </div>
             <button
               onClick={() => setIsGameOpen(true)}
-              disabled={!status?.canPlay}
-              className="mt-4 w-full px-4 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-4 w-full px-4 py-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
             >
               Начать игру
             </button>

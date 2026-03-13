@@ -90,7 +90,12 @@ const Navbar: React.FC<NavbarProps> = ({
       to: "/leaderboard",
       icon: <Trophy className="text-lg" />,
       label: t('header.leaderboard_table'),
-    }
+    },
+    {
+      to: "/tower-defense",
+      icon: <Sparkles className="text-lg" />,
+      label: t('header.tower_defense'),
+    },
   ];
 
   return (
