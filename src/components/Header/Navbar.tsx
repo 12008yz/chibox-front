@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles, Settings } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
 import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
@@ -63,6 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   // Показываем модалку входа только для защищённых маршрутов; на остальные (upgrade, leaderboard) пускаем без авторизации
+  type NavLinkItem = { to: string; icon: React.ReactNode; label: string; inDevelopment?: boolean };
   const PROTECTED_PATHS = ['/exchange', '/profile', '/tower-defense', '/streamer-cabinet'];
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!user) {
@@ -75,7 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  const links = [
+  const links: NavLinkItem[] = [
     {
       to: "/exchange",
       icon: <ShoppingBag className="text-lg" />,
@@ -95,6 +96,7 @@ const Navbar: React.FC<NavbarProps> = ({
       to: "/tower-defense",
       icon: <Sparkles className="text-lg" />,
       label: t('header.tower_defense'),
+      inDevelopment: true,
     },
   ];
 
@@ -143,28 +145,38 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Центр - Навигационные ссылки (Desktop) */}
             <div className="hidden lg:flex items-center gap-1">
-              {links.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.to}
-                  onClick={handleLinkClick}
-                  data-play-click-sound-mobile
-                  className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
-                >
-                  {/* Фоновый эффект при наведении */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"></div>
-
-                  {/* Нижняя граница при наведении */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-3/4 transition-all duration-300"></div>
-
-                  <span className="relative z-10 text-orange-400 group-hover:scale-110 transition-transform duration-200 text-sm xl:text-base">
-                    {link.icon}
+              {links.map((link, index) =>
+                link.inDevelopment ? (
+                  <span
+                    key={index}
+                    className="flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-500 cursor-not-allowed select-none"
+                  >
+                    <Settings className="text-red-500 text-sm xl:text-base animate-spin shrink-0" />
+                    <span className="font-medium text-xs xl:text-sm whitespace-nowrap">В разработке</span>
                   </span>
-                  <span className="relative z-10 font-medium text-xs xl:text-sm whitespace-nowrap">
-                    {link.label}
-                  </span>
-                </Link>
-              ))}
+                ) : (
+                  <Link
+                    key={index}
+                    to={link.to}
+                    onClick={handleLinkClick}
+                    data-play-click-sound-mobile
+                    className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
+                  >
+                    {/* Фоновый эффект при наведении */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-amber-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"></div>
+
+                    {/* Нижняя граница при наведении */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-3/4 transition-all duration-300"></div>
+
+                    <span className="relative z-10 text-orange-400 group-hover:scale-110 transition-transform duration-200 text-sm xl:text-base">
+                      {link.icon}
+                    </span>
+                    <span className="relative z-10 font-medium text-xs xl:text-sm whitespace-nowrap">
+                      {link.label}
+                    </span>
+                  </Link>
+                )
+              )}
             </div>
 
             {/* Правая часть - Онлайн счетчик и авторизация */}
@@ -228,27 +240,37 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Навигационные ссылки */}
             <div className="space-y-2">
-              {links.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.to}
-                  onClick={(e) => {
-                    handleLinkClick(e);
-                    if (user) {
-                      toggleMobileMenu();
-                    }
-                  }}
-                  data-play-click-sound-mobile
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
-                >
-                  <span className="text-orange-400">
-                    {link.icon}
+              {links.map((link, index) =>
+                link.inDevelopment ? (
+                  <span
+                    key={index}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700/30 text-gray-500 cursor-not-allowed select-none"
+                  >
+                    <Settings className="text-red-500 animate-spin shrink-0" />
+                    <span className="font-medium">В разработке</span>
                   </span>
-                  <span className="text-white font-medium">
-                    {link.label}
-                  </span>
-                </Link>
-              ))}
+                ) : (
+                  <Link
+                    key={index}
+                    to={link.to}
+                    onClick={(e) => {
+                      handleLinkClick(e);
+                      if (user) {
+                        toggleMobileMenu();
+                      }
+                    }}
+                    data-play-click-sound-mobile
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
+                  >
+                    <span className="text-orange-400">
+                      {link.icon}
+                    </span>
+                    <span className="text-white font-medium">
+                      {link.label}
+                    </span>
+                  </Link>
+                )
+              )}
             </div>
 
             {/* Онлайн счетчик (Mobile) */}

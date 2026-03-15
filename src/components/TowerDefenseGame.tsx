@@ -12,13 +12,11 @@ import type { UserInventoryItem } from '../types/api';
 // --- Константы карты и ассетов (логика из python-ml: 10x6, путь по середине) ---
 const TILE_SIZE = 56;
 const WALK_FRAMES = 20;
-const DIE_FRAMES = 20;
 const EXPLOSION_VISUAL_FRAMES = 8; // короткая вспышка, не спрайт мутанта
 // Кадр «во весь рост» — и для покоя, и для стрельбы (чтобы пушки сразу были видны целиком)
 const TOWER_IDLE_FRAME = 25;
 const TOWER_SHOOT_FRAME = 25;
 const PROJECTILE_MS = 280;
-const EXPLOSION_FRAME_MS = 50;
 
 const TILES_BASE = '/tower-defense/tiles';
 const TILE_GROUND = (i: number) => `${TILES_BASE}/PNG/Top-Down Simple Summer_Ground ${String(i).padStart(2, '0')}.png`;
@@ -62,7 +60,6 @@ function manhattan(a: Position, b: Position): number {
 
 function findTargetForTower(state: GameState, tower: TowerState): EnemyState | null {
   const path = state.path || [];
-  const baseIndex = path.length - 1;
   const inRange: EnemyState[] = [];
   for (const enemy of state.enemies || []) {
     if (!enemy.isAlive) continue;
@@ -119,7 +116,6 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
   const [completeGame] = useCompleteTowerDefenseGameMutation();
 
   const status = statusData?.data;
-  const currentGame = status?.currentGame;
   const attemptsLeft = status?.attemptsLeft ?? 0;
 
   const availableItems =
