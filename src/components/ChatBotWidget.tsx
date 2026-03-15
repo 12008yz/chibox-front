@@ -112,19 +112,6 @@ export default function ChatBotWidget() {
   return (
     <>
       <div className="fixed bottom-5 left-5 z-[9990] flex items-center justify-center">
-        {/* Две волны, расходящиеся от иконки кругами — только когда чат закрыт */}
-        {!open && (
-          <>
-            <span
-              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-2 border-orange-400/50 animate-support-wave"
-              aria-hidden
-            />
-            <span
-              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-2 border-orange-400/50 animate-support-wave animate-support-wave-delay"
-              aria-hidden
-            />
-          </>
-        )}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
