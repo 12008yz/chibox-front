@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, Wallet, Crown, CalendarClock, Hash, CheckCircle2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useGetPaymentHistoryQuery } from '../features/user/userApi';
 import Monetary from './Monetary';
-
-const RECENT_PAYMENT_MS = 5 * 60 * 1000; // 5 минут — считаем операцию «только что» завершённой
 
 type HistoryItem = {
   id: string;
@@ -18,28 +16,19 @@ type HistoryItem = {
 const PaymentSuccessModal: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const paymentSuccess = searchParams.get('payment') === 'success';
+  const amountFromUrl = searchParams.get('amount');
+  const amountNum = amountFromUrl != null ? parseFloat(amountFromUrl) : NaN;
+  const hasAmountFromUrl = !Number.isNaN(amountNum) && amountNum > 0;
 
-  const { data: paymentHistoryData, isSuccess } = useGetPaymentHistoryQuery(
+  const { data: paymentHistoryData } = useGetPaymentHistoryQuery(
     { limit: 5 },
     { skip: !paymentSuccess }
   );
 
-  const [shownForId, setShownForId] = useState<string | null>(null);
   const items: HistoryItem[] = paymentHistoryData?.success && paymentHistoryData?.data?.items
     ? paymentHistoryData.data.items
     : [];
-
   const latest = items[0];
-  const isRecent = latest?.completed_at
-    ? Date.now() - new Date(latest.completed_at).getTime() < RECENT_PAYMENT_MS
-    : false;
-  const shouldShow = paymentSuccess && isSuccess && latest && isRecent && shownForId !== latest.id;
-
-  useEffect(() => {
-    if (shouldShow && latest) {
-      setShownForId(latest.id);
-    }
-  }, [shouldShow, latest?.id]);
 
   const clearUrlAndClose = () => {
     setSearchParams((prev) => {
@@ -50,38 +39,25 @@ const PaymentSuccessModal: React.FC = () => {
     }, { replace: true });
   };
 
-  // Очистка URL, если долго нет «свежей» операции (избегаем залипания ?payment=success)
-  useEffect(() => {
-    if (!paymentSuccess || !isSuccess) return;
-    const t = setTimeout(() => {
-      setSearchParams((prev) => {
-        if (prev.get('payment') !== 'success') return prev;
-        prev.delete('payment');
-        prev.delete('amount');
-        const next = prev.toString();
-        return next ? { search: `?${next}` } : { search: '' };
-      }, { replace: true });
-    }, 12000);
-    return () => clearTimeout(t);
-  }, [paymentSuccess, isSuccess, setSearchParams]);
+  // Показываем модалку при любом возврате с успешной оплатой; закрывается только по кнопке или клику по фону
+  if (!paymentSuccess) return null;
 
-  if (!shouldShow || !latest) return null;
-
-  const dateStr = latest.completed_at
+  const isSubscription = latest?.purpose === 'subscription';
+  const amount = latest?.amount ?? (hasAmountFromUrl ? amountNum : 0);
+  const dateStr = latest?.completed_at
     ? new Date(latest.completed_at).toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
       })
     : '—';
-  const timeStr = latest.completed_at
+  const timeStr = latest?.completed_at
     ? new Date(latest.completed_at).toLocaleTimeString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
       })
     : '—';
-  const isSubscription = latest.purpose === 'subscription';
 
   const modalContent = (
     <div data-no-click-sound className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
@@ -131,33 +107,40 @@ const PaymentSuccessModal: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <span className="text-gray-400 text-sm">Сумма</span>
               <span className="text-lg font-semibold text-white">
-                <Monetary value={latest.amount} />
+                {amount > 0 ? <Monetary value={amount} /> : '—'}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-gray-400 text-sm">Операция</span>
-              <span className={`text-sm font-medium ${isSubscription ? 'text-amber-400/90' : 'text-emerald-400/90'}`}>
-                {latest.description}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-gray-400 text-sm flex items-center gap-1.5">
-                <CalendarClock className="h-4 w-4" />
-                Дата и время
-              </span>
-              <span className="text-sm text-white">
-                {dateStr} {timeStr}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-700/50">
-              <span className="text-gray-500 text-xs flex items-center gap-1.5">
-                <Hash className="h-3.5 w-3.5" />
-                ID операции
-              </span>
-              <span className="text-xs font-mono text-gray-500 truncate max-w-[180px]" title={latest.id}>
-                {latest.id}
-              </span>
-            </div>
+            {latest && (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-gray-400 text-sm">Операция</span>
+                  <span className={`text-sm font-medium ${isSubscription ? 'text-amber-400/90' : 'text-emerald-400/90'}`}>
+                    {latest.description}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-gray-400 text-sm flex items-center gap-1.5">
+                    <CalendarClock className="h-4 w-4" />
+                    Дата и время
+                  </span>
+                  <span className="text-sm text-white">
+                    {dateStr} {timeStr}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-700/50">
+                  <span className="text-gray-500 text-xs flex items-center gap-1.5">
+                    <Hash className="h-3.5 w-3.5" />
+                    ID операции
+                  </span>
+                  <span className="text-xs font-mono text-gray-500 truncate max-w-[180px]" title={latest.id}>
+                    {latest.id}
+                  </span>
+                </div>
+              </>
+            )}
+            {!latest && (
+              <p className="text-sm text-gray-400">Данные о платеже подгружаются или уже отражены в истории операций.</p>
+            )}
           </div>
 
           <button
