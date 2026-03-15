@@ -59,7 +59,6 @@ function manhattan(a: Position, b: Position): number {
 }
 
 function findTargetForTower(state: GameState, tower: TowerState): EnemyState | null {
-  const path = state.path || [];
   const inRange: EnemyState[] = [];
   for (const enemy of state.enemies || []) {
     if (!enemy.isAlive) continue;
