@@ -116,11 +116,11 @@ export default function ChatBotWidget() {
         {!open && (
           <>
             <span
-              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-[3px] border-orange-400 animate-support-wave"
+              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-2 border-orange-400/50 animate-support-wave"
               aria-hidden
             />
             <span
-              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-[3px] border-orange-400 animate-support-wave animate-support-wave-delay"
+              className="absolute inset-0 m-auto h-14 w-14 rounded-full border-2 border-orange-400/50 animate-support-wave animate-support-wave-delay"
               aria-hidden
             />
           </>

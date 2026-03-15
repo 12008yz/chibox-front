@@ -20,6 +20,7 @@ import CookieBanner from './components/CookieBanner';
 import ChatBotWidgetBoundary from './components/ChatBotWidgetBoundary';
 import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
+import PaymentSuccessModal from './components/PaymentSuccessModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { API_URL } from './utils/config';
@@ -216,6 +217,7 @@ const App: React.FC = () => {
               referralCode={referralModalCode}
             />
           )}
+          <PaymentSuccessModal />
           <main>
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
