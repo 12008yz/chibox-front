@@ -16,13 +16,18 @@ type HistoryItem = {
 const PaymentSuccessModal: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const paymentSuccess = searchParams.get('payment') === 'success';
+  const paymentId = searchParams.get('paymentId');
+  const account = searchParams.get('account');
+  // Unitpay редиректит на сайт с ?paymentId=...&account=... (без payment=success), бэкенд иногда отдаёт ?payment=success&amount=...
+  const isReturnFromPayment = paymentSuccess || (Boolean(paymentId) && Boolean(account));
+
   const amountFromUrl = searchParams.get('amount');
   const amountNum = amountFromUrl != null ? parseFloat(amountFromUrl) : NaN;
   const hasAmountFromUrl = !Number.isNaN(amountNum) && amountNum > 0;
 
   const { data: paymentHistoryData } = useGetPaymentHistoryQuery(
     { limit: 5 },
-    { skip: !paymentSuccess }
+    { skip: !isReturnFromPayment }
   );
 
   const items: HistoryItem[] = paymentHistoryData?.success && paymentHistoryData?.data?.items
@@ -34,13 +39,15 @@ const PaymentSuccessModal: React.FC = () => {
     setSearchParams((prev) => {
       prev.delete('payment');
       prev.delete('amount');
+      prev.delete('paymentId');
+      prev.delete('account');
       const next = prev.toString();
       return next ? { search: `?${next}` } : { search: '' };
     }, { replace: true });
   };
 
-  // Показываем модалку при любом возврате с успешной оплатой; закрывается только по кнопке или клику по фону
-  if (!paymentSuccess) return null;
+  // Показываем модалку при возврате с оплаты (?payment=success или ?paymentId=...&account=...); закрывается только по кнопке или клику по фону
+  if (!isReturnFromPayment) return null;
 
   const isSubscription = latest?.purpose === 'subscription';
   const amount = latest?.amount ?? (hasAmountFromUrl ? amountNum : 0);
