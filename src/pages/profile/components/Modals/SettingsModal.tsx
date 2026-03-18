@@ -311,13 +311,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-start justify-center z-[9999999] overflow-y-auto py-4 md:py-8" onClick={() => {
+    <div className="fixed inset-0 bg-black/90 flex items-start justify-center z-[9999999] overflow-y-auto py-2 md:py-4" onClick={() => {
       onClose();
       resetForm();
     }}>
-      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-6 max-w-md w-full mx-4 my-auto border border-gray-700/30" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-white">{t('profile.settings.title')}</h3>
+      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-4 max-w-sm w-full mx-3 my-auto border border-gray-700/30 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg sm:text-xl font-bold text-white">{t('profile.settings.title')}</h3>
           <button
             onClick={() => {
               onClose();
@@ -331,7 +331,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Username */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -642,7 +642,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Настройки звука
             </label>
-            <div className="flex items-center justify-between p-3 bg-black/20 rounded-lg border border-gray-600/30">
+            <div className="flex items-center justify-between p-2 bg-black/20 rounded-lg border border-gray-600/30">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   soundsEnabled ? 'bg-green-500/20' : 'bg-gray-500/20'
@@ -678,7 +678,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Logout Button */}
-          <div className="pt-4 border-t border-gray-700/30">
+          <div className="pt-3 border-t border-gray-700/30">
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
@@ -690,7 +690,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
+        <div className="flex gap-3 mt-4">
           <button
             onClick={handleSaveSettings}
             disabled={isUpdatingProfile}

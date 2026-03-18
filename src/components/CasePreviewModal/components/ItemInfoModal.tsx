@@ -55,16 +55,16 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black bg-opacity-75 md:hidden"
+      className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black bg-opacity-75 md:hidden overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-[#1a1629] rounded-lg w-[90%] max-w-sm mx-4 shadow-2xl animate-fade-in"
+        className="bg-[#1a1629] rounded-lg w-[86%] max-w-xs mx-3 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-700">
-          <h2 className="text-white font-bold text-lg">
+        <div className="flex justify-between items-center p-3 border-b border-gray-700">
+          <h2 className="text-white font-bold text-base">
             {showDropChance ? t('case_preview_modal.item_info') : t('case_preview_modal.you_won')}
           </h2>
           <button
@@ -78,9 +78,9 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4">
           {/* Item Image */}
-          <div className={`mb-4 rounded-lg p-4 border-2 ${rarityColorClass} bg-gray-900`}>
+          <div className={`mb-3 rounded-lg p-3 border-2 ${rarityColorClass} bg-gray-900`}>
             <div className="aspect-square flex items-center justify-center">
               <img loading="lazy" src={highQualityImageUrl}
                 alt={item.name}
@@ -93,11 +93,11 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
           </div>
 
           {/* Item Info */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {/* Name */}
             <div>
               <p className="text-gray-400 text-xs mb-1">{t('case_preview_modal.item_name')}</p>
-              <h3 className="text-white font-semibold text-base">{item.name}</h3>
+              <h3 className="text-white font-semibold text-sm">{item.name}</h3>
             </div>
 
             {/* Rarity */}
@@ -137,7 +137,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200"
+            className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-2.5 px-4 rounded-lg transition-all duration-200 text-sm"
           >
             {t('case_preview_modal.close')}
           </button>
