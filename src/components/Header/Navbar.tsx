@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Sparkles, Settings } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Crosshair, Settings } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
 import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
@@ -138,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 </span>
                 <div className="text-[9px] md:text-[10px] lg:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
-                  <Sparkles className="text-orange-400 animate-spin-fast w-3 h-3" />
+                  <Crosshair className="text-orange-400 w-3 h-3" />
                 </div>
               </div>
             </Link>

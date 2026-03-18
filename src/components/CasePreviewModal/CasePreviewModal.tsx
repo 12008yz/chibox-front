@@ -894,10 +894,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
     width: '100vw',
-    height: '100vh',
-    minHeight: '100vh',
+    bottom: 0,
+    height: '100dvh',
+    minHeight: '100dvh',
     zIndex: 99999998,
     isolation: 'isolate',
   };
@@ -919,7 +919,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         </div>
       ) : (
         <div
-          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 max-h-[90vh] shadow-2xl flex flex-col transition-all duration-300 ${
+          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 h-[90dvh] max-h-[90dvh] overflow-hidden shadow-2xl flex flex-col transition-all duration-300 ${
             isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'
           } ${showWinEffects ? 'win-shake' : ''}`}
           onClick={(e) => e.stopPropagation()}
@@ -937,7 +937,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 className={`flex-1 min-h-0 relative virtualized-container flex flex-col ${
                   animationPhase === 'speeding-up' ? 'spinning-container' : ''
                 }`}
-                style={{ maxHeight: 'calc(90vh - 200px)', minHeight: isMobileOrTablet ? 180 : undefined }}
+                style={{ minHeight: isMobileOrTablet ? 180 : undefined, overflow: 'hidden' }}
               >
                 {isLoading ? (
             <div className="flex items-center justify-center py-12 p-6">
@@ -1051,7 +1051,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               <div
                 ref={scrollContainerRef}
                 className={`flex-1 p-6 overflow-y-auto smooth-scroll scrollbar-hide`}
-                style={{ maxHeight: 'calc(90vh - 200px)' }}
               >
                 <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
                   {itemsWithAdjustedChances.map((item: any, index: number) => (
