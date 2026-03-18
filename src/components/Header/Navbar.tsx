@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Crosshair, Settings } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Crosshair, Sparkles, Settings } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
 import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
