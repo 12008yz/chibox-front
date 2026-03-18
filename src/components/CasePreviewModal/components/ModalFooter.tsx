@@ -26,11 +26,11 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
 
   if (isGuest) {
     return (
-      <div className="flex-shrink-0 p-3 sm:p-4 md:p-6 border-t border-gray-700 bg-[#1a1629]">
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3 sm:justify-between sm:items-center">
+      <div className="flex-shrink-0 p-2 sm:p-3 md:p-5 border-t border-gray-700 bg-[#1a1629]">
+        <div className="grid grid-cols-2 gap-1 sm:flex sm:flex-row sm:gap-2 sm:justify-between sm:items-center">
           <button
             onClick={handleClose}
-            className="w-full sm:w-auto px-4 py-2 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
+            className="w-full sm:w-auto px-3 py-1.5 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
           >
             {t('case_preview_modal.close')}
           </button>
@@ -38,7 +38,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
             <button
               type="button"
               onClick={onLoginRequest}
-              className="w-full sm:w-auto px-4 py-2 sm:px-6 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white rounded transition-colors duration-200"
+              className="w-full sm:w-auto px-3 py-1.5 sm:px-6 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white rounded transition-colors duration-200"
             >
               {t('case_preview_modal.login_to_open', { defaultValue: 'Войти чтобы открыть кейс' })}
             </button>
@@ -66,10 +66,10 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   };
 
   return (
-    <div className="flex-shrink-0 p-3 sm:p-4 md:p-6 border-t border-gray-700 bg-[#1a1629]">
+    <div className="flex-shrink-0 p-2 sm:p-3 md:p-5 border-t border-gray-700 bg-[#1a1629]">
       {/* Текст о требуемом статусе — только когда статуса нет */}
       {subscriptionBlocked && (
-        <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
           <div>{statusRequiredText}</div>
           <button
             type="button"
@@ -83,7 +83,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
       )}
 
       {isCooldown && (
-        <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
+        <div className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
           {d?.reason === 'Кейс еще недоступен' && d?.nextAvailableTime && (
             <div>
               {t('case_preview_modal.case_not_yet_available', { defaultValue: 'Кейс еще недоступен' })}
@@ -98,10 +98,10 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:gap-3 sm:justify-between sm:items-center">
+      <div className="grid grid-cols-2 gap-1 sm:flex sm:flex-row sm:gap-2 sm:justify-between sm:items-center">
         <button
           onClick={handleClose}
-          className="w-full sm:w-auto px-4 py-2 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
+          className="w-full sm:w-auto px-3 py-1.5 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
           disabled={isProcessing || showOpeningAnimation}
         >
           {t('case_preview_modal.close')}
@@ -109,7 +109,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
 
         {fixedPrices ? (
           // Показываем кнопки для премиум кейсов (только баланс)
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
             {/* Показ баланса */}
             {!showOpeningAnimation && !isProcessing && userData && (
               <div className="flex items-center space-x-1 text-xs">
@@ -134,7 +134,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                   <button
                     onClick={handleBuyCase}
                     disabled={isDisabled}
-                    className={`px-4 py-2 sm:px-6 text-sm sm:text-base text-white rounded transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-1 sm:gap-2 ${
+                    className={`px-3 py-1.5 sm:px-6 text-sm sm:text-base text-white rounded transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-1 sm:gap-2 ${
                       !hasEnoughBalance
                         ? 'bg-orange-600 hover:bg-orange-700'
                         : 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
@@ -165,7 +165,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
           </div>
         ) : (
           // Используем обычную логику для страницы профиля
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
             {statusData?.data && !statusLoading ? (
               <>
                 {statusData.data.canBuy && statusData.data.price > 0 && (() => {
@@ -178,7 +178,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                       <button
                         onClick={handleBuyCase}
                         disabled={isDisabled}
-                        className={`w-full sm:w-auto px-4 sm:px-6 py-2 text-white rounded transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-2 whitespace-nowrap ${
+                        className={`w-full sm:w-auto px-3 sm:px-5 py-1.5 text-white rounded transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap ${
                           !hasEnoughBalance
                             ? 'bg-orange-600 hover:bg-orange-700'
                             : 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
@@ -209,7 +209,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                   <button
                     onClick={() => handleOpenCase()}
                     disabled={isProcessing || buyLoading || openLoading || showOpeningAnimation}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-2 whitespace-nowrap"
+                    className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
                   >
                     {isProcessing || openLoading ? (
                       <>
@@ -227,7 +227,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
               <button
                 onClick={handleBuyCase}
                 disabled={buyLoading || openLoading || showOpeningAnimation}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-2 whitespace-nowrap"
+                  className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
               >
                 {isProcessing || buyLoading || openLoading ? (
                   <>

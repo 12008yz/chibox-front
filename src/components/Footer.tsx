@@ -95,7 +95,7 @@ const Footer = () => {
 
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Logo & Description */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
@@ -137,7 +137,7 @@ const Footer = () => {
             <h4 className="text-lg font-bold mb-4 text-orange-400">
               {t('footer.sections.company')}
             </h4>
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
               {links.company.map((link, index) => (
                 <li key={index}>
                   <Link
@@ -156,7 +156,7 @@ const Footer = () => {
             <h4 className="text-lg font-bold mb-4 text-orange-400">
               {t('footer.sections.legal')}
             </h4>
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-2">
               {links.legal.map((link, index) => (
                 <li key={index}>
                   <Link
