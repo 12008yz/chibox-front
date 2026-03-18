@@ -20,10 +20,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 overflow-y-auto"
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/80 overflow-y-auto"
         onClick={onClose}
       >
-        <div className="w-full max-w-md my-auto">
+        <div className="w-full max-w-sm sm:max-w-md my-auto">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -35,7 +35,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"
               aria-label="Закрыть"
             >
               <X size={20} />
@@ -43,30 +43,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
             {/* 18+ */}
             <div
-              className="absolute top-4 left-4 z-10 flex items-center justify-center w-10 h-10 rounded-lg bg-red-500/15 border border-red-400/50 text-red-400 font-bold text-sm shadow-[0_0_12px_rgba(248,113,113,0.25)]"
+              className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/15 border border-red-400/50 text-red-400 font-bold text-xs shadow-[0_0_12px_rgba(248,113,113,0.25)]"
               title="Сервис для лиц старше 18 лет"
             >
               18+
             </div>
 
             {/* Content */}
-            <div className="p-8">
+            <div className="p-6 sm:p-8">
               {/* Logo */}
-              <div className="text-center mb-8 pt-6">
-                <div className="w-20 h-20 flex items-center justify-center mx-auto mb-6">
+              <div className="text-center mb-6 pt-4 sm:mb-8 sm:pt-6">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6">
                   <img src="/images/logo.webp" alt="Logo" className="w-full h-full object-contain" width="200" height="40" />
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-3">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
                   {t('auth.welcome')}
                 </h2>
-                <p className="text-gray-400 text-base">
+                <p className="text-gray-400 text-sm sm:text-base">
                   Войдите через Steam, чтобы продолжить
                 </p>
-                <p className="text-red-400/90 text-xs mt-2">Сервис для лиц старше 18 лет</p>
+                <p className="text-red-400/90 text-[11px] sm:text-xs mt-1 sm:mt-2">Сервис для лиц старше 18 лет</p>
               </div>
 
               {/* Steam Info Card */}
-              <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg">
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
                     <svg
@@ -89,7 +89,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Features */}
-              <div className="mb-6 space-y-3">
+              <div className="mb-5 sm:mb-6 space-y-2 sm:space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="flex-shrink-0 w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center">
                     <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,7 +120,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <SteamLoginButton />
 
               {/* Terms Notice */}
-              <div className="mt-6 text-xs text-gray-400 text-center">
+              <div className="mt-4 sm:mt-6 text-[11px] sm:text-xs text-gray-400 text-center">
                 Входя на сайт, вы соглашаетесь с{' '}
                 <a
                   href="/terms"
