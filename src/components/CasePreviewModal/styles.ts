@@ -678,11 +678,19 @@ export const strikeAnimationStyles = `
     border-right-width: 2px;
   }
 
+  /* Мягкое затухание по краям «окна» рулетки */
+  .case-open-viewport-fade {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  }
+
   /* Полоска предметов при открытии кейса — снижает лаги на iPhone */
   .case-open-strip {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     contain: layout style;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     /* Центр первого слота совпадает с центром окна: 50% минус половина ширины карточки */
     padding-left: calc(50% - 50px);
     padding-right: calc(50% - 50px);

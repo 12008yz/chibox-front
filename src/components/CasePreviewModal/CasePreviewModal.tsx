@@ -23,6 +23,27 @@ import { setShowAuthModal } from '../../store/slices/uiSlice';
 // Добавляем стили в head только один раз
 injectStyles();
 
+/** Как у горизонтальной «рулетки»: easing близок к cubic-bezier(0.22, 0.2, 0.1, 0.985) — быстрый старт, длинное плавное торможение. */
+function cubicBezierYatX(t: number, x1: number, y1: number, x2: number, y2: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  const sampleCurveX = (u: number) =>
+    3 * (1 - u) * (1 - u) * u * x1 + 3 * (1 - u) * u * u * x2 + u * u * u;
+  const sampleCurveY = (u: number) =>
+    3 * (1 - u) * (1 - u) * u * y1 + 3 * (1 - u) * u * u * y2 + u * u * u;
+  let low = 0;
+  let high = 1;
+  let u = t;
+  for (let i = 0; i < 14; i++) {
+    u = (low + high) / 2;
+    const x = sampleCurveX(u);
+    if (x < t) low = u;
+    else high = u;
+  }
+  u = (low + high) / 2;
+  return sampleCurveY(u);
+}
+
 // Портал в documentElement, чтобы подложка (fixed) не привязывалась к body с position:fixed — иначе чёрный фон только в нижней части экрана
 const MODAL_PORTAL_TARGET = typeof document !== 'undefined' ? document.documentElement : null;
 
@@ -49,13 +70,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
   const [showGoldenSparks, setShowGoldenSparks] = useState(false);
-  const [_shouldFakeSlowdown, setShouldFakeSlowdown] = useState(false);
   const [_shouldStopBetween, setShouldStopBetween] = useState(false);
   const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showDropChance, setShowDropChance] = useState(false);
+  /** Десктоп (≥1024px): без прокрутки-рулетки — сразу карточка выпавшего предмета */
+  const [showDesktopInstantReveal, setShowDesktopInstantReveal] = useState(false);
   // На мобильных: 24 предмета в анимации (полоска + результат)
   const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
   const MOBILE_STRIP_SIZE = 24;
@@ -150,6 +172,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setSliderOffset(0);
       setAnimationPhase('idle');
       setShowOpeningAnimation(false);
+      setShowDesktopInstantReveal(false);
       setOpeningResult(null);
       setShowStrikeThrough(false);
       setShowGoldenSparks(false);
@@ -181,6 +204,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setIsAnimating(false);
       setIsProcessing(false);
       setShowOpeningAnimation(false);
+      setShowDesktopInstantReveal(false);
       setAnimationPhase('idle');
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
       animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
@@ -385,25 +409,30 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setOpeningResult(null);
   }, [openingResult]);
 
-  // Улучшенная анимация открытия с fake slowdown
+  const dismissDesktopInstantReveal = useCallback(() => {
+    setShowDesktopInstantReveal(false);
+    setOpeningResult(null);
+    if (onDataUpdate) onDataUpdate();
+  }, [onDataUpdate]);
+
+  // Горизонтальная рулетка (≤1023px): плавный translate3d по кривой как cubic-bezier(0.22, 0.2, 0.1, 0.985)
   const startAnimation = useCallback((wonItem: any) => {
-    // Очищаем все предыдущие таймауты и интервалы перед началом новой анимации
+    if (!isMobileOrTablet) return;
+
+    if (animationFrameRef.current != null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
     animationTimoutsRef.current = [];
     animationIntervalsRef.current.forEach(interval => clearInterval(interval));
     animationIntervalsRef.current = [];
 
-    // Вспомогательные функции для отслеживания таймаутов и интервалов
     const trackTimeout = (callback: () => void, delay: number) => {
       const timeout = setTimeout(callback, delay);
       animationTimoutsRef.current.push(timeout);
       return timeout;
-    };
-
-    const trackInterval = (callback: () => void, delay: number) => {
-      const interval = setInterval(callback, delay);
-      animationIntervalsRef.current.push(interval);
-      return interval;
     };
 
     setShowOpeningAnimation(true);
@@ -411,68 +440,41 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setShowStrikeThrough(false);
     setShowGoldenSparks(false);
     setShowWinEffects(false);
+    setShouldStopBetween(false);
 
-    // 25% шанс на fake slowdown
-    const useFakeSlowdown = Math.random() < 0.25;
-    setShouldFakeSlowdown(useFakeSlowdown);
-
-    // Убрали выбор между двумя предметами
-    const useStopBetween = false;
-    setShouldStopBetween(useStopBetween);
-
-    let availableItemsForAnimation = itemsWithAdjustedChances.filter(item => !item.isExcluded);
-    let wonItemIndex = availableItemsForAnimation.findIndex(item => item.id === wonItem.id);
+    let baseStrip = itemsWithAdjustedChances.filter(item => !item.isExcluded);
+    let wonItemIndex = baseStrip.findIndex(item => item.id === wonItem.id);
 
     if (wonItemIndex === -1) {
       setAnimationPhase('stopped');
-      setTimeout(() => handleAnimationComplete(), 1500);
+      trackTimeout(() => handleAnimationComplete(), 1500);
       return;
     }
 
-    // На мобильных: 24 предмета в полоске, выигрышный — в случайной позиции (0..23)
-    if (isMobileOrTablet) {
-      if (availableItemsForAnimation.length > MOBILE_STRIP_SIZE) {
-        const others = availableItemsForAnimation.filter(item => item.id !== wonItem.id);
-        const shuffled = [...others].sort(() => Math.random() - 0.5);
-        const rest = shuffled.slice(0, MOBILE_STRIP_SIZE - 1);
-        const insertAt = Math.floor(Math.random() * MOBILE_STRIP_SIZE);
-        const stripItems = [...rest.slice(0, insertAt), wonItem, ...rest.slice(insertAt)];
-        setMobileAnimationItems(stripItems);
-        availableItemsForAnimation = stripItems;
-        wonItemIndex = insertAt;
-      } else {
-        setMobileAnimationItems(availableItemsForAnimation);
-      }
-    } else {
-      setMobileAnimationItems([]);
+    if (baseStrip.length > MOBILE_STRIP_SIZE) {
+      const others = baseStrip.filter(item => item.id !== wonItem.id);
+      const shuffled = [...others].sort(() => Math.random() - 0.5);
+      const rest = shuffled.slice(0, MOBILE_STRIP_SIZE - 1);
+      const insertAt = Math.floor(Math.random() * MOBILE_STRIP_SIZE);
+      baseStrip = [...rest.slice(0, insertAt), wonItem, ...rest.slice(insertAt)];
+      wonItemIndex = insertAt;
     }
 
+    const L = baseStrip.length;
+    if (L === 0) {
+      setAnimationPhase('stopped');
+      trackTimeout(() => handleAnimationComplete(), 1500);
+      return;
+    }
+
+    const tripled = [...baseStrip, ...baseStrip, ...baseStrip];
+    const targetSlotIndex = L + wonItemIndex;
+
+    setMobileAnimationItems(tripled);
     setSliderPosition(0);
-    if (!isMobileOrTablet && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    setSliderOffset(0);
 
-    let currentAvailablePosition = 0;
-    // На мобильных (особенно iPhone) чуть реже обновляем кадры, чтобы анимация не лагала
-    const initialSpeed = isMobileOrTablet ? 100 : 80;
-    let currentSpeed = initialSpeed;
-    const distance = wonItemIndex;
-
-    // Точки анимации
-    const fakeSlowdownPoint = useFakeSlowdown ? Math.floor(distance * 0.4) : -1; // 40% пути
-    const fakeSlowdownEnd = useFakeSlowdown ? Math.floor(distance * 0.5) : -1; // 50% пути
-    const finalSlowdownStart = Math.max(0, distance - 8);
-
-    let hasFakeSlowedDown = false;
-    let hasSpedUpAgain = false;
-
-    const easeOutQuart = (t: number): number => 1 - Math.pow(1 - t, 4);
-    const easeInQuart = (t: number): number => Math.pow(t, 4);
-    const easeInOutCubic = (t: number): number => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    // На мобильных обновляем transform полоски через ref (без re-render), state — только для подсветки, раз в 2 шага
-    let mobileStepCount = 0;
-    const applyMobileStripTransform = (position: number, offset: number) => {
+    const applyMobileStripTransformFloat = (position: number, offset: number) => {
       mobileAnimationRef.current.position = position;
       mobileAnimationRef.current.offset = offset;
       if (mobileStripRef.current) {
@@ -482,191 +484,79 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
     };
 
-    const animateSlider = () => {
-      // Проверка на остановку между предметами (за 1 позицию до выигрыша)
-      if (useStopBetween && currentAvailablePosition === wonItemIndex - 1) {
-        const currentItemInFullList = itemsWithAdjustedChances.findIndex((_item, idx) => {
-          let availableCount = 0;
-          for (let i = 0; i <= idx; i++) {
-            if (!itemsWithAdjustedChances[i].isExcluded) {
-              if (availableCount === currentAvailablePosition) {
-                return i === idx;
-              }
-              availableCount++;
-            }
-          }
-          return false;
-        });
+    const reduceMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const durationMs = reduceMotion ? Math.min(900, 400 + targetSlotIndex * 28) : 5200 + Math.random() * 800;
+    const startDelayMs = reduceMotion ? 120 : 380;
+    let lastTickSlot = -1;
+    let slowdownPhaseSet = false;
+    let lastSoundAt = 0;
+    const SOUND_MIN_MS = 38;
 
-        setSliderPosition(currentItemInFullList);
-        if (isMobileOrTablet) mobileAnimationRef.current.position = currentItemInFullList;
-
-        // Небольшая задержка перед началом wobbling для плавности
-        trackTimeout(() => {
-          setAnimationPhase('wobbling');
-
-          // Плавное перекатывание на следующий предмет (30%) и обратно
-          let rollProgress = 0;
-          const rollSteps = 60; // Увеличили количество шагов для более медленной анимации
-          const rollInterval = trackInterval(() => {
-            rollProgress++;
-
-            // Создаем плавную кривую: 0 -> 0.3 -> 0
-            const normalizedProgress = rollProgress / rollSteps;
-            let offset = 0;
-
-            if (normalizedProgress < 0.5) {
-              // Первая половина: плавно двигаемся вперед до 30%
-              const forwardProgress = normalizedProgress * 2; // 0 -> 1
-              // Используем ease-in-out для плавного старта и замедления в конце
-              const eased = forwardProgress < 0.5
-                ? 4 * forwardProgress * forwardProgress * forwardProgress
-                : 1 - Math.pow(-2 * forwardProgress + 2, 3) / 2;
-              offset = 0.3 * eased;
-            } else {
-              // Вторая половина: плавно возвращаемся назад
-              const backwardProgress = (normalizedProgress - 0.5) * 2; // 0 -> 1
-              // Используем ease-in-out для плавного возврата
-              const eased = backwardProgress < 0.5
-                ? 4 * backwardProgress * backwardProgress * backwardProgress
-                : 1 - Math.pow(-2 * backwardProgress + 2, 3) / 2;
-              offset = 0.3 * (1 - eased);
-            }
-
-            setSliderOffset(offset);
-            if (isMobileOrTablet) applyMobileStripTransform(mobileAnimationRef.current.position, offset);
-
-            if (rollProgress >= rollSteps) {
-              clearInterval(rollInterval);
-              // Удаляем интервал из массива отслеживания
-              const index = animationIntervalsRef.current.indexOf(rollInterval);
-              if (index > -1) {
-                animationIntervalsRef.current.splice(index, 1);
-              }
-              setSliderOffset(0);
-              setAnimationPhase('falling');
-
-              // Быстрое падение на выигрышный предмет
-              trackTimeout(() => {
-                const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
-                setSliderPosition(wonItemInFullList);
-                if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
-                setAnimationPhase('stopped');
-
-                // Эффекты выигрыша: взрыв и искры и на мобильной, как на десктопе
-                trackTimeout(() => {
-                  soundManager.play('endProcess');
-                  setShowWinEffects(true);
-                }, 300);
-                trackTimeout(() => setShowGoldenSparks(true), 800);
-                trackTimeout(() => {
-                  if (caseData.id === "44444444-4444-4444-4444-444444444444") {
-                    setShowStrikeThrough(true);
-                  }
-                }, 1500);
-                trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
-              }, 200);
-            }
-          }, 25); // 25ms между шагами (60 шагов * 25ms = 1.5 секунды)
-        }, 200); // Задержка 200ms перед началом анимации
-
-        return;
+    const finishSpin = () => {
+      const el = mobileStripRef.current;
+      if (el) {
+        el.style.removeProperty('transition');
       }
-
-      if (currentAvailablePosition >= wonItemIndex) {
-        const wonItemInFullList = (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) ? wonItemIndex : itemsWithAdjustedChances.findIndex(item => item.id === wonItem.id);
-        setSliderPosition(wonItemInFullList);
-        if (isMobileOrTablet) applyMobileStripTransform(wonItemInFullList, 0);
-        setAnimationPhase('stopped');
-
-        // Эффекты выигрыша: взрыв и искры и на мобильной, как на десктопе
-        trackTimeout(() => {
-          soundManager.play('endProcess');
-          setShowWinEffects(true);
-        }, 300);
-        trackTimeout(() => setShowGoldenSparks(true), 800); // Золотые искры
-        trackTimeout(() => {
-          if (caseData.id === "44444444-4444-4444-4444-444444444444") {
-            setShowStrikeThrough(true);
-          }
-        }, 1500);
-        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
-        return;
-      }
-
-      currentAvailablePosition++;
-      let fullListPosition = 0;
-      if (isMobileOrTablet && availableItemsForAnimation.length <= MOBILE_STRIP_SIZE) {
-        // Полоска из 24 предметов: позиция = шаг анимации (0..23)
-        fullListPosition = currentAvailablePosition;
-      } else {
-        let availableCount = 0;
-        for (let i = 0; i < itemsWithAdjustedChances.length; i++) {
-          if (!itemsWithAdjustedChances[i].isExcluded) {
-            if (availableCount === currentAvailablePosition) {
-              fullListPosition = i;
-              break;
-            }
-            availableCount++;
-          }
+      applyMobileStripTransformFloat(targetSlotIndex, 0);
+      setSliderPosition(targetSlotIndex);
+      setAnimationPhase('stopped');
+      trackTimeout(() => {
+        soundManager.play('endProcess');
+        setShowWinEffects(true);
+      }, 300);
+      trackTimeout(() => setShowGoldenSparks(true), 800);
+      trackTimeout(() => {
+        if (caseData.id === "44444444-4444-4444-4444-444444444444") {
+          setShowStrikeThrough(true);
         }
-      }
-
-      // Мобильные: позиция полоски через ref (без re-render), state для подсветки — раз в 2 шага
-      if (isMobileOrTablet) {
-        applyMobileStripTransform(fullListPosition, 0);
-        if (mobileStepCount % 2 === 0) setSliderPosition(fullListPosition);
-        mobileStepCount++;
-      } else {
-        setSliderPosition(fullListPosition);
-      }
-
-      // Воспроизводим звук при каждой смене предмета (ignoreThrottle = true для частого воспроизведения)
-      soundManager.play('process', false, true);
-
-      // Логика fake slowdown
-      if (useFakeSlowdown && currentAvailablePosition >= fakeSlowdownPoint && currentAvailablePosition < fakeSlowdownEnd && !hasFakeSlowedDown) {
-        setAnimationPhase('fake-slowing');
-        const progress = (currentAvailablePosition - fakeSlowdownPoint) / (fakeSlowdownEnd - fakeSlowdownPoint);
-        currentSpeed = initialSpeed + (400 * easeInQuart(progress)); // Резкое замедление
-
-        if (currentAvailablePosition >= fakeSlowdownEnd - 1) {
-          hasFakeSlowedDown = true;
-        }
-      }
-      // Резкое ускорение после fake slowdown
-      else if (useFakeSlowdown && hasFakeSlowedDown && !hasSpedUpAgain && currentAvailablePosition < finalSlowdownStart) {
-        setAnimationPhase('speeding-up');
-        const speedUpDuration = 5;
-        const speedUpProgress = Math.min(1, (currentAvailablePosition - fakeSlowdownEnd) / speedUpDuration);
-        currentSpeed = Math.max(initialSpeed * 0.5, 400 - (350 * easeOutQuart(speedUpProgress))); // Резкое ускорение
-
-        if (speedUpProgress >= 1) {
-          hasSpedUpAgain = true;
-        }
-      }
-      // Обычное вращение
-      else if (currentAvailablePosition < finalSlowdownStart) {
-        setAnimationPhase('spinning');
-        currentSpeed = initialSpeed;
-      }
-      // Финальное замедление
-      else {
-        setAnimationPhase('slowing');
-        const stepsLeft = wonItemIndex - currentAvailablePosition;
-        const progress = 1 - (stepsLeft / 8);
-        currentSpeed = initialSpeed + (450 * easeInOutCubic(progress));
-      }
-
-      trackTimeout(animateSlider, currentSpeed);
+      }, 1500);
+      trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
     };
 
-    // На мобильных даём ещё 200–300 мс на догрузку картинок после preload
-    const startDelay = isMobileOrTablet ? 700 : 500;
     trackTimeout(() => {
-      if (isMobileOrTablet) applyMobileStripTransform(0, 0);
-      animateSlider();
-    }, startDelay);
+      if (mobileStripRef.current) {
+        mobileStripRef.current.style.transition = 'none';
+      }
+      applyMobileStripTransformFloat(0, 0);
+
+      let animStart: number | null = null;
+      const tick = (now: number) => {
+        if (animStart === null) animStart = now;
+        const elapsed = now - animStart;
+        const t = Math.min(1, elapsed / durationMs);
+        const eased = cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
+        const pos = eased * targetSlotIndex;
+        applyMobileStripTransformFloat(pos, 0);
+
+        if (!slowdownPhaseSet && t >= 0.72) {
+          slowdownPhaseSet = true;
+          setAnimationPhase('slowing');
+        }
+
+        const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
+        if (slot > lastTickSlot) {
+          lastTickSlot = slot;
+          if (now - lastSoundAt >= SOUND_MIN_MS) {
+            soundManager.play('process', false, true);
+            lastSoundAt = now;
+          }
+          /* Не вызываем setSliderPosition на каждый слот: иначе все ~72 CaseItem
+             перерисовываются десятки раз в секунду в начале ease-out — визуальные запинания. */
+        }
+
+        if (t < 1) {
+          animationFrameRef.current = requestAnimationFrame(tick);
+        } else {
+          animationFrameRef.current = null;
+          finishSpin();
+        }
+      };
+      /* Два кадра после монтирована длинной полоски — layout/paint, без смешивания с первым тиком анимации */
+      animationFrameRef.current = requestAnimationFrame(() => {
+        animationFrameRef.current = requestAnimationFrame(tick);
+      });
+    }, startDelayMs);
   }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
 
   const handleShowAuth = useCallback(() => {
@@ -679,7 +569,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || showDesktopInstantReveal) {
       return;
     }
 
@@ -690,7 +580,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const result = await onBuyAndOpenCase(caseData);
         if (result && result.item) {
           setOpeningResult(result);
-          startAnimation(result.item);
+          if (isMobileOrTablet) {
+            startAnimation(result.item);
+          } else {
+            setShowDesktopInstantReveal(true);
+          }
         }
         return;
       }
@@ -744,7 +638,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || showDesktopInstantReveal) {
       return;
     }
 
@@ -770,7 +664,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       if (result.success && result.data?.item) {
         setOpeningResult(result.data);
-        startAnimation(result.data.item);
+        if (isMobileOrTablet) {
+          startAnimation(result.data.item);
+        } else {
+          setShowDesktopInstantReveal(true);
+        }
       }
     } catch (error: any) {
       const openMsg = getApiErrorMessage(error, 'Произошла ошибка при открытии кейса');
@@ -824,19 +722,26 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
     <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
       <div className="relative w-full h-full flex items-center min-h-0">
-        <div className="flex-1 min-h-0 overflow-hidden flex items-center relative" style={{ contain: 'layout paint' }}>
+        <div
+          className="flex-1 min-h-0 overflow-hidden flex items-center relative case-open-viewport-fade"
+          style={{ contain: 'layout paint' }}
+        >
           <div
             ref={mobileStripRef}
             className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
           >
             {itemsForMobileStrip.map((item: any, index: number) => (
-              <div key={item.id || index} className="flex-shrink-0 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] flex items-center justify-center overflow-hidden" data-item-index={index}>
+              <div
+                key={`strip-${index}-${item.id}`}
+                className="flex-shrink-0 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] flex items-center justify-center overflow-hidden"
+                data-item-index={index}
+              >
                 <CaseItem
                   item={item}
                   index={index}
                   animationIndex={index}
                   showOpeningAnimation={showOpeningAnimation}
-                  sliderPosition={sliderPosition}
+                  sliderPosition={animationPhase === 'stopped' ? sliderPosition : -1}
                   sliderOffset={sliderOffset}
                   openingResult={openingResult}
                   animationPhase={animationPhase}
@@ -1048,32 +953,78 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 </div>
             ) : (
               /* Десктоп: вертикальный скролл и сетка */
-              <div
-                ref={scrollContainerRef}
-                className={`flex-1 p-6 overflow-y-auto smooth-scroll scrollbar-hide`}
-              >
-                <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
-                  {itemsWithAdjustedChances.map((item: any, index: number) => (
-                    <CaseItem
-                      key={item.id || index}
-                      item={item}
-                      index={index}
-                      animationIndex={index}
-                      showOpeningAnimation={showOpeningAnimation}
-                      sliderPosition={sliderPosition}
-                      sliderOffset={sliderOffset}
-                      openingResult={openingResult}
-                      animationPhase={animationPhase}
-                      caseData={caseData}
-                      showStrikeThrough={showStrikeThrough}
-                      showGoldenSparks={showGoldenSparks}
-                      showWinEffects={showWinEffects}
-                      getRarityColor={getRarityColor}
-                      generateGoldenSparks={generateGoldenSparks}
-                      t={t}
-                      onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                    />
-                  ))}
+              <div className="flex-1 min-h-0 relative flex flex-col">
+                {showDesktopInstantReveal && openingResult?.item && (
+                  <div
+                    className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 px-4 py-6"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="desktop-case-reveal-title"
+                  >
+                    <div
+                      className={`w-full max-w-[280px] sm:max-w-sm rounded-xl border-2 p-4 sm:p-5 bg-gray-900/95 shadow-2xl ${getRarityColor(openingResult.item.rarity)}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <h2
+                        id="desktop-case-reveal-title"
+                        className="text-white font-bold text-center text-sm sm:text-base mb-3"
+                      >
+                        {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
+                      </h2>
+                      <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-3 flex items-center justify-center">
+                        <img
+                          loading="lazy"
+                          src={
+                            adaptImageSize(getItemImageUrl(openingResult.item.image_url, openingResult.item.name)) ||
+                            getItemImageUrl(openingResult.item.image_url, openingResult.item.name)
+                          }
+                          alt={openingResult.item.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <p
+                        className="text-white font-semibold text-sm text-center line-clamp-3 mb-4"
+                        title={openingResult.item.name}
+                      >
+                        {openingResult.item.name}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={dismissDesktopInstantReveal}
+                        className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-sm transition-all"
+                      >
+                        {t('case_preview_modal.close')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div
+                  ref={scrollContainerRef}
+                  className={`flex-1 min-h-0 p-6 overflow-y-auto smooth-scroll scrollbar-hide`}
+                >
+                  <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
+                    {itemsWithAdjustedChances.map((item: any, index: number) => (
+                      <CaseItem
+                        key={item.id || index}
+                        item={item}
+                        index={index}
+                        animationIndex={index}
+                        showOpeningAnimation={showOpeningAnimation}
+                        sliderPosition={sliderPosition}
+                        sliderOffset={sliderOffset}
+                        openingResult={openingResult}
+                        animationPhase={animationPhase}
+                        caseData={caseData}
+                        showStrikeThrough={showStrikeThrough}
+                        showGoldenSparks={showGoldenSparks}
+                        showWinEffects={showWinEffects}
+                        getRarityColor={getRarityColor}
+                        generateGoldenSparks={generateGoldenSparks}
+                        t={t}
+                        onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             )
@@ -1094,6 +1045,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           buyLoading={buyLoading}
           openLoading={openLoading}
           showOpeningAnimation={showOpeningAnimation}
+          showDesktopInstantReveal={showDesktopInstantReveal}
           handleClose={handleClose}
           handleBuyCase={handleBuyCase}
           handleOpenCase={handleOpenCase}

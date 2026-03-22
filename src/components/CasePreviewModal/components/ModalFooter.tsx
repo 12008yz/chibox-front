@@ -12,6 +12,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   buyLoading,
   openLoading,
   showOpeningAnimation,
+  showDesktopInstantReveal = false,
   handleClose,
   handleBuyCase,
   handleOpenCase,
@@ -23,6 +24,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   onLoginRequest,
 }) => {
   const d = statusData?.data;
+  const blockFooterActions = showOpeningAnimation || showDesktopInstantReveal;
 
   if (isGuest) {
     return (
@@ -102,7 +104,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
         <button
           onClick={handleClose}
           className="w-full sm:w-auto px-3 py-1.5 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
-          disabled={isProcessing || showOpeningAnimation}
+          disabled={isProcessing || blockFooterActions}
         >
           {t('case_preview_modal.close')}
         </button>
@@ -111,7 +113,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
           // Показываем кнопки для премиум кейсов (только баланс)
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
             {/* Показ баланса */}
-            {!showOpeningAnimation && !isProcessing && userData && (
+            {!blockFooterActions && !isProcessing && userData && (
               <div className="flex items-center space-x-1 text-xs">
                 <span className="text-gray-400 flex items-center gap-1">
                   <img loading="lazy" src="/images/chiCoinFull.webp" alt="chiCoin" className="w-4 h-4 inline-block object-contain align-middle self-center" width="16" height="16" />
@@ -127,7 +129,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
             {(() => {
               const price = getCasePrice(caseData);
               const hasEnoughBalance = (userData?.balance || 0) >= price;
-              const isDisabled = isProcessing || buyLoading || openLoading || showOpeningAnimation || !hasEnoughBalance;
+              const isDisabled = isProcessing || buyLoading || openLoading || blockFooterActions || !hasEnoughBalance;
 
               return (
                 <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -171,7 +173,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                 {statusData.data.canBuy && statusData.data.price > 0 && (() => {
                   const price = statusData.data.price;
                   const hasEnoughBalance = (userData?.balance || 0) >= price;
-                  const isDisabled = isProcessing || buyLoading || openLoading || showOpeningAnimation || !hasEnoughBalance;
+                  const isDisabled = isProcessing || buyLoading || openLoading || blockFooterActions || !hasEnoughBalance;
 
                   return (
                     <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -208,7 +210,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                 {statusData.data.canOpen && (
                   <button
                     onClick={() => handleOpenCase()}
-                    disabled={isProcessing || buyLoading || openLoading || showOpeningAnimation}
+                    disabled={isProcessing || buyLoading || openLoading || blockFooterActions}
                     className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
                   >
                     {isProcessing || openLoading ? (
@@ -226,7 +228,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
               // Показываем кнопку по умолчанию, если статус не загружен
               <button
                 onClick={handleBuyCase}
-                disabled={buyLoading || openLoading || showOpeningAnimation}
+                disabled={buyLoading || openLoading || blockFooterActions}
                   className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
               >
                 {isProcessing || buyLoading || openLoading ? (
