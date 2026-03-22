@@ -65,8 +65,8 @@ export interface ModalFooterProps {
   buyLoading: boolean;
   openLoading: boolean;
   showOpeningAnimation: boolean;
-  /** Десктоп: показ карточки выпавшего предмета без рулетки */
-  showDesktopInstantReveal?: boolean;
+  /** Превью уходит в анимацию перед рулеткой */
+  casePreviewExiting?: boolean;
   handleClose: () => void;
   handleBuyCase: () => void;
   handleOpenCase: (caseId?: string, inventoryItemId?: string) => void;

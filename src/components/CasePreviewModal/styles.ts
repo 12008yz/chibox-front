@@ -678,10 +678,286 @@ export const strikeAnimationStyles = `
     border-right-width: 2px;
   }
 
-  /* Мягкое затухание по краям «окна» рулетки */
+  /* Мягкое затухание краёв ленты (маска на контенте) */
   .case-open-viewport-fade {
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  }
+
+  /* Виньетка + янтарное свечение к центру — поверх ленты, pointer-events: none в разметке */
+  .case-open-viewport-overlay {
+    z-index: 6;
+    background:
+      linear-gradient(90deg, rgba(8, 5, 18, 0.94) 0%, rgba(8, 5, 18, 0.25) 12%, transparent 22%, transparent 78%, rgba(8, 5, 18, 0.25) 88%, rgba(8, 5, 18, 0.94) 100%),
+      radial-gradient(ellipse 42% 130% at 50% 50%, rgba(251, 191, 36, 0.11) 0%, transparent 62%);
+    pointer-events: none;
+  }
+
+  /* Появление полноэкранной рулетки после ухода превью */
+  @keyframes case-open-roulette-enter {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+      filter: blur(12px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+  .case-open-roulette-layer {
+    animation: case-open-roulette-enter 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case-open-roulette-layer {
+      animation: none;
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+  }
+
+  /* Неоновые скобки по краям рулетки (как тройные трубки); лента под ними (z-index) */
+  .case-open-neon-bracket {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 32px;
+    z-index: 11;
+    pointer-events: none;
+    opacity: 0.74;
+  }
+  .case-open-neon-bracket--left {
+    left: 0;
+  }
+  .case-open-neon-bracket--right {
+    right: 0;
+  }
+  .case-open-neon-bracket--desktop {
+    width: 40px;
+  }
+
+  .case-open-neon-limb {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 2px;
+  }
+
+  /* Три параллельные «трубки»: вертикаль слева */
+  .case-open-neon-limb--left-v {
+    left: 3px;
+    top: 9%;
+    bottom: 9%;
+    width: 11px;
+    border-radius: 5px 2px 2px 5px;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 236, 200, 0.98) 0%,
+      rgba(255, 236, 200, 0.98) 22%,
+      rgba(255, 200, 120, 0.15) 26%,
+      rgba(255, 180, 95, 1) 34%,
+      rgba(255, 180, 95, 1) 52%,
+      rgba(255, 140, 60, 0.2) 56%,
+      rgba(255, 150, 75, 1) 64%,
+      rgba(255, 150, 75, 1) 82%,
+      rgba(230, 110, 40, 0.95) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(255, 170, 90, 0.95),
+      0 0 18px rgba(255, 140, 55, 0.65),
+      0 0 32px rgba(255, 120, 40, 0.4),
+      -4px 0 14px rgba(255, 160, 80, 0.45);
+  }
+  .case-open-neon-limb--left-ht {
+    left: 3px;
+    top: 9%;
+    width: 26px;
+    height: 10px;
+    border-radius: 5px 3px 2px 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 236, 200, 0.98) 0%,
+      rgba(255, 236, 200, 0.98) 24%,
+      rgba(255, 200, 120, 0.12) 28%,
+      rgba(255, 180, 95, 1) 36%,
+      rgba(255, 180, 95, 1) 54%,
+      rgba(255, 140, 60, 0.15) 58%,
+      rgba(255, 150, 75, 1) 66%,
+      rgba(255, 150, 75, 1) 84%,
+      rgba(230, 110, 40, 0.95) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(255, 170, 90, 0.85),
+      0 -2px 16px rgba(255, 150, 70, 0.45),
+      4px -2px 12px rgba(255, 160, 80, 0.35);
+  }
+  .case-open-neon-limb--left-hb {
+    left: 3px;
+    bottom: 9%;
+    width: 26px;
+    height: 10px;
+    border-radius: 2px 3px 5px 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(230, 110, 40, 0.95) 0%,
+      rgba(255, 150, 75, 1) 16%,
+      rgba(255, 150, 75, 1) 34%,
+      rgba(255, 140, 60, 0.15) 42%,
+      rgba(255, 180, 95, 1) 46%,
+      rgba(255, 180, 95, 1) 64%,
+      rgba(255, 200, 120, 0.12) 72%,
+      rgba(255, 236, 200, 0.98) 76%,
+      rgba(255, 236, 200, 0.98) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(255, 170, 90, 0.85),
+      0 2px 16px rgba(255, 150, 70, 0.45),
+      4px 2px 12px rgba(255, 160, 80, 0.35);
+  }
+
+  .case-open-neon-bracket--desktop .case-open-neon-limb--left-v {
+    left: 4px;
+    width: 13px;
+  }
+  .case-open-neon-bracket--desktop .case-open-neon-limb--left-ht,
+  .case-open-neon-bracket--desktop .case-open-neon-limb--left-hb {
+    left: 4px;
+    width: 34px;
+    height: 11px;
+  }
+
+  /* Правая скобка — циан */
+  .case-open-neon-limb--right-v {
+    right: 3px;
+    top: 9%;
+    bottom: 9%;
+    width: 11px;
+    border-radius: 2px 5px 5px 2px;
+    background: linear-gradient(
+      270deg,
+      rgba(200, 250, 255, 0.98) 0%,
+      rgba(200, 250, 255, 0.98) 22%,
+      rgba(120, 230, 255, 0.15) 26%,
+      rgba(56, 210, 240, 1) 34%,
+      rgba(56, 210, 240, 1) 52%,
+      rgba(20, 180, 220, 0.2) 56%,
+      rgba(34, 200, 230, 1) 64%,
+      rgba(34, 200, 230, 1) 82%,
+      rgba(10, 150, 190, 0.95) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(80, 220, 255, 0.95),
+      0 0 18px rgba(40, 200, 255, 0.65),
+      0 0 32px rgba(20, 180, 240, 0.4),
+      4px 0 14px rgba(60, 210, 255, 0.45);
+  }
+  .case-open-neon-limb--right-ht {
+    right: 3px;
+    top: 9%;
+    width: 26px;
+    height: 10px;
+    border-radius: 3px 5px 2px 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(200, 250, 255, 0.98) 0%,
+      rgba(200, 250, 255, 0.98) 24%,
+      rgba(120, 230, 255, 0.12) 28%,
+      rgba(56, 210, 240, 1) 36%,
+      rgba(56, 210, 240, 1) 54%,
+      rgba(20, 180, 220, 0.15) 58%,
+      rgba(34, 200, 230, 1) 66%,
+      rgba(34, 200, 230, 1) 84%,
+      rgba(10, 150, 190, 0.95) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(80, 220, 255, 0.85),
+      0 -2px 16px rgba(50, 200, 255, 0.45),
+      -4px -2px 12px rgba(60, 210, 255, 0.35);
+  }
+  .case-open-neon-limb--right-hb {
+    right: 3px;
+    bottom: 9%;
+    width: 26px;
+    height: 10px;
+    border-radius: 2px 2px 5px 3px;
+    background: linear-gradient(
+      180deg,
+      rgba(10, 150, 190, 0.95) 0%,
+      rgba(34, 200, 230, 1) 16%,
+      rgba(34, 200, 230, 1) 34%,
+      rgba(20, 180, 220, 0.15) 42%,
+      rgba(56, 210, 240, 1) 46%,
+      rgba(56, 210, 240, 1) 64%,
+      rgba(120, 230, 255, 0.12) 72%,
+      rgba(200, 250, 255, 0.98) 76%,
+      rgba(200, 250, 255, 0.98) 100%
+    );
+    box-shadow:
+      0 0 8px rgba(80, 220, 255, 0.85),
+      0 2px 16px rgba(50, 200, 255, 0.45),
+      -4px 2px 12px rgba(60, 210, 255, 0.35);
+  }
+
+  .case-open-neon-bracket--desktop .case-open-neon-limb--right-v {
+    right: 4px;
+    width: 13px;
+  }
+  .case-open-neon-bracket--desktop .case-open-neon-limb--right-ht,
+  .case-open-neon-bracket--desktop .case-open-neon-limb--right-hb {
+    right: 4px;
+    width: 34px;
+    height: 11px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .case-open-neon-limb--left-v,
+    .case-open-neon-limb--left-ht,
+    .case-open-neon-limb--left-hb,
+    .case-open-neon-limb--right-v,
+    .case-open-neon-limb--right-ht,
+    .case-open-neon-limb--right-hb {
+      box-shadow:
+        0 0 6px rgba(255, 170, 90, 0.5),
+        0 0 10px rgba(255, 140, 55, 0.35);
+    }
+    .case-open-neon-limb--right-v,
+    .case-open-neon-limb--right-ht,
+    .case-open-neon-limb--right-hb {
+      box-shadow:
+        0 0 6px rgba(80, 220, 255, 0.5),
+        0 0 10px rgba(40, 200, 255, 0.35);
+    }
+  }
+
+  /* Маркер: свечение; пульсация только с классом --pulse */
+  .case-open-center-marker {
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.45)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+  @keyframes case-open-marker-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+      opacity: 1;
+    }
+    50% {
+      filter: drop-shadow(0 0 18px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 28px rgba(245, 158, 11, 0.35)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+      opacity: 0.95;
+    }
+  }
+  .case-open-center-marker--pulse {
+    animation: case-open-marker-pulse 1.15s ease-in-out infinite;
+  }
+  .case-open-marker-needle {
+    width: 2px;
+    height: 12px;
+    border-radius: 1px;
+    background: linear-gradient(180deg, transparent, rgba(253, 230, 138, 0.95));
+    margin-bottom: -1px;
+  }
+  @media (min-width: 1024px) {
+    .case-open-marker-needle {
+      height: 17px;
+    }
   }
 
   /* Полоска предметов при открытии кейса — снижает лаги на iPhone */
@@ -691,38 +967,27 @@ export const strikeAnimationStyles = `
     contain: layout style;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    /* Центр первого слота совпадает с центром окна: 50% минус половина ширины карточки */
-    padding-left: calc(50% - 50px);
-    padding-right: calc(50% - 50px);
+    /* Центр первого слота: 50% − половина ширины карточки (120px, ~+20% к 100px) */
+    padding-left: calc(50% - 60px);
+    padding-right: calc(50% - 60px);
   }
   @media (min-width: 640px) {
     .case-open-strip {
-      padding-left: calc(50% - 56px);
-      padding-right: calc(50% - 56px);
+      padding-left: calc(50% - 67px);
+      padding-right: calc(50% - 67px);
     }
   }
 
-  /* Горизонтальный «рельс» анимации: обводка во всю ширину, один слой тени, без градиентов/блюра */
-  .case-open-rail {
-    border-top: 2px solid rgba(251, 191, 36, 0.6);
-    border-bottom: 2px solid rgba(251, 191, 36, 0.6);
-    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.15);
-    background-color: rgba(0, 0, 0, 0.25);
+  /* Десктоп: карточки 154px — центр первого слота */
+  .case-open-strip.case-open-strip--desktop {
+    padding-left: calc(50% - 77px);
+    padding-right: calc(50% - 77px);
   }
 
   /* will-change только во время движения, чтобы не держать слой после остановки */
   .case-open-strip.case-open-strip-moving {
     will-change: transform;
     -webkit-will-change: transform;
-  }
-
-  /* Указатель центра на мобильной анимации: лёгкая пульсация */
-  @keyframes case-mobile-pointer-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.75; }
-  }
-  .case-mobile-center-pointer {
-    animation: case-mobile-pointer-pulse 1.5s ease-in-out infinite;
   }
 
   /* Оптимизация изображений */

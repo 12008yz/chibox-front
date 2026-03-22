@@ -12,7 +12,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   buyLoading,
   openLoading,
   showOpeningAnimation,
-  showDesktopInstantReveal = false,
+  casePreviewExiting = false,
   handleClose,
   handleBuyCase,
   handleOpenCase,
@@ -24,7 +24,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   onLoginRequest,
 }) => {
   const d = statusData?.data;
-  const blockFooterActions = showOpeningAnimation || showDesktopInstantReveal;
+  const blockFooterActions = showOpeningAnimation || casePreviewExiting;
 
   if (isGuest) {
     return (

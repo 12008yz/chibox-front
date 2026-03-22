@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { throttle } from 'lodash-es';
 import toast from 'react-hot-toast';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../../features/cases/casesApi';
 import { useBuySubscriptionMutation } from '../../features/subscriptions/subscriptionsApi';
@@ -65,6 +64,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
+  /** Плавное «закрытие» превью перед полноэкранной рулеткой */
+  const [casePreviewExiting, setCasePreviewExiting] = useState(false);
   const [openingResult, setOpeningResult] = useState<any>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped'>('idle');
@@ -76,9 +77,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showDropChance, setShowDropChance] = useState(false);
-  /** Десктоп (≥1024px): без прокрутки-рулетки — сразу карточка выпавшего предмета */
-  const [showDesktopInstantReveal, setShowDesktopInstantReveal] = useState(false);
-  // На мобильных: 24 предмета в анимации (полоска + результат)
+  // Предметы в горизонтальной полоске рулетки (мобилка + десктоп)
   const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
   const MOBILE_STRIP_SIZE = 24;
 
@@ -91,8 +90,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Мобильная оптимизация: позиция полоски через ref, без лишних re-render на каждый шаг
   const mobileStripRef = useRef<HTMLDivElement>(null);
   const mobileAnimationRef = useRef<{ position: number; offset: number }>({ position: 0, offset: 0 });
-  // Шаг полоски: mobile 100px+12px=112, sm 112px+12px=124 (совпадает с w-[100px]/sm:w-[112px] + gap-3)
-  const getMobileStepPx = () => (typeof window !== 'undefined' && window.innerWidth >= 640 ? 124 : 112);
+  // Шаг полоски: мобилка 100+12 / 112+12; десктоп 128+16 (gap-4)
+  /** Шаг ленты = ширина карточки + gap (см. классы case-open-strip и padding в styles). ~+20% к базовым размерам. */
+  const getStripStepPx = () => {
+    if (typeof window === 'undefined') return 134;
+    if (window.innerWidth >= 1024) return 174;
+    return window.innerWidth >= 640 ? 148 : 134;
+  };
 
   // Мобильная/планшетная версия: по умолчанию false (десктоп), чтобы при открытии с десктопа не показывалась мобильная подложка
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
@@ -120,13 +124,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     preloadItemImages(urls);
   }, [isOpen, itemsData?.data?.items]);
 
-  // Мобильная полоска: начальная позиция при старте анимации (ref может быть уже смонтирован)
+  // Полоска рулетки: сброс transform при старте (мобилка и десктоп)
   useEffect(() => {
-    if (showOpeningAnimation && isMobileOrTablet && mobileStripRef.current) {
+    if (showOpeningAnimation && mobileStripRef.current) {
       mobileStripRef.current.style.transform = 'translate3d(0,0,0)';
       mobileStripRef.current.style.webkitTransform = 'translate3d(0,0,0)';
     }
-  }, [showOpeningAnimation, isMobileOrTablet]);
+  }, [showOpeningAnimation]);
 
   // Звук взрыва на мобильной теперь в trackTimeout вместе с setShowWinEffects (как на десктопе)
   const [openCase, { isLoading: openLoading }] = useOpenCaseMutation();
@@ -172,7 +176,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setSliderOffset(0);
       setAnimationPhase('idle');
       setShowOpeningAnimation(false);
-      setShowDesktopInstantReveal(false);
+      setCasePreviewExiting(false);
       setOpeningResult(null);
       setShowStrikeThrough(false);
       setShowGoldenSparks(false);
@@ -204,7 +208,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setIsAnimating(false);
       setIsProcessing(false);
       setShowOpeningAnimation(false);
-      setShowDesktopInstantReveal(false);
+      setCasePreviewExiting(false);
       setAnimationPhase('idle');
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
       animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
@@ -284,53 +288,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
   }, []);
 
-  // Оптимизированный автоскролл с throttling (вертикальный на десктопе, горизонтальный на мобиле/планшете)
-  const scrollToItem = useCallback(
-    throttle((index: number) => {
-      if (!scrollContainerRef.current || !showOpeningAnimation || animationPhase === 'idle') return;
-
-      const container = scrollContainerRef.current;
-      const items = container.querySelectorAll('[data-item-index]');
-      const currentItem = items[index] as HTMLElement;
-
-      if (currentItem) {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-
-        animationFrameRef.current = requestAnimationFrame(() => {
-          const containerRect = container.getBoundingClientRect();
-          const itemRect = currentItem.getBoundingClientRect();
-
-          if (isMobileOrTablet) {
-            const itemLeft = itemRect.left - containerRect.left + container.scrollLeft;
-            const containerWidth = container.clientWidth;
-            const targetScrollLeft = itemLeft - (containerWidth / 2) + (itemRect.width / 2);
-            container.scrollTo({
-              left: Math.max(0, targetScrollLeft),
-              behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
-            });
-          } else {
-            const itemTop = itemRect.top - containerRect.top + container.scrollTop;
-            const containerHeight = container.clientHeight;
-            const targetScrollTop = itemTop - (containerHeight / 2) + (itemRect.height / 2);
-            container.scrollTo({
-              top: Math.max(0, targetScrollTop),
-              behavior: animationPhase === 'spinning' ? 'auto' : 'smooth'
-            });
-          }
-        });
-      }
-    }, 16),
-    [showOpeningAnimation, animationPhase, isMobileOrTablet]
-  );
-
-  // Автоскролл к выбранному элементу во время анимации (только десктоп; на мобиле используется transform)
-  useEffect(() => {
-    if (!showOpeningAnimation || animationPhase === 'idle' || isMobileOrTablet) return;
-    scrollToItem(sliderPosition);
-  }, [sliderPosition, showOpeningAnimation, animationPhase, scrollToItem, isMobileOrTablet]);
-
   // Функция для определения мобильного устройства
   const isMobileDevice = () => {
     return window.innerWidth < 768; // md breakpoint в Tailwind
@@ -403,38 +360,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setShowDropChance(false);
         setShowItemInfoModal(true);
       }, 500); // Небольшая задержка для плавности
+    } else if (onDataUpdate) {
+      onDataUpdate();
     }
 
     // Сбрасываем результат после обработки
     setOpeningResult(null);
-  }, [openingResult]);
+  }, [openingResult, onDataUpdate]);
 
-  const dismissDesktopInstantReveal = useCallback(() => {
-    setShowDesktopInstantReveal(false);
-    setOpeningResult(null);
-    if (onDataUpdate) onDataUpdate();
-  }, [onDataUpdate]);
-
-  // Горизонтальная рулетка (≤1023px): плавный translate3d по кривой как cubic-bezier(0.22, 0.2, 0.1, 0.985)
-  const startAnimation = useCallback((wonItem: any) => {
-    if (!isMobileOrTablet) return;
-
-    if (animationFrameRef.current != null) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
-    animationTimoutsRef.current = [];
-    animationIntervalsRef.current.forEach(interval => clearInterval(interval));
-    animationIntervalsRef.current = [];
-
-    const trackTimeout = (callback: () => void, delay: number) => {
-      const timeout = setTimeout(callback, delay);
-      animationTimoutsRef.current.push(timeout);
-      return timeout;
-    };
-
+  /** Ядро рулетки (после выхода с превью). */
+  const runRouletteAnimationCore = useCallback(
+    (wonItem: any, trackTimeout: (callback: () => void, delay: number) => void) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
     setShowStrikeThrough(false);
@@ -478,7 +414,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       mobileAnimationRef.current.position = position;
       mobileAnimationRef.current.offset = offset;
       if (mobileStripRef.current) {
-        const px = -(position + offset) * getMobileStepPx();
+        const px = -(position + offset) * getStripStepPx();
         mobileStripRef.current.style.transform = `translate3d(${px}px,0,0)`;
         mobileStripRef.current.style.webkitTransform = `translate3d(${px}px,0,0)`;
       }
@@ -557,7 +493,46 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         animationFrameRef.current = requestAnimationFrame(tick);
       });
     }, startDelayMs);
-  }, [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isMobileOrTablet]);
+    },
+    [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]
+  );
+
+  // Горизонтальная рулетка: плавный translate3d (мобилка и десктоп), cubic-bezier(0.22, 0.2, 0.1, 0.985)
+  const startAnimation = useCallback(
+    (wonItem: any) => {
+      if (animationFrameRef.current != null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+
+      animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      animationTimoutsRef.current = [];
+      animationIntervalsRef.current.forEach(interval => clearInterval(interval));
+      animationIntervalsRef.current = [];
+
+      const trackTimeout = (callback: () => void, delay: number) => {
+        const timeout = setTimeout(callback, delay);
+        animationTimoutsRef.current.push(timeout);
+        return timeout;
+      };
+
+      const reduceMotion =
+        typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const previewExitMs = reduceMotion ? 0 : 440;
+
+      if (previewExitMs === 0) {
+        runRouletteAnimationCore(wonItem, trackTimeout);
+        return;
+      }
+
+      setCasePreviewExiting(true);
+      trackTimeout(() => {
+        setCasePreviewExiting(false);
+        runRouletteAnimationCore(wonItem, trackTimeout);
+      }, previewExitMs);
+    },
+    [runRouletteAnimationCore]
+  );
 
   const handleShowAuth = useCallback(() => {
     onClose();
@@ -569,7 +544,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || showDesktopInstantReveal) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting) {
       return;
     }
 
@@ -580,11 +555,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const result = await onBuyAndOpenCase(caseData);
         if (result && result.item) {
           setOpeningResult(result);
-          if (isMobileOrTablet) {
-            startAnimation(result.item);
-          } else {
-            setShowDesktopInstantReveal(true);
-          }
+          startAnimation(result.item);
         }
         return;
       }
@@ -638,7 +609,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || showDesktopInstantReveal) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting) {
       return;
     }
 
@@ -664,11 +635,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
       if (result.success && result.data?.item) {
         setOpeningResult(result.data);
-        if (isMobileOrTablet) {
-          startAnimation(result.data.item);
-        } else {
-          setShowDesktopInstantReveal(true);
-        }
+        startAnimation(result.data.item);
       }
     } catch (error: any) {
       const openMsg = getApiErrorMessage(error, 'Произошла ошибка при открытии кейса');
@@ -714,84 +681,129 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     ? getCaseImageUrl(caseData.image_url)
     : getDefaultCaseImage(caseData.name);
 
-  // На мобильных во время анимации: полоска из 24 предметов (или всех, если меньше)
+  // Полоска рулетки: до 24×3 слотов; вне анимации — запас из содержимого кейса
   const itemsForMobileStrip = mobileAnimationItems.length > 0 ? mobileAnimationItems : itemsWithAdjustedChances;
   const wonItem = openingResult?.item;
-  const showMobileWinReveal = showOpeningAnimation && isMobileOrTablet && animationPhase === 'stopped' && wonItem;
+  const caseStripActive = showOpeningAnimation && itemsForMobileStrip.length > 0;
+  const showStripWinReveal = showOpeningAnimation && animationPhase === 'stopped' && wonItem;
 
-  const mobileScrollOnlyContent = showOpeningAnimation && isMobileOrTablet && itemsForMobileStrip.length > 0 && (
-    <div className={`w-full h-full flex flex-col ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
-      <div className="relative w-full h-full flex items-center min-h-0">
-        <div
-          className="flex-1 min-h-0 overflow-hidden flex items-center relative case-open-viewport-fade"
-          style={{ contain: 'layout paint' }}
-        >
-          <div
-            ref={mobileStripRef}
-            className={`flex flex-nowrap items-center gap-3 py-4 case-open-strip ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
-          >
-            {itemsForMobileStrip.map((item: any, index: number) => (
-              <div
-                key={`strip-${index}-${item.id}`}
-                className="flex-shrink-0 w-[100px] h-[100px] sm:w-[112px] sm:h-[112px] flex items-center justify-center overflow-hidden"
-                data-item-index={index}
-              >
-                <CaseItem
-                  item={item}
-                  index={index}
-                  animationIndex={index}
-                  showOpeningAnimation={showOpeningAnimation}
-                  sliderPosition={animationPhase === 'stopped' ? sliderPosition : -1}
-                  sliderOffset={sliderOffset}
-                  openingResult={openingResult}
-                  animationPhase={animationPhase}
-                  caseData={caseData}
-                  showStrikeThrough={showStrikeThrough}
-                  showGoldenSparks={showGoldenSparks}
-                  showWinEffects={showWinEffects}
-                  getRarityColor={getRarityColor}
-                  generateGoldenSparks={generateGoldenSparks}
-                  t={t}
-                  onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                  suppressBetweenHighlight={true}
-                />
-              </div>
-            ))}
-          </div>
+  const showStripCenterMarker = animationPhase !== 'stopped' && animationPhase !== 'idle';
+  const stripMarkerPulse = animationPhase === 'slowing';
 
-          {/* Указатель центра: только стрелка вниз на линии, без рамки */}
-          {animationPhase !== 'stopped' && animationPhase !== 'idle' && (
+  const renderCaseOpenStrip = (layoutDesktop: boolean) =>
+    caseStripActive ? (
+      <div className={`w-full h-full flex flex-col min-h-0 ${animationPhase === 'speeding-up' ? 'spinning-container' : ''}`}>
+        <div className="relative w-full flex-1 flex min-h-[192px] md:min-h-[216px] items-center">
+          <div className="absolute inset-0 case-open-viewport-overlay" aria-hidden />
+
+          <div className="relative z-[8] flex-1 min-h-0 overflow-hidden flex items-center">
             <div
-              className="absolute left-1/2 top-0 -translate-x-1/2 z-10 pointer-events-none case-mobile-center-pointer"
+              className={`case-open-neon-bracket case-open-neon-bracket--left ${layoutDesktop ? 'case-open-neon-bracket--desktop' : ''}`}
               aria-hidden
             >
-              <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-amber-400/90" />
+              <span className="case-open-neon-limb case-open-neon-limb--left-v" />
+              <span className="case-open-neon-limb case-open-neon-limb--left-ht" />
+              <span className="case-open-neon-limb case-open-neon-limb--left-hb" />
+            </div>
+            <div
+              className={`case-open-neon-bracket case-open-neon-bracket--right ${layoutDesktop ? 'case-open-neon-bracket--desktop' : ''}`}
+              aria-hidden
+            >
+              <span className="case-open-neon-limb case-open-neon-limb--right-v" />
+              <span className="case-open-neon-limb case-open-neon-limb--right-ht" />
+              <span className="case-open-neon-limb case-open-neon-limb--right-hb" />
+            </div>
+
+            <div
+              className="relative z-[1] flex-1 min-h-0 overflow-hidden flex items-center case-open-viewport-fade"
+              style={{ contain: 'layout paint' }}
+            >
+              <div
+                ref={mobileStripRef}
+                className={`flex flex-nowrap items-center case-open-strip ${layoutDesktop ? 'case-open-strip--desktop gap-5 py-5 md:py-6' : 'gap-3.5 py-3.5 sm:py-5'} ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
+              >
+                {itemsForMobileStrip.map((item: any, index: number) => (
+                  <div
+                    key={`strip-${index}-${item.id}`}
+                    className={
+                      layoutDesktop
+                        ? 'flex-shrink-0 w-[154px] h-[154px] flex items-center justify-center overflow-hidden'
+                        : 'flex-shrink-0 w-[120px] h-[120px] sm:w-[134px] sm:h-[134px] flex items-center justify-center overflow-hidden'
+                    }
+                    data-item-index={index}
+                  >
+                    <CaseItem
+                      item={item}
+                      index={index}
+                      animationIndex={index}
+                      showOpeningAnimation={showOpeningAnimation}
+                      sliderPosition={animationPhase === 'stopped' ? sliderPosition : -1}
+                      sliderOffset={sliderOffset}
+                      openingResult={openingResult}
+                      animationPhase={animationPhase}
+                      caseData={caseData}
+                      showStrikeThrough={showStrikeThrough}
+                      showGoldenSparks={showGoldenSparks}
+                      showWinEffects={showWinEffects}
+                      getRarityColor={getRarityColor}
+                      generateGoldenSparks={generateGoldenSparks}
+                      t={t}
+                      onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                      suppressBetweenHighlight={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {showStripCenterMarker && (
+              <div
+                className={`absolute left-1/2 top-0 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none case-open-center-marker ${stripMarkerPulse ? 'case-open-center-marker--pulse' : ''}`}
+                aria-hidden
+              >
+                <div className="case-open-marker-needle" />
+                <div
+                  className={
+                    layoutDesktop
+                      ? 'w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[14px] border-t-amber-300'
+                      : 'w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-amber-300'
+                  }
+                />
+              </div>
+            )}
+          </div>
+
+          {showStripWinReveal && (
+            <div
+              className={`absolute left-1/2 top-1/2 z-20 mobile-win-reveal pointer-events-none ${layoutDesktop ? 'w-[288px]' : 'w-[216px] sm:w-[240px]'}`}
+            >
+              <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${layoutDesktop ? 'p-4' : ''} ${getRarityColor(wonItem.rarity)}`}>
+                <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+                  <img
+                    loading="lazy"
+                    src={
+                      adaptImageSize(getItemImageUrl(wonItem.image_url, wonItem.name)) ||
+                      getItemImageUrl(wonItem.image_url, wonItem.name)
+                    }
+                    alt={wonItem.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <p
+                  className={`text-white font-semibold text-center line-clamp-2 mb-1 ${layoutDesktop ? 'text-sm' : 'text-xs sm:text-sm'}`}
+                  title={wonItem.name}
+                >
+                  {wonItem.name}
+                </p>
+                <p className={`text-green-400 font-bold text-center ${layoutDesktop ? 'text-sm' : 'text-xs'}`}>
+                  {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
+                </p>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Мобильный показ выигрыша: карточка по центру с плавным появлением */}
-        {showMobileWinReveal && (
-          <div className="absolute left-1/2 top-1/2 z-20 mobile-win-reveal w-[180px] sm:w-[200px] pointer-events-none">
-            <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${getRarityColor(wonItem.rarity)}`}>
-              <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
-                <img loading="lazy" src={adaptImageSize(getItemImageUrl(wonItem.image_url, wonItem.name)) || getItemImageUrl(wonItem.image_url, wonItem.name)}
-                  alt={wonItem.name}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <p className="text-white font-semibold text-xs sm:text-sm text-center line-clamp-2 mb-1" title={wonItem.name}>
-                {wonItem.name}
-              </p>
-              <p className="text-green-400 text-xs font-bold text-center">
-                {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
-  );
+    ) : null;
 
   // Обёртка с явным viewport: избегаем бага, когда подложка рисуется «в полэкрана» из-за body position:fixed
   const viewportWrapperStyle: React.CSSProperties = {
@@ -810,23 +822,32 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const modalContent = (
     <div
       style={viewportWrapperStyle}
-      className="flex items-center justify-center min-h-[100dvh] bg-black/60"
-      onClick={handleClose}
+      className={`flex items-center justify-center min-h-[100dvh] transition-[background-color] duration-500 ease-out ${
+        caseStripActive ? 'bg-black/92' : casePreviewExiting ? 'bg-black/80' : 'bg-black/60'
+      }`}
+      onClick={caseStripActive || casePreviewExiting ? undefined : handleClose}
     >
-      {/* Мобильные: во время анимации — тёмный фон, затем показ выигрыша. */}
-      {showOpeningAnimation && isMobileOrTablet && mobileScrollOnlyContent ? (
-        <div className="absolute inset-0 flex items-center justify-center w-full h-full bg-black/80">
-          <div className="absolute inset-0 w-full h-full flex items-center justify-center px-0">
-            <div className="w-full case-open-rail min-h-[180px] sm:min-h-[200px] flex items-center justify-center">
-              {mobileScrollOnlyContent}
-            </div>
+      {/* Анимация открытия: только рулетка на весь экран — без шапки, футера и рамки */}
+      {caseStripActive ? (
+        <div
+          className="case-open-roulette-layer absolute inset-0 flex items-center justify-center w-full h-full"
+          onClick={handleClose}
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-[100vw] flex items-center justify-center px-1 sm:px-3 md:px-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderCaseOpenStrip(!isMobileOrTablet)}
           </div>
         </div>
       ) : (
         <div
-          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 h-[90dvh] max-h-[90dvh] overflow-hidden shadow-2xl flex flex-col transition-all duration-300 ${
-            isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'
-          } ${showWinEffects ? 'win-shake' : ''}`}
+          className={`bg-[#1a1629] rounded-lg max-w-6xl w-[95%] sm:w-full mx-4 h-[90dvh] max-h-[90dvh] overflow-hidden shadow-2xl flex flex-col ${
+            casePreviewExiting
+              ? 'pointer-events-none opacity-0 scale-[0.93] translate-y-3 blur-md transition-all duration-[440ms] ease-[cubic-bezier(0.4,0,0.2,1)]'
+              : `transition-all duration-300 ${isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`
+          } ${showWinEffects && !casePreviewExiting ? 'win-shake' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
               <ModalHeader
@@ -952,79 +973,33 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                   </div>
                 </div>
             ) : (
-              /* Десктоп: вертикальный скролл и сетка */
-              <div className="flex-1 min-h-0 relative flex flex-col">
-                {showDesktopInstantReveal && openingResult?.item && (
-                  <div
-                    className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 px-4 py-6"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="desktop-case-reveal-title"
-                  >
-                    <div
-                      className={`w-full max-w-[280px] sm:max-w-sm rounded-xl border-2 p-4 sm:p-5 bg-gray-900/95 shadow-2xl ${getRarityColor(openingResult.item.rarity)}`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <h2
-                        id="desktop-case-reveal-title"
-                        className="text-white font-bold text-center text-sm sm:text-base mb-3"
-                      >
-                        {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
-                      </h2>
-                      <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-3 flex items-center justify-center">
-                        <img
-                          loading="lazy"
-                          src={
-                            adaptImageSize(getItemImageUrl(openingResult.item.image_url, openingResult.item.name)) ||
-                            getItemImageUrl(openingResult.item.image_url, openingResult.item.name)
-                          }
-                          alt={openingResult.item.name}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <p
-                        className="text-white font-semibold text-sm text-center line-clamp-3 mb-4"
-                        title={openingResult.item.name}
-                      >
-                        {openingResult.item.name}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={dismissDesktopInstantReveal}
-                        className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-sm transition-all"
-                      >
-                        {t('case_preview_modal.close')}
-                      </button>
-                    </div>
-                  </div>
-                )}
-                <div
-                  ref={scrollContainerRef}
-                  className={`flex-1 min-h-0 p-6 overflow-y-auto smooth-scroll scrollbar-hide`}
-                >
-                  <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
-                    {itemsWithAdjustedChances.map((item: any, index: number) => (
-                      <CaseItem
-                        key={item.id || index}
-                        item={item}
-                        index={index}
-                        animationIndex={index}
-                        showOpeningAnimation={showOpeningAnimation}
-                        sliderPosition={sliderPosition}
-                        sliderOffset={sliderOffset}
-                        openingResult={openingResult}
-                        animationPhase={animationPhase}
-                        caseData={caseData}
-                        showStrikeThrough={showStrikeThrough}
-                        showGoldenSparks={showGoldenSparks}
-                        showWinEffects={showWinEffects}
-                        getRarityColor={getRarityColor}
-                        generateGoldenSparks={generateGoldenSparks}
-                        t={t}
-                        onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                      />
-                    ))}
-                  </div>
+              /* Десктоп: сетка (рулетка — отдельный полноэкранный слой выше) */
+              <div
+                ref={scrollContainerRef}
+                className="flex-1 min-h-0 p-6 overflow-y-auto smooth-scroll scrollbar-hide flex flex-col"
+              >
+                <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
+                  {itemsWithAdjustedChances.map((item: any, index: number) => (
+                    <CaseItem
+                      key={item.id || index}
+                      item={item}
+                      index={index}
+                      animationIndex={index}
+                      showOpeningAnimation={false}
+                      sliderPosition={0}
+                      sliderOffset={0}
+                      openingResult={null}
+                      animationPhase="idle"
+                      caseData={caseData}
+                      showStrikeThrough={false}
+                      showGoldenSparks={false}
+                      showWinEffects={false}
+                      getRarityColor={getRarityColor}
+                      generateGoldenSparks={generateGoldenSparks}
+                      t={t}
+                      onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                    />
+                  ))}
                 </div>
               </div>
             )
@@ -1045,7 +1020,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           buyLoading={buyLoading}
           openLoading={openLoading}
           showOpeningAnimation={showOpeningAnimation}
-          showDesktopInstantReveal={showDesktopInstantReveal}
+          casePreviewExiting={casePreviewExiting}
           handleClose={handleClose}
           handleBuyCase={handleBuyCase}
           handleOpenCase={handleOpenCase}
