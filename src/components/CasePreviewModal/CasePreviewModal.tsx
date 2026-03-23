@@ -17,6 +17,7 @@ import { injectStyles } from './styles';
 import { getCaseImageUrl, getItemImageUrl, adaptImageSize, preloadItemImages, preloadItemImagesAndWait } from '../../utils/steamImageUtils';
 import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
+import { rouletteAudio } from '../../utils/rouletteAudio';
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
 
@@ -223,6 +224,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowOpeningAnimation(false);
       setCasePreviewExiting(false);
       setAnimationPhase('idle');
+      rouletteAudio.stopAll();
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
       animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
       animationTimoutsRef.current = [];
@@ -286,6 +288,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         window.scrollTo(0, scrollLockRef.current);
         scrollLockRef.current = null;
       }
+      rouletteAudio.stopAll();
       soundManager.stopAll(); // Останавливаем все звуки при размонтировании
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
@@ -317,6 +320,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   const handleClose = () => {
     // Останавливаем все звуки при закрытии
+    rouletteAudio.stopAll();
     soundManager.stopAll();
     setIsAnimating(false);
     setTimeout(() => {
@@ -356,6 +360,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       await Promise.all([
         preloadItemImagesAndWait(imageUrls, 7000),
         soundManager.waitForSounds(['openCase', 'process', 'endProcess'], 1800),
+        rouletteAudio.preload(),
       ]);
     } finally {
       setIsPreparingAssets(false);
@@ -378,6 +383,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setMobileAnimationItems([]);
 
     // Останавливаем все звуки
+    rouletteAudio.stopAll();
     soundManager.stopAll();
 
     if (animationTimeoutRef.current) {
@@ -445,7 +451,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const useLoopedProcessSound = isIPhone && !reduceMotion;
+    const useWebAudioForIPhone = isIPhone && !reduceMotion;
     const durationMs = reduceMotion
       ? Math.min(900, 400 + targetSlotIndex * 28)
       : isIPhone
@@ -458,7 +464,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const SOUND_MIN_MS = isIPhone ? 72 : 38;
 
     const finishSpin = () => {
-      if (useLoopedProcessSound) {
+      if (useWebAudioForIPhone) {
+        rouletteAudio.stopLoop();
+      } else {
         soundManager.stop('process');
       }
       const el = mobileStripRef.current;
@@ -469,7 +477,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setSliderPosition(targetSlotIndex);
       setAnimationPhase('stopped');
       trackTimeout(() => {
-        soundManager.play('endProcess');
+        if (useWebAudioForIPhone) {
+          rouletteAudio.playEnd();
+        } else {
+          soundManager.play('endProcess');
+        }
         setShowWinEffects(true);
       }, 300);
       trackTimeout(() => setShowGoldenSparks(true), 800);
@@ -482,9 +494,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
 
     trackTimeout(() => {
-      if (useLoopedProcessSound) {
-        // На iPhone вместо частых коротких play() используем один loop, чтобы не лагал аудиопоток.
-        soundManager.play('process', true, true);
+      if (useWebAudioForIPhone) {
+        rouletteAudio.startProcessLoop();
       }
       if (mobileStripRef.current) {
         mobileStripRef.current.style.transition = 'none';
@@ -508,7 +519,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
         if (slot > lastTickSlot) {
           lastTickSlot = slot;
-          if (!useLoopedProcessSound && now - lastSoundAt >= SOUND_MIN_MS) {
+          if (!useWebAudioForIPhone && now - lastSoundAt >= SOUND_MIN_MS) {
             soundManager.play('process', false, true);
             lastSoundAt = now;
           }
@@ -664,7 +675,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       // Звук открытия кейса (не для ежедневного кейса)
       const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444" || "11111111-1111-1111-1111-111111111111" || "22222222-2222-2222-2222-222222222222" || "33333333-3333-3333-3333-333333333333" || "55555555-5555-5555-5555-555555555555" || "66666666-6666-6666-6666-666666666666" || "77777777-7777-7777-7777-777777777777";
       if (!isDailyCase) {
-        soundManager.play('openCase');
+        if (isIPhone) {
+          rouletteAudio.playOpenCase();
+        } else {
+          soundManager.play('openCase');
+        }
       }
 
       const result = await openCase(openCaseParams).unwrap();
