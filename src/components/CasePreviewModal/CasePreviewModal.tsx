@@ -7,6 +7,7 @@ import { useBuySubscriptionMutation } from '../../features/subscriptions/subscri
 import { CaseTemplate } from '../../types/api';
 import { useUserData } from '../../hooks/useUserData';
 import { CaseItem } from './components/CaseItem';
+import { StaticCaseItem } from './components/StaticCaseItem';
 import { ModalHeader } from './components/ModalHeader';
 import { ModalFooter } from './components/ModalFooter';
 import ItemInfoModal from './components/ItemInfoModal';
@@ -79,7 +80,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showDropChance, setShowDropChance] = useState(false);
   // Предметы в горизонтальной полоске рулетки (мобилка + десктоп)
   const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
-  const MOBILE_STRIP_SIZE = 24;
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,12 +100,24 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Мобильная/планшетная версия: по умолчанию false (десктоп), чтобы при открытии с десктопа не показывалась мобильная подложка
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+  const [isIPhone, setIsIPhone] = useState(false);
   useEffect(() => {
     const media = window.matchMedia('(max-width: 1023px)');
     const check = () => setIsMobileOrTablet(media.matches);
     check(); // сразу при монтировании
     media.addEventListener('change', check);
     return () => media.removeEventListener('change', check);
+  }, []);
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const ua = navigator.userAgent || '';
+    const platform = (navigator as any).platform || '';
+    const touchPoints = (navigator as any).maxTouchPoints || 0;
+    const isIOSDevice =
+      /iPhone|iPod/i.test(ua) ||
+      /iPad/i.test(ua) ||
+      (platform === 'MacIntel' && touchPoints > 1);
+    setIsIPhone(isIOSDevice);
   }, []);
 
   const { data: itemsData, isLoading, error } = useGetCaseItemsQuery(caseData.id, { skip: !isOpen });
@@ -387,15 +399,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
 
-    if (baseStrip.length > MOBILE_STRIP_SIZE) {
-      const others = baseStrip.filter(item => item.id !== wonItem.id);
-      const shuffled = [...others].sort(() => Math.random() - 0.5);
-      const rest = shuffled.slice(0, MOBILE_STRIP_SIZE - 1);
-      const insertAt = Math.floor(Math.random() * MOBILE_STRIP_SIZE);
-      baseStrip = [...rest.slice(0, insertAt), wonItem, ...rest.slice(insertAt)];
-      wonItemIndex = insertAt;
-    }
-
     const L = baseStrip.length;
     if (L === 0) {
       setAnimationPhase('stopped');
@@ -422,12 +425,16 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const durationMs = reduceMotion ? Math.min(900, 400 + targetSlotIndex * 28) : 5200 + Math.random() * 800;
+    const durationMs = reduceMotion
+      ? Math.min(900, 400 + targetSlotIndex * 28)
+      : isIPhone
+        ? 3600 + Math.random() * 500
+        : 5200 + Math.random() * 800;
     const startDelayMs = reduceMotion ? 120 : 380;
     let lastTickSlot = -1;
     let slowdownPhaseSet = false;
     let lastSoundAt = 0;
-    const SOUND_MIN_MS = 38;
+    const SOUND_MIN_MS = isIPhone ? 72 : 38;
 
     const finishSpin = () => {
       const el = mobileStripRef.current;
@@ -494,7 +501,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       });
     }, startDelayMs);
     },
-    [itemsWithAdjustedChances, caseData.id, handleAnimationComplete]
+    [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isIPhone]
   );
 
   // Горизонтальная рулетка: плавный translate3d (мобилка и десктоп), cubic-bezier(0.22, 0.2, 0.1, 0.985)
@@ -732,25 +739,33 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     }
                     data-item-index={index}
                   >
-                    <CaseItem
-                      item={item}
-                      index={index}
-                      animationIndex={index}
-                      showOpeningAnimation={showOpeningAnimation}
-                      sliderPosition={animationPhase === 'stopped' ? sliderPosition : -1}
-                      sliderOffset={sliderOffset}
-                      openingResult={openingResult}
-                      animationPhase={animationPhase}
-                      caseData={caseData}
-                      showStrikeThrough={showStrikeThrough}
-                      showGoldenSparks={showGoldenSparks}
-                      showWinEffects={showWinEffects}
-                      getRarityColor={getRarityColor}
-                      generateGoldenSparks={generateGoldenSparks}
-                      t={t}
-                      onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
-                      suppressBetweenHighlight={true}
-                    />
+                    {isIPhone && animationPhase !== 'stopped' ? (
+                      <StaticCaseItem
+                        item={item}
+                        getRarityColor={getRarityColor}
+                        t={t}
+                      />
+                    ) : (
+                      <CaseItem
+                        item={item}
+                        index={index}
+                        animationIndex={index}
+                        showOpeningAnimation={showOpeningAnimation}
+                        sliderPosition={animationPhase === 'stopped' ? sliderPosition : -1}
+                        sliderOffset={sliderOffset}
+                        openingResult={openingResult}
+                        animationPhase={animationPhase}
+                        caseData={caseData}
+                        showStrikeThrough={showStrikeThrough}
+                        showGoldenSparks={showGoldenSparks}
+                        showWinEffects={showWinEffects}
+                        getRarityColor={getRarityColor}
+                        generateGoldenSparks={generateGoldenSparks}
+                        t={t}
+                        onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
+                        suppressBetweenHighlight={true}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
