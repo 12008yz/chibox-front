@@ -9,6 +9,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   userData,
   caseData,
   isProcessing,
+  isPreparingAssets = false,
   buyLoading,
   openLoading,
   showOpeningAnimation,
@@ -25,6 +26,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
 }) => {
   const d = statusData?.data;
   const blockFooterActions = showOpeningAnimation || casePreviewExiting;
+  const isBusy = isProcessing || buyLoading || openLoading || isPreparingAssets;
 
   if (isGuest) {
     return (
@@ -104,7 +106,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
         <button
           onClick={handleClose}
           className="w-full sm:w-auto px-3 py-1.5 sm:px-6 text-sm sm:text-base bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors duration-200"
-          disabled={isProcessing || blockFooterActions}
+          disabled={isBusy || blockFooterActions}
         >
           {t('case_preview_modal.close')}
         </button>
@@ -129,7 +131,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
             {(() => {
               const price = getCasePrice(caseData);
               const hasEnoughBalance = (userData?.balance || 0) >= price;
-              const isDisabled = isProcessing || buyLoading || openLoading || blockFooterActions || !hasEnoughBalance;
+              const isDisabled = isBusy || blockFooterActions || !hasEnoughBalance;
 
               return (
                 <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -142,10 +144,10 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                         : 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
                     } w-full sm:w-auto`}
                   >
-                    {isProcessing || buyLoading || openLoading ? (
+                    {isBusy ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>{t('case_preview_modal.opening')}</span>
+                        <span>{isPreparingAssets ? t('common.loading', { defaultValue: 'Загрузка...' }) : t('case_preview_modal.opening')}</span>
                       </>
                     ) : !hasEnoughBalance ? (
                       <>
@@ -173,7 +175,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                 {statusData.data.canBuy && statusData.data.price > 0 && (() => {
                   const price = statusData.data.price;
                   const hasEnoughBalance = (userData?.balance || 0) >= price;
-                  const isDisabled = isProcessing || buyLoading || openLoading || blockFooterActions || !hasEnoughBalance;
+                  const isDisabled = isBusy || blockFooterActions || !hasEnoughBalance;
 
                   return (
                     <div className="flex flex-col gap-2 w-full sm:w-auto">
@@ -186,10 +188,10 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                             : 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
                         }`}
                       >
-                        {isProcessing || buyLoading ? (
+                        {isBusy ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>{t('case_preview_modal.buying')}</span>
+                            <span>{isPreparingAssets ? t('common.loading', { defaultValue: 'Загрузка...' }) : t('case_preview_modal.buying')}</span>
                           </>
                         ) : !hasEnoughBalance ? (
                           <>
@@ -210,13 +212,13 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
                 {statusData.data.canOpen && (
                   <button
                     onClick={() => handleOpenCase()}
-                    disabled={isProcessing || buyLoading || openLoading || blockFooterActions}
+                    disabled={isBusy || blockFooterActions}
                     className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
                   >
-                    {isProcessing || openLoading ? (
+                    {isBusy ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>{t('case_preview_modal.opening')}</span>
+                        <span>{isPreparingAssets ? t('common.loading', { defaultValue: 'Загрузка...' }) : t('case_preview_modal.opening')}</span>
                       </>
                     ) : (
                       <span>{t('case_preview_modal.open_case')}</span>
@@ -228,13 +230,13 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
               // Показываем кнопку по умолчанию, если статус не загружен
               <button
                 onClick={handleBuyCase}
-                disabled={buyLoading || openLoading || blockFooterActions}
+                disabled={isBusy || blockFooterActions}
                   className="w-full sm:w-auto px-3 sm:px-5 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center sm:justify-start space-x-1 whitespace-nowrap"
               >
-                {isProcessing || buyLoading || openLoading ? (
+                {isBusy ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{t('case_preview_modal.opening')}</span>
+                    <span>{isPreparingAssets ? t('common.loading', { defaultValue: 'Загрузка...' }) : t('case_preview_modal.opening')}</span>
                   </>
                 ) : (
                   <>

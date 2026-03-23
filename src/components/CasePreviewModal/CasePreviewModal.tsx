@@ -14,7 +14,7 @@ import ItemInfoModal from './components/ItemInfoModal';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
-import { getCaseImageUrl, getItemImageUrl, adaptImageSize, preloadItemImages } from '../../utils/steamImageUtils';
+import { getCaseImageUrl, getItemImageUrl, adaptImageSize, preloadItemImages, preloadItemImagesAndWait } from '../../utils/steamImageUtils';
 import { getApiErrorMessage } from '../../utils/config';
 import { soundManager } from '../../utils/soundManager';
 import { useAppDispatch } from '../../store/hooks';
@@ -78,6 +78,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showDropChance, setShowDropChance] = useState(false);
+  const [isPreparingAssets, setIsPreparingAssets] = useState(false);
   // Предметы в горизонтальной полоске рулетки (мобилка + десктоп)
   const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
 
@@ -342,6 +343,25 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }));
   }, [itemsData?.data?.items, caseData.id]);
 
+  const prepareIPhoneAssetsBeforeAnimation = useCallback(async (wonItem: any) => {
+    if (!isIPhone || !isMobileOrTablet) return;
+
+    const baseStrip = itemsWithAdjustedChances.filter(item => !item.isExcluded);
+    const stripUrls = baseStrip.map((item) => getItemImageUrl(item.image_url, item.name));
+    const wonUrl = wonItem ? getItemImageUrl(wonItem.image_url, wonItem.name) : null;
+    const imageUrls = wonUrl ? [...stripUrls, wonUrl] : stripUrls;
+
+    setIsPreparingAssets(true);
+    try {
+      await Promise.all([
+        preloadItemImagesAndWait(imageUrls, 2600),
+        soundManager.waitForSounds(['openCase', 'process', 'endProcess'], 1800),
+      ]);
+    } finally {
+      setIsPreparingAssets(false);
+    }
+  }, [isIPhone, isMobileOrTablet, itemsWithAdjustedChances]);
+
   const handleAnimationComplete = useCallback(() => {
     // Сохраняем результат открытия перед сбросом
     const wonItem = openingResult?.item;
@@ -551,7 +571,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting || isPreparingAssets) {
       return;
     }
 
@@ -561,6 +581,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (onBuyAndOpenCase) {
         const result = await onBuyAndOpenCase(caseData);
         if (result && result.item) {
+          await prepareIPhoneAssetsBeforeAnimation(result.item);
           setOpeningResult(result);
           startAnimation(result.item);
         }
@@ -616,7 +637,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       handleShowAuth();
       return;
     }
-    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting) {
+    if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting || isPreparingAssets) {
       return;
     }
 
@@ -641,6 +662,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       const result = await openCase(openCaseParams).unwrap();
 
       if (result.success && result.data?.item) {
+        await prepareIPhoneAssetsBeforeAnimation(result.data.item);
         setOpeningResult(result.data);
         startAnimation(result.data.item);
       }
@@ -1032,6 +1054,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           userData={userData}
           caseData={caseData}
           isProcessing={isProcessing}
+          isPreparingAssets={isPreparingAssets}
           buyLoading={buyLoading}
           openLoading={openLoading}
           showOpeningAnimation={showOpeningAnimation}

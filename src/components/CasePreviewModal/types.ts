@@ -62,6 +62,7 @@ export interface ModalFooterProps {
   userData: any;
   caseData: CaseTemplate;
   isProcessing: boolean;
+  isPreparingAssets?: boolean;
   buyLoading: boolean;
   openLoading: boolean;
   showOpeningAnimation: boolean;

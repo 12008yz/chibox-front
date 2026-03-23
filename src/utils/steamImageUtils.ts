@@ -183,6 +183,45 @@ export function preloadItemImages(urls: (string | null | undefined)[]): void {
   });
 }
 
+/**
+ * Предзагрузка изображений с ожиданием завершения (или таймаута).
+ * Нужна для iPhone, чтобы перед стартом анимации ассеты уже были в кэше.
+ */
+export async function preloadItemImagesAndWait(
+  urls: (string | null | undefined)[],
+  timeoutMs: number = 2500
+): Promise<void> {
+  const unique = Array.from(new Set(urls.filter((u): u is string => !!u)));
+  if (unique.length === 0) return;
+
+  const loadPromises = unique.map((src) => {
+    const adapted = adaptImageSize(src) ?? src;
+    return new Promise<void>((resolve) => {
+      const img = new Image();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        resolve();
+      };
+
+      img.onload = finish;
+      img.onerror = finish;
+      img.src = adapted;
+
+      // decode может ускорить рендер первого кадра там, где поддерживается
+      if (typeof img.decode === 'function') {
+        img.decode().then(finish).catch(finish);
+      }
+    });
+  });
+
+  await Promise.race([
+    Promise.allSettled(loadPromises).then(() => undefined),
+    new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
+}
+
 // Функция для получения дефолтного изображения предмета
 export function getDefaultItemImage(itemName?: string): string {
   // Дефолтные изображения предметов CS2

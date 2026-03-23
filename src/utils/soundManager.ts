@@ -274,6 +274,37 @@ class SoundManager {
     const sound = this.sounds.get(soundKey);
     return sound ? sound.readyState >= 3 : false;
   }
+
+  // Ожидание предзагрузки конкретных звуков (или таймаута)
+  waitForSounds(soundKeys: string[], timeoutMs: number = 1800): Promise<void> {
+    const pending = soundKeys
+      .map((key) => this.sounds.get(key))
+      .filter((audio): audio is HTMLAudioElement => !!audio)
+      .filter((audio) => audio.readyState < 3);
+
+    if (pending.length === 0) {
+      return Promise.resolve();
+    }
+
+    const waitForOne = (audio: HTMLAudioElement) =>
+      new Promise<void>((resolve) => {
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          audio.removeEventListener('canplaythrough', finish);
+          audio.removeEventListener('error', finish);
+          resolve();
+        };
+        audio.addEventListener('canplaythrough', finish, { once: true });
+        audio.addEventListener('error', finish, { once: true });
+      });
+
+    return Promise.race([
+      Promise.allSettled(pending.map(waitForOne)).then(() => undefined),
+      new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
+  }
 }
 
 // Создаем единственный экземпляр
