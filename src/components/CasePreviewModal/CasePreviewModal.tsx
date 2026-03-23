@@ -354,7 +354,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setIsPreparingAssets(true);
     try {
       await Promise.all([
-        preloadItemImagesAndWait(imageUrls, 2600),
+        preloadItemImagesAndWait(imageUrls, 7000),
         soundManager.waitForSounds(['openCase', 'process', 'endProcess'], 1800),
       ]);
     } finally {

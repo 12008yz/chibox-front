@@ -1,20 +1,19 @@
 import { memo, useState, useMemo } from 'react';
 import Monetary from '../../Monetary';
 import { StaticCaseItemProps } from '../types';
-import { adaptImageSize } from '../../../utils/steamImageUtils';
+import { adaptImageSize, isImagePreloaded } from '../../../utils/steamImageUtils';
 
 export const StaticCaseItem = memo(({
   item,
   getRarityColor,
   t
 }: StaticCaseItemProps) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
   // Адаптируем размер изображения под устройство
   const adaptedImageUrl = useMemo(() => {
     return adaptImageSize(item.image_url);
   }, [item.image_url]);
+  const [imageLoaded, setImageLoaded] = useState(() => isImagePreloaded(adaptedImageUrl));
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div className={`bg-gray-800 rounded-lg p-1 md:p-2 border-2 relative hover:scale-105 transition-transform duration-200 ${getRarityColor(item.rarity)} ${item.isExcluded ? 'opacity-50 grayscale' : ''}`}>
@@ -26,7 +25,9 @@ export const StaticCaseItem = memo(({
             className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             } ${item.isExcluded ? 'opacity-70' : ''}`}
-            loading="lazy"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
             style={{

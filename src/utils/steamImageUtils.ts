@@ -102,6 +102,7 @@ export function getItemImageUrl(imageUrl: string | null | undefined, fallbackNam
 
 // Версия для кэша изображений (изменяйте это число при обновлении изображений)
 const CACHE_VERSION = '2';
+const preloadedImageCache = new Set<string>();
 
 // Функция для получения изображения кейса (всегда с бэкенда)
 export function getCaseImageUrl(imageUrl: string | null | undefined): string {
@@ -179,6 +180,8 @@ export function preloadItemImages(urls: (string | null | undefined)[]): void {
   unique.forEach((src) => {
     const adapted = adaptImageSize(src) ?? src;
     const img = new Image();
+    img.onload = () => preloadedImageCache.add(adapted);
+    img.onerror = () => {};
     img.src = adapted;
   });
 }
@@ -202,6 +205,7 @@ export async function preloadItemImagesAndWait(
       const finish = () => {
         if (done) return;
         done = true;
+        preloadedImageCache.add(adapted);
         resolve();
       };
 
@@ -220,6 +224,11 @@ export async function preloadItemImagesAndWait(
     Promise.allSettled(loadPromises).then(() => undefined),
     new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
   ]);
+}
+
+export function isImagePreloaded(url: string | null | undefined): boolean {
+  if (!url) return false;
+  return preloadedImageCache.has(url);
 }
 
 // Функция для получения дефолтного изображения предмета
