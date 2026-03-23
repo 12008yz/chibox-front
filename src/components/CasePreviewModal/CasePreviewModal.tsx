@@ -445,6 +445,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const useLoopedProcessSound = isIPhone && !reduceMotion;
     const durationMs = reduceMotion
       ? Math.min(900, 400 + targetSlotIndex * 28)
       : isIPhone
@@ -457,6 +458,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const SOUND_MIN_MS = isIPhone ? 72 : 38;
 
     const finishSpin = () => {
+      if (useLoopedProcessSound) {
+        soundManager.stop('process');
+      }
       const el = mobileStripRef.current;
       if (el) {
         el.style.removeProperty('transition');
@@ -478,6 +482,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     };
 
     trackTimeout(() => {
+      if (useLoopedProcessSound) {
+        // На iPhone вместо частых коротких play() используем один loop, чтобы не лагал аудиопоток.
+        soundManager.play('process', true, true);
+      }
       if (mobileStripRef.current) {
         mobileStripRef.current.style.transition = 'none';
       }
@@ -500,7 +508,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
         if (slot > lastTickSlot) {
           lastTickSlot = slot;
-          if (now - lastSoundAt >= SOUND_MIN_MS) {
+          if (!useLoopedProcessSound && now - lastSoundAt >= SOUND_MIN_MS) {
             soundManager.play('process', false, true);
             lastSoundAt = now;
           }
