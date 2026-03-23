@@ -59,6 +59,26 @@ export const CaseItem = memo(({
 
   // Определяем, нужно ли применять GPU acceleration
   const shouldUseGPU = isCurrentSliderPosition || isWinningItemStopped;
+  const isMobileViewport = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // Фиксируем траектории частиц заранее, чтобы не пересчитывать Math.random в пиковой фазе
+  const winParticles = useMemo(() => {
+    const particleCount = isMobileViewport ? 6 : 12;
+    const particleStep = isMobileViewport ? 60 : 30;
+    const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#A78BFA', '#F472B6'];
+
+    return Array.from({ length: particleCount }).map((_, i) => {
+      const angle = (i * particleStep) * Math.PI / 180;
+      const distance = 60 + (i % 5) * 8; // детерминированно, без random-рывков в конце
+      return {
+        key: `particle-${i}`,
+        tx: Math.cos(angle) * distance,
+        ty: Math.sin(angle) * distance,
+        color: colors[i % colors.length],
+        delay: i * 0.05,
+      };
+    });
+  }, [isMobileViewport]);
 
   // Предвычисляем все классы CSS с мемоизацией
   const itemClasses = useMemo(() => {
@@ -298,19 +318,16 @@ export const CaseItem = memo(({
 
           {/* КРУТЫЕ ЭФФЕКТЫ ПОБЕДЫ (на мобильных меньше частиц для плавности) */}
           {!shouldRenderSimplified && showWinEffects && isWinningItemStopped && (() => {
-            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-            const particleCount = isMobile ? 6 : 12;
-            const particleStep = isMobile ? 60 : 30; // угол между частицами
             return (
               <>
                 {/* Расходящиеся кольца — на мобильных 2 вместо 3 */}
                 <div className="expanding-ring" />
                 <div className="expanding-ring" />
-                {!isMobile && <div className="expanding-ring" />}
+                {!isMobileViewport && <div className="expanding-ring" />}
 
                 {/* Световые лучи — на мобильных один для экономии GPU */}
                 <div className="light-ray" style={{ animationDelay: '0s' }} />
-                {!isMobile && (
+                {!isMobileViewport && (
                   <>
                     <div className="light-ray" style={{ animationDelay: '0.3s', transform: 'rotate(45deg)' }} />
                     <div className="light-ray" style={{ animationDelay: '0.6s', transform: 'rotate(90deg)' }} />
@@ -318,26 +335,19 @@ export const CaseItem = memo(({
                 )}
 
                 {/* Particle burst эффект */}
-                {Array.from({ length: particleCount }).map((_, i) => {
-                  const angle = (i * particleStep) * Math.PI / 180;
-                  const distance = 60 + Math.random() * 40;
-                  const tx = Math.cos(angle) * distance;
-                  const ty = Math.sin(angle) * distance;
-                  const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#A78BFA', '#F472B6'];
-                  const color = colors[i % colors.length];
-
+                {winParticles.map((p) => {
                   return (
                     <div
-                      key={i}
+                      key={p.key}
                       className="particle-burst"
                       style={{
-                        '--tx': `${tx}px`,
-                        '--ty': `${ty}px`,
-                        background: color,
-                        animationDelay: `${i * 0.05}s`,
+                        '--tx': `${p.tx}px`,
+                        '--ty': `${p.ty}px`,
+                        background: p.color,
+                        animationDelay: `${p.delay}s`,
                         left: '50%',
                         top: '50%',
-                        boxShadow: `0 0 10px ${color}`,
+                        boxShadow: `0 0 10px ${p.color}`,
                       } as React.CSSProperties}
                     />
                   );

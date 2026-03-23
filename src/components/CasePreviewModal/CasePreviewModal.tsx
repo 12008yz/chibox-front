@@ -459,7 +459,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         : 5200 + Math.random() * 800;
     const startDelayMs = reduceMotion ? 120 : 380;
     let lastTickSlot = -1;
-    let slowdownPhaseSet = false;
     let lastSoundAt = 0;
     const SOUND_MIN_MS = isIPhone ? 72 : 38;
 
@@ -477,14 +476,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setSliderPosition(targetSlotIndex);
       setAnimationPhase('stopped');
       trackTimeout(() => {
+        // Разносим по кадрам звук и тяжелые win-эффекты, чтобы убрать микро-рывок в конце
         if (useWebAudioForIPhone) {
           rouletteAudio.playEnd();
         } else {
           soundManager.play('endProcess');
         }
-        setShowWinEffects(true);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setShowWinEffects(true));
+        });
       }, 300);
-      trackTimeout(() => setShowGoldenSparks(true), 800);
+      trackTimeout(() => setShowGoldenSparks(true), 950);
       trackTimeout(() => {
         if (caseData.id === "44444444-4444-4444-4444-444444444444") {
           setShowStrikeThrough(true);
@@ -510,11 +512,6 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const eased = cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
         const pos = eased * targetSlotIndex;
         applyMobileStripTransformFloat(pos, 0);
-
-        if (!slowdownPhaseSet && t >= 0.72) {
-          slowdownPhaseSet = true;
-          setAnimationPhase('slowing');
-        }
 
         const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
         if (slot > lastTickSlot) {
@@ -791,6 +788,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         t={t}
                       />
                     ) : (
+                      (() => {
+                        const winningItemId = openingResult?.item?.id;
+                        const isWinningStripItem = !!winningItemId && item.id === winningItemId;
+                        return (
                       <CaseItem
                         item={item}
                         index={index}
@@ -801,15 +802,17 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         openingResult={openingResult}
                         animationPhase={animationPhase}
                         caseData={caseData}
-                        showStrikeThrough={showStrikeThrough}
-                        showGoldenSparks={showGoldenSparks}
-                        showWinEffects={showWinEffects}
+                        showStrikeThrough={isWinningStripItem ? showStrikeThrough : false}
+                        showGoldenSparks={isWinningStripItem ? showGoldenSparks : false}
+                        showWinEffects={isWinningStripItem ? showWinEffects : false}
                         getRarityColor={getRarityColor}
                         generateGoldenSparks={generateGoldenSparks}
                         t={t}
                         onItemClick={(clickedItem) => handleItemClick(clickedItem, true)}
                         suppressBetweenHighlight={true}
                       />
+                        );
+                      })()
                     )}
                   </div>
                 ))}
