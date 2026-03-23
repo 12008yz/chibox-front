@@ -779,8 +779,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     key={`strip-${index}-${item.id}`}
                     className={
                       layoutDesktop
-                        ? 'flex-shrink-0 w-[154px] h-[154px] flex items-center justify-center overflow-hidden'
-                        : 'flex-shrink-0 w-[120px] h-[120px] sm:w-[134px] sm:h-[134px] flex items-center justify-center overflow-hidden'
+                        ? 'flex-shrink-0 w-[154px] h-[154px] flex items-center justify-center overflow-visible'
+                        : 'flex-shrink-0 w-[120px] h-[120px] sm:w-[134px] sm:h-[134px] flex items-center justify-center overflow-visible'
                     }
                     data-item-index={index}
                   >

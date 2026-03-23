@@ -194,7 +194,7 @@ export const CaseItem = memo(({
         // Упрощенная версия для элементов вне области видимости
         <div className="aspect-square mb-0 md:mb-2 bg-gray-900 rounded" style={{ minHeight: '150px' }} />
       ) : (
-        <div className={`aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative overflow-hidden ${suppressBetweenHighlight ? 'w-full min-h-0' : ''}`}>
+        <div className={`aspect-square mb-0 md:mb-2 bg-gray-900 rounded flex items-center justify-center relative overflow-visible ${suppressBetweenHighlight ? 'w-full min-h-0' : ''}`}>
           {adaptedImageUrl && !imageError ? (
             // Во время анимации открытия — обычный img (картинки уже в кэше после preload), без LazyLoad, чтобы на iPhone не было пустых слотов
             showOpeningAnimation ? (
