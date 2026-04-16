@@ -75,7 +75,9 @@ const createGlobalSocket = () => {
   const serverUrl = BACKEND_URL.replace(/\/$/, '');
 
   globalSocket = io(serverUrl, {
-    transports: ['polling', 'websocket'],
+    // WebSocket first: long-polling holds extra HTTP/1.1 connections per host;
+    // Safari (esp. iOS) limits parallel connections — can starve RTK fetch to /api/v1/cases.
+    transports: ['websocket', 'polling'],
     timeout: 20000,
     forceNew: true,
     reconnectionDelay: 1000,
