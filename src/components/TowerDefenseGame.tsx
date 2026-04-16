@@ -8,6 +8,7 @@ import {
 import { soundManager } from '../utils/soundManager';
 import { X } from 'lucide-react';
 import type { UserInventoryItem } from '../types/api';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 // --- Константы карты и ассетов (логика из python-ml: 10x6, путь по середине) ---
 const TILE_SIZE = 56;
@@ -422,7 +423,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
                   }`}
                 >
                   {item.item?.image_url && (
-                    <img loading="lazy" src={item.item.image_url} alt={item.item.name} className="w-full h-20 object-contain mb-2" />
+                    <img loading="lazy" src={getItemImageUrl(item.item.image_url, item.item.name)} alt={item.item.name} className="w-full h-20 object-contain mb-2" />
                   )}
                   <p className="text-sm text-white truncate">{item.item?.name}</p>
                   <p className="text-xs text-gray-400">{parseFloat(item.item?.price || '0').toFixed(2)} ₽</p>
@@ -631,7 +632,7 @@ const TowerDefenseGame: React.FC<TowerDefenseGameProps> = ({ isOpen, onClose, on
                 <p className="text-white mb-2">Вы получили предмет-награду:</p>
                 <div className="inline-block p-4 bg-purple-900/50 rounded-lg border border-purple-600">
                   {rewardItem.image_url && (
-                    <img loading="lazy" src={rewardItem.image_url} alt={rewardItem.name} className="w-28 h-28 object-contain mx-auto mb-2" />
+                    <img loading="lazy" src={getItemImageUrl(rewardItem.image_url, rewardItem.name)} alt={rewardItem.name} className="w-28 h-28 object-contain mx-auto mb-2" />
                   )}
                   <p className="text-white font-semibold">{rewardItem.name}</p>
                   <p className="text-green-400">{parseFloat(String(rewardItem.price)).toFixed(2)} ₽</p>

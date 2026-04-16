@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { soundManager } from '../utils/soundManager';
 import { useAppSelector } from '../store/hooks';
 import { hasActiveSubscription } from '../utils/subscriptionUtils';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 import { PartyPopper, Frown, Gift, Check, X, Coins, RefreshCw, Clock, Lock, LockOpen } from 'lucide-react';
 
 interface SafeCrackerGameProps {
@@ -382,7 +383,7 @@ const SafeCrackerGame: React.FC<SafeCrackerGameProps> = ({ isOpen, onClose }) =>
 
                       {/* Предмет */}
                       <div className="relative bg-gradient-to-br from-yellow-600/90 to-orange-600/90 p-4 rounded-xl border-4 border-yellow-400 shadow-2xl">
-                        <img loading="lazy" src={wonItem.image_url}
+                        <img loading="lazy" src={getItemImageUrl(wonItem.image_url, wonItem.name)}
                           alt={wonItem.name}
                           className="w-32 h-32 sm:w-40 sm:h-40 object-contain select-none pointer-events-none"
                           draggable={false}

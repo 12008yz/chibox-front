@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LiveDropData } from '../types/socket';
 import { Flame, Star } from 'lucide-react';
+import { getPreferredAvatar } from '../utils/avatarUtils';
+import { getItemImageUrl } from '../utils/steamImageUtils';
 
 interface LiveDropItemProps {
   drop: LiveDropData;
@@ -34,9 +36,9 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
   const isHighValue = drop.item.price >= 100;
   // Fallback при 404 кастомного аватара (например после смены аватара)
   const [avatarError, setAvatarError] = useState(false);
-  const avatarSrc = drop.user.avatar && !avatarError
-    ? drop.user.avatar
-    : drop.user.steam_avatar_url || null;
+  const avatarSrc = !avatarError
+    ? getPreferredAvatar(drop.user.avatar, drop.user.steam_avatar_url, String(drop.user.id))
+    : null;
 
   return (
     <Link
@@ -128,7 +130,7 @@ const LiveDropItem: React.FC<LiveDropItemProps> = ({ drop }) => {
               maxHeight: '80px'
             }}
           >
-            <img loading="lazy" src={drop.item.image}
+            <img loading="lazy" src={getItemImageUrl(drop.item.image, drop.item.name)}
               alt={drop.item.name}
               className="live-drop-item"
               style={{

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Monetary from '../Monetary';
+import { getPreferredAvatar } from '../../utils/avatarUtils';
+import { getItemImageUrl } from '../../utils/steamImageUtils';
 
 interface User {
   id: number;
@@ -103,7 +105,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
 
       {/* Информация о пользователе */}
       <div className="flex items-center space-x-2 mb-3">
-        <img loading="lazy" src={user.avatar_url || user.steam_avatar_url || '/images/default-avatar.webp'}
+        <img loading="lazy" src={getPreferredAvatar(user.avatar_url, user.steam_avatar_url, String(user.id))}
           alt={user.name}
           className="w-8 h-8 rounded-full"
          //  onError={(e) => {
@@ -140,7 +142,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
         </div>
 
         <div className="flex items-center justify-center space-x-2 mb-2">
-          <img loading="lazy" src={item.image}
+          <img loading="lazy" src={getItemImageUrl(item.image, item.name)}
             alt={item.name}
             className="w-12 h-12 object-contain"
             onError={(e) => {
