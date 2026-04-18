@@ -67,7 +67,8 @@ export default defineConfig({
         entryFileNames: 'assets/js/[name]-[hash].js',
       }
     },
-    target: 'es2015',
+    // Меньше полифиллов, быстрее парсинг в браузере (целевой аудитории CS2 хватает современных движков)
+    target: 'es2020',
     minify: 'esbuild',
     chunkSizeWarningLimit: 600,
     // Сжатие

@@ -46,9 +46,7 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <!-- DNS prefetch и preconnect для критических ресурсов -->
-    <link rel="dns-prefetch" href="https://chibox-game.ru" />
-    <link rel="preconnect" href="https://chibox-game.ru" crossorigin />
+    <!-- Preconnect к внешним доменам (Steam); свой origin не prefetch — уже это соединение -->
     <link rel="dns-prefetch" href="https://steamcommunity.com" />
     <link rel="preconnect" href="https://steamcommunity.com" crossorigin />
     <link rel="dns-prefetch" href="https://store.steampowered.com" />
