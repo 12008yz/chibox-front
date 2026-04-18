@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { prefetchRoute } from '../utils/routePrefetch';
 import { useGetGlobalStatisticsQuery } from '../features/user/userApi';
 import { Package, Users, RefreshCw, Swords, Clock } from 'lucide-react';
 
@@ -142,6 +143,9 @@ const Footer = () => {
                 <li key={index}>
                   <Link
                     to={link.path}
+                    onMouseEnter={() => prefetchRoute(link.path)}
+                    onFocus={() => prefetchRoute(link.path)}
+                    onTouchStart={() => prefetchRoute(link.path)}
                     className="text-gray-400 hover:text-orange-400 transition-colors duration-300 text-sm md:text-base"
                   >
                     {link.name}
@@ -161,6 +165,9 @@ const Footer = () => {
                 <li key={index}>
                   <Link
                     to={link.path}
+                    onMouseEnter={() => prefetchRoute(link.path)}
+                    onFocus={() => prefetchRoute(link.path)}
+                    onTouchStart={() => prefetchRoute(link.path)}
                     className="text-gray-400 hover:text-orange-400 transition-colors duration-300 text-sm md:text-base"
                   >
                     {link.name}

@@ -46,6 +46,17 @@ const RequisitesPage = lazyWithChunkError(() => import('./pages/RequisitesPage')
 const ServicesPage = lazyWithChunkError(() => import('./pages/ServicesPage'));
 const StreamerCabinetPage = lazyWithChunkError(() => import('./pages/StreamerCabinetPage'));
 
+function RouteSuspenseFallback() {
+  return (
+    <div className="flex justify-center py-16 md:py-24" aria-busy>
+      <div
+        className="h-10 w-10 animate-spin rounded-full border-2 border-purple-500/80 border-t-transparent"
+        aria-hidden
+      />
+    </div>
+  );
+}
+
 const ProtectedRoute: React.FC<{
   children: React.ReactElement;
   isAuthenticated: boolean;
@@ -221,11 +232,7 @@ const App: React.FC = () => {
           )}
           <PaymentSuccessModal />
           <main>
-          <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div>
-            </div>
-          }>
+          <Suspense fallback={<RouteSuspenseFallback />}>
             <Routes>
             <Route path="/" element={<HomePage />} />
             <Route

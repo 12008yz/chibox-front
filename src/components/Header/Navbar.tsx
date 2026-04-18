@@ -6,6 +6,7 @@ import RightContent from "./Navbar/RightContent";
 import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
+import { prefetchRoute, prefetchMainNavRoutesIdle } from '../../utils/routePrefetch';
 
 interface NavbarProps {
   openNotifications: boolean;
@@ -56,6 +57,12 @@ const Navbar: React.FC<NavbarProps> = ({
   // Закрываем мобильное меню при изменении маршрута
   useEffect(() => {
     setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // На главной после idle подгружаем чанки «Апгрейд» и «Таблица лидеров» — первый клик быстрее.
+  useEffect(() => {
+    if (location.pathname !== '/') return;
+    return prefetchMainNavRoutesIdle();
   }, [location.pathname]);
 
   const toggleMobileMenu = () => {
@@ -174,6 +181,9 @@ const Navbar: React.FC<NavbarProps> = ({
                     key={index}
                     to={link.to}
                     onClick={handleLinkClick}
+                    onMouseEnter={() => prefetchRoute(link.to)}
+                    onFocus={() => prefetchRoute(link.to)}
+                    onTouchStart={() => prefetchRoute(link.to)}
                     data-play-click-sound-mobile
                     className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                   >
@@ -284,6 +294,9 @@ const Navbar: React.FC<NavbarProps> = ({
                         toggleMobileMenu();
                       }
                     }}
+                    onMouseEnter={() => prefetchRoute(link.to)}
+                    onFocus={() => prefetchRoute(link.to)}
+                    onTouchStart={() => prefetchRoute(link.to)}
                     data-play-click-sound-mobile
                     className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
                   >

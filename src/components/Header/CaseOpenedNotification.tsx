@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Monetary from '../Monetary';
 import { getPreferredAvatar } from '../../utils/avatarUtils';
 import { getItemImageUrl } from '../../utils/steamImageUtils';
+import { prefetchRoute } from '../../utils/routePrefetch';
 
 interface User {
   id: number;
@@ -114,6 +115,7 @@ const CaseOpenedNotification: React.FC<CaseOpenedNotificationProps> = ({
         />
         <Link
           to={`/profile/${user.id}`}
+          onMouseEnter={() => prefetchRoute(`/profile/${user.id}`)}
           className="text-blue-400 hover:text-blue-300 text-sm font-medium"
         >
           {user.name}
