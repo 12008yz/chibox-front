@@ -25,8 +25,10 @@ import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { API_URL } from './utils/config';
 
+// Главная без lazy: иначе Suspense блокирует весь HomePage (баннер, разметка) пока грузится отдельный чанк — в инкогнито без кеша виден «пустой экран + спиннер».
+import HomePage from './pages/HomePage';
+
 // Lazy loading страниц: при 404 чанка после деплоя — авто-перезагрузка
-const HomePage = lazyWithChunkError(() => import('./pages/HomePage'));
 const SteamAuthPage = lazyWithChunkError(() => import('./pages/SteamAuthPage'));
 const ProfilePage = lazyWithChunkError(() => import('./pages/profile/ProfilePage'));
 const PublicProfilePage = lazyWithChunkError(() => import('./pages/PublicProfilePage'));

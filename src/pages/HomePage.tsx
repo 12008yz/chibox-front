@@ -363,9 +363,15 @@ const HomePage: React.FC = () => {
           {/* Кейсы секция */}
           <div className="container mx-auto px-4 py-8">
             {casesLoading ? (
-              <div className="flex items-center justify-center w-full mt-[164px]">
-                <div className="spinner" />
-                <p className="text-white ml-4">{t('homepage.loading_cases')}</p>
+              <div className="w-full animate-pulse" aria-busy="true" aria-label={t('homepage.loading_cases')}>
+                <div className="h-8 w-64 mx-auto mb-2 rounded bg-white/10" />
+                <div className="h-4 w-96 max-w-full mx-auto mb-10 rounded bg-white/5" />
+                <div className="grid grid-cols-2 md:flex md:flex-row justify-center gap-5 md:gap-8 md:flex-wrap">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-full md:w-64 aspect-[3/4] rounded-xl bg-white/5 border border-white/10" />
+                  ))}
+                </div>
+                <p className="text-center text-gray-500 text-sm mt-6">{t('homepage.loading_cases')}</p>
               </div>
             ) : casesData && (casesData.success || casesData.data) ? (
               <>
