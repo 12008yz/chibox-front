@@ -127,6 +127,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   width="48"
                   height="48"
                   className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain"
+                  loading="eager"
+                  decoding="async"
                   onError={(e) => {
                     e.currentTarget.src = '/vite.svg';
                   }}

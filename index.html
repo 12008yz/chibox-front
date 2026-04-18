@@ -52,8 +52,8 @@
     <link rel="dns-prefetch" href="https://store.steampowered.com" />
     <link rel="preconnect" href="https://store.steampowered.com" crossorigin />
 
-    <!-- Preload критических ресурсов -->
-    <link rel="preload" href="/images/logo.webp" as="image" />
+    <!-- LCP на главной — первый слайд баннера (тяжелее лого в шапке) -->
+    <link rel="preload" href="/images/banners/tma.webp" as="image" fetchpriority="high" />
   </head>
   <body>
     <div id="root"></div>

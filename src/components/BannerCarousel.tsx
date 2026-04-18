@@ -90,6 +90,15 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
     return () => clearInterval(id);
   }, [items.length, autoPlayInterval, current, next]);
 
+  // Следующий слайд подгружаем заранее — при переключении не ждём сеть
+  useEffect(() => {
+    if (items.length < 2) return;
+    const nextIdx = (current + 1) % items.length;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = items[nextIdx];
+  }, [current, items]);
+
   if (items.length === 0) return null;
 
   return (
@@ -109,10 +118,13 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           <img
             src={items[current]}
             alt=""
-            width="1920"
-            height="1080"
-            className="w-full h-full object-cover object-center block"
+            width={1200}
+            height={675}
+            className="w-full h-full object-cover object-center block max-w-[100vw]"
+            sizes="100vw"
             loading={current === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchPriority={current === 0 ? 'high' : 'low'}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}

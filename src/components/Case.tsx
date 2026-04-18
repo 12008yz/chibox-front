@@ -65,7 +65,7 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       )}
 
       <div className="relative w-full flex items-center justify-center overflow-visible aspect-square md:aspect-[3/4]">
-        <img loading="lazy" src={caseImageUrl}
+        <img loading="lazy" decoding="async" src={caseImageUrl}
           alt={title}
           width="256"
           height="256"
