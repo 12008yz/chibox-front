@@ -11,8 +11,41 @@ import App from "./App.tsx";
 import "./utils/clearAllAuth";
 import { initAnalytics } from "./utils/analytics";
 
-// Подключаем Яндекс.Метрику / Google Analytics при наличии ID в переменных окружения
-initAnalytics();
+// Аналитику не блокируем первый кадр: тяжёлые внешние скрипты — после load или в idle
+function scheduleNonCriticalInit(fn: () => void) {
+  const run = () => {
+    try {
+      fn();
+    } catch {
+      /* ignore */
+    }
+  };
+  if (typeof window === "undefined") {
+    run();
+    return;
+  }
+  if (document.readyState === "complete") {
+    if (typeof requestIdleCallback !== "undefined") {
+      requestIdleCallback(run, { timeout: 4000 });
+    } else {
+      setTimeout(run, 0);
+    }
+    return;
+  }
+  window.addEventListener(
+    "load",
+    () => {
+      if (typeof requestIdleCallback !== "undefined") {
+        requestIdleCallback(run, { timeout: 4000 });
+      } else {
+        setTimeout(run, 0);
+      }
+    },
+    { once: true }
+  );
+}
+
+scheduleNonCriticalInit(() => initAnalytics());
 
 // При 404 чанка после деплоя (старый кэш) — перезагрузка, чтобы подтянуть новые скрипты
 window.addEventListener('error', (event) => {

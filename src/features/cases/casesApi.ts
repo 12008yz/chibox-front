@@ -28,7 +28,8 @@ export const casesApi = baseApi.injectEndpoints({
     }>, void>({
       query: () => 'v1/cases',
       providesTags: ['Cases', 'CaseTemplates'],
-      keepUnusedDataFor: 0, // Не кэшировать данные
+      // Краткий кеш: убирает лишние повторные запросы при быстром remount без устаревших данных в UI (инвалидация по мутациям сохраняется)
+      keepUnusedDataFor: 60,
     }),
 
     // Получение истории кейсов пользователя

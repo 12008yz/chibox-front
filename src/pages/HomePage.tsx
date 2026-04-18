@@ -344,10 +344,7 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Принудительное обновление данных при маунте
-  useEffect(() => {
-    refetchCases();
-  }, [refetchCases]);
+  // Не вызываем refetchCases() отдельно: useGetAllCasesQuery уже с refetchOnMountOrArgChange — иначе два одинаковых запроса к /v1/cases подряд.
 
   return (
     <div className="min-h-screen text-white relative">
