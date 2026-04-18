@@ -1,10 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import viteCompression from 'vite-plugin-compression'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    // Рядом с бандлами создаются .gz — nginx отдаёт gzip_static без сжатия на лету (Lighthouse: text compression)
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+      threshold: 1024,
+      deleteOriginFile: false,
+    }),
     // Анализатор размера бандла (установите: npm install -D rollup-plugin-visualizer)
     // import { visualizer } from 'rollup-plugin-visualizer'
     // visualizer({ open: true, filename: 'dist/stats.html' })
