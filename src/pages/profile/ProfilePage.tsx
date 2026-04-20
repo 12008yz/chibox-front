@@ -9,7 +9,6 @@ import { useGetStreamerMeQuery } from '../../features/streamer/streamerApi';
 import { useUserData } from '../../hooks/useUserData';
 import ScrollToTop from '../../components/ScrollToTop';
 import ScrollToTopOnMount from '../../components/ScrollToTopOnMount';
-import DepositModal from '../../components/DepositModal';
 
 // Импорты компонентов
 import ProfileHeader from './components/ProfileHeader/ProfileHeader';
@@ -34,7 +33,10 @@ const ProfilePage: React.FC = () => {
   // State для модальных окон
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const openDepositModal = () => {
+    window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }));
+  };
+
   const [shouldSkipToVerify, setShouldSkipToVerify] = useState(false);
 
   // State для отслеживания ID открываемого кейса
@@ -310,7 +312,7 @@ const ProfilePage: React.FC = () => {
             <button
               data-no-click-sound
               onClick={() => {
-                setIsDepositModalOpen(true);
+                openDepositModal();
               }}
               className="w-full bg-gradient-to-br from-purple-500/85 to-indigo-600/85 hover:from-purple-600/95 hover:to-indigo-700/95 text-white font-bold text-lg sm:text-xl py-6 sm:py-8 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-purple-400/50"
             >
@@ -369,12 +371,6 @@ const ProfilePage: React.FC = () => {
         }}
         user={user}
         skipToVerify={shouldSkipToVerify}
-      />
-
-      {/* Deposit Modal */}
-      <DepositModal
-        isOpen={isDepositModalOpen}
-        onClose={() => setIsDepositModalOpen(false)}
       />
 
       {/* Scroll to Top Button */}

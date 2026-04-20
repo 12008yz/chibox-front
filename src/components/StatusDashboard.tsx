@@ -6,7 +6,6 @@ import { formatDaysI18n } from '../utils/declension';
 import Monetary from './Monetary';
 import Title from './Title';
 import AppFeatures from './AppFeatures';
-import DepositModal from './DepositModal';
 import { ReceivedIcon } from './icons';
 
 interface StatusDashboardProps {
@@ -43,7 +42,9 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('activities');
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const openDepositModal = () => {
+    window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }));
+  };
 
   // Проверяем активность подписки
   const now = new Date();
@@ -175,7 +176,7 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
 
             <div className="text-left md:text-right w-full md:w-auto flex flex-col items-start md:items-end">
               <button
-                onClick={() => setIsDepositModalOpen(true)}
+                onClick={openDepositModal}
                 className="mt-2 px-3 md:px-4 py-1.5 md:py-2 text-sm md:text-base bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 w-full md:w-auto"
               >
                 {t('profile.purchase_button')}
@@ -367,11 +368,6 @@ const StatusDashboard: React.FC<StatusDashboardProps> = ({
         )}
       </div>
 
-      {/* Deposit Modal */}
-      <DepositModal
-        isOpen={isDepositModalOpen}
-        onClose={() => setIsDepositModalOpen(false)}
-      />
     </div>
   );
 };

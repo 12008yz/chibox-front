@@ -74,7 +74,7 @@ const Loading = () => (
 );
 
 // В development режиме отключаем StrictMode для WebSocket
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = import.meta.env.DEV;
 
 const AppWithToaster = () => (
   <Provider store={store}>

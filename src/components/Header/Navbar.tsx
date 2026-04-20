@@ -28,11 +28,13 @@ const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [depositModalInitialTab, setDepositModalInitialTab] = useState<'balance' | 'subscription'>('balance');
+  const [depositModalSelectedSubscription, setDepositModalSelectedSubscription] = useState<number | undefined>(undefined);
 
   // Один общий слушатель openDepositModal — модалка рендерится только здесь, иначе два RightContent открывали бы две модалки
   useEffect(() => {
-    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription' }>) => {
+    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription'; subscriptionId?: number }>) => {
       setDepositModalInitialTab(e.detail?.tab || 'balance');
+      setDepositModalSelectedSubscription(e.detail?.subscriptionId);
       setIsDepositModalOpen(true);
     };
     window.addEventListener('openDepositModal', handler as EventListener);
@@ -41,6 +43,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const openDepositModal = useCallback((tab: 'balance' | 'subscription' = 'balance') => {
     setDepositModalInitialTab(tab);
+    setDepositModalSelectedSubscription(undefined);
     setIsDepositModalOpen(true);
   }, []);
 
@@ -183,7 +186,6 @@ const Navbar: React.FC<NavbarProps> = ({
                     onClick={handleLinkClick}
                     onMouseEnter={() => prefetchRoute(link.to)}
                     onFocus={() => prefetchRoute(link.to)}
-                    onTouchStart={() => prefetchRoute(link.to)}
                     data-play-click-sound-mobile
                     className="group relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-4 2xl:px-5 py-2 xl:py-2.5 rounded-lg text-gray-300 hover:text-white transition-all duration-200 overflow-hidden"
                   >
@@ -296,7 +298,6 @@ const Navbar: React.FC<NavbarProps> = ({
                     }}
                     onMouseEnter={() => prefetchRoute(link.to)}
                     onFocus={() => prefetchRoute(link.to)}
-                    onTouchStart={() => prefetchRoute(link.to)}
                     data-play-click-sound-mobile
                     className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/30 hover:border-orange-500/50 transition-all"
                   >
@@ -335,8 +336,12 @@ const Navbar: React.FC<NavbarProps> = ({
       {/* Одна модалка пополнения на всё приложение (из баннера, кейса, хедера) */}
       <DepositModal
         isOpen={isDepositModalOpen}
-        onClose={() => setIsDepositModalOpen(false)}
+        onClose={() => {
+          setIsDepositModalOpen(false);
+          setDepositModalSelectedSubscription(undefined);
+        }}
         initialTab={depositModalInitialTab}
+        initialSelectedSubscription={depositModalSelectedSubscription}
       />
 
       {/* Spacer для контента под фиксированным навбаром */}

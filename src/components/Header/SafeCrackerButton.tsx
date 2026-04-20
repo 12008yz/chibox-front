@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useGetSafeCrackerStatusQuery } from "../../features/user/userApi";
-import SafeCrackerGame from "../SafeCrackerGame";
 import { useAppSelector } from "../../store/hooks";
 import { hasActiveSubscription } from "../../utils/subscriptionUtils";
+import { lazyWithChunkError } from "../../utils/lazyWithChunkError";
+
+const SafeCrackerGame = lazyWithChunkError(() => import("../SafeCrackerGame"));
 
 const SafeCrackerButton = () => {
   const [showSafeCrackerGame, setShowSafeCrackerGame] = useState(false);
@@ -48,10 +50,12 @@ const SafeCrackerButton = () => {
         />
       </button>
 
-      <SafeCrackerGame
-        isOpen={showSafeCrackerGame}
-        onClose={() => setShowSafeCrackerGame(false)}
-      />
+      <Suspense fallback={null}>
+        <SafeCrackerGame
+          isOpen={showSafeCrackerGame}
+          onClose={() => setShowSafeCrackerGame(false)}
+        />
+      </Suspense>
     </>
   );
 };

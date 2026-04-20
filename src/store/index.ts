@@ -41,7 +41,7 @@ export const store = configureStore({
       baseApi.middleware,
       authMiddleware.middleware
     ),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: import.meta.env.DEV,
 });
 
 // Создаем persistor

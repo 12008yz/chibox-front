@@ -1,28 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
 import { useGetSubscriptionCaseStatusQuery } from '../features/subscriptions/subscriptionsApi';
 import { useGetCurrentTicTacToeGameQuery } from '../features/user/userApi';
 import { useUpdateProfileMutation } from '../features/auth/authApi';
-import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
-import IntroVideo from '../components/IntroVideo';
 import SteamTradeUrlModal from '../components/SteamTradeUrlModal';
 import LiveDrops from '../components/LiveDrops';
 import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import CaseListing from '../components/CaseListing';
-import CasePreviewModal from '../components/CasePreviewModal';
 import StatusDashboard from '../components/StatusDashboard';
-import TicTacToeGame from '../components/TicTacToeGame';
-import SafeCrackerGame from '../components/SafeCrackerGame';
-import OnboardingTour from '../components/OnboardingTour';
-import DepositModal from '../components/DepositModal';
 import BannerCarousel from '../components/BannerCarousel';
 import { formatDaysI18n } from '../utils/declension';
 import { useUserData } from '../hooks/useUserData';
 import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setShowIntroVideo as setGlobalShowIntroVideo, setShowTradeUrlModal as setGlobalShowTradeUrlModal, setShowOnboarding, setHasSeenOnboarding, setShowAuthModal } from '../store/slices/uiSlice';
+import { lazyWithChunkError } from '../utils/lazyWithChunkError';
+
+const RegistrationSuccessModal = lazyWithChunkError(() => import('../components/RegistrationSuccessModal'));
+const IntroVideo = lazyWithChunkError(() => import('../components/IntroVideo'));
+const CasePreviewModal = lazyWithChunkError(() => import('../components/CasePreviewModal'));
+const TicTacToeGame = lazyWithChunkError(() => import('../components/TicTacToeGame'));
+const SafeCrackerGame = lazyWithChunkError(() => import('../components/SafeCrackerGame'));
+const OnboardingTour = lazyWithChunkError(() => import('../components/OnboardingTour'));
+const DepositModal = lazyWithChunkError(() => import('../components/DepositModal'));
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -546,11 +548,13 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Вступительное видео после регистрации */}
-      <IntroVideo
-        isOpen={showIntroVideo}
-        onVideoEnd={handleVideoEnd}
-        videoUrl="/preview.mp4"
-      />
+      <Suspense fallback={null}>
+        <IntroVideo
+          isOpen={showIntroVideo}
+          onVideoEnd={handleVideoEnd}
+          videoUrl="/preview.mp4"
+        />
+      </Suspense>
 
       {/* Steam Trade URL Modal - показывается только после видео */}
       <SteamTradeUrlModal
@@ -562,50 +566,62 @@ const HomePage: React.FC = () => {
 
       {/* Модальное окно успешной регистрации */}
       {registrationData && (
-        <RegistrationSuccessModal
-          isOpen={showRegistrationModal}
-          onClose={handleCloseRegistrationModal}
-          email={registrationData.email}
-          previewUrl={registrationData.previewUrl}
-        />
+        <Suspense fallback={null}>
+          <RegistrationSuccessModal
+            isOpen={showRegistrationModal}
+            onClose={handleCloseRegistrationModal}
+            email={registrationData.email}
+            previewUrl={registrationData.previewUrl}
+          />
+        </Suspense>
       )}
 
       {/* Игра крестики-нолики */}
-      <TicTacToeGame
-        isOpen={showTicTacToeGame}
-        onClose={handleTicTacToeGameClose}
-        onRewardReceived={handleTicTacToeWin}
-      />
+      <Suspense fallback={null}>
+        <TicTacToeGame
+          isOpen={showTicTacToeGame}
+          onClose={handleTicTacToeGameClose}
+          onRewardReceived={handleTicTacToeWin}
+        />
+      </Suspense>
 
       {/* Игра Safe Cracker */}
-      <SafeCrackerGame
-        isOpen={showSafeCrackerGame}
-        onClose={() => setShowSafeCrackerGame(false)}
-      />
+      <Suspense fallback={null}>
+        <SafeCrackerGame
+          isOpen={showSafeCrackerGame}
+          onClose={() => setShowSafeCrackerGame(false)}
+        />
+      </Suspense>
 
       {/* Онбординг тур */}
-      <OnboardingTour
-        isActive={showOnboarding}
-        onComplete={handleOnboardingComplete}
-      />
+      <Suspense fallback={null}>
+        <OnboardingTour
+          isActive={showOnboarding}
+          onComplete={handleOnboardingComplete}
+        />
+      </Suspense>
 
       {/* Модалка покупки статуса (при переходе из профиля) */}
-      <DepositModal
-        isOpen={showStatusPurchaseModal}
-        onClose={() => setShowStatusPurchaseModal(false)}
-        initialTab="subscription"
-      />
+      <Suspense fallback={null}>
+        <DepositModal
+          isOpen={showStatusPurchaseModal}
+          onClose={() => setShowStatusPurchaseModal(false)}
+          initialTab="subscription"
+        />
+      </Suspense>
 
       {/* Одна модалка превью кейса (из любой секции) */}
       {previewCase && (
-        <CasePreviewModal
-          isOpen={true}
-          onClose={closeCasePreview}
-          caseData={previewCase}
-          onBuyAndOpenCase={handleBuyAndOpenCase}
-          fixedPrices={false}
-          onDataUpdate={handleDataUpdate}
-        />
+        <Suspense fallback={null}>
+          <CasePreviewModal
+            isOpen={true}
+            onClose={closeCasePreview}
+            caseData={previewCase}
+            onBuyAndOpenCase={handleBuyAndOpenCase}
+            fixedPrices={false}
+            onDataUpdate={handleDataUpdate}
+          />
+        </Suspense>
       )}
 
     </div>

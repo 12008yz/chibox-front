@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Title from './Title';
 import { useTranslation } from 'react-i18next';
 import { formatDaysI18n } from '../utils/declension';
-import DepositModal from './DepositModal';
 import {
   TrendingUp,
   Gift,
@@ -52,8 +51,6 @@ interface AppFeaturesProps {
 
 const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
   const { t } = useTranslation();
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-  const [selectedTierId, setSelectedTierId] = useState<number | undefined>(undefined);
   const statusTiers: StatusTier[] = [
     {
       id: 1,
@@ -121,6 +118,10 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
       ]
     }
   ];
+
+  const openSubscriptionDeposit = (tierId: number) => {
+    window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription', subscriptionId: tierId } }));
+  };
 
   return (
     <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none z-50">
@@ -199,8 +200,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               {/* Кнопка покупки */}
               <button
                 onClick={() => {
-                  setSelectedTierId(tier.id);
-                  setIsDepositModalOpen(true);
+                  openSubscriptionDeposit(tier.id);
                 }}
                 className={`block w-full text-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
                   tier.popular
@@ -218,15 +218,6 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
         ))}
       </div>
 
-      <DepositModal
-        isOpen={isDepositModalOpen}
-        onClose={() => {
-          setIsDepositModalOpen(false);
-          setSelectedTierId(undefined);
-        }}
-        initialTab="subscription"
-        initialSelectedSubscription={selectedTierId}
-      />
     </div>
   );
 };

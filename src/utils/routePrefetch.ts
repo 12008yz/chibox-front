@@ -4,6 +4,16 @@
  */
 const prefetched = new Set<string>();
 
+function shouldPrefetch(): boolean {
+  if (typeof navigator === 'undefined') return true;
+  const connection = (navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+  }).connection;
+  if (!connection) return true;
+  if (connection.saveData) return false;
+  return connection.effectiveType !== 'slow-2g' && connection.effectiveType !== '2g';
+}
+
 const loaders: Record<string, () => Promise<unknown>> = {
   '/exchange': () => import('../pages/ExchangePage'),
   '/upgrade': () => import('../pages/UpgradePage'),
@@ -29,6 +39,7 @@ function runOnce(key: string, fn: () => Promise<unknown>): void {
 }
 
 export function prefetchRoute(path: string): void {
+  if (!shouldPrefetch()) return;
   const p = path.split('?')[0] || '/';
   if (p.startsWith('/user/')) {
     runOnce('public-profile', () => import('../pages/PublicProfilePage'));
@@ -45,6 +56,7 @@ export function prefetchRoute(path: string): void {
 
 /** После загрузки главной — подгружаем частые маршруты, когда браузер простаивает. */
 export function prefetchMainNavRoutesIdle(): () => void {
+  if (!shouldPrefetch()) return () => {};
   const w = typeof globalThis !== 'undefined' ? globalThis : null;
   if (!w) return () => {};
   const run = () => {

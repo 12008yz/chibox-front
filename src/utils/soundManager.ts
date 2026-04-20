@@ -8,6 +8,7 @@ class SoundManager {
   private unlocked: boolean = false;
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
   private minPlayInterval: number = 500; // Минимальная задержка между воспроизведениями в мс
+  private unlockedSoundKey: string = 'uiClick';
  
   // Загружаем  звуки
   private soundPaths = {
@@ -31,7 +32,7 @@ class SoundManager {
   };
 
   constructor() {
-    this.preloadSounds();
+    this.preloadEssentialSounds();
     this.initAudioContext();
     this.setupUnlockListeners();
   }
@@ -60,7 +61,7 @@ class SoundManager {
 
       // Воспроизводим только ОДИН тихий звук для разблокировки (вместо всех)
       // Это предотвращает одновременное воспроизведение всех звуков
-      const firstSound = this.sounds.values().next().value;
+      const firstSound = this.ensureSoundLoaded(this.unlockedSoundKey) || this.sounds.values().next().value;
       if (firstSound) {
         const originalVolume = firstSound.volume;
         firstSound.volume = 0;
@@ -92,30 +93,39 @@ class SoundManager {
     document.addEventListener('keydown', unlockAudio, { once: true });
   }
 
-  // Предзагрузка всех звуков
-  private preloadSounds() {
-    let loadedCount = 0;
+  private createSound(path: string, preload: 'none' | 'metadata' | 'auto' = 'none'): HTMLAudioElement {
+    const audio = new Audio();
+    audio.preload = preload;
+    audio.volume = this.volume;
+    audio.src = path;
+    return audio;
+  }
 
-    Object.entries(this.soundPaths).forEach(([key, path]) => {
+  // Предзагрузка только базовых звуков (остальные — по требованию)
+  private preloadEssentialSounds() {
+    const essentialKeys: Array<keyof SoundManager['soundPaths']> = ['uiClick', 'click'];
+    essentialKeys.forEach((key) => {
+      const path = this.soundPaths[key];
       try {
-        const audio = new Audio();
-        audio.preload = 'auto';
-        audio.volume = this.volume;
-
-        // Обработчик успешной загрузки
-        audio.addEventListener('canplaythrough', () => {
-          loadedCount++;
-        }, { once: true });
-
-        // Обработчик ошибки загрузки
-        audio.addEventListener('error', () => {
-        }, { once: true });
-
-        audio.src = path;
+        const audio = this.createSound(path, 'metadata');
         this.sounds.set(key, audio);
       } catch (error) {
       }
     });
+  }
+
+  private ensureSoundLoaded(soundKey: string): HTMLAudioElement | null {
+    const existing = this.sounds.get(soundKey);
+    if (existing) return existing;
+    const path = this.soundPaths[soundKey as keyof SoundManager['soundPaths']];
+    if (!path) return null;
+    try {
+      const audio = this.createSound(path, 'auto');
+      this.sounds.set(soundKey, audio);
+      return audio;
+    } catch (error) {
+      return null;
+    }
   }
 
   // Установка состояния звуков
@@ -152,7 +162,7 @@ class SoundManager {
       return;
     }
 
-    const sound = this.sounds.get(soundKey);
+    const sound = this.ensureSoundLoaded(soundKey);
     if (!sound) {
       return;
     }

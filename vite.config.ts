@@ -13,6 +13,12 @@ export default defineConfig({
       threshold: 1024,
       deleteOriginFile: false,
     }),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      threshold: 1024,
+      deleteOriginFile: false,
+    }),
     // Анализатор размера бандла (установите: npm install -D rollup-plugin-visualizer)
     // import { visualizer } from 'rollup-plugin-visualizer'
     // visualizer({ open: true, filename: 'dist/stats.html' })
