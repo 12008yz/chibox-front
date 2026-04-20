@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Crosshair, Sparkles, Settings } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Menu, X, Trophy, Radio, Crosshair, Settings } from 'lucide-react';
 import RightContent from "./Navbar/RightContent";
 import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   // Показываем модалку входа только для защищённых маршрутов; на остальные (upgrade, leaderboard) пускаем без авторизации
   type NavLinkItem = { to: string; icon: React.ReactNode; label: string; inDevelopment?: boolean };
-  const PROTECTED_PATHS = ['/exchange', '/profile', '/tower-defense', '/streamer-cabinet'];
+  const PROTECTED_PATHS = ['/exchange', '/profile', '/streamer-cabinet'];
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!user) {
       const href = e.currentTarget.getAttribute('href') ?? '';
@@ -101,12 +101,6 @@ const Navbar: React.FC<NavbarProps> = ({
       to: "/leaderboard",
       icon: <Trophy className="text-lg" />,
       label: t('header.leaderboard_table'),
-    },
-    {
-      to: "/tower-defense",
-      icon: <Sparkles className="text-lg" />,
-      label: t('header.tower_defense'),
-      inDevelopment: true,
     },
   ];
 

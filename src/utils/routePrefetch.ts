@@ -20,7 +20,6 @@ const loaders: Record<string, () => Promise<unknown>> = {
   '/leaderboard': () => import('../pages/LeaderboardPage'),
   '/coinflip': () => import('../pages/LeaderboardPage'),
   '/profile': () => import('../pages/profile/ProfilePage'),
-  '/tower-defense': () => import('../pages/TowerDefensePage'),
   '/streamer-cabinet': () => import('../pages/StreamerCabinetPage'),
   '/terms': () => import('../pages/TermsPage'),
   '/privacy': () => import('../pages/PrivacyPage'),

@@ -17,7 +17,6 @@ import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
 import { useSocket } from './hooks/useSocket';
 import CookieBanner from './components/CookieBanner';
-import ChatBotWidgetBoundary from './components/ChatBotWidgetBoundary';
 import AuthModal from './components/AuthModal';
 import ReferralModal from './components/ReferralModal';
 import PaymentSuccessModal from './components/PaymentSuccessModal';
@@ -35,7 +34,6 @@ const PublicProfilePage = lazyWithChunkError(() => import('./pages/PublicProfile
 const LeaderboardPage = lazyWithChunkError(() => import('./pages/LeaderboardPage'));
 const ExchangePage = lazyWithChunkError(() => import('./pages/ExchangePage'));
 const UpgradePage = lazyWithChunkError(() => import('./pages/UpgradePage'));
-const TowerDefensePage = lazyWithChunkError(() => import('./pages/TowerDefensePage'));
 const TermsPage = lazyWithChunkError(() => import('./pages/TermsPage'));
 const PrivacyPage = lazyWithChunkError(() => import('./pages/PrivacyPage'));
 const ResponsibleGamingPage = lazyWithChunkError(() => import('./pages/ResponsibleGamingPage'));
@@ -305,14 +303,6 @@ const App: React.FC = () => {
               }
             />
             <Route path="/upgrade" element={<UpgradePage />} />
-            <Route
-              path="/tower-defense"
-              element={
-                <ProtectedRoute isAuthenticated={auth.isAuthenticated} onShowAuthModal={onShowAuthModal}>
-                  <TowerDefensePage />
-                </ProtectedRoute>
-              }
-            />
             {/* Footer Pages */}
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
@@ -340,7 +330,6 @@ const App: React.FC = () => {
         </div>
       </div>
       <DiagnosticOverlay />
-      <ChatBotWidgetBoundary />
       {/* Скрываем cookie banner во время онбординга */}
       {!showIntroVideo && !showTradeUrlModal && !showOnboarding && <CookieBanner />}
 
