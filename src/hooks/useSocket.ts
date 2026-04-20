@@ -127,7 +127,7 @@ const createGlobalSocket = () => {
 
   // Обработчик обновления количества пользователей онлайн
   globalSocket.on('onlineUsersUpdate', (data) => {
-    const n = typeof data?.count === 'number' && !Number.isNaN(data.count) ? data.count : 0;
+    const n = parseOnlineCount(data);
     onlineUsersListeners.forEach(listener => listener(n));
   });
 
@@ -171,57 +171,29 @@ const createGlobalSocket = () => {
   return globalSocket;
 };
 
-const SMOOTH_ONLINE_INTERVAL_MS = 350; // плавное приближение счётчика онлайна к значению с сервера
-/** Если расхождение больше — показываем цель сразу (иначе «лагает» на десятки секунд) */
-const ONLINE_SNAP_IF_DELTA = 12;
+/** payload от сервера: count может прийти числом или строкой (прокси/сериализация) */
+function parseOnlineCount(data: { count?: unknown } | null | undefined): number {
+  const raw = data?.count;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return Math.max(0, Math.floor(raw));
+  const n = Number(raw);
+  if (Number.isFinite(n)) return Math.max(0, Math.floor(n));
+  return 0;
+}
 
 export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   const subscribeToLiveDrops = options?.subscribeToLiveDrops ?? false;
-  const [onlineUsersTarget, setOnlineUsersTarget] = useState<number>(0);
-  const [displayOnline, setDisplayOnline] = useState<number>(0);
+  const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(() => lastConnectionError);
   const [liveDrops, setLiveDrops] = useState<LiveDropData[]>(() =>
     subscribeToLiveDrops ? loadLiveDropsFromStorage() : []
   );
   const initialized = useRef(false);
-  const onlineTargetRef = useRef(0);
-  const isFirstOnlineValue = useRef(true);
   const dispatch = useAppDispatch();
-
-  // Плавное изменение счётчика онлайна (без скачка при малых изменениях)
-  useEffect(() => {
-    onlineTargetRef.current = onlineUsersTarget;
-    if (isFirstOnlineValue.current && onlineUsersTarget > 0) {
-      setDisplayOnline(onlineUsersTarget);
-      isFirstOnlineValue.current = false;
-      return;
-    }
-    setDisplayOnline((prev) => {
-      const d = Math.abs(onlineUsersTarget - prev);
-      if (d >= ONLINE_SNAP_IF_DELTA) return onlineUsersTarget;
-      return prev;
-    });
-  }, [onlineUsersTarget]);
-
-  useEffect(() => {
-    const tid = setInterval(() => {
-      const target = onlineTargetRef.current;
-      setDisplayOnline((prev) => {
-        if (prev === target) return prev;
-        const d = Math.abs(target - prev);
-        if (d >= ONLINE_SNAP_IF_DELTA) return target;
-        if (prev < target) return Math.min(prev + 1, target);
-        if (prev > target) return Math.max(prev - 1, target);
-        return prev;
-      });
-    }, SMOOTH_ONLINE_INTERVAL_MS);
-    return () => clearInterval(tid);
-  }, []);
 
   useEffect(() => {
     if (isDemoMode()) {
-      setOnlineUsersTarget(128);
+      setOnlineUsers(128);
       setIsConnected(true);
       return;
     }
@@ -234,7 +206,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
     const socket = createGlobalSocket();
 
     // Функции-слушатели для этого компонента
-    const onlineUsersListener = (count: number) => setOnlineUsersTarget(count);
+    const onlineUsersListener = (count: number) => setOnlineUsers(count);
     const connectionListener = (connected: boolean) => setIsConnected(connected);
     const connectionErrorListener = (err: string | null) => setConnectionError(err);
     const liveDropListener = subscribeToLiveDrops
@@ -322,7 +294,7 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
 
   return {
     socket: globalSocket,
-    onlineUsers: displayOnline,
+    onlineUsers,
     isConnected,
     connectionError,
     liveDrops,
