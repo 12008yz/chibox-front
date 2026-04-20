@@ -6,12 +6,13 @@ import authReducer from '../features/auth/authSlice';
 import uiReducer from './slices/uiSlice';
 import errorReducer from './slices/errorSlice';
 import { authMiddleware } from '../store/middleware/authMiddleware';
+import { isDemoMode } from '../utils/demoMode';
 
-// Конфигурация для persist только для auth
+// Конфигурация для persist только для auth (в демо не сохраняем — всегда чистый мок)
 const authPersistConfig = {
   key: 'auth',
   storage,
-  whitelist: ['user', 'token', 'isAuthenticated'], // Сохраняем только нужные поля
+  whitelist: isDemoMode() ? [] : ['user', 'token', 'isAuthenticated'],
 };
 
 // Создаем persisted reducer для auth

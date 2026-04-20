@@ -23,6 +23,7 @@ import EmailVerificationModal from './components/Modals/EmailVerificationModal';
 import { injectProfileStyles } from './utils/profileStyles';
 import { soundManager } from '../../utils/soundManager';
 import { getApiErrorMessage } from '../../utils/config';
+import { isDemoMode } from '../../utils/demoMode';
 
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -117,7 +118,7 @@ const ProfilePage: React.FC = () => {
   const user = currentUserData || auth.user;
 
   // Проверяем, является ли пользователь стримером (кабинет показываем только стримерам)
-  const { data: streamerMeData } = useGetStreamerMeQuery(undefined, { skip: !user });
+  const { data: streamerMeData } = useGetStreamerMeQuery(undefined, { skip: !user || isDemoMode() });
 
   // Функция для перевода названий кейсов
   const translateCaseName = (caseName: string) => {

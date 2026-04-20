@@ -4,6 +4,10 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster, ToastBar, toast } from "react-hot-toast";
 import { store, persistor } from "./store/index";
+import { isDemoMode } from "./utils/demoMode";
+import { loginSuccess } from "./features/auth/authSlice";
+import { buildDemoProfileUser } from "./utils/demoData";
+import { getDemoBalance, getDemoInventory, getDemoTotalCasesOpened } from "./utils/demoState";
 import "./index.css";
 import "./i18n";
 import App from "./App.tsx";
@@ -78,7 +82,20 @@ const isDevelopment = import.meta.env.DEV;
 
 const AppWithToaster = () => (
   <Provider store={store}>
-    <PersistGate loading={<Loading />} persistor={persistor}>
+    <PersistGate
+      loading={<Loading />}
+      persistor={persistor}
+      onBeforeLift={() => {
+        if (isDemoMode()) {
+          const inv = getDemoInventory();
+          store.dispatch(
+            loginSuccess({
+              user: buildDemoProfileUser(getDemoBalance(), inv, getDemoTotalCasesOpened()),
+            })
+          );
+        }
+      }}
+    >
       <App />
       <Toaster
         position="top-right"

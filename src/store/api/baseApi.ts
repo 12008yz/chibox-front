@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { API_URL } from '../../utils/config';
+import { isDemoMode } from '../../utils/demoMode';
+import { getDemoApiResponse } from '../../utils/demoApiHandler';
 
 const BASE_URL = API_URL;
 
@@ -61,6 +63,16 @@ export const resetRefreshState = () => {
 
 // Обертка для обработки ошибок авторизации и обновления токенов
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
+  if (isDemoMode()) {
+    try {
+      const data = getDemoApiResponse(args);
+      return { data };
+    } catch (e) {
+      console.error('[demo] mock API error', e);
+      return { error: { status: 500, data: { message: 'Demo mock error' } } };
+    }
+  }
+
   // Проверяем, не является ли это запросом logout или refresh
   const isLogoutRequest = typeof args === 'object' && args.url?.includes('/logout');
   const isRefreshRequest = typeof args === 'object' && args.url?.includes('/refresh');

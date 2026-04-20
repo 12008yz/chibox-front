@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents, LiveDropData, NotificationData } from '../types/socket';
 import { BACKEND_URL } from '../utils/config';
+import { isDemoMode } from '../utils/demoMode';
 import { useAppDispatch } from '../store/hooks';
 import { userApi } from '../features/user/userApi';
 import { toastWithSound } from '../utils/toastWithSound';
@@ -126,8 +127,8 @@ const createGlobalSocket = () => {
 
   // Обработчик обновления количества пользователей онлайн
   globalSocket.on('onlineUsersUpdate', (data) => {
-
-    onlineUsersListeners.forEach(listener => listener(data.count));
+    const n = typeof data?.count === 'number' && !Number.isNaN(data.count) ? data.count : 0;
+    onlineUsersListeners.forEach(listener => listener(n));
   });
 
   // Обработчик живых падений
@@ -171,6 +172,8 @@ const createGlobalSocket = () => {
 };
 
 const SMOOTH_ONLINE_INTERVAL_MS = 350; // плавное приближение счётчика онлайна к значению с сервера
+/** Если расхождение больше — показываем цель сразу (иначе «лагает» на десятки секунд) */
+const ONLINE_SNAP_IF_DELTA = 12;
 
 export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   const subscribeToLiveDrops = options?.subscribeToLiveDrops ?? false;
@@ -186,19 +189,28 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   const isFirstOnlineValue = useRef(true);
   const dispatch = useAppDispatch();
 
-  // Плавное изменение счётчика онлайна (без скачка при обновлении страницы)
+  // Плавное изменение счётчика онлайна (без скачка при малых изменениях)
   useEffect(() => {
     onlineTargetRef.current = onlineUsersTarget;
     if (isFirstOnlineValue.current && onlineUsersTarget > 0) {
       setDisplayOnline(onlineUsersTarget);
       isFirstOnlineValue.current = false;
+      return;
     }
+    setDisplayOnline((prev) => {
+      const d = Math.abs(onlineUsersTarget - prev);
+      if (d >= ONLINE_SNAP_IF_DELTA) return onlineUsersTarget;
+      return prev;
+    });
   }, [onlineUsersTarget]);
 
   useEffect(() => {
     const tid = setInterval(() => {
       const target = onlineTargetRef.current;
       setDisplayOnline((prev) => {
+        if (prev === target) return prev;
+        const d = Math.abs(target - prev);
+        if (d >= ONLINE_SNAP_IF_DELTA) return target;
         if (prev < target) return Math.min(prev + 1, target);
         if (prev > target) return Math.max(prev - 1, target);
         return prev;
@@ -208,6 +220,12 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
   }, []);
 
   useEffect(() => {
+    if (isDemoMode()) {
+      setOnlineUsersTarget(128);
+      setIsConnected(true);
+      return;
+    }
+
     // Предотвращаем повторную инициализацию в React Strict Mode
     if (initialized.current) return;
     initialized.current = true;

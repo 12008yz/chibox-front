@@ -1,6 +1,8 @@
 export const API_URL = import.meta.env.VITE_API_URL || 'https://chibox-game.ru/api';
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://chibox-game.ru';
 
+export { isDemoMode } from './demoMode';
+
 /** Текст ошибки из ответа API (RTK Query / axios) */
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   if (error && typeof error === 'object' && 'data' in error) {

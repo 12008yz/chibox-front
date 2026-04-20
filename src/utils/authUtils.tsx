@@ -1,7 +1,10 @@
 // Утилиты для работы с авторизацией
 import { AppDispatch } from '../store';
-import { logout } from '../features/auth/authSlice';
+import { logout, loginSuccess } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
+import { isDemoMode } from './demoMode';
+import { buildDemoProfileUser } from './demoData';
+import { getDemoBalance, getDemoInventory, getDemoTotalCasesOpened, resetDemoState } from './demoState';
 
 /**
  * Полная очистка состояния приложения при выходе
@@ -9,6 +12,18 @@ import { baseApi } from '../store/api/baseApi';
  */
 export const performFullLogout = (dispatch: AppDispatch) => {
   try {
+    if (isDemoMode()) {
+      dispatch(baseApi.util.resetApiState());
+      resetDemoState();
+      const inv = getDemoInventory();
+      dispatch(
+        loginSuccess({
+          user: buildDemoProfileUser(getDemoBalance(), inv, getDemoTotalCasesOpened()),
+        })
+      );
+      return;
+    }
+
     // Сбрасываем весь кэш RTK Query ПЕРЕД очисткой Redux
     dispatch(baseApi.util.resetApiState());
 

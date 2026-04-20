@@ -7,6 +7,7 @@ import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
 import { prefetchRoute, prefetchMainNavRoutesIdle } from '../../utils/routePrefetch';
+import { isDemoMode } from '../../utils/demoMode';
 
 interface NavbarProps {
   openNotifications: boolean;
@@ -139,8 +140,16 @@ const Navbar: React.FC<NavbarProps> = ({
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-white tracking-tight">
+                <span className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
                   Chi<span className="text-orange-400">Box</span>
+                  {isDemoMode() && (
+                    <span
+                      className="text-[10px] md:text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-100 border border-amber-400/40 uppercase tracking-wide"
+                      title="Портфолио: без реального API и платежей"
+                    >
+                      Демо
+                    </span>
+                  )}
                 </span>
                 <div className="text-[9px] md:text-[10px] lg:text-xs text-orange-300/70 tracking-widest uppercase flex items-center gap-1">
                   GAME
