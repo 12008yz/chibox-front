@@ -1,8 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { API_URL } from '../../utils/config';
-import { isDemoMode } from '../../utils/demoMode';
+import {
+  getDemoCatalogApiUrl,
+  mergeDemoCasesAvailableResponse,
+  mergeDemoCasesResponse,
+  parseDemoRequestPath,
+  shouldDemoFetchCatalogFromProduction,
+} from '../../utils/demoCatalogFetch';
 import { getDemoApiResponse } from '../../utils/demoApiHandler';
+import { isDemoMode } from '../../utils/demoMode';
 
 const BASE_URL = API_URL;
 
@@ -51,6 +58,14 @@ const baseQueryWithRetry: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuer
   return result;
 };
 
+/** В демо: публичные GET с боевого API (каталог кейсов и предметов), без cookies. */
+const demoCatalogBaseQuery = fetchBaseQuery({
+  baseUrl: getDemoCatalogApiUrl(),
+  timeout: 60000,
+  credentials: 'omit',
+  prepareHeaders: (headers) => headers,
+});
+
 // Флаг для предотвращения множественных попыток обновления токена одновременно
 let isRefreshing = false;
 let refreshPromise: Promise<any> | null = null;
@@ -64,8 +79,22 @@ export const resetRefreshState = () => {
 // Обертка для обработки ошибок авторизации и обновления токенов
 const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any) => {
   if (isDemoMode()) {
+    if (shouldDemoFetchCatalogFromProduction(args)) {
+      const result = await demoCatalogBaseQuery(args, api, extraOptions);
+      if (result.error) {
+        return result;
+      }
+      const { path } = parseDemoRequestPath(args);
+      let data = result.data as Record<string, unknown>;
+      if (path === 'v1/cases') {
+        data = mergeDemoCasesResponse(data);
+      } else if (path === 'v1/cases/available') {
+        data = mergeDemoCasesAvailableResponse(data);
+      }
+      return { data };
+    }
     try {
-      const data = getDemoApiResponse(args);
+      const data = await getDemoApiResponse(args);
       return { data };
     } catch (e) {
       console.error('[demo] mock API error', e);

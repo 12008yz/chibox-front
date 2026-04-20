@@ -1,6 +1,12 @@
 import type { FetchArgs } from '@reduxjs/toolkit/query';
 import type { Item, UserCaseItem, UserInventoryItem } from '../types/api';
 import {
+  fetchCaseTemplateItemsFromProd,
+  fetchCaseTemplatesFromProd,
+  pickRandomDropFromProdItems,
+  resolveCaseTemplateByIdFromProd,
+} from './demoCatalogFetch';
+import {
   DEMO_CASE_TEMPLATES,
   DEMO_DROP_POOL,
   buildDemoAchievementsProgress,
@@ -41,8 +47,8 @@ function parseJsonBody(body: unknown): Record<string, unknown> {
   return body as Record<string, unknown>;
 }
 
-/** Ответ для RTK Query или null — тогда уйдёт настоящий fetch. */
-export function getDemoApiResponse(args: string | FetchArgs): unknown {
+/** Моки для демо; каталог кейсов/предметов подгружается с прода через baseApi (см. shouldDemoFetchCatalogFromProduction). */
+export async function getDemoApiResponse(args: string | FetchArgs): Promise<unknown> {
   const { path, method, body } = parseRequest(args);
 
   // ——— Профиль ———
@@ -182,16 +188,6 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
     };
   }
 
-  if (path === 'v1/subscription/tiers' && method === 'GET') {
-    return {
-      success: true,
-      data: [
-        { id: 1, days: 7, max_daily_cases: 2, bonus_percentage: 2, name: 'Базовый', price: 299 },
-        { id: 3, days: 30, max_daily_cases: 5, bonus_percentage: 5, name: 'Статус++', price: 899 },
-      ],
-    };
-  }
-
   if (path === 'v1/subscription/claim-case' && method === 'POST') {
     return {
       success: true,
@@ -219,126 +215,13 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
     };
   }
 
-  if (path === 'v1/currency' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        base: 'RUB',
-        rates: { USD: 0.011, EUR: 0.01 },
-      },
-    };
-  }
-
-  if (path === 'v1/statistics/global' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        total_users: 128_400,
-        total_cases_opened: 4_200_000,
-        total_items_withdrawn: 890_000,
-      },
-    };
-  }
-
-  if (path.startsWith('v1/leaderboard') && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        type: 'level',
-        leaderboard: [
-          { rank: 1, user_id: 'u1', username: 'top1', level: 99, subscription_tier: 3, subscription_days_left: 10, total_xp_earned: 900000 },
-          { rank: 2, user_id: 'u2', username: 'pro_player', level: 88, subscription_tier: 3, subscription_days_left: 5, total_xp_earned: 720000 },
-          {
-            rank: 42,
-            user_id: '00000000-0000-0000-0000-00000000d3m0',
-            username: 'DemoPlayer',
-            level: 42,
-            subscription_tier: 3,
-            subscription_days_left: 14,
-            total_xp_earned: 450000,
-          },
-        ],
-        totalItems: 100,
-        limit: 10,
-      },
-    };
-  }
-
-  if (path === 'v1/cases' && method === 'GET') {
-    const free = DEMO_CASE_TEMPLATES.filter((c) => !c.price || parseFloat(c.price) <= 0);
-    const paid = DEMO_CASE_TEMPLATES.filter((c) => c.price && parseFloat(c.price) > 0);
-    const inv = getDemoInventory();
-    return {
-      success: true,
-      free_cases: free,
-      paid_cases: paid,
-      user_cases: inv.cases.map((c) => ({
-        id: c.id,
-        inventory_case_id: c.id,
-        name: c.case_template?.name || 'Case',
-        acquisition_date: c.acquisition_date,
-        expires_at: c.expires_at,
-        case_template: c.case_template,
-        source: c.source,
-        is_paid: c.source === 'purchase',
-      })),
-      user_subscription_tier: 3,
-      next_case_available_time: null,
-      pagination: { limit: 50, offset: 0 },
-    };
-  }
-
-  if (path === 'v1/cases/available' && method === 'GET') {
-    return {
-      success: true,
-      data: DEMO_CASE_TEMPLATES,
-      user_info: {
-        max_daily_cases: 5,
-        cases_opened_today: 1,
-        cases_available: 3,
-        next_case_available_time: null,
-      },
-    };
-  }
-
-  if (path.startsWith('v1/case-templates/') && path.endsWith('/items') && method === 'GET') {
-    const id = path.replace('v1/case-templates/', '').replace('/items', '');
-    const ct = caseTemplateById(id);
-    return {
-      success: true,
-      data: {
-        caseTemplate: ct,
-        items: DEMO_DROP_POOL.map((it) => ({
-          ...it,
-          drop_chance_percent: 12.5,
-        })),
-      },
-    };
-  }
-
-  if (path.startsWith('v1/case-templates/') && path.endsWith('/status') && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        canOpen: true,
-        canBuy: true,
-        reason: '',
-        nextAvailableTime: null,
-        caseType: 'paid',
-        price: 249,
-        subscriptionRequired: false,
-        userSubscriptionTier: 3,
-        subscriptionDaysLeft: 14,
-        minSubscriptionTier: 0,
-      },
-    };
-  }
-
   if (path === 'v1/cases/purchase-info' && method === 'GET') {
     return { success: true, data: {} };
   }
 
   if (path === 'v1/free-case/status' && method === 'GET') {
+    const list = await fetchCaseTemplatesFromProd();
+    const hint = list.find((c) => c.type === 'daily' || c.type === 'free') || list[0] || DEMO_CASE_TEMPLATES[0];
     return {
       success: true,
       data: {
@@ -349,35 +232,7 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
         maxClaims: 2,
         firstClaimDate: null,
         lastClaimDate: null,
-        caseTemplateId: DEMO_CASE_TEMPLATES[0].id,
-      },
-    };
-  }
-
-  if (path.startsWith('v1/live-drops') && method === 'GET') {
-    const item = DEMO_DROP_POOL[0];
-    return {
-      success: true,
-      data: {
-        drops: [
-          {
-            id: 'ld1',
-            user: { id: 'u1', username: 'PlayerOne', level: 12, avatar: null, steam_avatar_url: null },
-            item: {
-              id: item.id,
-              name: item.name,
-              image: item.image_url,
-              price: parseFloat(item.price),
-              rarity: item.rarity,
-            },
-            case: null,
-            dropTime: new Date().toISOString(),
-            isRare: true,
-            isHighlighted: false,
-            price: parseFloat(item.price),
-          },
-        ],
-        pagination: { limit: 10, offset: 0, hasMore: false },
+        caseTemplateId: hint.id,
       },
     };
   }
@@ -559,21 +414,12 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
     };
   }
 
-  if (path === 'v1/avatars' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        avatars: [],
-      },
-    };
-  }
-
   // ——— Мутации кейсов ———
   if (path === 'v1/cases/buy' && method === 'POST') {
     const b = parseJsonBody(body);
     const tid = String(b.case_template_id || b.caseTemplateId || '');
-    const ct = caseTemplateById(tid);
-    const price = parseFloat(ct.price || '0') || 0;
+    const ct = (await resolveCaseTemplateByIdFromProd(tid)) || caseTemplateById(tid);
+    const price = parseFloat(String(ct.price || '0')) || 0;
     const bal = getDemoBalance();
     if (price > 0 && bal < price) {
       return { success: false, message: 'Недостаточно ChiCoins (демо).' };
@@ -617,7 +463,20 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
     const inventoryItemId = b.inventoryItemId as string | undefined;
     const templateId = b.template_id as string | undefined;
 
-    let dropped: Item = pickRandomDemoDrop();
+    let resolveTemplateId = templateId;
+    if (inventoryItemId) {
+      const inv = getDemoInventory();
+      const caseRow = inv.cases.find((c) => c.id === inventoryItemId);
+      if (caseRow?.case_template_id) resolveTemplateId = caseRow.case_template_id;
+    }
+
+    let dropped: Item;
+    if (resolveTemplateId) {
+      const items = await fetchCaseTemplateItemsFromProd(resolveTemplateId);
+      dropped = items.length > 0 ? pickRandomDropFromProdItems(items) : pickRandomDemoDrop();
+    } else {
+      dropped = pickRandomDemoDrop();
+    }
 
     if (inventoryItemId) {
       const removed = removeDemoCase(inventoryItemId);
@@ -626,7 +485,6 @@ export function getDemoApiResponse(args: string | FetchArgs): unknown {
       }
       incrementDemoCasesOpened();
     } else if (templateId) {
-      // бесплатное открытие по шаблону — не трогаем инвентарь, только счётчик
       incrementDemoCasesOpened();
     } else {
       incrementDemoCasesOpened();
