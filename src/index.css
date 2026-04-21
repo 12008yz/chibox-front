@@ -1908,7 +1908,7 @@ html::-webkit-scrollbar-thumb,
 }
 
 .case-image {
-  overflow: visible;
+  overflow: clip;
   border-radius: 0;
   border: none !important;
   outline: none !important;

@@ -3,7 +3,7 @@ import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, Suspense, useCallback, useState, useRef } from 'react';
+import { useEffect, Suspense, useCallback, useState } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 import { lazyWithChunkError } from './utils/lazyWithChunkError';
@@ -84,15 +84,12 @@ const App: React.FC = () => {
 
   // Проверяем, находимся ли мы на странице Steam авторизации
   const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
-  const hasCheckedSession = useRef(false);
-
-  // БЕЗОПАСНОСТЬ: Токены в httpOnly cookies. Запрашиваем профиль только:
-  // 1. Есть старый токен (миграция), 2. Уже есть user (обновление), 3. Ещё не проверяли сессию (одна попытка с cookies).
-  // После 401 для гостя больше не дергаем /profile — убираем лишние 401 в консоли и каскад refetch.
+  // Не делаем гостевой probe /profile, чтобы не получать лишние 401 в консоли Lighthouse.
+  // Профиль запрашиваем только для уже авторизованного состояния (token/user/isAuthenticated).
   const shouldFetchUser = !isSteamAuthPage && (
     auth.token ||
     (auth.user != null && auth.user.id) ||
-    !hasCheckedSession.current
+    auth.isAuthenticated
   );
 
   const {
@@ -127,11 +124,6 @@ const App: React.FC = () => {
       }));
     }
   }, [userData, auth.token, dispatch]);
-
-  // После первого ответа getCurrentUser (успех или 401) помечаем сессию проверенной — гостям больше не запрашиваем /profile
-  useEffect(() => {
-    if (userData?.success || userError) hasCheckedSession.current = true;
-  }, [userData?.success, userError]);
 
   // Logout ТОЛЬКО при ошибке getCurrentUser (не при других API вызовах)
   useEffect(() => {
