@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export const BANNER_IMAGES = [
   '/images/banners/tma.webp',
@@ -106,15 +105,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
       className={`w-full overflow-hidden rounded-xl ${height} relative bg-dark-800 border border-white/5`}
       style={CAROUSEL_GLOW_STYLE}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={current}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          className="absolute inset-0"
-        >
+      <div key={current} className="absolute inset-0 transition-opacity duration-300 opacity-100">
           <img
             src={items[current]}
             alt=""
@@ -244,8 +235,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               )}
             </>
           )}
-        </motion.div>
-      </AnimatePresence>
+      </div>
 
       {items.length > 1 && (
         <>

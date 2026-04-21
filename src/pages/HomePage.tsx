@@ -548,13 +548,15 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Вступительное видео после регистрации */}
-      <Suspense fallback={null}>
-        <IntroVideo
-          isOpen={showIntroVideo}
-          onVideoEnd={handleVideoEnd}
-          videoUrl="/preview.mp4"
-        />
-      </Suspense>
+      {showIntroVideo && (
+        <Suspense fallback={null}>
+          <IntroVideo
+            isOpen={showIntroVideo}
+            onVideoEnd={handleVideoEnd}
+            videoUrl="/preview.mp4"
+          />
+        </Suspense>
+      )}
 
       {/* Steam Trade URL Modal - показывается только после видео */}
       <SteamTradeUrlModal
@@ -577,38 +579,46 @@ const HomePage: React.FC = () => {
       )}
 
       {/* Игра крестики-нолики */}
-      <Suspense fallback={null}>
-        <TicTacToeGame
-          isOpen={showTicTacToeGame}
-          onClose={handleTicTacToeGameClose}
-          onRewardReceived={handleTicTacToeWin}
-        />
-      </Suspense>
+      {showTicTacToeGame && (
+        <Suspense fallback={null}>
+          <TicTacToeGame
+            isOpen={showTicTacToeGame}
+            onClose={handleTicTacToeGameClose}
+            onRewardReceived={handleTicTacToeWin}
+          />
+        </Suspense>
+      )}
 
       {/* Игра Safe Cracker */}
-      <Suspense fallback={null}>
-        <SafeCrackerGame
-          isOpen={showSafeCrackerGame}
-          onClose={() => setShowSafeCrackerGame(false)}
-        />
-      </Suspense>
+      {showSafeCrackerGame && (
+        <Suspense fallback={null}>
+          <SafeCrackerGame
+            isOpen={showSafeCrackerGame}
+            onClose={() => setShowSafeCrackerGame(false)}
+          />
+        </Suspense>
+      )}
 
       {/* Онбординг тур */}
-      <Suspense fallback={null}>
-        <OnboardingTour
-          isActive={showOnboarding}
-          onComplete={handleOnboardingComplete}
-        />
-      </Suspense>
+      {showOnboarding && (
+        <Suspense fallback={null}>
+          <OnboardingTour
+            isActive={showOnboarding}
+            onComplete={handleOnboardingComplete}
+          />
+        </Suspense>
+      )}
 
       {/* Модалка покупки статуса (при переходе из профиля) */}
-      <Suspense fallback={null}>
-        <DepositModal
-          isOpen={showStatusPurchaseModal}
-          onClose={() => setShowStatusPurchaseModal(false)}
-          initialTab="subscription"
-        />
-      </Suspense>
+      {showStatusPurchaseModal && (
+        <Suspense fallback={null}>
+          <DepositModal
+            isOpen={showStatusPurchaseModal}
+            onClose={() => setShowStatusPurchaseModal(false)}
+            initialTab="subscription"
+          />
+        </Suspense>
+      )}
 
       {/* Одна модалка превью кейса (из любой секции) */}
       {previewCase && (
