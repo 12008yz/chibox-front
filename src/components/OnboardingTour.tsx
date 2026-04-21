@@ -370,72 +370,63 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
 
-    let position: React.CSSProperties = {};
+    let top = 0;
+    let left = 0;
+    let transform = '';
 
     // Для первого шага показываем подсказку по центру экрана
     if (currentStep === 0) {
-      position = {
+      return {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)'
       };
-      return position;
     }
 
     switch (step.position) {
       case 'bottom':
-        position = {
-          top: targetPosition.top + targetPosition.height + offset + arrowSize,
-          left: targetPosition.left + targetPosition.width / 2,
-          transform: 'translateX(-50%)'
-        };
-        if (position.top + tooltipHeight > viewportHeight) {
-          position.top = targetPosition.top - offset - arrowSize;
-          position.transform = 'translateX(-50%) translateY(-100%)';
+        top = targetPosition.top + targetPosition.height + offset + arrowSize;
+        left = targetPosition.left + targetPosition.width / 2;
+        transform = 'translateX(-50%)';
+        if (top + tooltipHeight > viewportHeight) {
+          top = targetPosition.top - offset - arrowSize;
+          transform = 'translateX(-50%) translateY(-100%)';
         }
         break;
       case 'top':
-        position = {
-          top: targetPosition.top - offset - arrowSize,
-          left: targetPosition.left + targetPosition.width / 2,
-          transform: 'translateX(-50%) translateY(-100%)'
-        };
-        if (position.top - tooltipHeight < 0) {
-          position.top = targetPosition.top + targetPosition.height + offset + arrowSize;
-          position.transform = 'translateX(-50%)';
+        top = targetPosition.top - offset - arrowSize;
+        left = targetPosition.left + targetPosition.width / 2;
+        transform = 'translateX(-50%) translateY(-100%)';
+        if (top - tooltipHeight < 0) {
+          top = targetPosition.top + targetPosition.height + offset + arrowSize;
+          transform = 'translateX(-50%)';
         }
         break;
       case 'left':
-        position = {
-          top: targetPosition.top + targetPosition.height / 2,
-          left: targetPosition.left - offset - arrowSize,
-          transform: 'translateY(-50%) translateX(-100%)'
-        };
+        top = targetPosition.top + targetPosition.height / 2;
+        left = targetPosition.left - offset - arrowSize;
+        transform = 'translateY(-50%) translateX(-100%)';
         break;
       case 'right':
-        position = {
-          top: targetPosition.top + targetPosition.height / 2,
-          left: targetPosition.left + targetPosition.width + offset + arrowSize,
-          transform: 'translateY(-50%)'
-        };
+        top = targetPosition.top + targetPosition.height / 2;
+        left = targetPosition.left + targetPosition.width + offset + arrowSize;
+        transform = 'translateY(-50%)';
         break;
       default:
         return {};
     }
 
-    if (position.left) {
-      const estimatedLeft = position.transform?.includes('translateX(-50%)')
-        ? position.left - tooltipMaxWidth / 2
-        : position.left;
+    const estimatedLeft = transform.includes('translateX(-50%)')
+      ? left - tooltipMaxWidth / 2
+      : left;
 
-      if (estimatedLeft < 20) {
-        position.left = tooltipMaxWidth / 2 + 20;
-      } else if (estimatedLeft + tooltipMaxWidth > viewportWidth - 20) {
-        position.left = viewportWidth - tooltipMaxWidth / 2 - 20;
-      }
+    if (estimatedLeft < 20) {
+      left = tooltipMaxWidth / 2 + 20;
+    } else if (estimatedLeft + tooltipMaxWidth > viewportWidth - 20) {
+      left = viewportWidth - tooltipMaxWidth / 2 - 20;
     }
 
-    return position;
+    return { top, left, transform };
   };
 
   const getArrowPosition = () => {

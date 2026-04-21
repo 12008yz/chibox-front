@@ -232,7 +232,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                 return {
                     title: t('notifications.notification_types.case_purchase'),
                     message: t('notifications.notification_types.case_purchase_message', {
-                        count: match[1],
+                        count: Number(match[1]),
                         amount: match[2]
                     })
                 };
