@@ -251,10 +251,10 @@ const MobileUpgradeAnimation: React.FC<{
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Анимация движения прицела во время прицеливания
-    let crosshairInterval: NodeJS.Timeout | null = null;
-    let crosshairMovementTime = 0;
-    const crosshairSpeed = 0.02; // Скорость движения прицела
+    // Анимация движения прицела во время прицеливания через RAF (меньше джиттера на mobile)
+    let crosshairRafId: number | null = null;
+    let crosshairAnimationStart = 0;
+    const crosshairCycleMs = 2400;
 
     // Вычисляем точку попадания на статичной мишени
     const targetRadius = 50; // радиус мишени в процентах от центра
@@ -282,24 +282,29 @@ const MobileUpgradeAnimation: React.FC<{
     const timer1 = setTimeout(() => {
       setPhase('aiming');
 
-      // Запускаем хаотичное движение прицела по всей области мишени
-      crosshairInterval = setInterval(() => {
-        crosshairMovementTime += crosshairSpeed;
+      const animateCrosshair = (now: number) => {
+        if (!crosshairAnimationStart) {
+          crosshairAnimationStart = now;
+        }
+        const phase = ((now - crosshairAnimationStart) % crosshairCycleMs) / crosshairCycleMs;
+        const angle = phase * Math.PI * 2;
         // Прицел двигается хаотично по мишени (комбинация синусоид)
-        const offsetX = Math.sin(crosshairMovementTime * Math.PI * 2) * 25 + Math.cos(crosshairMovementTime * Math.PI * 1.5) * 15;
-        const offsetY = Math.sin(crosshairMovementTime * Math.PI * 2.3) * 25 + Math.cos(crosshairMovementTime * Math.PI * 1.7) * 15;
+        const offsetX = Math.sin(angle) * 25 + Math.cos(angle * 0.75) * 15;
+        const offsetY = Math.sin(angle * 1.15) * 25 + Math.cos(angle * 0.85) * 15;
         setCrosshairPosition({
           x: 50 + offsetX,
           y: 50 + offsetY
         });
-      }, 16); // ~60fps
+        crosshairRafId = requestAnimationFrame(animateCrosshair);
+      };
+      crosshairRafId = requestAnimationFrame(animateCrosshair);
     }, 800);
 
     // Фаза 2: Остановка прицела на точке попадания и подготовка к выстрелу (за 0.2s до выстрела)
     const timerStop = setTimeout(() => {
-      if (crosshairInterval) {
-        clearInterval(crosshairInterval);
-        crosshairInterval = null;
+      if (crosshairRafId !== null) {
+        cancelAnimationFrame(crosshairRafId);
+        crosshairRafId = null;
       }
       // Фиксируем прицел на точке попадания с плавной анимацией
       setCrosshairPosition({ x: hitX, y: hitY });
@@ -341,7 +346,7 @@ const MobileUpgradeAnimation: React.FC<{
     }, 4100);
 
     return () => {
-      if (crosshairInterval) clearInterval(crosshairInterval);
+      if (crosshairRafId !== null) cancelAnimationFrame(crosshairRafId);
       clearTimeout(timer1);
       clearTimeout(timerStop);
       clearTimeout(timer2);

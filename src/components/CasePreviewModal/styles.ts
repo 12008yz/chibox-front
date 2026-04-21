@@ -440,6 +440,16 @@ export const strikeAnimationStyles = `
     -webkit-animation: light-ray 2s ease-out forwards;
     animation: light-ray 2s ease-out forwards;
   }
+  @media (max-width: 1023px) {
+    .light-ray {
+      /* Сокращаем площадь и длительность лучей на mobile */
+      width: 160%;
+      left: -30%;
+      opacity: 0.75;
+      -webkit-animation: light-ray 1.3s ease-out forwards;
+      animation: light-ray 1.3s ease-out forwards;
+    }
+  }
 
   @-webkit-keyframes golden-spark {
     0% {
@@ -584,6 +594,15 @@ export const strikeAnimationStyles = `
     animation: victory-glow 2s ease-in-out;
     will-change: filter;
   }
+  @media (max-width: 1023px) {
+    .victory-glow {
+      /* Фоллбэк без filter-анимации: заметно и легче для GPU */
+      -webkit-animation: none;
+      animation: none;
+      filter: none;
+      box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.45), 0 0 14px rgba(255, 215, 0, 0.32);
+    }
+  }
 
   /* КРИТИЧЕСКАЯ ОПТИМИЗАЦИЯ GPU */
   .gpu-layer {
@@ -691,6 +710,14 @@ export const strikeAnimationStyles = `
       linear-gradient(90deg, rgba(8, 5, 18, 0.94) 0%, rgba(8, 5, 18, 0.25) 12%, transparent 22%, transparent 78%, rgba(8, 5, 18, 0.25) 88%, rgba(8, 5, 18, 0.94) 100%),
       radial-gradient(ellipse 42% 130% at 50% 50%, rgba(251, 191, 36, 0.11) 0%, transparent 62%);
     pointer-events: none;
+  }
+  @media (max-width: 1023px) {
+    /* На mobile/tablet снижаем тяжесть перерисовки оверлея */
+    .case-open-viewport-overlay {
+      background:
+        linear-gradient(90deg, rgba(8, 5, 18, 0.92) 0%, rgba(8, 5, 18, 0.3) 14%, transparent 24%, transparent 76%, rgba(8, 5, 18, 0.3) 86%, rgba(8, 5, 18, 0.92) 100%),
+        radial-gradient(ellipse 40% 120% at 50% 50%, rgba(251, 191, 36, 0.08) 0%, transparent 58%);
+    }
   }
 
   /* Появление полноэкранной рулетки после ухода превью */
@@ -946,6 +973,16 @@ export const strikeAnimationStyles = `
   }
   .case-open-center-marker--pulse {
     animation: case-open-marker-pulse 1.15s ease-in-out infinite;
+  }
+  @media (max-width: 1023px) {
+    .case-open-center-marker {
+      filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.35));
+    }
+    .case-open-center-marker--pulse {
+      /* На мобильных оставляем только статичное свечение, без filter-анимации */
+      animation: none;
+      opacity: 0.95;
+    }
   }
   .case-open-marker-needle {
     width: 2px;

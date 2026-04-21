@@ -47,6 +47,15 @@ function cubicBezierYatX(t: number, x1: number, y1: number, x2: number, y2: numb
 
 // Портал в documentElement, чтобы подложка (fixed) не привязывалась к body с position:fixed — иначе чёрный фон только в нижней части экрана
 const MODAL_PORTAL_TARGET = typeof document !== 'undefined' ? document.documentElement : null;
+const DAILY_CASE_IDS = new Set([
+  '11111111-1111-1111-1111-111111111111',
+  '22222222-2222-2222-2222-222222222222',
+  '33333333-3333-3333-3333-333333333333',
+  '44444444-4444-4444-4444-444444444444',
+  '55555555-5555-5555-5555-555555555555',
+  '66666666-6666-6666-6666-666666666666',
+  '77777777-7777-7777-7777-777777777777',
+]);
 
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   isOpen,
@@ -334,7 +343,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const items = itemsData?.data?.items || [];
     if (!items || items.length === 0) return [];
 
-    const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444";
+    const isDailyCase = DAILY_CASE_IDS.has(caseData.id);
 
     return items.map(item => ({
       ...item,
@@ -670,7 +679,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
 
       // Звук открытия кейса (не для ежедневного кейса)
-      const isDailyCase = caseData.id === "44444444-4444-4444-4444-444444444444" || "11111111-1111-1111-1111-111111111111" || "22222222-2222-2222-2222-222222222222" || "33333333-3333-3333-3333-333333333333" || "55555555-5555-5555-5555-555555555555" || "66666666-6666-6666-6666-666666666666" || "77777777-7777-7777-7777-777777777777";
+      const isDailyCase = DAILY_CASE_IDS.has(caseData.id);
       if (!isDailyCase) {
         if (isIPhone) {
           rouletteAudio.playOpenCase();

@@ -296,12 +296,6 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-/* Стандартизация рендеринга анимаций - ВСЕГДА АКТИВНО */
-* {
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* Отключение адаптивной яркости на мобильных */
 @media screen and (max-width: 768px) {
   html {
