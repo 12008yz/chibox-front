@@ -75,6 +75,76 @@ export function mergeDemoCasesAvailableResponse(prodBody: Record<string, unknown
   };
 }
 
+function pickImageUrl(row: Record<string, unknown>): string | null {
+  const variants = [
+    row.image_url,
+    row.image,
+    row.icon_url,
+    row.icon,
+    row.market_image,
+    row.preview_image,
+  ];
+  const hit = variants.find((v) => typeof v === 'string' && v.trim() !== '');
+  return typeof hit === 'string' ? hit : null;
+}
+
+function pickString(row: Record<string, unknown>, keys: string[], fallback = ''): string {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'string' && value.trim() !== '') return value;
+  }
+  return fallback;
+}
+
+function pickOptionalString(row: Record<string, unknown>, keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'string' && value.trim() !== '') return value;
+  }
+  return undefined;
+}
+
+function pickNumberishAsString(row: Record<string, unknown>, keys: string[], fallback = '0'): string {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'number' || typeof value === 'string') return String(value);
+  }
+  return fallback;
+}
+
+/** Нормализует состав кейса из прода под контракт фронта в demo-сборке. */
+export function normalizeDemoCaseItemsResponse(prodBody: Record<string, unknown>) {
+  const data = (prodBody.data ?? {}) as Record<string, unknown>;
+  const rawItems = Array.isArray(data.items) ? data.items : [];
+  const items = rawItems
+    .filter((x): x is Record<string, unknown> => x !== null && typeof x === 'object')
+    .map((row) => ({
+      ...row,
+      id: String(row.id ?? ''),
+      name: pickString(row, ['name', 'market_hash_name', 'title'], 'Unknown Item'),
+      image_url: pickImageUrl(row),
+      price: pickNumberishAsString(row, ['price', 'price_value', 'steam_price'], '0'),
+      rarity: pickString(row, ['rarity'], 'common'),
+      weapon_type: pickOptionalString(row, ['weapon_type']),
+      drop_chance_percent:
+        typeof row.drop_chance_percent === 'number'
+          ? row.drop_chance_percent
+          : typeof row.drop_chance === 'number'
+            ? row.drop_chance
+            : 0,
+      is_excluded: Boolean(row.is_excluded),
+      is_already_dropped: Boolean(row.is_already_dropped),
+    }));
+
+  return {
+    ...prodBody,
+    data: {
+      ...data,
+      items,
+    },
+  };
+}
+
 export async function fetchCaseTemplatesFromProd(): Promise<CaseTemplate[]> {
   const base = getDemoCatalogApiUrl();
   const r = await fetch(`${base}/v1/cases/available`, { credentials: 'omit' });

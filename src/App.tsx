@@ -23,6 +23,7 @@ import PaymentSuccessModal from './components/PaymentSuccessModal';
 import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { API_URL } from './utils/config';
+import { isDemoMode } from './utils/demoMode';
 
 // Главная без lazy: иначе Suspense блокирует весь HomePage (баннер, разметка) пока грузится отдельный чанк — в инкогнито без кеша виден «пустой экран + спиннер».
 import HomePage from './pages/HomePage';
@@ -176,6 +177,9 @@ const App: React.FC = () => {
   // Глобальный звук клика (на мобильных — только в зонах с data-play-click-sound-mobile)
   useEffect(() => {
     const handleGlobalClick = (event: MouseEvent) => {
+      // В demo-режиме игнорируем синтетические клики (скрипты/автофокус), чтобы убрать "вечный клик" в профиле.
+      if (isDemoMode() && !event.isTrusted) return;
+
       const target = event.target as HTMLElement;
       const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], [onclick]');
 

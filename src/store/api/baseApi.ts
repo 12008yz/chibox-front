@@ -5,6 +5,7 @@ import {
   getDemoCatalogApiUrl,
   mergeDemoCasesAvailableResponse,
   mergeDemoCasesResponse,
+  normalizeDemoCaseItemsResponse,
   parseDemoRequestPath,
   shouldDemoFetchCatalogFromProduction,
 } from '../../utils/demoCatalogFetch';
@@ -90,6 +91,8 @@ const baseQueryWithErrorHandling = async (args: any, api: any, extraOptions: any
         data = mergeDemoCasesResponse(data);
       } else if (path === 'v1/cases/available') {
         data = mergeDemoCasesAvailableResponse(data);
+      } else if (/^v1\/case-templates\/[^/]+\/items$/.test(path)) {
+        data = normalizeDemoCaseItemsResponse(data);
       }
       return { data };
     }
