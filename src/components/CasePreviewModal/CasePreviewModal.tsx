@@ -466,6 +466,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       : isIPhone
         ? 3600 + Math.random() * 500
         : 5200 + Math.random() * 800;
+    const settleDurationMs = reduceMotion ? 120 : isIPhone ? 260 : 300;
+    const overshootSlots = reduceMotion ? 0 : isIPhone ? 0.16 : 0.24;
+    const firstPhaseTarget = targetSlotIndex + overshootSlots;
     const startDelayMs = reduceMotion ? 120 : 380;
     let lastTickSlot = -1;
     let lastSoundAt = 0;
@@ -481,27 +484,69 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (el) {
         el.style.removeProperty('transition');
       }
-      applyMobileStripTransformFloat(targetSlotIndex, 0);
-      setSliderPosition(targetSlotIndex);
-      setAnimationPhase('stopped');
-      trackTimeout(() => {
-        // Разносим по кадрам звук и тяжелые win-эффекты, чтобы убрать микро-рывок в конце
-        if (useWebAudioForIPhone) {
-          rouletteAudio.playEnd();
-        } else {
-          soundManager.play('endProcess');
+
+      const settleStartPos = mobileAnimationRef.current.position + mobileAnimationRef.current.offset;
+      if (Math.abs(settleStartPos - targetSlotIndex) <= 0.001) {
+        applyMobileStripTransformFloat(targetSlotIndex, 0);
+        setSliderPosition(targetSlotIndex);
+        setAnimationPhase('stopped');
+        trackTimeout(() => {
+          if (useWebAudioForIPhone) {
+            rouletteAudio.playEnd();
+          } else {
+            soundManager.play('endProcess');
+          }
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setShowWinEffects(true));
+          });
+        }, 220);
+        trackTimeout(() => setShowGoldenSparks(true), 900);
+        trackTimeout(() => {
+          if (caseData.id === '44444444-4444-4444-4444-444444444444') {
+            setShowStrikeThrough(true);
+          }
+        }, 1400);
+        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+        return;
+      }
+
+      let settleStart: number | null = null;
+      const settle = (now: number) => {
+        if (settleStart === null) settleStart = now;
+        const settleElapsed = now - settleStart;
+        const tSettle = Math.min(1, settleElapsed / settleDurationMs);
+        const easedSettle = cubicBezierYatX(tSettle, 0.34, 1, 0.64, 1);
+        const pos = settleStartPos + (targetSlotIndex - settleStartPos) * easedSettle;
+        applyMobileStripTransformFloat(pos, 0);
+
+        if (tSettle < 1) {
+          animationFrameRef.current = requestAnimationFrame(settle);
+          return;
         }
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => setShowWinEffects(true));
-        });
-      }, 300);
-      trackTimeout(() => setShowGoldenSparks(true), 950);
-      trackTimeout(() => {
-        if (caseData.id === "44444444-4444-4444-4444-444444444444") {
-          setShowStrikeThrough(true);
-        }
-      }, 1500);
-      trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+
+        animationFrameRef.current = null;
+        applyMobileStripTransformFloat(targetSlotIndex, 0);
+        setSliderPosition(targetSlotIndex);
+        setAnimationPhase('stopped');
+        trackTimeout(() => {
+          if (useWebAudioForIPhone) {
+            rouletteAudio.playEnd();
+          } else {
+            soundManager.play('endProcess');
+          }
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setShowWinEffects(true));
+          });
+        }, 220);
+        trackTimeout(() => setShowGoldenSparks(true), 900);
+        trackTimeout(() => {
+          if (caseData.id === '44444444-4444-4444-4444-444444444444') {
+            setShowStrikeThrough(true);
+          }
+        }, 1400);
+        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+      };
+      animationFrameRef.current = requestAnimationFrame(settle);
     };
 
     trackTimeout(() => {
@@ -519,7 +564,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         const elapsed = now - animStart;
         const t = Math.min(1, elapsed / durationMs);
         const eased = cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
-        const pos = eased * targetSlotIndex;
+        const pos = eased * firstPhaseTarget;
         applyMobileStripTransformFloat(pos, 0);
 
         const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
