@@ -112,15 +112,18 @@ export const CaseItem = memo(({
         // Эффекты отключены для лучшей производительности
         break;
       case 'fake-slowing':
-        // Пульсация во время fake slowdown
+        // Лёгкая пульсация без filter: меньше repaint нагрузки
         if (!isWinningItemStopped) {
-          styles.animation = 'fake-slow-pulse 0.6s ease-in-out';
+          styles.opacity = 0.96;
+          styles.transform = 'scale(1.01)';
+          styles.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
         }
         break;
       case 'slowing':
-        // Плавное убирание blur при замедлении
-        styles.filter = 'blur(0px)';
-        styles.transition = 'filter 0.3s ease-out';
+        // Замедление только через transform/opacity
+        styles.opacity = 1;
+        styles.transform = 'scale(1)';
+        styles.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
         break;
       case 'wobbling':
         // Эффект перекатывания: на десктопе — умеренный scale (без сильного сужения), на мобилке — без изменений
@@ -132,20 +135,18 @@ export const CaseItem = memo(({
             const scale = 1 + (0.15 * (1 - progress)) - (0.1 * progress);
             const opacity = 1 - (0.3 * progress);
             const rotation = -3 * progress;
-            styles.filter = `brightness(${brightness})`;
             styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-            styles.opacity = opacity;
+            styles.opacity = opacity * Math.min(1.08, brightness);
           } else {
             // Десктоп: мягче, чтобы блоки не сужались
             const brightness = 1 + (0.2 * (1 - progress)) - (0.35 * progress);
             const scale = 1 + (0.05 * (1 - progress)) - (0.05 * progress);
             const opacity = 1 - (0.2 * progress);
             const rotation = -2 * progress;
-            styles.filter = `brightness(${brightness})`;
             styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-            styles.opacity = opacity;
+            styles.opacity = opacity * Math.min(1.05, brightness);
           }
-          styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
+          styles.transition = 'transform 0.05s ease-out, opacity 0.05s ease-out';
         } else if (isNextSliderPosition) {
           const progress = sliderOffset / 0.3;
           if (suppressBetweenHighlight) {
@@ -153,27 +154,25 @@ export const CaseItem = memo(({
             const scale = 1 - (0.1 * (1 - progress)) + (0.15 * progress);
             const opacity = 1 - (0.3 * (1 - progress));
             const rotation = 3 * progress;
-            styles.filter = `brightness(${brightness})`;
             styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-            styles.opacity = opacity;
+            styles.opacity = opacity * Math.min(1.08, brightness);
           } else {
             const brightness = 1 - (0.15 * (1 - progress)) + (0.25 * progress);
             const scale = 1 - (0.05 * (1 - progress)) + (0.05 * progress);
             const opacity = 1 - (0.2 * (1 - progress));
             const rotation = 2 * progress;
-            styles.filter = `brightness(${brightness})`;
             styles.transform = `scale(${scale}) rotate(${rotation}deg)`;
-            styles.opacity = opacity;
+            styles.opacity = opacity * Math.min(1.05, brightness);
           }
-          styles.transition = 'filter 0.05s ease-out, transform 0.05s ease-out, opacity 0.05s ease-out';
+          styles.transition = 'transform 0.05s ease-out, opacity 0.05s ease-out';
         }
         break;
       case 'falling':
         // Во время падения
         if (isCurrentSliderPosition) {
-          styles.filter = 'brightness(1.1)';
+          styles.opacity = 1;
           styles.transform = 'scale(1.05)';
-          styles.transition = 'filter 0.2s ease-out, transform 0.2s ease-out';
+          styles.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
         }
         break;
       default:
@@ -182,6 +181,13 @@ export const CaseItem = memo(({
 
     return styles;
   }, [showOpeningAnimation, animationPhase, isCurrentSliderPosition, isNextSliderPosition, isWinningItemStopped, sliderOffset, suppressBetweenHighlight]);
+
+  // Обработчик клика на предмет только для мобильных устройств
+  const handleClick = useCallback(() => {
+    if (onItemClick && !showOpeningAnimation && window.innerWidth < 768) {
+      onItemClick(item);
+    }
+  }, [onItemClick, item, showOpeningAnimation]);
 
   // Рендерим заглушку для невидимых элементов
   if (!isVisible) {
@@ -193,13 +199,6 @@ export const CaseItem = memo(({
   const shouldRenderSimplified = showOpeningAnimation
     ? false
     : (false); // упрощённый рендер не используется вне анимации
-
-  // Обработчик клика на предмет только для мобильных устройств
-  const handleClick = useCallback(() => {
-    if (onItemClick && !showOpeningAnimation && window.innerWidth < 768) {
-      onItemClick(item);
-    }
-  }, [onItemClick, item, showOpeningAnimation]);
 
   return (
     <div

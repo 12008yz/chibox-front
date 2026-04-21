@@ -12,27 +12,31 @@ export const strikeAnimationStyles = `
 
   @-webkit-keyframes item-glow-pulse {
     0%, 100% {
-      -webkit-filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
-      filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
       border-color: rgb(34, 197, 94);
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
     50% {
-      -webkit-filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
-      filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
       border-color: rgb(239, 68, 68);
+      opacity: 0.9;
+      -webkit-transform: scale(1.02);
+      transform: scale(1.02);
     }
   }
 
   @keyframes item-glow-pulse {
     0%, 100% {
-      -webkit-filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
-      filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
       border-color: rgb(34, 197, 94);
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
     50% {
-      -webkit-filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
-      filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
       border-color: rgb(239, 68, 68);
+      opacity: 0.9;
+      -webkit-transform: scale(1.02);
+      transform: scale(1.02);
     }
   }
 
@@ -122,10 +126,14 @@ export const strikeAnimationStyles = `
 
   @keyframes container-pulse {
     0%, 100% {
-      box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.3);
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
     50% {
-      box-shadow: inset 0 0 20px rgba(234, 179, 8, 0.6);
+      opacity: 0.96;
+      -webkit-transform: scale(1.006);
+      transform: scale(1.006);
     }
   }
 
@@ -479,23 +487,27 @@ export const strikeAnimationStyles = `
 
   @-webkit-keyframes victory-glow {
     0%, 100% {
-      -webkit-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
     50% {
-      -webkit-filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+      opacity: 0.92;
+      -webkit-transform: scale(1.015);
+      transform: scale(1.015);
     }
   }
 
   @keyframes victory-glow {
     0%, 100% {
-      -webkit-filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+      opacity: 1;
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
     50% {
-      -webkit-filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+      opacity: 0.92;
+      -webkit-transform: scale(1.015);
+      transform: scale(1.015);
     }
   }
 
@@ -556,7 +568,7 @@ export const strikeAnimationStyles = `
   .animate-item-glow {
     -webkit-animation: item-glow-pulse 3s ease-in-out infinite;
     animation: item-glow-pulse 3s ease-in-out infinite;
-    will-change: filter, border-color;
+    will-change: transform, opacity;
   }
 
   .animate-svg-line-1 {
@@ -592,7 +604,8 @@ export const strikeAnimationStyles = `
   .victory-glow {
     -webkit-animation: victory-glow 2s ease-in-out;
     animation: victory-glow 2s ease-in-out;
-    will-change: filter;
+    will-change: transform, opacity;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.35), 0 0 12px rgba(255, 215, 0, 0.25);
   }
   @media (max-width: 1023px) {
     .victory-glow {
@@ -725,12 +738,10 @@ export const strikeAnimationStyles = `
     from {
       opacity: 0;
       transform: scale(0.96);
-      filter: blur(12px);
     }
     to {
       opacity: 1;
       transform: scale(1);
-      filter: blur(0);
     }
   }
   .case-open-roulette-layer {
@@ -740,7 +751,6 @@ export const strikeAnimationStyles = `
     .case-open-roulette-layer {
       animation: none;
       opacity: 1;
-      filter: none;
       transform: none;
     }
   }
@@ -959,16 +969,16 @@ export const strikeAnimationStyles = `
 
   /* Маркер: свечение; пульсация только с классом --pulse */
   .case-open-center-marker {
-    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.45)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    opacity: 0.97;
   }
   @keyframes case-open-marker-pulse {
     0%, 100% {
-      filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
       opacity: 1;
+      transform: translateX(-50%) scale(1);
     }
     50% {
-      filter: drop-shadow(0 0 18px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 28px rgba(245, 158, 11, 0.35)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
-      opacity: 0.95;
+      opacity: 0.88;
+      transform: translateX(-50%) scale(1.06);
     }
   }
   .case-open-center-marker--pulse {
@@ -976,7 +986,7 @@ export const strikeAnimationStyles = `
   }
   @media (max-width: 1023px) {
     .case-open-center-marker {
-      filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.35));
+      opacity: 0.92;
     }
     .case-open-center-marker--pulse {
       /* На мобильных оставляем только статичное свечение, без filter-анимации */
