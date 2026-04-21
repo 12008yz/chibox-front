@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Monetary from './Monetary';
 import CaseTimer from './CaseTimer';
@@ -32,27 +32,19 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
   const [loaded, setLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Дефолтные изображения кейсов CS2
-  const defaultCaseImages = [
-    'https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frncVtqv7MPE8JaHHCj_Dl-wk4-NtFirikURy4jiGwo2udHqVaAEjDZp3EflK7EeSMnMs4w/256fx256f'
-  ];
-
-  // Выбираем случайное изображение кейса на основе названия для стабильности
-  const defaultImage = useMemo(() => {
-    const hash = title.split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a & a;
-    }, 0);
-    return defaultCaseImages[Math.abs(hash) % defaultCaseImages.length];
-  }, [title]);
-
-  // Получаем правильный URL изображения кейса (с бэкенда или Steam)
+  // Используем только реальное изображение кейса; без дефолтных fallback-изображений
   const caseImageUrl = useMemo(() => {
     if (!image || image.trim() === '' || imageError) {
-      return defaultImage;
+      return '';
     }
     return getCaseImageUrl(image);
-  }, [image, imageError, defaultImage]);
+  }, [image, imageError]);
+
+  useEffect(() => {
+    if (!caseImageUrl) {
+      setLoaded(true);
+    }
+  }, [caseImageUrl]);
 
   return (
     <div
@@ -65,23 +57,29 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
       )}
 
       <div className="relative w-full flex items-center justify-center overflow-visible aspect-square md:aspect-[3/4]">
-        <img loading="lazy" decoding="async" src={caseImageUrl}
-          alt={title}
-          width="256"
-          height="256"
-          draggable="false"
-          className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
-          style={{
-            pointerEvents: 'none',
-            userSelect: 'none'
-          } as React.CSSProperties}
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            if (!imageError) {
-              setImageError(true);
-            }
-          }}
-        />
+        {caseImageUrl ? (
+          <img loading="lazy" decoding="async" src={caseImageUrl}
+            alt={title}
+            width="256"
+            height="256"
+            draggable="false"
+            className={`case-image w-full h-32 md:h-64 object-contain md:object-cover md:-ml-4 relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            style={{
+              pointerEvents: 'none',
+              userSelect: 'none'
+            } as React.CSSProperties}
+            onLoad={() => setLoaded(true)}
+            onError={() => {
+              if (!imageError) {
+                setImageError(true);
+              }
+            }}
+          />
+        ) : (
+          <div className="w-full h-32 md:h-64 rounded-lg border border-gray-700 bg-gray-900/70 flex items-center justify-center text-gray-500 text-xs md:text-sm">
+            {t('case_preview_modal.no_image', { defaultValue: 'Нет изображения' })}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 p-2 md:p-4 items-center w-full min-w-0">
@@ -125,10 +123,9 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
               if (onPlayBonusGame) {
                 try {
                   onPlayBonusGame();
-                } catch (error) {
+                } catch {
+                  // noop: ошибка бонусной мини-игры обрабатывается в вызывающем коде
                 }
-              } else {
-
               }
 
             }}

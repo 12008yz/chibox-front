@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -61,7 +61,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     // Подсчитаем непрочитанные уведомления
     const unreadCount = notifications.filter(n => !n.is_read).length;
 
-    const handleCloseNotifications = () => {
+    const handleCloseNotifications = useCallback(() => {
         // Отмечаем все уведомления как прочитанные при закрытии панели
         if (unreadCount > 0) {
             markAllAsRead().unwrap()
@@ -71,7 +71,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         }
         setWithdrawalNoStockNotification(null);
         setOpenNotifications(false);
-    };
+    }, [unreadCount, markAllAsRead, setOpenNotifications]);
 
     // Отметить уведомление как прочитанное
     const handleMarkAsRead = async (notificationId: string) => {
@@ -154,7 +154,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [openNotifications, unreadCount, markAllAsRead]);
+    }, [openNotifications, handleCloseNotifications]);
 
     // Функция для перевода названий кейсов
     const translateCaseName = (caseName: string) => {
@@ -163,7 +163,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     };
 
     // Улучшенная логика определения типа уведомления
-    const detectNotificationType = (notification: Notification, translated: { title: string, message: string | any }) => {
+    const detectNotificationType = (notification: Notification, translated: { title: string; message: string }) => {
         const { title } = translated;
         const data = notification.data as WithdrawalNoStockData | undefined;
         if (data?.subtype === 'withdrawal_item_not_in_stock') return 'warning';
@@ -234,7 +234,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                     message: t('notifications.notification_types.case_purchase_message', {
                         count: match[1],
                         amount: match[2]
-                    } as any)
+                    })
                 };
             }
         }

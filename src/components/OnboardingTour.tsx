@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowDown, X, ArrowLeft, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { CelebrateIcon, GiftIcon, TicTacToeIcon, BalanceIcon } from './icons';
@@ -25,7 +25,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
   const [targetPosition, setTargetPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  const steps: OnboardingStep[] = [
+  const steps: OnboardingStep[] = useMemo(() => [
     {
       id: 'welcome',
       targetId: 'onboarding-balance',
@@ -85,7 +85,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       mobileTitle: 'Ваш Баланс',
       mobileDescription: 'В меню (☰) вверху вы увидите свой баланс. После окончания бонусов можете пополнить его кнопкой "+".'
     }
-  ];
+  ], [t]);
 
   // Функция для получения иконки по id шага
   const getStepIcon = (stepId: string) => {
@@ -131,7 +131,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [isActive, currentStep]);
+  }, [isActive, currentStep, steps]);
 
   useEffect(() => {
     if (!isActive || isMobile) return;
@@ -183,7 +183,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition);
     };
-  }, [isActive, currentStep, isMobile]);
+  }, [isActive, currentStep, isMobile, steps]);
 
   const handleNext = () => {
     // Очищаем стили перед переходом
@@ -370,7 +370,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
 
-    let position: any = {};
+    let position: React.CSSProperties = {};
 
     // Для первого шага показываем подсказку по центру экрана
     if (currentStep === 0) {
@@ -444,7 +444,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isActive, onComplete })
     const arrowSize = 40;
     const offset = 10;
 
-    let arrowPos: any = {};
+    let arrowPos: React.CSSProperties = {};
 
     switch (step.arrowDirection) {
       case 'down':

@@ -9,6 +9,9 @@ class SoundManager {
   private lastPlayTime: Map<string, number> = new Map(); // Отслеживаем время последнего воспроизведения
   private minPlayInterval: number = 500; // Минимальная задержка между воспроизведениями в мс
   private unlockedSoundKey: string = 'uiClick';
+  private ignoreError(): void {
+    // intentionally ignored in non-critical audio flows
+  }
  
   // Загружаем  звуки
   private soundPaths = {
@@ -40,11 +43,14 @@ class SoundManager {
   // Инициализация AudioContext для разблокировки звуков
   private initAudioContext() {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         this.audioContext = new AudioContextClass();
       }
-    } catch (error) {
+    } catch {
+      this.ignoreError();
     }
   }
 
@@ -109,7 +115,8 @@ class SoundManager {
       try {
         const audio = this.createSound(path, 'metadata');
         this.sounds.set(key, audio);
-      } catch (error) {
+      } catch {
+        this.ignoreError();
       }
     });
   }
@@ -123,7 +130,8 @@ class SoundManager {
       const audio = this.createSound(path, 'auto');
       this.sounds.set(soundKey, audio);
       return audio;
-    } catch (error) {
+    } catch {
+      this.ignoreError();
       return null;
     }
   }
@@ -204,14 +212,16 @@ class SoundManager {
             this.activeClones.delete(clone);
 
             if (error.name === 'NotAllowedError') {
-              if (!this.unlocked) {
-              }
+              if (!this.unlocked) this.ignoreError();
             } else if (error.name === 'NotSupportedError') {
+              this.ignoreError();
             } else {
+              this.ignoreError();
             }
           });
       }
-    } catch (error) {
+    } catch {
+      this.ignoreError();
     }
   }
 
@@ -223,7 +233,8 @@ class SoundManager {
       try {
         sound.pause();
         sound.currentTime = 0;
-      } catch (error) {
+      } catch {
+        this.ignoreError();
       }
     });
 
@@ -232,7 +243,8 @@ class SoundManager {
       try {
         clone.pause();
         clone.currentTime = 0;
-      } catch (error) {
+      } catch {
+        this.ignoreError();
       }
     });
 
@@ -249,7 +261,8 @@ class SoundManager {
       try {
         sound.pause();
         sound.currentTime = 0;
-      } catch (error) {
+      } catch {
+        this.ignoreError();
       }
     }
 
@@ -262,7 +275,8 @@ class SoundManager {
           clone.currentTime = 0;
           this.activeClones.delete(clone);
         }
-      } catch (error) {
+      } catch {
+        this.ignoreError();
       }
     });
 
@@ -327,6 +341,6 @@ export const useSound = () => {
 
 // Экспортируем для отладки в консоли
 if (typeof window !== 'undefined') {
-  (window as any).soundManager = soundManager;
+  (window as Window & { soundManager?: SoundManager }).soundManager = soundManager;
  
 }

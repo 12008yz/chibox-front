@@ -27,15 +27,14 @@ interface CaseOpeningItem {
 interface HeaderProps {
   onlineUsers?: number;
   recentCaseOpenings?: CaseOpeningItem[];
-  notification?: any;
-  setNotification?: React.Dispatch<React.SetStateAction<any>>;
-  user?: any;
+  notification?: { message?: string } | null;
+  setNotification?: React.Dispatch<React.SetStateAction<unknown[]>>;
+  user?: unknown;
 }
 
 const HeaderComponent: React.FC<HeaderProps> = ({
   onlineUsers = 0,
   recentCaseOpenings = [],
-  notification,
   setNotification,
   user
 }) => {
@@ -58,12 +57,6 @@ const HeaderComponent: React.FC<HeaderProps> = ({
       }
     }
   }, [recentCaseOpenings]);
-
-  // Тост уведомления
-  useEffect(() => {
-    if (notification?.message) {
-    }
-  }, [notification]);
 
   const handleCloseCaseNotification = (index: number) => {
     setCaseNotifications(prev => prev.filter((_, i) => i !== index));

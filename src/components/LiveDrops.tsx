@@ -24,6 +24,7 @@ const LiveDrops: React.FC = () => {
           }
         }
       } catch {
+        // noop: live drops fallback to socket stream
       } finally {
         setIsLoading(false);
       }
