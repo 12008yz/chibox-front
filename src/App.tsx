@@ -1,9 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, useAppDispatch, useAppSelector } from './store/hooks';
 import { useGetCurrentUserQuery } from './features/auth/authApi';
 import { loginSuccess, logout, checkSessionValidity } from './features/auth/authSlice';
 import { cleanupExpiredData } from './utils/authUtils';
-import { useEffect, Suspense, useCallback, useState } from 'react';
+import { useEffect, useLayoutEffect, Suspense, useCallback, useState } from 'react';
 import './index.css';
 import { soundManager } from './utils/soundManager';
 import { lazyWithChunkError } from './utils/lazyWithChunkError';
@@ -24,6 +24,7 @@ import { setShowAuthModal } from './store/slices/uiSlice';
 import { setReferralCookie, wasReferralModalShownForCode, setReferralModalShownForCode } from './utils/referralUtils';
 import { API_URL } from './utils/config';
 import { isDemoMode } from './utils/demoMode';
+import { HAD_USER_ACCOUNT_KEY, setPostAuthRedirect } from './utils/postAuthRedirect';
 
 // Главная без lazy: иначе Suspense блокирует весь HomePage (баннер, разметка) пока грузится отдельный чанк — в инкогнито без кеша виден «пустой экран + спиннер».
 import HomePage from './pages/HomePage';
@@ -44,6 +45,7 @@ const FAQPage = lazyWithChunkError(() => import('./pages/FAQPage'));
 const RequisitesPage = lazyWithChunkError(() => import('./pages/RequisitesPage'));
 const ServicesPage = lazyWithChunkError(() => import('./pages/ServicesPage'));
 const StreamerCabinetPage = lazyWithChunkError(() => import('./pages/StreamerCabinetPage'));
+const NotFoundPage = lazyWithChunkError(() => import('./pages/NotFoundPage'));
 
 function RouteSuspenseFallback() {
   return (
@@ -61,9 +63,18 @@ const ProtectedRoute: React.FC<{
   isAuthenticated: boolean;
   onShowAuthModal: () => void;
 }> = ({ children, isAuthenticated, onShowAuthModal }) => {
+  const location = useLocation();
+
+  useLayoutEffect(() => {
+    if (!isAuthenticated) {
+      setPostAuthRedirect(`${location.pathname}${location.search}`);
+    }
+  }, [isAuthenticated, location.pathname, location.search]);
+
   useEffect(() => {
     if (!isAuthenticated) onShowAuthModal();
   }, [isAuthenticated, onShowAuthModal]);
+
   if (!isAuthenticated) return <Navigate to="/" replace />;
   return children;
 };
@@ -82,15 +93,19 @@ const App: React.FC = () => {
   const onShowAuthModal = useCallback(() => dispatch(setShowAuthModal(true)), [dispatch]);
   const [referralModalCode, setReferralModalCode] = useState<string | null>(null);
 
-  // Проверяем, находимся ли мы на странице Steam авторизации
-  const isSteamAuthPage = window.location.pathname === '/auth/steam-success';
-  // Не делаем гостевой probe /profile, чтобы не получать лишние 401 в консоли Lighthouse.
-  // Профиль запрашиваем только для уже авторизованного состояния (token/user/isAuthenticated).
-  const shouldFetchUser = !isSteamAuthPage && (
-    auth.token ||
-    (auth.user != null && auth.user.id) ||
-    auth.isAuthenticated
-  );
+  // Не дергаем /profile на колбэке Steam (ручная загрузка в SteamAuthPage), на обоих путях возврата.
+  const isSteamAuthPage =
+    window.location.pathname === '/auth/steam-success' ||
+    window.location.pathname === '/auth/success';
+  const hadAccountHint =
+    typeof window !== 'undefined' && localStorage.getItem(HAD_USER_ACCOUNT_KEY) === '1';
+  // Профиль: при известной сессии в Redux/cookie-миграции; либо одна попытка восстановления после сброса persist при «подсказке» из localStorage.
+  const shouldFetchUser =
+    !isSteamAuthPage &&
+    (Boolean(auth.token) ||
+      Boolean(auth.user?.id) ||
+      auth.isAuthenticated ||
+      (hadAccountHint && !auth.token && !auth.user?.id && !auth.isAuthenticated));
 
   const {
     data: userData,
@@ -125,13 +140,32 @@ const App: React.FC = () => {
     }
   }, [userData, auth.token, dispatch]);
 
-  // Logout ТОЛЬКО при ошибке getCurrentUser (не при других API вызовах)
+  // Ошибка getCurrentUser: сброс «подсказки» при тихой проверке без сессии; иначе — полный logout при признаках залогиненного стора.
   useEffect(() => {
-    if (userError && auth.token && shouldFetchUser) {
+    if (!userError || !shouldFetchUser) return;
 
+    const status = (userError as { status?: number }).status;
+    const unauthorized = status === 401 || status === 403;
+    let hinted = false;
+    try {
+      hinted = localStorage.getItem(HAD_USER_ACCOUNT_KEY) === '1';
+    } catch {
+      /* noop */
+    }
+
+    if (unauthorized && hinted && !auth.isAuthenticated && !auth.user?.id) {
+      try {
+        localStorage.removeItem(HAD_USER_ACCOUNT_KEY);
+      } catch {
+        /* noop */
+      }
+      return;
+    }
+
+    if (auth.token || auth.isAuthenticated) {
       dispatch(logout());
     }
-  }, [userError, auth.token, shouldFetchUser, dispatch]);
+  }, [userError, shouldFetchUser, auth.token, auth.isAuthenticated, auth.user?.id, dispatch]);
 
   // Синхронизация настройки звука с soundManager
   useEffect(() => {
@@ -280,10 +314,7 @@ const App: React.FC = () => {
                 </div>
               }
             />
-            <Route
-              path="/coinflip"
-              element={<LeaderboardPage />}
-            />
+            <Route path="/coinflip" element={<Navigate to="/leaderboard" replace />} />
             <Route
               path="/leaderboard"
               element={<LeaderboardPage />}
@@ -318,8 +349,7 @@ const App: React.FC = () => {
               }
             />
 
-            {/* 404 */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </Suspense>
           <Footer />

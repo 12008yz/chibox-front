@@ -1,4 +1,5 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetAllCasesQuery, useBuyCaseMutation, useOpenCaseMutation, useGetFreeCaseStatusQuery } from '../features/cases/casesApi';
@@ -17,6 +18,8 @@ import type { CaseTemplate } from '../types/api';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setShowIntroVideo as setGlobalShowIntroVideo, setShowTradeUrlModal as setGlobalShowTradeUrlModal, setShowOnboarding, setHasSeenOnboarding, setShowAuthModal } from '../store/slices/uiSlice';
 import { lazyWithChunkError } from '../utils/lazyWithChunkError';
+import { getApiErrorMessage } from '../utils/config';
+import { consumeDeferredPostIntroNav } from '../utils/postAuthRedirect';
 
 const RegistrationSuccessModal = lazyWithChunkError(() => import('../components/RegistrationSuccessModal'));
 const IntroVideo = lazyWithChunkError(() => import('../components/IntroVideo'));
@@ -32,6 +35,13 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { userData, refetch: refetchUser } = useUserData({ autoRefresh: false }); // Получаем данные пользователя
+  const authUser = useAppSelector((state) => state.auth.user);
+  const resolveUserId = () => userData?.id || authUser?.id;
+
+  const flushDeferredNav = useCallback(() => {
+    const p = consumeDeferredPostIntroNav();
+    if (p) navigate(p, { replace: true });
+  }, [navigate]);
 
   // Получаем глобальное состояние показа интро из Redux
   const globalShowIntroVideo = useAppSelector(state => state.ui.showIntroVideo);
@@ -202,12 +212,13 @@ const HomePage: React.FC = () => {
         setShowTradeUrlModal(true);
       }, 300);
     } else {
-      // Если trade modal не нужен, показываем онбординг
       const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
-      if (!hasSeenOnboardingStorage && userData?.id) {
+      if (!hasSeenOnboardingStorage && resolveUserId()) {
         setTimeout(() => {
           dispatch(setShowOnboarding(true));
         }, 500);
+      } else {
+        queueMicrotask(() => flushDeferredNav());
       }
     }
   };
@@ -220,16 +231,18 @@ const HomePage: React.FC = () => {
       setShowTradeUrlModal(false);
       dispatch(setGlobalShowTradeUrlModal(false));
 
-      // После сохранения trade URL показываем onboarding
       const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
-      if (!hasSeenOnboardingStorage && userData?.id) {
+      if (!hasSeenOnboardingStorage && resolveUserId()) {
         setTimeout(() => {
           dispatch(setShowOnboarding(true));
         }, 500);
+      } else {
+        queueMicrotask(() => flushDeferredNav());
       }
 
-      if (userData?.id) refetchUser();
+      if (resolveUserId()) refetchUser();
     } catch (err) {
+      toast.error(getApiErrorMessage(err, t('errors.server_error')));
     }
   };
 
@@ -237,12 +250,13 @@ const HomePage: React.FC = () => {
     setShowTradeUrlModal(false);
     dispatch(setGlobalShowTradeUrlModal(false));
 
-    // После пропуска показываем onboarding
     const hasSeenOnboardingStorage = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeenOnboardingStorage && userData?.id) {
+    if (!hasSeenOnboardingStorage && resolveUserId()) {
       setTimeout(() => {
         dispatch(setShowOnboarding(true));
       }, 500);
+    } else {
+      queueMicrotask(() => flushDeferredNav());
     }
   };
 
@@ -251,6 +265,7 @@ const HomePage: React.FC = () => {
   const handleOnboardingComplete = () => {
     dispatch(setShowOnboarding(false));
     dispatch(setHasSeenOnboarding(true));
+    flushDeferredNav();
   };
 
   // Функция для покупки и открытия кейса - ВОЗВРАЩАЕТ результат для анимации в модале

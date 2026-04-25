@@ -2,6 +2,7 @@ import { createListenerMiddleware } from '@reduxjs/toolkit';
 import { authApi } from '../../features/auth/authApi';
 import { loginSuccess, logout } from '../../features/auth/authSlice';
 import { baseApi, resetRefreshState } from '../api/baseApi';
+import { HAD_USER_ACCOUNT_KEY } from '../../utils/postAuthRedirect';
 
 // Создаем middleware для обработки авторизации
 export const authMiddleware = createListenerMiddleware();
@@ -33,15 +34,18 @@ authMiddleware.startListening({
 // Слушаем loginSuccess action (в том числе от Steam авторизации)
 authMiddleware.startListening({
   actionCreator: loginSuccess,
-  effect: async (_action, listenerApi) => {
+  effect: async (action, listenerApi) => {
+    if (action.payload.user?.id && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(HAD_USER_ACCOUNT_KEY, '1');
+      } catch {
+        /* ignore */
+      }
+    }
 
-
-    // Инвалидируем кэш пользовательских данных
     listenerApi.dispatch(
       baseApi.util.invalidateTags(['User', 'Profile', 'Balance', 'Inventory'])
     );
-
-
   },
 });
 
@@ -49,12 +53,16 @@ authMiddleware.startListening({
 authMiddleware.startListening({
   actionCreator: logout,
   effect: async (_action, listenerApi) => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(HAD_USER_ACCOUNT_KEY);
+      } catch {
+        /* ignore */
+      }
+    }
 
-    // Сбрасываем флаг обновления токена
     resetRefreshState();
 
-    // Сбрасываем состояние RTK Query API, чтобы очистить весь кэш и остановить все активные запросы
     listenerApi.dispatch(baseApi.util.resetApiState());
-
   },
 });

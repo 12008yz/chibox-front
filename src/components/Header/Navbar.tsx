@@ -7,6 +7,7 @@ import DepositModal from "../DepositModal";
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
 import { prefetchRoute, prefetchMainNavRoutesIdle } from '../../utils/routePrefetch';
+import { setPostAuthRedirect } from '../../utils/postAuthRedirect';
 import { isDemoMode } from '../../utils/demoMode';
 
 interface NavbarProps {
@@ -82,6 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({
       const path = href.replace(window.location.origin, '').split('?')[0];
       if (PROTECTED_PATHS.some((p) => path === p || path.startsWith(p + '/'))) {
         e.preventDefault();
+        setPostAuthRedirect(path);
         dispatch(setShowAuthModal(true));
       }
     }

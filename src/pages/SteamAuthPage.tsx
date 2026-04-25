@@ -5,6 +5,12 @@ import { useAppDispatch } from '../store/hooks';
 import { loginSuccess, logout } from '../features/auth/authSlice';
 import { baseApi } from '../store/api/baseApi';
 import { setShowIntroVideo, setShowTradeUrlModal } from '../store/slices/uiSlice';
+import {
+  consumePostAuthRedirect,
+  POST_AUTH_PATH_KEY,
+  setDeferredPostIntroNav,
+  NAV_AFTER_INTRO_KEY,
+} from '../utils/postAuthRedirect';
 
 const SteamAuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -17,14 +23,20 @@ const SteamAuthPage: React.FC = () => {
   useEffect(() => {
 
     // Полная очистка
-    const keysToKeep = ['theme', 'language', 'cookieConsent'];
+    const keysToKeep = ['theme', 'language', 'cookieConsent', POST_AUTH_PATH_KEY];
     const allKeys = Object.keys(localStorage);
     allKeys.forEach(key => {
       if (!keysToKeep.includes(key)) {
         localStorage.removeItem(key);
       }
     });
-    sessionStorage.clear();
+    try {
+      Object.keys(sessionStorage).forEach((k) => {
+        if (k !== NAV_AFTER_INTRO_KEY) sessionStorage.removeItem(k);
+      });
+    } catch {
+      sessionStorage.clear();
+    }
 
     dispatch(baseApi.util.resetApiState());
     dispatch(logout());
@@ -58,7 +70,10 @@ const SteamAuthPage: React.FC = () => {
               dispatch(setShowTradeUrlModal(true));
             }
 
-            // Перенаправляем на главную
+            const returnTo = consumePostAuthRedirect();
+            if (returnTo !== '/') {
+              setDeferredPostIntroNav(returnTo);
+            }
             navigate('/', { replace: true });
           } else {
             throw new Error('Не удалось загрузить данные пользователя');
