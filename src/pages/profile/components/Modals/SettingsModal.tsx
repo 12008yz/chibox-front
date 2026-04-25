@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useUpdateUserProfileMutation } from '../../../../features/user/userApi';
 import { validateUsername, suggestAlternativeUsername } from '../../../../utils/profanityFilter';
@@ -45,8 +46,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(() => user?.email || '');
   const [emailError, setEmailError] = useState('');
+  const [isTradeUrlExpanded, setIsTradeUrlExpanded] = useState(false);
+  const [tradeUrlOverlay, setTradeUrlOverlay] = useState<{ top: number; left: number; width: number } | null>(null);
+  const tradeUrlFieldRef = useRef<HTMLDivElement | null>(null);
 
   const prevIsOpenRef = useRef(false);
+
+  const recalcTradeUrlOverlay = () => {
+    const el = tradeUrlFieldRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const maxWidth = Math.max(320, window.innerWidth - rect.left - 16);
+    setTradeUrlOverlay({
+      top: rect.top,
+      left: rect.left,
+      width: Math.min(760, maxWidth),
+    });
+  };
 
   // Блокировка скролла при открытии модального окна
   useEffect(() => {
@@ -296,6 +312,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     // Form reset logic (if needed in the future)
   };
 
+  useEffect(() => {
+    if (!isTradeUrlExpanded) return;
+    const onViewportChange = () => recalcTradeUrlOverlay();
+    window.addEventListener('scroll', onViewportChange, true);
+    window.addEventListener('resize', onViewportChange);
+    return () => {
+      window.removeEventListener('scroll', onViewportChange, true);
+      window.removeEventListener('resize', onViewportChange);
+    };
+  }, [isTradeUrlExpanded]);
+
   const handleLogout = async () => {
     try {
       await logoutApi().unwrap();
@@ -315,7 +342,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       onClose();
       resetForm();
     }}>
-      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-4 max-w-sm w-full mx-3 my-auto border border-gray-700/30 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1530] rounded-xl p-4 max-w-sm w-full mx-3 my-auto border border-gray-700/30 max-h-[85vh] overflow-y-auto overflow-x-visible" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg sm:text-xl font-bold text-white">{t('profile.settings.title')}</h3>
           <button
@@ -404,17 +431,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-2">
               {user?.steam_trade_url ? (
                 // Если Trade URL уже установлен - показываем только для чтения
-                <div className="relative">
-                  <input
-                    type="url"
-                    value={tradeUrl}
-                    readOnly
-                    className="w-full px-3 py-2 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 cursor-not-allowed"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
-                    </svg>
+                <div
+                  ref={tradeUrlFieldRef}
+                  className="relative h-10 overflow-visible"
+                  onMouseEnter={() => {
+                    recalcTradeUrlOverlay();
+                    setIsTradeUrlExpanded(true);
+                  }}
+                  onMouseLeave={() => setIsTradeUrlExpanded(false)}
+                >
+                  <div className="absolute left-0 top-0 h-10 w-full z-10">
+                    <input
+                      type="url"
+                      value={tradeUrl}
+                      readOnly
+                      className="w-full h-full px-3 py-2 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 cursor-not-allowed"
+                    />
+                    {!isTradeUrlExpanded && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -709,6 +748,25 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
       </div>
+      {isTradeUrlExpanded && tradeUrlOverlay && user?.steam_trade_url && createPortal(
+        <div
+          className="fixed z-[10000001] pointer-events-none"
+          style={{
+            top: tradeUrlOverlay.top,
+            left: tradeUrlOverlay.left,
+            width: tradeUrlOverlay.width,
+            height: 40,
+          }}
+        >
+          <input
+            type="url"
+            value={tradeUrl}
+            readOnly
+            className="w-full h-full px-3 py-2 bg-[#0d231b] border border-green-500/35 rounded-lg text-green-300 cursor-not-allowed shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
+          />
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

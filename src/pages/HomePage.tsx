@@ -115,18 +115,7 @@ const HomePage: React.FC = () => {
     }
   }, [location.state, location.pathname, navigate]);
 
-  /* Скрыть полосу прокрутки только на главной (html, body и #root — скролл может быть на любом) */
-  useEffect(() => {
-    const root = document.getElementById('root');
-    document.documentElement.classList.add('scrollbar-hide');
-    document.body.classList.add('scrollbar-hide');
-    if (root) root.classList.add('scrollbar-hide');
-    return () => {
-      document.documentElement.classList.remove('scrollbar-hide');
-      document.body.classList.remove('scrollbar-hide');
-      if (root) root.classList.remove('scrollbar-hide');
-    };
-  }, []);
+  // Не скрываем глобально scrollbar на главной: это уменьшает количество layout/paint при скролле.
 
   // Логирование изменений состояния игры
   useEffect(() => {

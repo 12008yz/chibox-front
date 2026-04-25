@@ -51,12 +51,27 @@ const Navbar: React.FC<NavbarProps> = ({
 
   // Отслеживание скролла для изменения стиля навбара
   useEffect(() => {
+    let rafId: number | null = null;
+    let lastIsScrolled = window.scrollY > 20;
+    setIsScrolled(lastIsScrolled);
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        const nextIsScrolled = window.scrollY > 20;
+        if (nextIsScrolled !== lastIsScrolled) {
+          lastIsScrolled = nextIsScrolled;
+          setIsScrolled(nextIsScrolled);
+        }
+        rafId = null;
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Закрываем мобильное меню при изменении маршрута
@@ -143,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div className="flex flex-col">
                 <span className="text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
-                  Chi<span className="text-orange-400">Box</span>
+                  <span>Chi<span className="text-orange-400">Box</span></span>
                   {isDemoMode() && (
                     <span
                       className="text-[10px] md:text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-100 border border-amber-400/40 uppercase tracking-wide"
