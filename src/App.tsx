@@ -209,7 +209,8 @@ const App: React.FC = () => {
     <Router>
       <div className="app-bg" aria-hidden="true" />
       <ScrollToTopOnRoute />
-      <div className="min-h-screen relative overflow-hidden">
+      {/* overflow-x-hidden: горизонтальный клип без обрезания скролла по вертикали (иначе подвал мог «теряться» под длинными страницами) */}
+      <div className="min-h-screen relative overflow-x-hidden">
         <FloatingWatermark />
         <div className="relative z-10">
           <Header

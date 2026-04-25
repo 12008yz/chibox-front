@@ -135,7 +135,8 @@ const LeaderboardPage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+      {/* pb: зазор перед подвалом + проще докрутить до футера на мобильных */}
+      <div className="relative z-10 container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8 pb-12 sm:pb-16 md:pb-20">
         <div className="flex flex-col items-center justify-center max-w-[360px] md:max-w-none mx-auto">
           <Title title={t('leaderboard_page.title')} />
 

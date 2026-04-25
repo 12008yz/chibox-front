@@ -75,9 +75,15 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-white mt-20">
+    <footer className="relative z-10 mt-16 md:mt-24 text-white">
+      {/* Мягкий «мост» от фона страницы к подвалу + лёгкая граница-акцент */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-24 h-24 bg-gradient-to-b from-transparent via-black/50 to-zinc-950"
+      />
+      <div className="relative border-t border-orange-500/20 bg-gradient-to-b from-zinc-950 via-gray-900 to-black shadow-[0_-20px_50px_-15px_rgba(0,0,0,0.75)]">
       {/* Stats Section */}
-      <div className="container mx-auto px-4 py-12 border-b border-gray-800">
+      <div className="container mx-auto px-4 py-12 border-b border-gray-800/80">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {stats.map((stat, index) => (
             <div
@@ -297,7 +303,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
+      </div>
 
     </footer>
   );
