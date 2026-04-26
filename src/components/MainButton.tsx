@@ -49,6 +49,7 @@ interface MainButtonProps {
 
    return (
      <button
+      data-no-click-sound
        className={`flex items-center justify-center w-full h-10 ${colorClasses[type]}
        focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md
        text-white font-medium ${disabled ? "opacity-50 cursor-not-allowed" : pulseClass} ${

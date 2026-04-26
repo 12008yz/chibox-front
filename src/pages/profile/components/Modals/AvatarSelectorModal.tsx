@@ -65,7 +65,7 @@ const AvatarSelectorModal: React.FC<AvatarSelectorModalProps> = ({
       title={t('profile.select_avatar') || 'Выберите аватар'}
       showCloseButton={true}
     >
-      <div className="p-4 sm:p-6" data-play-click-sound-mobile>
+      <div className="p-4 sm:p-6" data-play-click-sound-mobile data-no-click-sound>
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
