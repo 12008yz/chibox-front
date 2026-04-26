@@ -78,9 +78,11 @@ const createGlobalSocket = () => {
   const serverUrl = BACKEND_URL.replace(/\/$/, '');
 
   globalSocket = io(serverUrl, {
-    // WebSocket first: long-polling holds extra HTTP/1.1 connections per host;
-    // Safari (esp. iOS) limits parallel connections — can starve RTK fetch to /api/v1/cases.
-    transports: ['websocket', 'polling'],
+    // Polling first makes connection more tolerant to Safari/privacy filters and mobile proxies.
+    // Then Socket.IO upgrades to WebSocket when possible.
+    transports: ['polling', 'websocket'],
+    upgrade: true,
+    rememberUpgrade: false,
     timeout: 20000,
     forceNew: true,
     reconnectionDelay: 1000,
