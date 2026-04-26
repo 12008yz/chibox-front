@@ -154,7 +154,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({ name, description }) => {
               {/* Иконка и название */}
               <div className="text-center mb-6">
                 <div className="mb-3 group-hover:scale-110 transition-transform duration-300 flex justify-center">
-                  <img loading="lazy" src={tier.icon} alt={tier.name} className="w-20 h-20 object-contain" />
+                  <img loading="lazy" src={tier.icon} alt={tier.name} width="80" height="80" className="w-20 h-20 object-contain" />
                 </div>
                 <h3 className="text-white font-bold text-2xl mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
                   {tier.name}

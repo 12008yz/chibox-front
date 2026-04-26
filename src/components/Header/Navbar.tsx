@@ -250,7 +250,8 @@ const Navbar: React.FC<NavbarProps> = ({
               {/* Мобильное меню (Mobile) */}
               <button
                 onClick={toggleMobileMenu}
-                className="lg:hidden p-2 text-gray-300 hover:text-white transition-colors"
+                className="lg:hidden min-w-[44px] min-h-[44px] p-2 text-gray-300 hover:text-white transition-colors"
+                aria-label={mobileMenuOpen ? t('common.close') : t('header.menu')}
               >
                 {mobileMenuOpen ? (
                   <X className="w-6 h-6" />

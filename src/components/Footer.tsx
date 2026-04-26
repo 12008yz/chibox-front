@@ -109,6 +109,8 @@ const Footer = () => {
               <img
                 src="/images/logo.webp"
                 alt="ChiBox Logo"
+                width="80"
+                height="80"
                 className="w-16 h-16 md:w-20 md:h-20 object-contain"
               />
               <div>
@@ -271,6 +273,8 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <img loading="lazy" src="/images/chiCoinFull.webp"
               alt="ChiCoin"
+              width="192"
+              height="192"
               className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain object-center animate-spin-slow"
             />
             <div className="text-center md:text-left">
