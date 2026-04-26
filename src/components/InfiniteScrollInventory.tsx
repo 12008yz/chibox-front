@@ -5,9 +5,15 @@ import CaseWithDrop from './CaseWithDrop';
 import ItemWithdrawBanner from './ItemWithdrawBanner';
 import toast from 'react-hot-toast';
 import Monetary from './Monetary';
+import type { CaseTemplate, InventoryItem } from '../types/api';
+
+type InventoryItemWithExtras = InventoryItem & {
+  quantity?: number;
+  case_template?: CaseTemplate;
+};
 
 interface InfiniteScrollInventoryProps {
-  items: any[];
+  items: InventoryItemWithExtras[];
   hasMore: boolean;
   isLoading: boolean;
   onLoadMore: () => void;
@@ -16,10 +22,10 @@ interface InfiniteScrollInventoryProps {
   onOpenCase?: (id: string) => void;
   onInventoryRefresh?: () => void;
   onUserRefresh?: () => void;
-  getCaseTemplateById?: (id: string) => any;
+  getCaseTemplateById?: (id: string) => CaseTemplate | null;
   translateCaseName?: (name: string) => string;
   getRarityColor?: (rarity: string) => string;
-  getRarityName?: (rarity: string, t?: any) => string;
+  getRarityName?: (rarity: string, t?: (key: string, fallback?: string) => string) => string;
   getItemImageUrl?: (imageUrl: string, itemName: string) => string;
 }
 
@@ -62,8 +68,10 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
     }
   };
 
-  const isUserItem = (item: any) => item.item_type === 'item' && item.item;
-  const isUserCase = (item: any) => item.item_type === 'case' && item.case_template_id;
+  const isUserItem = (item: InventoryItemWithExtras): item is Extract<InventoryItemWithExtras, { item_type: 'item' }> =>
+    item.item_type === 'item' && !!item.item;
+  const isUserCase = (item: InventoryItemWithExtras): item is Extract<InventoryItemWithExtras, { item_type: 'case' }> =>
+    item.item_type === 'case' && !!item.case_template_id;
 
   return (
     <div>

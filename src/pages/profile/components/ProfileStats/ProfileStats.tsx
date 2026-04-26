@@ -3,13 +3,39 @@ import { useTranslation } from 'react-i18next';
 import { formatDaysI18n } from '../../../../utils/declension';
 import { getSubscriptionName } from '../../utils/profileUtils';
 import AchievementsCard from '../Achievements/AchievementsCard';
+import type { User } from '../../../../types/api';
+
+interface AchievementProgressItem {
+  id: string;
+  name: string;
+  description: string;
+  icon_url?: string;
+  completed: boolean;
+  progress?: number;
+  target?: number;
+  requirement_type?: string;
+  bonus_percentage?: number;
+  xp_reward?: number;
+  category?: string;
+  badge_color?: string;
+}
+
+interface AchievementsProgressResponse {
+  success?: boolean;
+  data?: AchievementProgressItem[];
+}
+
+interface AchievementsCatalogResponse {
+  success?: boolean;
+  data?: unknown[];
+}
 
 interface ProfileStatsProps {
-  user: any;
+  user: User;
   availableInventoryCount: number;
   openedCasesCount: number;
-  achievementsProgressData: any;
-  allAchievementsData: any;
+  achievementsProgressData: AchievementsProgressResponse | null | undefined;
+  allAchievementsData: AchievementsCatalogResponse | null | undefined;
   achievementsLoading: boolean;
 }
 
@@ -30,7 +56,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
   const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 23;
 
   // Завершенные достижения
-  const completedAchievementsCount = achievementsProgress.filter((ach: any) => ach.completed).length;
+  const completedAchievementsCount = achievementsProgress.filter((ach) => ach.completed).length;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">

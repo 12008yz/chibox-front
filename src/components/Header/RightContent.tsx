@@ -11,11 +11,12 @@ import { performFullLogout } from "../../utils/authUtils";
 import { useGetUnreadNotificationsCountQuery } from "../../features/user/userApi";
 import Notifications from './Navbar/Notifications';
 import DepositModal from '../DepositModal';
+import type { User } from "../../types/api";
 
 interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
-  user?: any; // TODO: заменить на правильный тип
+  user?: User | null;
 }
 
 const RightContent: React.FC<RightContentProps> = ({

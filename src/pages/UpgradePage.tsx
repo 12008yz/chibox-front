@@ -27,10 +27,37 @@ const PlaceholderImage: React.FC<{ className?: string }> = ({ className = "w-ful
   </div>
 );
 
+interface UpgradeItem {
+  id: string;
+  name: string;
+  image_url: string;
+  price: number | string;
+  rarity: string;
+  weapon_type?: string;
+}
+
+interface UpgradeItemInstance {
+  id: string;
+  status: string;
+}
+
+interface UpgradeableItemGroup {
+  item: UpgradeItem;
+  instances: UpgradeItemInstance[];
+  count: number;
+}
+
+interface UpgradeOptionItem extends UpgradeItem {
+  upgrade_chance: number;
+  price_ratio: number;
+  base_chance: number;
+  cheap_target_bonus: number;
+}
+
 // Компонент для отображения выбранных предметов вверху
 const SelectedItemsDisplay: React.FC<{
-  selectedItems: any[];
-  targetItem: any;
+  selectedItems: UpgradeItem[];
+  targetItem: UpgradeOptionItem | null;
   upgradeChance: number;
   totalValue: number;
   onUpgrade: () => void;
@@ -224,9 +251,9 @@ const SelectedItemsDisplay: React.FC<{
 interface UpgradeResult {
   upgrade_success: boolean;
   data: {
-    source_items: any[];
-    result_item?: any;
-    target_item?: any;
+    source_items: UpgradeItem[];
+    result_item?: UpgradeItem;
+    target_item?: UpgradeOptionItem;
     success_chance: number;
     rolled_value: number;
     total_source_price: number;
@@ -938,7 +965,7 @@ const UpgradeAnimationComponent: React.FC<{
 
 // Компонент карточки предмета для выбора
 const SourceItemCard: React.FC<{
-  itemGroup: any;
+  itemGroup: UpgradeableItemGroup;
   onSelect: (itemId: string) => void;
   selectedItemIds: string[];
   selectedInventoryIds: string[];
@@ -950,7 +977,7 @@ const SourceItemCard: React.FC<{
 
   const isSelected = selectedItemIds.includes(item.id);
   const selectedCount = selectedInventoryIds.filter(id =>
-    instances.some((inst: any) => inst.id === id)
+    instances.some((inst: UpgradeItemInstance) => inst.id === id)
   ).length;
 
   // Проверяем, можно ли взаимодействовать с предметом (добавить или убрать)
@@ -1047,7 +1074,7 @@ const SourceItemCard: React.FC<{
 
 // Компонент карточки целевого предмета
 const TargetItemCard: React.FC<{
-  item: any;
+  item: UpgradeOptionItem;
   onSelect: () => void;
   isSelected: boolean;
 }> = ({ item, onSelect, isSelected }) => {
@@ -1191,7 +1218,7 @@ const UpgradePage: React.FC = () => {
       // Получаем список всех доступных ID предметов в инвентаре
       const availableInventoryIds = new Set<string>();
       upgradeableItems.data.items.forEach(itemGroup => {
-        itemGroup.instances.forEach((inst: any) => {
+        itemGroup.instances.forEach((inst: UpgradeItemInstance) => {
           if (inst && inst.id) {
             availableInventoryIds.add(inst.id);
           }
@@ -1210,7 +1237,7 @@ const UpgradePage: React.FC = () => {
         // Также обновляем selectedItemIds
         const validItemIds = new Set<string>();
         upgradeableItems.data.items.forEach(itemGroup => {
-          const hasSelectedInstance = itemGroup.instances.some((inst: any) =>
+          const hasSelectedInstance = itemGroup.instances.some((inst: UpgradeItemInstance) =>
             inst && inst.id && validSelectedInventoryIds.includes(inst.id)
           );
           if (hasSelectedInstance) {
@@ -1236,9 +1263,9 @@ const UpgradePage: React.FC = () => {
   const selectedItemsDetails = React.useMemo(() => {
     if (!upgradeableItems?.data?.items || selectedInventoryIds.length === 0) return [];
 
-    const details: any[] = [];
+    const details: UpgradeItem[] = [];
     upgradeableItems.data.items.forEach(itemGroup => {
-      itemGroup.instances.forEach((inst: any) => {
+      itemGroup.instances.forEach((inst: UpgradeItemInstance) => {
         if (selectedInventoryIds.includes(inst.id)) {
           details.push(itemGroup.item);
         }
@@ -1272,12 +1299,12 @@ const UpgradePage: React.FC = () => {
     }
 
     // Находим выбранные экземпляры этого предмета
-    const selectedInstances = itemGroup.instances.filter((inst: any) =>
+    const selectedInstances = itemGroup.instances.filter((inst: UpgradeItemInstance) =>
       inst && inst.id && selectedInventoryIds.includes(inst.id)
     );
 
     // Находим доступные экземпляры этого предмета, которые еще не выбраны
-    const availableInstances = itemGroup.instances.filter((inst: any) =>
+    const availableInstances = itemGroup.instances.filter((inst: UpgradeItemInstance) =>
       inst && inst.id && !selectedInventoryIds.includes(inst.id)
     );
 
@@ -1330,7 +1357,7 @@ const UpgradePage: React.FC = () => {
 
     let total = 0;
     upgradeableItems.data.items.forEach(itemGroup => {
-      itemGroup.instances.forEach((inst: any) => {
+      itemGroup.instances.forEach((inst: UpgradeItemInstance) => {
         if (selectedInventoryIds.includes(inst.id)) {
           // Преобразуем цену в число и проверяем что это корректное число
           const price = typeof itemGroup.item.price === 'string'
@@ -1401,7 +1428,7 @@ const UpgradePage: React.FC = () => {
         handleAnimationComplete();
       }, 7500);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage = getApiErrorMessage(error, t('errors.server_error'));
       toast.error(errorMessage);
       // Сбрасываем флаг обработки в случае ошибки

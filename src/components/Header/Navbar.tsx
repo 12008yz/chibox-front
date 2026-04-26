@@ -9,11 +9,12 @@ import { setShowAuthModal } from '../../store/slices/uiSlice';
 import { prefetchRoute, prefetchMainNavRoutesIdle } from '../../utils/routePrefetch';
 import { setPostAuthRedirect } from '../../utils/postAuthRedirect';
 import { isDemoMode } from '../../utils/demoMode';
+import type { User } from '../../types/api';
 
 interface NavbarProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
-  user?: any;
+  user?: User | null;
   onlineUsers?: number;
 }
 
@@ -197,6 +198,8 @@ const Navbar: React.FC<NavbarProps> = ({
                   className="w-8 h-8 md:w-10 md:h-10 xl:w-12 xl:h-12 object-contain"
                   loading="eager"
                   decoding="async"
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 32px, (max-width: 1280px) 40px, 48px"
                   onError={(e) => {
                     e.currentTarget.src = '/vite.svg';
                   }}

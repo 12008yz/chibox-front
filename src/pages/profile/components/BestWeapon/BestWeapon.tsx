@@ -2,13 +2,30 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRarityColor, getRarityName } from '../../utils/profileUtils';
 import { getItemImageUrl, adaptImageSize } from '../../../../utils/steamImageUtils';
-import type { UserInventoryItem } from '../../../../types/api';
+import type { InventoryItem, User, UserInventoryItem } from '../../../../types/api';
 import { isUserItem } from '../../hooks/useInventory';
 import Monetary from '../../../../components/Monetary';
 
+type BestWeaponRecord = {
+  id: string;
+  name: string;
+  image_url: string;
+  price: number;
+  rarity: string;
+  weapon_type?: string;
+  isRecord?: boolean;
+  acquisition_date?: string;
+};
+
+type BestWeaponInventory = UserInventoryItem & {
+  isRecord?: boolean;
+};
+
 interface BestWeaponProps {
-  user: any;
-  inventory: any[];
+  user: User & {
+    bestWeapon?: BestWeaponRecord;
+  };
+  inventory: InventoryItem[];
   inventoryLoading: boolean;
 }
 
@@ -17,7 +34,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
 
   // Используем лучшее оружие за всё время с сервера
   // Если bestWeapon не установлено на сервере, ищем среди всех предметов в инвентаре
-  let bestWeapon = user.bestWeapon || inventory
+  let bestWeapon: BestWeaponRecord | BestWeaponInventory | null = user.bestWeapon || inventory
     .filter((item): item is UserInventoryItem => isUserItem(item) && !!item.item?.price)
     .sort((a, b) => parseFloat(String(b.item.price)) - parseFloat(String(a.item.price)))[0];
 

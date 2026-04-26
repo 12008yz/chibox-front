@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -59,7 +59,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
     const notifications = notificationsData?.data?.items || [];
 
     // Подсчитаем непрочитанные уведомления
-    const unreadCount = notifications.filter(n => !n.is_read).length;
+    const unreadCount = useMemo(() => notifications.filter((n) => !n.is_read).length, [notifications]);
 
     const handleCloseNotifications = useCallback(() => {
         // Отмечаем все уведомления как прочитанные при закрытии панели
@@ -424,6 +424,16 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
         }
     };
 
+    const preparedNotifications = useMemo(
+        () =>
+            notifications.map((notification) => {
+                const translated = translateNotification(notification);
+                const detectedType = detectNotificationType(notification, translated);
+                return { notification, translated, detectedType };
+            }),
+        [notifications, t]
+    );
+
     if (!openNotifications) return null;
 
     const notificationsElement = (
@@ -534,9 +544,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             <p className="gaming-empty-subtext">{t('notifications.new_notifications_appear_here')}</p>
                         </div>
                     ) : (
-                        notifications.map((notification) => {
-                            const translatedNotification = translateNotification(notification);
-                            const detectedType = detectNotificationType(notification, translatedNotification);
+                        preparedNotifications.map(({ notification, translated: translatedNotification, detectedType }) => {
                             return (
                                 <button
                                     type="button"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export const BANNER_IMAGES = [
@@ -72,6 +72,11 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
   height = 'aspect-[16/10] min-h-[220px] md:aspect-auto md:h-[380px]',
 }) => {
   const [current, setCurrent] = useState(0);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const [isInViewport, setIsInViewport] = useState(true);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const items = images.filter(Boolean);
 
   const goTo = useCallback(
@@ -84,10 +89,33 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
 
   useEffect(() => {
-    if (items.length <= 1 || autoPlayInterval <= 0) return;
+    if (items.length <= 1 || autoPlayInterval <= 0 || !isPageVisible || !isInViewport) return;
     const id = setInterval(next, autoPlayInterval);
     return () => clearInterval(id);
-  }, [items.length, autoPlayInterval, current, next]);
+  }, [items.length, autoPlayInterval, current, next, isPageVisible, isInViewport]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsPageVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    handleVisibility();
+
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(rootRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Следующий слайд подгружаем заранее — при переключении не ждём сеть
   useEffect(() => {
@@ -100,10 +128,37 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
 
   if (items.length === 0) return null;
 
+  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (event) => {
+    const touch = event.touches[0];
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+  };
+
+  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = (event) => {
+    if (touchStartX.current == null || touchStartY.current == null) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // Считаем только уверенный горизонтальный свайп, чтобы не ломать вертикальный скролл.
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+    if (deltaX < 0) {
+      goTo(current + 1);
+    } else {
+      goTo(current - 1);
+    }
+  };
+
   return (
     <div
+      ref={rootRef}
       className={`w-full overflow-hidden rounded-xl ${height} relative bg-dark-800 border border-white/5`}
       style={CAROUSEL_GLOW_STYLE}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div key={current} className="absolute inset-0 transition-opacity duration-300 opacity-100">
           <img

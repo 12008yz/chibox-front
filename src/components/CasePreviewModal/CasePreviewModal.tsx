@@ -57,6 +57,28 @@ const DAILY_CASE_IDS = new Set([
   '77777777-7777-7777-7777-777777777777',
 ]);
 
+type BrowserNavigator = Navigator & {
+  platform?: string;
+  maxTouchPoints?: number;
+};
+
+type CasePreviewDisplayItem = {
+  id: string;
+  name: string;
+  image_url: string | null;
+  rarity?: string;
+  drop_chance_percent?: number;
+  isExcluded?: boolean;
+  isAlreadyWon?: boolean;
+  modifiedWeight?: number;
+  weightMultiplier?: number;
+  bonusApplied?: number;
+};
+
+type OpeningResultData = {
+  item: CasePreviewDisplayItem;
+};
+
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   isOpen,
   onClose,
@@ -77,7 +99,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [showOpeningAnimation, setShowOpeningAnimation] = useState(false);
   /** Плавное «закрытие» превью перед полноэкранной рулеткой */
   const [casePreviewExiting, setCasePreviewExiting] = useState(false);
-  const [openingResult, setOpeningResult] = useState<any>(null);
+  const [openingResult, setOpeningResult] = useState<OpeningResultData | null>(null);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'spinning' | 'slowing' | 'fake-slowing' | 'speeding-up' | 'wobbling' | 'falling' | 'stopped'>('idle');
   const [showStrikeThrough, setShowStrikeThrough] = useState(false);
@@ -86,11 +108,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<CasePreviewDisplayItem | null>(null);
   const [showDropChance, setShowDropChance] = useState(false);
   const [isPreparingAssets, setIsPreparingAssets] = useState(false);
   // Предметы в горизонтальной полоске рулетки (мобилка + десктоп)
-  const [mobileAnimationItems, setMobileAnimationItems] = useState<any[]>([]);
+  const [mobileAnimationItems, setMobileAnimationItems] = useState<CasePreviewDisplayItem[]>([]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -122,8 +144,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   useEffect(() => {
     if (typeof navigator === 'undefined') return;
     const ua = navigator.userAgent || '';
-    const platform = (navigator as any).platform || '';
-    const touchPoints = (navigator as any).maxTouchPoints || 0;
+    const typedNavigator = navigator as BrowserNavigator;
+    const platform = typedNavigator.platform || '';
+    const touchPoints = typedNavigator.maxTouchPoints || 0;
     const isIOSDevice =
       /iPhone|iPod/i.test(ua) ||
       /iPad/i.test(ua) ||
@@ -319,7 +342,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   };
 
   // Обработчик клика на предмет для показа информации
-  const handleItemClick = (item: any, withDropChance: boolean = true) => {
+  const handleItemClick = (item: unknown, withDropChance: boolean = true) => {
     if (!isMobileDevice() || showOpeningAnimation) return;
 
     setSelectedItem(item);
@@ -356,7 +379,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }));
   }, [itemsData?.data?.items, caseData.id]);
 
-  const prepareIPhoneAssetsBeforeAnimation = useCallback(async (wonItem: any) => {
+  const prepareIPhoneAssetsBeforeAnimation = useCallback(async (wonItem: { image_url?: string | null; name?: string } | null | undefined) => {
     if (!isIPhone || !isMobileOrTablet) return;
 
     const baseStrip = itemsWithAdjustedChances.filter(item => !item.isExcluded);
@@ -417,7 +440,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   /** Ядро рулетки (после выхода с превью). */
   const runRouletteAnimationCore = useCallback(
-    (wonItem: any, trackTimeout: (callback: () => void, delay: number) => void) => {
+    (wonItem: { id: string; image_url?: string | null; name?: string }, trackTimeout: (callback: () => void, delay: number) => void) => {
     setShowOpeningAnimation(true);
     setAnimationPhase('spinning');
     setShowStrikeThrough(false);
@@ -598,7 +621,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
   // Горизонтальная рулетка: плавный translate3d (мобилка и десктоп), cubic-bezier(0.22, 0.2, 0.1, 0.985)
   const startAnimation = useCallback(
-    (wonItem: any) => {
+    (wonItem: { id: string; image_url?: string | null; name?: string }) => {
       if (animationFrameRef.current != null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -684,7 +707,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       } else {
         toast.error(result.message || 'Ошибка покупки');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const msg = getApiErrorMessage(error, '');
       if (error?.status === 400 && msg.includes('Недостаточно средств')) {
         const requiredAmount = error?.data?.data?.required || 0;
@@ -716,7 +739,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     setIsProcessing(true);
 
     try {
-      const openCaseParams: any = {};
+      const openCaseParams: Record<string, string> = {};
       if (inventoryItemId) {
         openCaseParams.inventoryItemId = inventoryItemId;
       } else if (caseId) {
@@ -742,7 +765,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         setOpeningResult(result.data);
         startAnimation(result.data.item);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const openMsg = getApiErrorMessage(error, 'Произошла ошибка при открытии кейса');
       if (openMsg.includes('уже получали') || openMsg.includes('завтра')) {
         toast.error(openMsg || 'Кейс уже получен сегодня', {
@@ -827,7 +850,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 ref={mobileStripRef}
                 className={`flex flex-nowrap items-center case-open-strip ${layoutDesktop ? 'case-open-strip--desktop gap-5 py-5 md:py-6' : 'gap-3.5 py-3.5 sm:py-5'} ${animationPhase !== 'stopped' && animationPhase !== 'idle' ? 'case-open-strip-moving' : ''}`}
               >
-                {itemsForMobileStrip.map((item: any, index: number) => (
+                {itemsForMobileStrip.map((item: CasePreviewDisplayItem, index: number) => (
                   <div
                     key={`strip-${index}-${item.id}`}
                     className={
@@ -1068,7 +1091,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     {t('case_contents', { defaultValue: 'Содержимое кейса' })}
                   </h3>
                   <div className="grid grid-cols-4 gap-2 sm:gap-3 pb-4">
-                    {itemsWithAdjustedChances.map((item: any, index: number) => (
+                    {itemsWithAdjustedChances.map((item: CasePreviewDisplayItem, index: number) => (
                       <CaseItem
                         key={item.id || index}
                         item={item}
@@ -1098,7 +1121,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 className="flex-1 min-h-0 p-6 overflow-y-auto smooth-scroll scrollbar-hide flex flex-col"
               >
                 <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
-                  {itemsWithAdjustedChances.map((item: any, index: number) => (
+                  {itemsWithAdjustedChances.map((item: CasePreviewDisplayItem, index: number) => (
                     <CaseItem
                       key={item.id || index}
                       item={item}

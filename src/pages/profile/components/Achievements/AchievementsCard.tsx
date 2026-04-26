@@ -8,8 +8,23 @@ import { getImageUrl } from '../../../../utils/imageUtils';
 interface AchievementsCardProps {
   completedAchievementsCount: number;
   totalAchievements: number;
-  achievementsProgress: any[];
+  achievementsProgress: AchievementProgressItem[];
   achievementsLoading: boolean;
+}
+
+interface AchievementProgressItem {
+  id: string;
+  name: string;
+  description: string;
+  icon_url?: string;
+  completed: boolean;
+  progress?: number;
+  target?: number;
+  requirement_type?: string;
+  bonus_percentage?: number;
+  xp_reward?: number;
+  category?: string;
+  badge_color?: string;
 }
 
 const AchievementsCard: React.FC<AchievementsCardProps> = ({

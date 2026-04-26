@@ -7,11 +7,12 @@ import { calculateLevelProgress } from '../../utils/profileUtils';
 import Monetary from '../../../../components/Monetary';
 import AvatarSelectorModal from '../Modals/AvatarSelectorModal';
 import PromoCodeModal from '../Modals/PromoCodeModal';
+import type { User } from '../../../../types/api';
 // import AvatarUploadModal from '../Modals/AvatarUploadModal'; // DISABLED - only Steam avatars
 // import { getAvatarUrl } from '../../../../utils/avatarUtils'; // DISABLED - only Steam avatars
 
 interface ProfileHeaderProps {
-  user: any;
+  user: User;
   onSettingsClick: () => void;
 }
 

@@ -9,16 +9,22 @@ import { isUserItem, isUserCase, type InventoryTab } from '../../hooks/useInvent
 import Monetary from '../../../../components/Monetary';
 import { useCancelWithdrawalMutation, useCheckWithdrawalStatusesMutation } from '../../../../features/user/userApi';
 import { getApiErrorMessage } from '../../../../utils/config';
+import type { CaseTemplate, InventoryItem } from '../../../../types/api';
+
+type InventoryItemWithExtras = InventoryItem & {
+  quantity?: number;
+  withdrawal_id?: string;
+};
 
 interface InventoryContentProps {
   activeTab: InventoryTab;
-  filteredInventory: any[];
+  filteredInventory: InventoryItemWithExtras[];
   inventoryLoading: boolean;
   openingCaseId: string | null;
   onOpenCase: (id: string) => void;
   onInventoryRefresh: () => void;
   onUserRefresh: () => void;
-  getCaseTemplateById: (id: string) => any;
+  getCaseTemplateById: (id: string) => CaseTemplate | null;
   translateCaseName: (name: string) => string;
 }
 
@@ -75,7 +81,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
   };
 
   // Обработчик отмены вывода
-  const handleCancelWithdrawal = async (inventoryItem: any) => {
+  const handleCancelWithdrawal = async (inventoryItem: InventoryItemWithExtras) => {
 
     if (!inventoryItem.withdrawal_id) {
       showNotification(t('profile.withdrawal_id_not_found'), 'error');
@@ -101,7 +107,7 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
       } else {
         showNotification(result.message || t('profile.withdrawal_cancel_failed'), 'error');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       showNotification(
         getApiErrorMessage(error, t('profile.withdrawal_cancel_error')),
         'error'
@@ -334,9 +340,9 @@ const InventoryContent: React.FC<InventoryContentProps> = ({
                           {t('profile.free_case', { defaultValue: 'Бесплатно' })}
                         </p>
                       )}
-                      {((inventoryItem as any).quantity || 1) > 1 && (
+                      {(inventoryItem.quantity || 1) > 1 && (
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-600 text-white font-bold">
-                          x{(inventoryItem as any).quantity}
+                          x{inventoryItem.quantity}
                         </span>
                       )}
                     </div>

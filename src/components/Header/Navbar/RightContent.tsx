@@ -10,11 +10,12 @@ import Notifications from './Notifications';
 import SafeCrackerButton from '../SafeCrackerButton';
 import { useAppDispatch } from '../../../store/hooks';
 import { setShowAuthModal } from '../../../store/slices/uiSlice';
+import type { User } from '../../../types/api';
 
 interface RightContentProps {
   openNotifications: boolean;
   setOpenNotifications: React.Dispatch<React.SetStateAction<boolean>>;
-  user?: any; // TODO: заменить на правильный тип
+  user?: User | null;
   onOpenDepositModal?: (tab: 'balance' | 'subscription') => void;
 }
 

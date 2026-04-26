@@ -9,6 +9,54 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { getImageUrl } from '../utils/imageUtils';
 import Monetary from '../components/Monetary';
+import type { CaseTemplate, InventoryItem, Item } from '../types/api';
+
+type PublicAchievement = {
+  id: string;
+  name: string;
+  description: string;
+  icon_url?: string;
+  bonus_percentage: number;
+  category: string;
+};
+
+type PublicProfileUser = {
+  id: string;
+  username: string;
+  createdAt: string;
+  level: number;
+  avatar_url?: string;
+  steam_avatar?: string;
+  steam_avatar_url?: string;
+  steam_profile?: {
+    personaname?: string;
+  };
+  subscriptionStatus?: string;
+  totalCasesOpened?: number;
+  totalItemsValue?: number;
+  dailyStreak?: number;
+  daily_streak?: number;
+  maxDailyStreak?: number;
+  max_daily_streak?: number;
+  inventory?: InventoryItem[];
+  caseItems?: InventoryItem[];
+  inventoryPagination?: {
+    total: number;
+    hasMore: boolean;
+  };
+  caseItemsPagination?: {
+    total: number;
+    hasMore: boolean;
+  };
+  bestWeapon?: Item & { isRecord?: boolean };
+  achievements?: PublicAchievement[];
+  dropBonuses?: {
+    achievements: number;
+    subscription: number;
+    level: number;
+    total: number;
+  };
+};
 
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -17,8 +65,8 @@ const PublicProfilePage: React.FC = () => {
   // State для пагинации (отдельно для каждого таба)
   const [activePage, setActivePage] = useState(1);
   const [openedPage, setOpenedPage] = useState(1);
-  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
-  const [caseItemsList, setCaseItemsList] = useState<any[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [caseItemsList, setCaseItemsList] = useState<InventoryItem[]>([]);
 // State для переключения между категориями инвентаря
 const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
   // State для сохранения изначальных счетчиков
@@ -124,14 +172,14 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
     );
   }
 
-  const user = profileData.user;
-  const dailyStreak = (user as any).dailyStreak ?? (user as any).daily_streak ?? 0;
-  const maxDailyStreak = (user as any).maxDailyStreak ?? (user as any).max_daily_streak ?? 0;
+  const user = profileData.user as PublicProfileUser;
+  const dailyStreak = user.dailyStreak ?? user.daily_streak ?? 0;
+  const maxDailyStreak = user.maxDailyStreak ?? user.max_daily_streak ?? 0;
 
   // Функция для получения шаблона кейса по ID
-  const getCaseTemplateById = (templateId: string) => {
+  const getCaseTemplateById = (templateId: string): CaseTemplate | null => {
     if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
-    return caseTemplatesData.data.find(template => template.id === templateId);
+    return caseTemplatesData.data.find(template => template.id === templateId) || null;
   };
 
   const getRarityColor = (rarity: string) => {
@@ -188,12 +236,12 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
   const bestWeapon = user.bestWeapon;
 
 
-  const achievements = user.achievements || [];
+  const achievements: PublicAchievement[] = user.achievements || [];
   const dropBonuses = user.dropBonuses || { achievements: 0, subscription: 0, level: 0, total: 0 };
 
   // Функции для фильтрации инвентаря
   const getActiveInventory = () => {
-    const filtered = inventoryItems.filter(item =>
+    const filtered = inventoryItems.filter((item) =>
       item.status !== 'sold' && item.status !== 'withdrawn' && item.status !== 'used'
     );
     return filtered;
@@ -440,7 +488,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {achievements.slice(0, 6).map((achievement: any) => (
+              {achievements.slice(0, 6).map((achievement: PublicAchievement) => (
                 <div
                   key={achievement.id}
                   className="bg-black/30 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-600/30 hover:border-gray-400/50 transition-all duration-300"
@@ -540,7 +588,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                         className="w-4 h-4 sm:w-5 sm:h-5 inline-block object-contain align-middle self-center"
                       />
                     </span>
-                    {(bestWeapon as any).isRecord && (
+                    {bestWeapon.isRecord && (
                       <span className="px-2 py-0.5 sm:py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">
                         {t('profile.all_time_record')}
                       </span>
@@ -632,7 +680,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
-                  filteredInventory.map((inventoryItem: any) => {
+                  filteredInventory.map((inventoryItem: InventoryItem) => {
                     // Используем case_template напрямую из ответа, если доступен
                     // Или ищем через getCaseTemplateById, если нужно
                     const caseTemplate = inventoryItem.case_template ||
@@ -648,7 +696,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                   })
                 ) : (
                   // Обычный рендеринг для активных предметов
-                  filteredInventory.map((inventoryItem: any) => {
+                  filteredInventory.map((inventoryItem: InventoryItem) => {
                     // Проверяем, является ли это активным кейсом
                     if (inventoryItem.item_type === 'case') {
                       const caseTemplate = inventoryItem.case_template ||

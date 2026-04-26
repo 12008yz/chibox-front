@@ -34,6 +34,8 @@ let connectionErrorListeners = new Set<(err: string | null) => void>();
 let lastConnectionError: string | null = null;
 let liveDropListeners = new Set<(drop: LiveDropData) => void>();
 let notificationListeners = new Set<(notification: NotificationData) => void>();
+let lastNotificationsRefreshAt = 0;
+let notificationsRefreshTimer: number | null = null;
 
 // Глобальный кеш для предотвращения дублирования дропов
 let receivedDrops = new Map<string, number>();
@@ -230,11 +232,33 @@ export const useSocket = (options?: UseSocketOptions): UseSocketReturn => {
       // Немедленно инвалидируем кеш уведомлений и счетчика
       dispatch(userApi.util.invalidateTags(['Notifications']));
 
-      // Принудительно обновляем данные уведомлений
-      setTimeout(() => {
-        dispatch(userApi.endpoints.getUserNotifications.initiate({ limit: 20 }));
-        dispatch(userApi.endpoints.getUnreadNotificationsCount.initiate());
-      }, 100);
+      // Принудительный refetch делаем с троттлингом, чтобы при серии сокет-событий
+      // не устраивать сетевой шторм.
+      const now = Date.now();
+      const runRefetch = () => {
+        lastNotificationsRefreshAt = Date.now();
+        dispatch(
+          userApi.endpoints.getUserNotifications.initiate(
+            { limit: 20 },
+            { forceRefetch: true, subscribe: false }
+          )
+        );
+        dispatch(
+          userApi.endpoints.getUnreadNotificationsCount.initiate(
+            undefined,
+            { forceRefetch: true, subscribe: false }
+          )
+        );
+      };
+
+      if (now - lastNotificationsRefreshAt > 4000) {
+        runRefetch();
+      } else if (notificationsRefreshTimer === null) {
+        notificationsRefreshTimer = window.setTimeout(() => {
+          notificationsRefreshTimer = null;
+          runRefetch();
+        }, 500);
+      }
 
       // Показываем toast уведомление в зависимости от типа
       const message = notification.title;

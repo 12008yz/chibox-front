@@ -13,14 +13,21 @@ import { performFullLogout } from '../../../../utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { API_URL, BACKEND_URL, getApiErrorMessage } from '../../../../utils/config';
+import type { User } from '../../../../types/api';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user: User;
   onUserRefresh: () => void;
   onEmailVerificationOpen: (skipToVerify?: boolean) => void;
 }
+
+type SettingsUpdatePayload = {
+  steam_trade_url?: string;
+  username?: string;
+  email?: string;
+};
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -175,7 +182,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       }
 
       // Формируем данные для отправки
-      const updateData: any = {};
+      const updateData: SettingsUpdatePayload = {};
 
       if (tradeUrl !== (user?.steam_trade_url || '')) {
         updateData.steam_trade_url = tradeUrl;
@@ -225,7 +232,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           onUserRefresh();
         }, 500);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       showNotification(getApiErrorMessage(error, t('profile.settings.settings_save_error')), 'error');
     }
   };
@@ -298,9 +305,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           );
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error
+        ? error.message
+        : t('profile.settings.trade_url_fetch_network_error');
       showNotification(
-        error.message || t('profile.settings.trade_url_fetch_network_error'),
+        message,
         'error'
       );
     } finally {

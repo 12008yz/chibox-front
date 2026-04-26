@@ -1,0 +1,43 @@
+/* Классы производительности для body */
+.performance-low {
+  --animation-duration: 0.1s;
+  --enable-backdrop-filter: none;
+  --enable-animations: 0;
+}
+
+.performance-low *,
+.performance-low *::before,
+.performance-low *::after {
+  animation-duration: 0.1s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.1s !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.performance-low .animate-pulse,
+.performance-low .animate-ping,
+.performance-low .animate-bounce,
+.performance-low .animate-spin {
+  animation: none !important;
+}
+
+.performance-medium {
+  --animation-duration: 0.2s;
+  --enable-backdrop-filter: none;
+  --enable-animations: 1;
+}
+
+.performance-medium .animate-pulse,
+.performance-medium .animate-ping {
+  animation-duration: 1s !important;
+}
+
+.performance-high {
+  --animation-duration: 0.25s;
+  --enable-backdrop-filter: none;
+  --enable-animations: 1;
+}

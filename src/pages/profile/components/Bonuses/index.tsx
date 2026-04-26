@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { User } from '../../../../types/api';
 
 interface DropRateBonusesProps {
-  user: any;
+  user: User;
 }
 
 const DropRateBonuses: React.FC<DropRateBonusesProps> = ({ user }) => {

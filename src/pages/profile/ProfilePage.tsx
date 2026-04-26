@@ -24,6 +24,7 @@ import { injectProfileStyles } from './utils/profileStyles';
 import { soundManager } from '../../utils/soundManager';
 import { getApiErrorMessage } from '../../utils/config';
 import { isDemoMode } from '../../utils/demoMode';
+import type { CaseTemplate, InventoryItem, UserCaseItem } from '../../types/api';
 
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -154,18 +155,18 @@ const ProfilePage: React.FC = () => {
       ] : (user?.inventory || []);
 
     // Находим кейс в инвентаре для получения информации о шаблоне
-    const caseItem = rawInventory.find((item: any) =>
+    const caseItem = rawInventory.find((item: InventoryItem) =>
       item.id === inventoryItemId && item.item_type === 'case'
-    );
+    ) as UserCaseItem | undefined;
 
     if (!caseItem || caseItem.item_type !== 'case') {
       showNotification(t('profile.case_not_found'), 'error');
       return;
     }
 
-    const getCaseTemplateById = (templateId: string) => {
+    const getCaseTemplateById = (templateId: string): CaseTemplate | null => {
       if (!caseTemplatesData?.success || !caseTemplatesData?.data) return null;
-      return caseTemplatesData.data.find((template: any) => template.id === templateId);
+      return caseTemplatesData.data.find((template: CaseTemplate) => template.id === templateId) ?? null;
     };
 
     const caseTemplate = getCaseTemplateById(caseItem.case_template_id);
@@ -201,7 +202,7 @@ const ProfilePage: React.FC = () => {
       } else {
         showNotification(t('profile.item_info_error'), 'error');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
 
       const errorMessage = getApiErrorMessage(error, t('common.error'));
       showNotification(t('profile.case_opening_error', { error: errorMessage }), 'error');
@@ -243,7 +244,7 @@ const ProfilePage: React.FC = () => {
     ] : (user.inventory || []);
 
   // Подсчитываем активный инвентарь для статистик
-  const availableInventoryCount = rawInventory.filter((item: any) =>
+  const availableInventoryCount = rawInventory.filter((item: InventoryItem) =>
     (item.status === 'inventory' || item.status === 'available') &&
     (item.item_type === 'item' || item.item_type === 'case')
   ).length;
