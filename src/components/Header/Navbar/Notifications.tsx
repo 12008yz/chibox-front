@@ -538,12 +538,14 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                             const translatedNotification = translateNotification(notification);
                             const detectedType = detectNotificationType(notification, translatedNotification);
                             return (
-                                <div
+                                <button
+                                    type="button"
                                     key={notification.id}
                                     className={`gaming-notification-item ${getNotificationTypeClass(detectedType)} ${
                                         !notification.is_read ? 'gaming-notification-unread' : 'gaming-notification-read'
-                                    }`}
+                                    } w-full text-left bg-transparent`}
                                     onClick={() => handleNotificationClick(notification)}
+                                    aria-label={translatedNotification.title}
                                 >
                                     <div className="gaming-notification-content">
                                         <div className="gaming-notification-icon">
@@ -568,7 +570,7 @@ const Notifications: React.FC<NotificationsProps> = ({ openNotifications, setOpe
                                             </p>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             );
                         })
                     )}

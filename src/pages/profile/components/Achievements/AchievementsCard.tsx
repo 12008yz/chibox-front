@@ -75,7 +75,13 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
         }`}
       >
         {/* Main Achievement Card */}
-        <div className="p-4 sm:p-5 lg:p-6 cursor-pointer" onClick={toggleAchievements}>
+        <button
+          type="button"
+          className="p-4 sm:p-5 lg:p-6 cursor-pointer w-full text-left"
+          onClick={toggleAchievements}
+          aria-expanded={isAchievementsExpanded}
+          aria-controls="achievements-expanded-content"
+        >
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <div className={`w-9 h-9 sm:w-10 sm:h-10 bg-red-500/20 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
             isAchievementsExpanded
@@ -116,10 +122,10 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
             <span className="truncate">{isAchievementsExpanded ? t('profile.achievements_collapse_hint') : t('profile.achievements_expand_hint')}</span>
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Expandable Content */}
-      <div className={`absolute top-full left-0 right-0 bg-black/95 lg:bg-black/80 border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
+      <div id="achievements-expanded-content" className={`absolute top-full left-0 right-0 bg-black/95 lg:bg-black/80 border-t border-white/10 rounded-b-xl overflow-hidden transition-all duration-700 ease-in-out shadow-2xl z-[50] ${
         isAchievementsExpanded
           ? 'max-h-[600px] opacity-100 transform scale-y-100'
           : 'max-h-0 opacity-0 transform scale-y-95 pointer-events-none'

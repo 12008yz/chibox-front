@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./styles/base.css";
+@import "./styles/accessibility.css";
 
 @theme {
   --color-blue-50: #eff6ff;
@@ -76,21 +78,18 @@
   color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
-  forced-color-adjust: none !important;
 }
 
 html {
   color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
-  forced-color-adjust: none !important;
 }
 
 body {
   color-scheme: dark !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
-  forced-color-adjust: none !important;
 }
 
 /* Отключаем ночной режим и фильтры Яндекс Браузера */
@@ -162,7 +161,6 @@ html, body {
     filter: none !important;
     -webkit-filter: none !important;
     color-scheme: dark !important;
-    forced-color-adjust: none !important;
   }
 }
 
@@ -194,45 +192,6 @@ html, body {
   .gaming-balance-add-button,
   .gaming-notification-button {
     background-color: rgba(21, 18, 37, 0.98) !important;
-  }
-}
-
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #0d0b14;
-    color: white;
-  }
-
-  #root {
-    min-height: 100vh;
-    background-color: transparent;
-    color: white;
-  }
-
-  body {
-    background: #0d0b14;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  /* ОТКЛЮЧЕНЫ ФОНОВЫЕ ПАТТЕРНЫ - ЭКОНОМИЯ GPU */
-  body::before,
-  body::after {
-    display: none;
   }
 }
 
@@ -318,16 +277,6 @@ html, body {
   }
 }
 
-/* ПРИНУДИТЕЛЬНОЕ ВКЛЮЧЕНИЕ АНИМАЦИЙ - ИГНОРИРУЕМ СИСТЕМНЫЕ НАСТРОЙКИ */
-/* Все анимации работают независимо от prefers-reduced-motion */
-@media (prefers-reduced-motion: reduce) {
-  /* Больше НЕ отключаем анимации - все работает как обычно */
-  *,
-  *::before,
-  *::after {
-    /* Убрали отключение анимаций */
-  }
-}
 
 /* Gaming Typography */
 .gaming-font {
@@ -1219,21 +1168,6 @@ img.live-drop-item {
   }
 }
 
-@media (prefers-contrast: high) {
-  .live-drop-container img,
-  .live-drop-image-container img {
-    filter: none !important;
-    forced-color-adjust: none !important;
-  }
-}
-
-/* Анимации для LiveDrop работают всегда */
-@media (prefers-reduced-motion: reduce) {
-  .live-drop-container img,
-  .live-drop-image-container img {
-    /* Оставляем анимации включенными */
-  }
-}
 
 /* Исключение для аватаров пользователей в LiveDrop */
 .user-avatar-live-drop {
@@ -1944,7 +1878,7 @@ body[data-ya-mode="dark"] {
 @media (prefers-contrast: high) {
   html, body {
     background-color: #0d0b14 !important;
-    forced-color-adjust: none !important;
+    forced-color-adjust: auto !important;
   }
 }
 

@@ -28,6 +28,8 @@ const Navbar: React.FC<NavbarProps> = ({
   const dispatch = useAppDispatch();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = React.useRef<HTMLDivElement>(null);
+
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [depositModalInitialTab, setDepositModalInitialTab] = useState<'balance' | 'subscription'>('balance');
   const [depositModalSelectedSubscription, setDepositModalSelectedSubscription] = useState<number | undefined>(undefined);
@@ -84,6 +86,50 @@ const Navbar: React.FC<NavbarProps> = ({
     if (location.pathname !== '/') return;
     return prefetchMainNavRoutesIdle();
   }, [location.pathname]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab' || !mobileMenuRef.current) return;
+
+      const focusableElements = mobileMenuRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length === 0) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    if (mobileMenuOpen) {
+      window.addEventListener('keydown', onKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen || !mobileMenuRef.current) return;
+    const firstFocusable = mobileMenuRef.current.querySelector<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    firstFocusable?.focus();
+  }, [mobileMenuOpen]);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -252,6 +298,8 @@ const Navbar: React.FC<NavbarProps> = ({
                 onClick={toggleMobileMenu}
                 className="lg:hidden min-w-[44px] min-h-[44px] p-2 text-gray-300 hover:text-white transition-colors"
                 aria-label={mobileMenuOpen ? t('common.close') : t('header.menu')}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-navigation-menu"
               >
                 {mobileMenuOpen ? (
                   <X className="w-6 h-6" />
@@ -266,11 +314,15 @@ const Navbar: React.FC<NavbarProps> = ({
 
       {/* Мобильное меню */}
       <div
+        id="mobile-navigation-menu"
         className={`fixed inset-0 z-[99] lg:hidden transition-all duration-300 ${
           mobileMenuOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('header.menu')}
       >
         {/* Затемнение */}
         <div
@@ -280,6 +332,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
         {/* Меню */}
         <div
+          ref={mobileMenuRef}
           className={`absolute top-16 left-0 right-0 bg-[#0a0e1a] border-b border-gray-800 shadow-2xl transition-transform duration-300 ${
             mobileMenuOpen ? 'translate-y-0' : '-translate-y-full'
           }`}

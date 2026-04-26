@@ -1,0 +1,30 @@
+/* Accessibility preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Для reduced-motion отключаем интенсивные анимации LiveDrop */
+@media (prefers-reduced-motion: reduce) {
+  .live-drop-container img,
+  .live-drop-image-container img {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Не ломаем системный high-contrast режим */
+@media (prefers-contrast: high) {
+  .live-drop-container img,
+  .live-drop-image-container img {
+    filter: none !important;
+    forced-color-adjust: auto !important;
+  }
+}

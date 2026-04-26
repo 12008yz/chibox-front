@@ -1,0 +1,38 @@
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0d0b14;
+    color: white;
+  }
+
+  #root {
+    min-height: 100vh;
+    background-color: transparent;
+    color: white;
+  }
+
+  body {
+    background: #0d0b14;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ОТКЛЮЧЕНЫ ФОНОВЫЕ ПАТТЕРНЫ - ЭКОНОМИЯ GPU */
+  body::before,
+  body::after {
+    display: none;
+  }
+}

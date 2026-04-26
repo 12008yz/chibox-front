@@ -15,6 +15,7 @@ import FloatingWatermark from './components/FloatingWatermark';
 import SteamLoadingPage from './components/SteamLoadingPage';
 import ScrollToTopOnRoute from './components/ScrollToTopOnRoute';
 import { DiagnosticOverlay } from './components/DiagnosticOverlay';
+import AppErrorBoundary from './components/AppErrorBoundary';
 import { useSocket } from './hooks/useSocket';
 import CookieBanner from './components/CookieBanner';
 import AuthModal from './components/AuthModal';
@@ -240,17 +241,18 @@ const App: React.FC = () => {
   }
 
   return (
-    <Router>
-      <div className="app-bg" aria-hidden="true" />
-      <ScrollToTopOnRoute />
-      {/* overflow-x-hidden: горизонтальный клип без обрезания скролла по вертикали (иначе подвал мог «теряться» под длинными страницами) */}
-      <div className="min-h-screen relative overflow-x-hidden">
-        <FloatingWatermark />
-        <div className="relative z-10">
-          <Header
-            onlineUsers={onlineUsers}
-            user={auth.user}
-          />
+    <AppErrorBoundary>
+      <Router>
+        <div className="app-bg" aria-hidden="true" />
+        <ScrollToTopOnRoute />
+        {/* overflow-x-hidden: горизонтальный клип без обрезания скролла по вертикали (иначе подвал мог «теряться» под длинными страницами) */}
+        <div className="min-h-screen relative overflow-x-hidden">
+          <FloatingWatermark />
+          <div className="relative z-10">
+            <Header
+              onlineUsers={onlineUsers}
+              user={auth.user}
+            />
 
           {referralModalCode && (
             <ReferralModal
@@ -365,7 +367,8 @@ const App: React.FC = () => {
         isOpen={showAuthModal}
         onClose={() => dispatch(setShowAuthModal(false))}
       />
-    </Router>
+      </Router>
+    </AppErrorBoundary>
   );
 };
 

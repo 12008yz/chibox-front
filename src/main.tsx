@@ -52,6 +52,8 @@ function scheduleNonCriticalInit(fn: () => void) {
 scheduleNonCriticalInit(() => initAnalytics());
 
 // При 404 чанка после деплоя (старый кэш) — перезагрузка, чтобы подтянуть новые скрипты
+const CHUNK_RELOAD_GUARD_KEY = 'chunk-reload-attempted';
+
 window.addEventListener('error', (event) => {
   const msg = event.message || '';
   if (
@@ -60,10 +62,21 @@ window.addEventListener('error', (event) => {
     (event.filename && /[-][A-Za-z0-9]+\.js$/.test(event.filename) && event.message?.includes('fetch'))
   ) {
     event.preventDefault();
+
+    // One-shot guard: защищает от бесконечного цикла перезагрузки при проблемном ассете/CDN.
+    if (sessionStorage.getItem(CHUNK_RELOAD_GUARD_KEY) === '1') {
+      return true;
+    }
+    sessionStorage.setItem(CHUNK_RELOAD_GUARD_KEY, '1');
     window.location.reload();
     return true;
   }
 });
+
+// Если приложение успешно загрузилось, guard можно сбросить.
+if (sessionStorage.getItem(CHUNK_RELOAD_GUARD_KEY) === '1') {
+  sessionStorage.removeItem(CHUNK_RELOAD_GUARD_KEY);
+}
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
