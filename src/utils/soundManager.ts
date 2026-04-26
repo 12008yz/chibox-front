@@ -36,7 +36,6 @@ class SoundManager {
 
   constructor() {
     this.preloadEssentialSounds();
-    this.initAudioContext();
     this.setupUnlockListeners();
   }
 
@@ -58,6 +57,10 @@ class SoundManager {
   private setupUnlockListeners() {
     const unlockAudio = () => {
       if (this.unlocked) return;
+
+      if (!this.audioContext) {
+        this.initAudioContext();
+      }
 
       // Разблокируем AudioContext
       if (this.audioContext && this.audioContext.state === 'suspended') {
