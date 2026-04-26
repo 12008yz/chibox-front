@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import CaseWithDrop from './CaseWithDrop';
 import ItemWithdrawBanner from './ItemWithdrawBanner';
@@ -25,7 +26,7 @@ interface InfiniteScrollInventoryProps {
   getCaseTemplateById?: (id: string) => CaseTemplate | null;
   translateCaseName?: (name: string) => string;
   getRarityColor?: (rarity: string) => string;
-  getRarityName?: (rarity: string, t?: (key: string, fallback?: string) => string) => string;
+  getRarityName?: (rarity: string, t?: TFunction) => string;
   getItemImageUrl?: (imageUrl: string, itemName: string) => string;
 }
 
@@ -118,7 +119,9 @@ export const InfiniteScrollInventory: React.FC<InfiniteScrollInventoryProps> = (
               {isUserItem(inventoryItem) ? (
                 <>
                   <div className={`w-full aspect-square rounded-lg bg-gradient-to-br ${getRarityColor?.(inventoryItem.item.rarity) || 'from-gray-500 to-gray-600'} p-1 mb-3 flex items-center justify-center item-image-container`}>
-                    <img loading="lazy" src={getItemImageUrl?.(inventoryItem.item.image_url, inventoryItem.item.name) || inventoryItem.item.image_url}
+                    <img
+                      loading="lazy"
+                      src={getItemImageUrl?.(inventoryItem.item.image_url || '', inventoryItem.item.name) || inventoryItem.item.image_url || ''}
                       alt={inventoryItem.item.name}
                       className="w-full h-full object-contain rounded item-image"
                       onError={(e) => {

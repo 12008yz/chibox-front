@@ -1,6 +1,7 @@
 import React, { useState, useEffect, memo } from "react";
 import Navbar from "./Navbar";
 import CaseOpenedNotification from "./CaseOpenedNotification";
+import type { User as AuthUser } from "../../types/api";
 
 interface BasicItem {
   id: string;
@@ -10,17 +11,15 @@ interface BasicItem {
   price: number;
 }
 
-interface User {
-  id: number;
-  name: string;
-  avatar_url?: string;
-  steam_avatar_url?: string;
-}
-
 interface CaseOpeningItem {
   caseImage: string;
   timestamp: number;
-  user: User;
+  user: {
+    id: number;
+    name: string;
+    avatar_url?: string;
+    steam_avatar_url?: string;
+  };
   winningItems: BasicItem[];
 }
 
@@ -29,7 +28,7 @@ interface HeaderProps {
   recentCaseOpenings?: CaseOpeningItem[];
   notification?: { message?: string } | null;
   setNotification?: React.Dispatch<React.SetStateAction<unknown[]>>;
-  user?: unknown;
+  user?: AuthUser | null;
 }
 
 const HeaderComponent: React.FC<HeaderProps> = ({

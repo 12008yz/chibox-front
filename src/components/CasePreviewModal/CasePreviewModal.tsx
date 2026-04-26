@@ -66,6 +66,7 @@ type CasePreviewDisplayItem = {
   id: string;
   name: string;
   image_url: string | null;
+  price?: string | number;
   rarity?: string;
   drop_chance_percent?: number;
   isExcluded?: boolean;
@@ -77,6 +78,16 @@ type CasePreviewDisplayItem = {
 
 type OpeningResultData = {
   item: CasePreviewDisplayItem;
+};
+
+type ApiErrorLike = {
+  status?: number;
+  data?: {
+    data?: {
+      required?: number;
+      available?: number;
+    };
+  };
 };
 
 const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
@@ -344,8 +355,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Обработчик клика на предмет для показа информации
   const handleItemClick = (item: unknown, withDropChance: boolean = true) => {
     if (!isMobileDevice() || showOpeningAnimation) return;
+    if (!item || typeof item !== 'object') return;
+    const typedItem = item as CasePreviewDisplayItem;
+    if (!typedItem.id || !typedItem.name) return;
 
-    setSelectedItem(item);
+    setSelectedItem(typedItem);
     setShowDropChance(withDropChance);
     setShowItemInfoModal(true);
   };
@@ -709,9 +723,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
     } catch (error: unknown) {
       const msg = getApiErrorMessage(error, '');
-      if (error?.status === 400 && msg.includes('Недостаточно средств')) {
-        const requiredAmount = error?.data?.data?.required || 0;
-        const availableAmount = error?.data?.data?.available || 0;
+      const apiError = error as ApiErrorLike;
+      if (apiError?.status === 400 && msg.includes('Недостаточно средств')) {
+        const requiredAmount = apiError?.data?.data?.required || 0;
+        const availableAmount = apiError?.data?.data?.available || 0;
         const shortfall = requiredAmount - availableAmount;
         toast.error(`Недостаточно ${shortfall} ChiCoins для покупки`, {
           duration: 3000,
@@ -795,7 +810,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               setShowItemInfoModal(false);
               setSelectedItem(null);
             }}
-            item={selectedItem}
+            item={{
+              name: selectedItem.name,
+              rarity: selectedItem.rarity || '',
+              price: selectedItem.price || 0,
+              image_url: selectedItem.image_url || '',
+              drop_chance_percent: selectedItem.drop_chance_percent,
+              bonusApplied: selectedItem.bonusApplied,
+            }}
             showDropChance={showDropChance}
             getRarityColor={getRarityColor}
             t={t}
@@ -919,7 +941,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             <div
               className={`absolute left-1/2 top-1/2 z-20 mobile-win-reveal pointer-events-none ${layoutDesktop ? 'w-[288px]' : 'w-[216px] sm:w-[240px]'}`}
             >
-              <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${layoutDesktop ? 'p-4' : ''} ${getRarityColor(wonItem.rarity)}`}>
+              <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${layoutDesktop ? 'p-4' : ''} ${getRarityColor(wonItem.rarity || '')}`}>
                 <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
                   <img
                     loading="lazy"
@@ -1190,7 +1212,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             setShowItemInfoModal(false);
             setSelectedItem(null);
           }}
-          item={selectedItem}
+          item={{
+            name: selectedItem.name,
+            rarity: selectedItem.rarity || '',
+            price: selectedItem.price || 0,
+            image_url: selectedItem.image_url || '',
+            drop_chance_percent: selectedItem.drop_chance_percent,
+            bonusApplied: selectedItem.bonusApplied,
+          }}
           showDropChance={showDropChance}
           getRarityColor={getRarityColor}
           t={t}
