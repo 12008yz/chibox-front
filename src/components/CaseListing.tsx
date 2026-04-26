@@ -65,17 +65,82 @@ const CaseListing: React.FC<CaseListingProps> = ({
     }
   };
 
+  const renderCaseCard = (caseItem: CaseTemplate) => {
+    if (!caseItem.id) return null;
+
+    const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
+    const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
+    const isTicTacToeCase = isBonusCase;
+    const caseNextAvailableTime = isFreeCase && freeCaseStatus
+      ? freeCaseStatus.nextAvailableTime
+      : (hideSubscriptionDailyCaseTimer && !isBonusCase
+          ? undefined
+          : (caseItem.next_available_time || nextCaseAvailableTime));
+
+    if (isBonusCase) {
+      return (
+        <div
+          key={caseItem.id}
+          id={isFreeCase ? 'onboarding-cases' : undefined}
+          className="case-item-wrapper cursor-pointer overflow-visible"
+          onClick={(e) => {
+            if (!(e.target as HTMLElement).closest('button')) {
+              handleCaseClick(caseItem, e);
+            }
+          }}
+        >
+          <Case
+            title={caseItem.name}
+            image={caseItem.image_url}
+            price={caseItem.price}
+            fixedPrices={fixedPrices}
+            description={t('homepage.win_bonus_game')}
+            nextCaseAvailableTime={caseNextAvailableTime}
+            isBonusCase={true}
+            onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
+            isTicTacToeCase={isTicTacToeCase}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={onAuthRequired}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Link
+        to={`/case/${caseItem.id}`}
+        key={caseItem.id}
+        id={isFreeCase ? 'onboarding-cases' : undefined}
+        className="case-item-wrapper overflow-visible block"
+        onClick={(e) => handleCaseClick(caseItem, e)}
+      >
+        <Case
+          title={caseItem.name}
+          image={caseItem.image_url}
+          price={caseItem.price}
+          fixedPrices={fixedPrices}
+          isRegistrationBonusCase={!!isFreeCase}
+          description={caseItem.name?.toLowerCase().includes('бонус') ? t('homepage.win_bonus_game') : undefined}
+          nextCaseAvailableTime={caseNextAvailableTime}
+          isBonusCase={false}
+          onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
+          isTicTacToeCase={false}
+        />
+      </Link>
+    );
+  };
+
 
   return (
     <div className="cases-section flex flex-col items-center justify-center max-w-[1600px] w-full">
       <Title title={name} />
       {description && (
-        <p className="text-gray-400/90 mb-8 text-center max-w-xl text-sm sm:text-base leading-relaxed">
+        <p className="text-gray-400/90 mb-6 sm:mb-8 text-center max-w-xl text-base sm:text-base leading-relaxed px-2">
           {description}
         </p>
       )}
 
-      <div className="grid grid-cols-2 md:flex md:flex-row items-center justify-center w-full gap-5 md:gap-8 md:flex-wrap overflow-visible">
+      <div className="w-full overflow-visible">
         {(() => {
           // Скрываем кейс «бонус после регистрации», если пользователь исчерпал лимит:
           // - получил все 2 кейса (claimCount >= maxClaims), или
@@ -89,85 +154,61 @@ const CaseListing: React.FC<CaseListingProps> = ({
             }
             return true;
           });
-          return visibleCases.length > 0 ? (
-          visibleCases.map((caseItem) => {
-            if (caseItem.id) {
-              const isBonusCase = caseItem.id === '55555555-5555-5555-5555-555555555555';
-
-              // Проверяем, является ли это бесплатным кейсом для новых пользователей (2 кейса в первые дни после регистрации)
-              const isFreeCase = freeCaseStatus && caseItem.id === freeCaseStatus.caseTemplateId;
-
-              // Проверяем, является ли это кейсом крестиков-ноликов (бонусный кейс)
-              const isTicTacToeCase = isBonusCase;
-              // Если есть подписной кейс в инвентаре — не показываем таймер у ежедневного подписного кейса (не бонуса)
-              const caseNextAvailableTime = isFreeCase && freeCaseStatus
-                ? freeCaseStatus.nextAvailableTime
-                : (hideSubscriptionDailyCaseTimer && !isBonusCase
-                    ? undefined
-                    : (caseItem.next_available_time || nextCaseAvailableTime));
-
-              if (isBonusCase) {
-                // Для бонусного кейса не используем Link, чтобы кнопка "Играть" работала
-                return (
-                  <div
-                    key={caseItem.id}
-                    id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="case-item-wrapper cursor-pointer overflow-visible"
-                    onClick={(e) => {
-                      // Проверяем, был ли клик по кнопке "Играть"
-                      if (!(e.target as HTMLElement).closest('button')) {
-                        handleCaseClick(caseItem, e);
-                      }
-                    }}
-                  >
-                    <Case
-                      title={caseItem.name}
-                      image={caseItem.image_url}
-                      price={caseItem.price}
-                      fixedPrices={fixedPrices}
-                      description={t('homepage.win_bonus_game')}
-                      nextCaseAvailableTime={caseNextAvailableTime}
-                      isBonusCase={true}
-                      onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
-                      isTicTacToeCase={isTicTacToeCase}
-                      isAuthenticated={isAuthenticated}
-                      onAuthRequired={onAuthRequired}
-                    />
-                  </div>
-                );
-              } else {
-                return (
-                  <Link
-                    to={`/case/${caseItem.id}`}
-                    key={caseItem.id}
-                    id={isFreeCase ? 'onboarding-cases' : undefined}
-                    className="case-item-wrapper overflow-visible block"
-                    onClick={(e) => handleCaseClick(caseItem, e)}
-                  >
-                    <Case
-                      title={caseItem.name}
-                      image={caseItem.image_url}
-                      price={caseItem.price}
-                      fixedPrices={fixedPrices}
-                      isRegistrationBonusCase={!!isFreeCase}
-                      description={caseItem.name?.toLowerCase().includes('бонус') ? t('homepage.win_bonus_game') : undefined}
-                      nextCaseAvailableTime={caseNextAvailableTime}
-                      isBonusCase={false}
-                      onPlayBonusGame={() => handlePlayBonusGame(caseItem)}
-                      isTicTacToeCase={false}
-                    />
-                  </Link>
-                );
-              }
-            } else {
-              return null;
-            }
-          })
-          ) : (
+          if (visibleCases.length === 0) {
+            return (
           <div className="text-gray-400 text-center py-8">
             {t('homepage.cases_not_found')}
           </div>
-        );
+            );
+          }
+
+          const bonusCase = visibleCases.find((caseItem) => caseItem.id === '55555555-5555-5555-5555-555555555555');
+          const regularCases = visibleCases.filter((caseItem) => caseItem.id !== '55555555-5555-5555-5555-555555555555');
+
+          return (
+            <>
+              {/* Mobile-only layout: бонус отдельно сверху, остальные по 2 */}
+              <div className="md:hidden">
+                {bonusCase && (
+                  <div className="flex justify-center mb-3 sm:mb-4">
+                    <div className="w-full max-w-[220px]">
+                      {renderCaseCard(bonusCase)}
+                    </div>
+                  </div>
+                )}
+
+                {regularCases.length > 0 && (
+                  <div className="grid grid-cols-2 items-start justify-center w-full gap-3 sm:gap-4 overflow-visible">
+                    {regularCases.map((caseItem, index) => {
+                      const isLast = index === regularCases.length - 1;
+                      const shouldCenterLastOnMobile = regularCases.length % 2 === 1 && isLast;
+
+                      if (shouldCenterLastOnMobile) {
+                        return (
+                          <div key={caseItem.id} className="col-span-2 flex justify-center">
+                            <div className="w-full max-w-[220px]">
+                              {renderCaseCard(caseItem)}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return <React.Fragment key={caseItem.id}>{renderCaseCard(caseItem)}</React.Fragment>;
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop layout: как раньше, без мобильных перестроений */}
+              <div className="hidden md:flex md:flex-row items-start justify-center w-full gap-8 flex-wrap overflow-visible">
+                {visibleCases.map((caseItem) => (
+                  <React.Fragment key={caseItem.id}>
+                    {renderCaseCard(caseItem)}
+                  </React.Fragment>
+                ))}
+              </div>
+            </>
+          );
         })()}
       </div>
 

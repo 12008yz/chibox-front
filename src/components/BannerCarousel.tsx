@@ -69,7 +69,7 @@ interface BannerCarouselProps {
 const BannerCarousel: React.FC<BannerCarouselProps> = ({
   images = BANNER_IMAGES,
   autoPlayInterval = 7000,
-  height = 'h-[42vh] min-h-[220px] md:h-[380px]',
+  height = 'aspect-[16/10] min-h-[220px] md:aspect-auto md:h-[380px]',
 }) => {
   const [current, setCurrent] = useState(0);
   const items = images.filter(Boolean);
@@ -124,7 +124,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to top, rgba(13, 11, 20, 0.85) 0%, transparent 35%, transparent 100%)',
+              background: 'linear-gradient(to top, rgba(13, 11, 20, 0.94) 0%, rgba(13, 11, 20, 0.58) 34%, rgba(13, 11, 20, 0.18) 62%, transparent 100%)',
             }}
           />
           {/* Текст и кнопки для слайда (индекс из BANNER_SLIDE_CONTENT) */}
@@ -133,10 +133,10 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               {/* Слайд с cta и titleOnTop (второй — статус): заголовок слева сверху, справа внизу — кнопка, затем подпись */}
               {BANNER_SLIDE_CONTENT[current].cta && current === 1 ? (
                 <>
-                  <div className="absolute top-4 md:top-8 lg:top-10 left-4 md:left-10 z-10 pointer-events-none">
+                  <div className="absolute top-3 md:top-8 lg:top-10 left-3 md:left-10 z-10 pointer-events-none max-w-[75%] md:max-w-none">
                     <div className="pointer-events-auto">
                       <p
-                        className="text-white text-base md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-sm md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].title}
@@ -144,20 +144,20 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                     </div>
                   </div>
                   <div
-                    className="absolute right-4 md:right-10 z-10 text-right flex flex-col items-end gap-2 md:gap-3"
-                    style={{ bottom: 40 }}
+                    className="absolute right-3 md:right-10 z-10 text-right flex flex-col items-end gap-1.5 md:gap-3"
+                    style={{ bottom: 28 }}
                   >
                     <button
                       type="button"
                       onClick={() => window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription' } }))}
-                      className="inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-red-400 bg-red-500/15 border border-red-400/50 hover:bg-red-500/25 hover:border-red-400 hover:text-red-300 transition-all duration-300 shadow-[0_0_12px_rgba(248,113,113,0.25)] pointer-events-auto"
+                      className="inline-flex items-center justify-center min-h-[38px] px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-red-400 bg-red-500/15 border border-red-400/50 hover:bg-red-500/25 hover:border-red-400 hover:text-red-300 transition-all duration-300 shadow-[0_0_12px_rgba(248,113,113,0.25)] pointer-events-auto"
                       style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                     >
                       {BANNER_SLIDE_CONTENT[current].cta!.label}
                     </button>
                     {BANNER_SLIDE_CONTENT[current].subtitle && (
                       <p
-                        className="text-white text-sm md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] pointer-events-none"
+                        className="text-white text-xs md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] pointer-events-none max-w-[210px] md:max-w-none"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].subtitle}
@@ -168,12 +168,12 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               ) : BANNER_SLIDE_CONTENT[current].cta ? (
                 /* Слайд с cta в одну строку внизу (третий — апгрейд) */
                 <div
-                  className="absolute left-4 right-4 md:left-10 md:right-10 z-10 flex flex-wrap items-center justify-between gap-2 md:gap-3 pointer-events-none"
-                  style={{ bottom: 40 }}
+                  className="absolute left-3 right-3 md:left-10 md:right-10 z-10 flex flex-wrap items-center justify-between gap-2 md:gap-3 pointer-events-none"
+                  style={{ bottom: 28 }}
                 >
                   <div className="pointer-events-auto flex flex-wrap items-center gap-1.5 md:gap-3">
                     <span
-                      className="text-white text-sm md:text-xl lg:text-2xl font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      className="text-white text-xs md:text-xl lg:text-2xl font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                       style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                     >
                       {BANNER_SLIDE_CONTENT[current].title}
@@ -181,7 +181,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                   </div>
                   <Link
                     to={BANNER_SLIDE_CONTENT[current].cta!.url}
-                    className="pointer-events-auto inline-flex items-center justify-center px-3 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300 shrink-0"
+                    className="pointer-events-auto inline-flex items-center justify-center min-h-[38px] px-3 py-1.5 md:px-5 md:py-2.5 text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300 shrink-0"
                     style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}
                   >
                     {BANNER_SLIDE_CONTENT[current].cta!.label}
@@ -190,10 +190,10 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
               ) : (
                 <>
                   {/* Заголовок и иконки — слева сверху, иконки под первым слоганом */}
-                  <div className="absolute top-4 md:top-8 lg:top-10 left-4 md:left-10 z-10 pointer-events-none">
+                  <div className="absolute top-3 md:top-8 lg:top-10 left-3 md:left-10 z-10 pointer-events-none max-w-[76%] md:max-w-none">
                     <div className="pointer-events-auto">
                       <p
-                        className="text-white text-base md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-sm md:text-2xl lg:text-3xl font-bold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].title}
@@ -206,7 +206,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                               href={link.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
+                              className="inline-flex items-center gap-1.5 md:gap-2 min-h-[36px] px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white bg-white/15 border border-white/25 hover:bg-white/25 hover:border-white/40 transition-all duration-300"
                             >
                               {link.icon === 'telegram' && <IconTelegram />}
                               {link.icon === 'vk' && <IconVK />}
@@ -220,11 +220,11 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
                   {/* Второй слоган — справа внизу, 40px от низа */}
                   {BANNER_SLIDE_CONTENT[current].subtitle && (
                     <div
-                      className="absolute right-4 md:right-10 z-10 text-right pointer-events-none"
-                      style={{ bottom: 40 }}
+                      className="absolute right-3 md:right-10 z-10 text-right pointer-events-none"
+                      style={{ bottom: 28 }}
                     >
                       <p
-                        className="text-white text-sm md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                        className="text-white text-xs md:text-xl lg:text-2xl font-semibold leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] max-w-[220px] md:max-w-none"
                         style={{ textShadow: '0 0 24px rgba(0,0,0,0.6)' }}
                       >
                         {BANNER_SLIDE_CONTENT[current].subtitle}
@@ -237,30 +237,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
           )}
       </div>
 
-      {items.length > 1 && (
-        <>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goTo(i)}
-                className="w-10 h-10 inline-flex items-center justify-center rounded-full touch-manipulation"
-                aria-label={`Баннер ${i + 1}`}
-              >
-                <span
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === current
-                      ? 'w-6 bg-gradient-to-r from-indigo-500 via-orange-400 to-amber-500'
-                      : 'w-1.5 bg-white/40 hover:bg-white/60'
-                  }`}
-                  style={i === current ? { boxShadow: '0 0 12px rgba(99, 102, 241, 0.5), 0 0 16px rgba(251, 146, 60, 0.3)' } : undefined}
-                />
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      
     </div>
   );
 };

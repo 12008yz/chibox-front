@@ -1897,8 +1897,10 @@ html::-webkit-scrollbar-thumb,
   border-radius: 0 !important;
 }
 
-.case-item-wrapper:hover {
-  transform: scale(1.02) translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .case-item-wrapper:hover {
+    transform: scale(1.02) translateY(-2px);
+  }
 }
 
 .case-image {
@@ -1910,11 +1912,11 @@ html::-webkit-scrollbar-thumb,
 
 @media (max-width: 768px) {
   .case-item-wrapper > * {
-    padding: 8px;
+    padding: 6px;
   }
 
-  .case-item-wrapper:hover {
-    transform: scale(1.01) translateY(-1px);
+  .case-item-wrapper {
+    transform: none !important;
   }
 }
 
