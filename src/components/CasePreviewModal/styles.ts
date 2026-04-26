@@ -989,8 +989,8 @@ export const strikeAnimationStyles = `
       opacity: 0.92;
     }
     .case-open-center-marker--pulse {
-      /* На мобильных оставляем только статичное свечение, без filter-анимации */
-      animation: none;
+      /* На мобильных оставляем лёгкую transform-пульсацию (без тяжелых фильтров) */
+      animation: case-open-marker-pulse 1.35s ease-in-out infinite;
       opacity: 0.95;
     }
   }

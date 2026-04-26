@@ -464,15 +464,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const durationMs = reduceMotion
       ? Math.min(900, 400 + targetSlotIndex * 28)
       : isIPhone
-        ? 3600 + Math.random() * 500
+        ? 5700 + Math.random() * 850
         : 5200 + Math.random() * 800;
-    const settleDurationMs = reduceMotion ? 120 : isIPhone ? 260 : 300;
-    const overshootSlots = reduceMotion ? 0 : isIPhone ? 0.16 : 0.24;
+    const settleDurationMs = reduceMotion ? 120 : isIPhone ? 390 : 300;
+    const overshootSlots = reduceMotion ? 0 : isIPhone ? 0.22 : 0.24;
     const firstPhaseTarget = targetSlotIndex + overshootSlots;
-    const startDelayMs = reduceMotion ? 120 : 380;
+    const startDelayMs = reduceMotion ? 120 : isIPhone ? 300 : 380;
     let lastTickSlot = -1;
     let lastSoundAt = 0;
-    const SOUND_MIN_MS = isIPhone ? 72 : 38;
+    const SOUND_MIN_MS = isIPhone ? 56 : 38;
 
     const finishSpin = () => {
       if (useWebAudioForIPhone) {
@@ -563,7 +563,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         if (animStart === null) animStart = now;
         const elapsed = now - animStart;
         const t = Math.min(1, elapsed / durationMs);
-        const eased = cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
+        const eased = isIPhone
+          ? cubicBezierYatX(t, 0.2, 0.14, 0.18, 1)
+          : cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
         const pos = eased * firstPhaseTarget;
         applyMobileStripTransformFloat(pos, 0);
 
