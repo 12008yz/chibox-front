@@ -1405,7 +1405,15 @@ const UpgradePage: React.FC = () => {
         data: {
           source_items: result.data.source_items,
           result_item: result.data.result_item,
-          target_item: result.data.target_item,
+          target_item: result.data.target_item
+            ? {
+                ...result.data.target_item,
+                upgrade_chance: selectedTargetItemDetails?.upgrade_chance ?? 0,
+                price_ratio: selectedTargetItemDetails?.price_ratio ?? 0,
+                base_chance: selectedTargetItemDetails?.base_chance ?? 0,
+                cheap_target_bonus: selectedTargetItemDetails?.cheap_target_bonus ?? 0,
+              }
+            : undefined,
           success_chance: result.data.success_chance,
           rolled_value: result.data.rolled_value,
           total_source_price: result.data.total_source_price,

@@ -21,6 +21,9 @@ type BestWeaponInventory = UserInventoryItem & {
   isRecord?: boolean;
 };
 
+const isBestWeaponRecord = (weapon: BestWeaponRecord | BestWeaponInventory): weapon is BestWeaponRecord =>
+  'price' in weapon && !('item' in weapon);
+
 interface BestWeaponProps {
   user: User & {
     bestWeapon?: BestWeaponRecord;
@@ -40,7 +43,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
 
   // Если цена предмета 0 или меньше, считаем что предмета нет
   if (bestWeapon) {
-    const price = parseFloat(String(bestWeapon.price || bestWeapon.item?.price || 0));
+    const price = parseFloat(String(isBestWeaponRecord(bestWeapon) ? bestWeapon.price : bestWeapon.item?.price || 0));
     if (price <= 0) {
       bestWeapon = null;
     }
@@ -69,11 +72,13 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
   );
 
   const renderBestWeapon = () => {
+    if (!bestWeapon) return null;
+    const currentBestWeapon = bestWeapon;
     // Определяем, является ли bestWeapon объектом из сервера (с прямыми полями)
     // или элементом инвентаря (с вложенным объектом item)
-    const isDirectWeapon = !!bestWeapon.price && !bestWeapon.item;
-    const weaponData = isDirectWeapon ? bestWeapon : bestWeapon.item;
-    const weaponPrice = isDirectWeapon ? bestWeapon.price : (bestWeapon.item?.price || 0);
+    const isDirectWeapon = isBestWeaponRecord(currentBestWeapon);
+    const weaponData = isDirectWeapon ? currentBestWeapon : currentBestWeapon.item;
+    const weaponPrice = isDirectWeapon ? currentBestWeapon.price : (currentBestWeapon.item?.price || 0);
 
     return (
       <div className="bg-black/40 rounded-xl p-3 sm:p-4 lg:p-6 border-2 border-white/10 hover:border-orange-500/50 transition-all duration-300">
@@ -119,7 +124,7 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
               <span className="text-green-400 font-bold text-base sm:text-lg">
                 <Monetary value={Number(weaponPrice)} showFraction={true} />
               </span>
-              {bestWeapon.isRecord && (
+              {currentBestWeapon.isRecord && (
                 <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full border border-yellow-500/30">
                   {t('profile.all_time_record')}
                 </span>
@@ -128,8 +133,8 @@ const BestWeapon: React.FC<BestWeaponProps> = ({ user, inventory, inventoryLoadi
             <p className="text-gray-400 text-xs sm:text-sm truncate">
               {weaponData?.weapon_type ? (
                 `${t('profile.weapon_type')} ${weaponData.weapon_type || t('profile.weapon_type_default')}`
-              ) : bestWeapon.acquisition_date ? (
-                `${t('profile.acquired_date')} ${new Date(bestWeapon.acquisition_date as string).toLocaleDateString()}`
+              ) : currentBestWeapon.acquisition_date ? (
+                `${t('profile.acquired_date')} ${new Date(currentBestWeapon.acquisition_date as string).toLocaleDateString()}`
               ) : (
                 `${t('profile.weapon_type')} ${t('profile.weapon_type_default')}`
               )}

@@ -50,10 +50,12 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
   const { t } = useTranslation();
 
   // Всегда используем данные из API запроса прогресса достижений
-  const achievementsProgress = achievementsProgressData?.success ? achievementsProgressData.data : [];
+  const achievementsProgress: AchievementProgressItem[] = achievementsProgressData?.success
+    ? (achievementsProgressData.data ?? [])
+    : [];
 
   // Общее количество достижений в системе (соответствует сидеру)
-  const totalAchievements = allAchievementsData?.success ? allAchievementsData.data.length : 23;
+  const totalAchievements = allAchievementsData?.success ? (allAchievementsData.data?.length ?? 23) : 23;
 
   // Завершенные достижения
   const completedAchievementsCount = achievementsProgress.filter((ach) => ach.completed).length;

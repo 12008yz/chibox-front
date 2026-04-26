@@ -27,6 +27,8 @@ interface AchievementProgressItem {
   badge_color?: string;
 }
 
+type AchievementCategory = 'regular' | 'beginner' | 'expert' | 'legendary';
+
 const AchievementsCard: React.FC<AchievementsCardProps> = ({
   completedAchievementsCount,
   totalAchievements,
@@ -53,6 +55,10 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
 
   // Преобразуем данные для модального окна
   const modalAchievements = achievementsProgress.map(ach => {
+    const category: AchievementCategory =
+      ach.category === 'beginner' || ach.category === 'expert' || ach.category === 'legendary'
+        ? ach.category
+        : 'regular';
     const transformed = {
       id: ach.id,
       name: ach.name,
@@ -61,7 +67,7 @@ const AchievementsCard: React.FC<AchievementsCardProps> = ({
       icon_url: ach.icon_url || '',
       requirement_type: ach.requirement_type || '',
       requirement_value: ach.target || 1,
-      category: ach.category || 'regular',
+      category,
       badge_color: ach.badge_color || '#6B7280',
       is_completed: ach.completed,
       current_progress: ach.progress || 0,

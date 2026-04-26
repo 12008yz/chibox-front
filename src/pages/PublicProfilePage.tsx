@@ -9,7 +9,7 @@ import ScrollToTopOnMount from '../components/ScrollToTopOnMount';
 import { getItemImageUrl, getCaseImageUrl, adaptImageSize } from '../utils/steamImageUtils';
 import { getImageUrl } from '../utils/imageUtils';
 import Monetary from '../components/Monetary';
-import type { CaseTemplate, InventoryItem, Item } from '../types/api';
+import type { CaseTemplate, InventoryItem, Item, UserCaseItem, UserInventoryItem } from '../types/api';
 
 type PublicAchievement = {
   id: string;
@@ -58,6 +58,21 @@ type PublicProfileUser = {
   };
 };
 
+type InventoryItemWithCaseTemplate = InventoryItem & {
+  case_template?: CaseTemplate;
+};
+
+const isUserItem = (item: InventoryItem): item is UserInventoryItem => item.item_type === 'item';
+const isUserCase = (item: InventoryItem): item is UserCaseItem => item.item_type === 'case';
+const toInventoryItems = (value: unknown): InventoryItem[] => {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is InventoryItem => {
+    if (!item || typeof item !== 'object') return false;
+    const typed = item as { id?: unknown; item_type?: unknown };
+    return typeof typed.id === 'string' && (typed.item_type === 'item' || typed.item_type === 'case');
+  });
+};
+
 const PublicProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -66,7 +81,7 @@ const PublicProfilePage: React.FC = () => {
   const [activePage, setActivePage] = useState(1);
   const [openedPage, setOpenedPage] = useState(1);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  const [caseItemsList, setCaseItemsList] = useState<InventoryItem[]>([]);
+  const [caseItemsList, setCaseItemsList] = useState<UserInventoryItem[]>([]);
 // State для переключения между категориями инвентаря
 const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'>('active');
   // State для сохранения изначальных счетчиков
@@ -110,24 +125,26 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
      
 
       if (activeInventoryTab === 'active') {
+        const inventoryFromApi = toInventoryItems(profileData.user.inventory);
         if (activePage === 1) {
-          setInventoryItems(profileData.user.inventory || []);
+          setInventoryItems(inventoryFromApi);
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
           setInventoryItems(prev => {
-            const newItems = (profileData.user.inventory || []).filter(
+            const newItems = inventoryFromApi.filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
           });
         }
       } else {
+        const caseItemsFromApi = toInventoryItems(profileData.user.caseItems);
         if (openedPage === 1) {
-          setCaseItemsList(profileData.user.caseItems || []);
+          setCaseItemsList(caseItemsFromApi.filter(isUserItem));
         } else {
           // Добавляем только новые предметы, которых еще нет в списке
           setCaseItemsList(prev => {
-            const newItems = (profileData.user.caseItems || []).filter(
+            const newItems = caseItemsFromApi.filter(isUserItem).filter(
               newItem => !prev.some(existingItem => existingItem.id === newItem.id)
             );
             return newItems.length > 0 ? [...prev, ...newItems] : prev;
@@ -681,9 +698,13 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                 {(activeInventoryTab as 'active' | 'opened') === 'opened' ? (
                   // Специальный рендеринг для открытых кейсов с анимацией
                   filteredInventory.map((inventoryItem: InventoryItem) => {
+                    if (!isUserItem(inventoryItem)) {
+                      return null;
+                    }
                     // Используем case_template напрямую из ответа, если доступен
                     // Или ищем через getCaseTemplateById, если нужно
-                    const caseTemplate = inventoryItem.case_template ||
+                    const itemWithCaseTemplate = inventoryItem as InventoryItemWithCaseTemplate;
+                    const caseTemplate = itemWithCaseTemplate.case_template ||
                       (inventoryItem.case_template_id ? getCaseTemplateById(inventoryItem.case_template_id) : null);
 
                     return (
@@ -698,8 +719,9 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                   // Обычный рендеринг для активных предметов
                   filteredInventory.map((inventoryItem: InventoryItem) => {
                     // Проверяем, является ли это активным кейсом
-                    if (inventoryItem.item_type === 'case') {
-                      const caseTemplate = inventoryItem.case_template ||
+                    if (isUserCase(inventoryItem)) {
+                      const itemWithCaseTemplate = inventoryItem as InventoryItemWithCaseTemplate;
+                      const caseTemplate = itemWithCaseTemplate.case_template ||
                         (inventoryItem.case_template_id ? getCaseTemplateById(inventoryItem.case_template_id) : null);
 
                       return (
@@ -746,6 +768,10 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                     }
 
                     // Обычный рендеринг для предметов
+                    if (!isUserItem(inventoryItem)) {
+                      return null;
+                    }
+
                     return (
                       <div
                         key={inventoryItem.id}
@@ -778,7 +804,7 @@ const [activeInventoryTab, setActiveInventoryTab] = useState<'active' | 'opened'
                           {inventoryItem.item?.name}
                         </h5>
                         <p className="text-green-400 text-xs sm:text-sm font-bold">
-                          <Monetary value={Number(inventoryItem.item?.price || inventoryItem.price || 0)} showFraction={true} />
+                          <Monetary value={Number(inventoryItem.item?.price || 0)} showFraction={true} />
                         </p>
 
                         {/* Дополнительная информация о предмете */}
