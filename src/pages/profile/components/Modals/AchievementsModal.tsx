@@ -36,22 +36,19 @@ const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
 
-  // Блокировка скролла при открытии модального окна
+  // Блокировка скролла и звук только при реальном открытии модалки
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       soundManager.play('modal');
     } else {
       document.body.style.overflow = 'unset';
-      if (document.body.style.overflow === 'unset') {
-        soundManager.play('modal');
-      }
     }
 
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, achievements, loading]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
