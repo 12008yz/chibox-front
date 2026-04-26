@@ -28,6 +28,8 @@ const MAX_LIVE_DROPS = 17;
 let globalSocket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 /** Повтор без cookie (для Opera и браузеров с блокировкой) */
 let tryWithoutCredentials = false;
+/** Жесткий режим для проблемных браузеров/сетей: только polling */
+let forcePollingOnly = false;
 let onlineUsersListeners = new Set<(count: number) => void>();
 let connectionListeners = new Set<(isConnected: boolean) => void>();
 let connectionErrorListeners = new Set<(err: string | null) => void>();
@@ -76,12 +78,17 @@ const createGlobalSocket = () => {
   }
 
   const serverUrl = BACKEND_URL.replace(/\/$/, '');
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isSafari = /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser/i.test(ua);
+  const preferSafeTransport = forcePollingOnly || (isIOS && isSafari);
+  const transports = preferSafeTransport ? ['polling'] : ['polling', 'websocket'];
 
   globalSocket = io(serverUrl, {
     // Polling first makes connection more tolerant to Safari/privacy filters and mobile proxies.
     // Then Socket.IO upgrades to WebSocket when possible.
-    transports: ['polling', 'websocket'],
-    upgrade: true,
+    transports,
+    upgrade: !preferSafeTransport,
     rememberUpgrade: false,
     timeout: 20000,
     forceNew: true,
@@ -121,6 +128,23 @@ const createGlobalSocket = () => {
           createGlobalSocket();
         }
       }, 2500);
+    }
+    // Если ws рукопожатие регулярно рвётся до установления — переключаемся на polling-only.
+    const msg = String(err?.message || '').toLowerCase();
+    const wsHandshakeFailed = msg.includes('websocket') || msg.includes('transport close');
+    if (!forcePollingOnly && wsHandshakeFailed && globalSocket) {
+      forcePollingOnly = true;
+      const failed = globalSocket;
+      setTimeout(() => {
+        if (globalSocket === failed && !failed.connected) {
+          failed.removeAllListeners();
+          failed.disconnect();
+          globalSocket = null;
+          lastConnectionError = null;
+          connectionErrorListeners.forEach(listener => listener(null));
+          createGlobalSocket();
+        }
+      }, 1000);
     }
   });
 
