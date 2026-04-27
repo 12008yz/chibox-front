@@ -1579,7 +1579,7 @@ img.live-drop-item {
 }
 
 .case-image {
-  overflow: clip;
+  overflow: visible;
   border-radius: 0;
   border: none !important;
   outline: none !important;
