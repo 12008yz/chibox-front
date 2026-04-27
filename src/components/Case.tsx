@@ -64,14 +64,14 @@ const Case: React.FC<CaseProps> = ({ title, image, price, fixedPrices = false, d
         </div>
       )}
 
-      <div className="relative w-full flex items-end justify-center overflow-visible h-[140px] sm:h-[156px] md:h-auto md:aspect-[3/4]">
+      <div className="relative w-full flex items-center justify-center overflow-visible h-[140px] sm:h-[156px] md:h-[260px]">
         {caseImageUrl ? (
           <img loading="lazy" decoding="async" src={caseImageUrl}
             alt={title}
             width="256"
             height="256"
             draggable="false"
-            className={`case-image w-full h-full md:h-64 object-contain relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`case-image w-auto h-auto max-w-full max-h-full md:max-h-[240px] object-contain relative z-10 transition-all duration-300 select-none ${loaded ? 'opacity-100' : 'opacity-0'}`}
             style={{
               pointerEvents: 'none',
               userSelect: 'none'
