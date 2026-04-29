@@ -478,10 +478,28 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
 
-    const tripled = [...baseStrip, ...baseStrip, ...baseStrip];
-    const targetSlotIndex = L + wonItemIndex;
+    /**
+     * Формируем "длинную" клиентскую ленту, чтобы визуально скрыть зависимость
+     * анимации от количества предметов в кейсе (особенно при малом L).
+     * Сервер задаёт только выигрышный предмет, а не характер движения.
+     */
+    const reduceMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const useWebAudioForIPhone = isIPhone && !reduceMotion;
 
-    setMobileAnimationItems(tripled);
+    const minTravelSlots = reduceMotion ? 10 : isIPhone ? 54 : 64;
+    const maxTravelSlots = reduceMotion ? 16 : isIPhone ? 72 : 88;
+    const desiredTravelSlots =
+      minTravelSlots + Math.floor(Math.random() * Math.max(1, maxTravelSlots - minTravelSlots + 1));
+
+    // Целевой индекс выигрыша в "виртуальной" длинной ленте
+    const cyclesBeforeTarget = Math.max(2, Math.ceil((desiredTravelSlots - wonItemIndex) / L));
+    const targetSlotIndex = cyclesBeforeTarget * L + wonItemIndex;
+    const tailCycles = reduceMotion ? 1 : 2;
+    const repeatCount = cyclesBeforeTarget + tailCycles + 1; // +1 чтобы точно покрыть target index
+    const longStrip = Array.from({ length: repeatCount }, () => baseStrip).flat();
+
+    setMobileAnimationItems(longStrip);
     setSliderPosition(0);
     setSliderOffset(0);
 
@@ -495,11 +513,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       }
     };
 
-    const reduceMotion =
-      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const useWebAudioForIPhone = isIPhone && !reduceMotion;
     const durationMs = reduceMotion
-      ? Math.min(900, 400 + targetSlotIndex * 28)
+      ? 700
       : isIPhone
         ? 5700 + Math.random() * 850
         : 5200 + Math.random() * 800;
