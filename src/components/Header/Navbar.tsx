@@ -37,9 +37,9 @@ const Navbar: React.FC<NavbarProps> = ({
 
   // Один общий слушатель openDepositModal — модалка рендерится только здесь, иначе два RightContent открывали бы две модалки
   useEffect(() => {
-    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription'; subscriptionId?: number }>) => {
+    const handler = (e: CustomEvent<{ tab?: 'balance' | 'subscription'; subscriptionId?: number; tier?: number }>) => {
       setDepositModalInitialTab(e.detail?.tab || 'balance');
-      setDepositModalSelectedSubscription(e.detail?.subscriptionId);
+      setDepositModalSelectedSubscription(e.detail?.subscriptionId ?? e.detail?.tier);
       setIsDepositModalOpen(true);
     };
     window.addEventListener('openDepositModal', handler as EventListener);

@@ -64,7 +64,7 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
     if (onBuyStatusClick) {
       Promise.resolve(onBuyStatusClick(requiredTier)).catch(() => {});
     } else {
-      window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription', tier: requiredTier } }));
+      window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'subscription', subscriptionId: requiredTier } }));
       handleClose();
     }
   };

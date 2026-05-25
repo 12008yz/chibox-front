@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import Monetary from '../../Monetary';
+import ItemStrikeThroughOverlay from './ItemStrikeThroughOverlay';
 
 interface ItemInfoModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface ItemInfoModalProps {
     bonusApplied?: number;
   };
   showDropChance?: boolean;
+  showStrikeThrough?: boolean;
   getRarityColor: (rarity: string) => string;
   t: (key: string) => string;
 }
@@ -45,6 +47,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
   onClose,
   item,
   showDropChance = false,
+  showStrikeThrough = false,
   getRarityColor,
   t,
 }) => {
@@ -65,7 +68,11 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center p-3 border-b border-gray-700">
           <h2 className="text-white font-bold text-base">
-            {showDropChance ? t('case_preview_modal.item_info') : t('case_preview_modal.you_won')}
+            {showDropChance
+              ? t('case_preview_modal.item_info')
+              : showStrikeThrough
+                ? t('case_preview_modal.received')
+                : t('case_preview_modal.you_won')}
           </h2>
           <button
             onClick={onClose}
@@ -81,7 +88,11 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
         <div className="p-4">
           {/* Item Image */}
           <div className={`mb-3 rounded-lg p-3 border-2 ${rarityColorClass} bg-gray-900`}>
-            <div className="aspect-square flex items-center justify-center">
+            <div
+              className={`relative aspect-square flex items-center justify-center ${
+                showStrikeThrough ? 'opacity-50 grayscale' : ''
+              }`}
+            >
               <img loading="lazy" src={highQualityImageUrl}
                 alt={item.name}
                 className="max-w-full max-h-full object-contain"
@@ -89,6 +100,7 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
                   e.currentTarget.style.display = 'none';
                 }}
               />
+              {showStrikeThrough && <ItemStrikeThroughOverlay />}
             </div>
           </div>
 
@@ -109,12 +121,14 @@ const ItemInfoModal: React.FC<ItemInfoModalProps> = ({
             </div>
 
             {/* Price */}
-            <div>
-              <p className="text-gray-400 text-xs mb-1">{t('case_preview_modal.price')}</p>
-              <p className="text-green-400 font-bold text-lg">
-                <Monetary value={parseFloat(String(item.price || '0'))} />
-              </p>
-            </div>
+            {!showStrikeThrough && (
+              <div>
+                <p className="text-gray-400 text-xs mb-1">{t('case_preview_modal.price')}</p>
+                <p className="text-green-400 font-bold text-lg">
+                  <Monetary value={parseFloat(String(item.price || '0'))} />
+                </p>
+              </div>
+            )}
 
             {/* Drop Chance (if applicable) */}
             {showDropChance && item.drop_chance_percent !== undefined && (

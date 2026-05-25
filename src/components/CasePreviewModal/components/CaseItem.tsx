@@ -4,7 +4,8 @@ import { useInView } from 'react-intersection-observer';
 import Monetary from '../../Monetary';
 import { CaseItemProps } from '../types';
 import { adaptImageSize } from '../../../utils/steamImageUtils';
-import { ReceivedIcon } from '../../icons';
+import ItemStrikeThroughOverlay from './ItemStrikeThroughOverlay';
+import { DAILY_CASE_ID } from '../constants';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 
 export const CaseItem = memo(({
@@ -45,7 +46,7 @@ export const CaseItem = memo(({
     (isCurrentSliderPosition || isNextSliderPosition);
   const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
   const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
-  const isDailyCase = caseData.id === '44444444-4444-4444-4444-444444444444';
+  const isDailyCase = caseData.id === DAILY_CASE_ID;
 
   // Оптимизированный обработчик ошибки изображения
   const handleImageError = useCallback(() => {
@@ -251,61 +252,10 @@ export const CaseItem = memo(({
 
           {/* Красивое перечеркивание */}
           {!shouldRenderSimplified && ((item.isExcluded && !(showOpeningAnimation && isWinningItem)) || (isWinningItemStopped && showStrikeThrough && isDailyCase)) && (
-            <div className="absolute inset-0 z-20 rounded overflow-hidden">
-              {/* Затемнённый фон с градиентом */}
-              <div className={`absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/60 ${
-                isWinningItemStopped && showStrikeThrough ? 'animate-overlay-fade' : ''
-              }`} />
-
-              {/* SVG крест с анимацией */}
-              <svg
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                style={{ pointerEvents: 'none' }}
-              >
-                {/* Первая линия (слева-сверху вправо-вниз) */}
-                <line
-                  x1="15" y1="15"
-                  x2="85" y2="85"
-                  stroke={isWinningItemStopped && showStrikeThrough ? "#ef4444" : "#dc2626"}
-                  strokeWidth={isWinningItemStopped && showStrikeThrough ? "4" : "3"}
-                  strokeLinecap="round"
-                  className={isWinningItemStopped && showStrikeThrough ? 'animate-svg-line-1' : ''}
-                  style={{
-                    filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.9))',
-                    strokeDasharray: isWinningItemStopped && showStrikeThrough ? '113' : undefined,
-                    strokeDashoffset: isWinningItemStopped && showStrikeThrough ? '0' : undefined,
-                    opacity: isWinningItemStopped && showStrikeThrough ? undefined : 1
-                  }}
-                />
-
-                {/* Вторая линия (справа-сверху влево-вниз) */}
-                <line
-                  x1="85" y1="15"
-                  x2="15" y2="85"
-                  stroke={isWinningItemStopped && showStrikeThrough ? "#ef4444" : "#dc2626"}
-                  strokeWidth={isWinningItemStopped && showStrikeThrough ? "4" : "3"}
-                  strokeLinecap="round"
-                  className={isWinningItemStopped && showStrikeThrough ? 'animate-svg-line-2' : ''}
-                  style={{
-                    filter: 'drop-shadow(0 0 6px rgba(239, 68, 68, 0.9))',
-                    strokeDasharray: isWinningItemStopped && showStrikeThrough ? '113' : undefined,
-                    strokeDashoffset: isWinningItemStopped && showStrikeThrough ? '0' : undefined,
-                    opacity: isWinningItemStopped && showStrikeThrough ? undefined : 1
-                  }}
-                />
-              </svg>
-
-              {/* Галочка подтверждения */}
-              {isWinningItemStopped && showStrikeThrough && (
-                <div className="absolute top-2 right-2 animate-checkmark-bounce">
-                  <div className="bg-gradient-to-br from-green-400 to-green-600 text-white text-sm px-2.5 py-1 rounded-full font-bold shadow-lg border-2 border-green-300">
-                    <ReceivedIcon className="w-4 h-4" />
-                  </div>
-                </div>
-              )}
-            </div>
+            <ItemStrikeThroughOverlay
+              animated={isWinningItemStopped && showStrikeThrough}
+              showCheckmark={isWinningItemStopped && showStrikeThrough}
+            />
           )}
 
           {/* Эффект золотых искр только для выигранного предмета */}

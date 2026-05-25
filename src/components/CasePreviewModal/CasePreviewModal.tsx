@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { useGetCaseItemsQuery, useGetCaseStatusQuery, useBuyCaseMutation, useOpenCaseMutation } from '../../features/cases/casesApi';
 import { useBuySubscriptionMutation } from '../../features/subscriptions/subscriptionsApi';
+import { PAYMENTS_TEMPORARILY_DISABLED } from '../../config/payments';
 import { CaseTemplate } from '../../types/api';
 import { useUserData } from '../../hooks/useUserData';
 import { CaseItem } from './components/CaseItem';
@@ -11,6 +12,8 @@ import { StaticCaseItem } from './components/StaticCaseItem';
 import { ModalHeader } from './components/ModalHeader';
 import { ModalFooter } from './components/ModalFooter';
 import ItemInfoModal from './components/ItemInfoModal';
+import ItemStrikeThroughOverlay from './components/ItemStrikeThroughOverlay';
+import { DAILY_CASE_ID } from './constants';
 import { CasePreviewModalProps } from './types';
 import { getRarityColor, generateGoldenSparks, getDefaultCaseImage } from './utils';
 import { injectStyles } from './styles';
@@ -119,6 +122,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const [sliderOffset, setSliderOffset] = useState(0);
   const [showWinEffects, setShowWinEffects] = useState(false);
   const [showItemInfoModal, setShowItemInfoModal] = useState(false);
+  /** Перечёркивание в финальной модалке (Статус++), сохраняется после сброса анимации */
+  const [winModalStrikeThrough, setWinModalStrikeThrough] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CasePreviewDisplayItem | null>(null);
   const [showDropChance, setShowDropChance] = useState(false);
   const [isPreparingAssets, setIsPreparingAssets] = useState(false);
@@ -134,6 +139,20 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   // Мобильная оптимизация: позиция полоски через ref, без лишних re-render на каждый шаг
   const mobileStripRef = useRef<HTMLDivElement>(null);
   const mobileAnimationRef = useRef<{ position: number; offset: number }>({ position: 0, offset: 0 });
+  /** Актуальное значение showStrikeThrough для колбэков в setTimeout анимации */
+  const showStrikeThroughRef = useRef(false);
+  const winRevealModalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearWinRevealModalTimeout = useCallback(() => {
+    if (winRevealModalTimeoutRef.current) {
+      clearTimeout(winRevealModalTimeoutRef.current);
+      winRevealModalTimeoutRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    showStrikeThroughRef.current = showStrikeThrough;
+  }, [showStrikeThrough]);
   // Шаг полоски: мобилка 100+12 / 112+12; десктоп 128+16 (gap-4)
   /** Шаг ленты = ширина карточки + gap (см. классы case-open-strip и padding в styles). ~+20% к базовым размерам. */
   const getStripStepPx = () => {
@@ -201,8 +220,15 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
   }, [statusData]);
 
-  // Покупка статуса с переходом сразу на страницу оплаты (tier 1/2/3)
+  // Покупка статуса: при отключённых платежах — модалка с баннером; иначе переход на оплату
   const handleBuyStatusClick = useCallback(async (tier: number) => {
+    if (PAYMENTS_TEMPORARILY_DISABLED) {
+      onClose();
+      window.dispatchEvent(
+        new CustomEvent('openDepositModal', { detail: { tab: 'subscription', subscriptionId: tier } })
+      );
+      return;
+    }
     try {
       const result = await buySubscription({
         tierId: tier,
@@ -239,6 +265,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowGoldenSparks(false);
       setShowWinEffects(false);
       setShouldStopBetween(false);
+      clearWinRevealModalTimeout();
+      setShowItemInfoModal(false);
+      setWinModalStrikeThrough(false);
+      setSelectedItem(null);
       // Блокировка скролла: сдвигаем только #root (не body), чтобы подложка модалки не ломалась
       const scrollY = window.scrollY;
       const root = document.getElementById('root');
@@ -267,6 +297,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       setShowOpeningAnimation(false);
       setCasePreviewExiting(false);
       setAnimationPhase('idle');
+      clearWinRevealModalTimeout();
+      setShowItemInfoModal(false);
+      setWinModalStrikeThrough(false);
+      setSelectedItem(null);
       rouletteAudio.stopAll();
       soundManager.stopAll(); // Останавливаем все звуки при закрытии
       animationTimoutsRef.current.forEach(timeout => clearTimeout(timeout));
@@ -368,6 +402,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     // Останавливаем все звуки при закрытии
     rouletteAudio.stopAll();
     soundManager.stopAll();
+    clearWinRevealModalTimeout();
+    setShowItemInfoModal(false);
+    setWinModalStrikeThrough(false);
     setIsAnimating(false);
     setTimeout(() => {
       setIsVisible(false);
@@ -416,6 +453,8 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const handleAnimationComplete = useCallback(() => {
     // Сохраняем результат открытия перед сбросом
     const wonItem = openingResult?.item;
+    // ref: таймер анимации держит старый колбэк, state showStrikeThrough там может быть false
+    const strikeThroughForWinModal = showStrikeThroughRef.current;
 
     setShowOpeningAnimation(false);
     setAnimationPhase('idle');
@@ -438,10 +477,13 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     }
 
     // Открываем модальное окно на мобильных устройствах с информацией о выпавшем предмете
+    clearWinRevealModalTimeout();
     if (isMobileDevice() && wonItem) {
-      setTimeout(() => {
+      winRevealModalTimeoutRef.current = setTimeout(() => {
+        winRevealModalTimeoutRef.current = null;
         setSelectedItem(wonItem);
         setShowDropChance(false);
+        setWinModalStrikeThrough(strikeThroughForWinModal);
         setShowItemInfoModal(true);
       }, 500); // Небольшая задержка для плавности
     } else if (onDataUpdate) {
@@ -450,7 +492,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
 
     // Сбрасываем результат после обработки
     setOpeningResult(null);
-  }, [openingResult, onDataUpdate]);
+  }, [openingResult, onDataUpdate, clearWinRevealModalTimeout]);
 
   /** Ядро рулетки (после выхода с превью). */
   const runRouletteAnimationCore = useCallback(
@@ -554,11 +596,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         }, 220);
         trackTimeout(() => setShowGoldenSparks(true), 900);
         trackTimeout(() => {
-          if (caseData.id === '44444444-4444-4444-4444-444444444444') {
+          if (caseData.id === DAILY_CASE_ID) {
             setShowStrikeThrough(true);
           }
         }, 1400);
-        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+        trackTimeout(() => handleAnimationComplete(), caseData.id === DAILY_CASE_ID ? 5000 : 4000);
         return;
       }
 
@@ -592,11 +634,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
         }, 220);
         trackTimeout(() => setShowGoldenSparks(true), 900);
         trackTimeout(() => {
-          if (caseData.id === '44444444-4444-4444-4444-444444444444') {
+          if (caseData.id === DAILY_CASE_ID) {
             setShowStrikeThrough(true);
           }
         }, 1400);
-        trackTimeout(() => handleAnimationComplete(), caseData.id === '44444444-4444-4444-4444-444444444444' ? 5000 : 4000);
+        trackTimeout(() => handleAnimationComplete(), caseData.id === DAILY_CASE_ID ? 5000 : 4000);
       };
       animationFrameRef.current = requestAnimationFrame(settle);
     };
@@ -696,6 +738,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       return;
     }
     if (isProcessing || buyLoading || openLoading || showOpeningAnimation || casePreviewExiting || isPreparingAssets) {
+      return;
+    }
+
+    const price = getCasePrice(caseData);
+    const hasEnoughBalance = (userData?.balance || 0) >= price;
+    if (price > 0 && !hasEnoughBalance) {
+      onClose();
+      window.dispatchEvent(new CustomEvent('openDepositModal', { detail: { tab: 'balance' } }));
       return;
     }
 
@@ -824,6 +874,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             onClose={() => {
               setShowItemInfoModal(false);
               setSelectedItem(null);
+              setWinModalStrikeThrough(false);
             }}
             item={{
               name: selectedItem.name,
@@ -834,6 +885,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               bonusApplied: selectedItem.bonusApplied,
             }}
             showDropChance={showDropChance}
+            showStrikeThrough={winModalStrikeThrough}
             getRarityColor={getRarityColor}
             t={t}
           />
@@ -957,7 +1009,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
               className={`absolute left-1/2 top-1/2 z-20 mobile-win-reveal pointer-events-none ${layoutDesktop ? 'w-[288px]' : 'w-[216px] sm:w-[240px]'}`}
             >
               <div className={`rounded-xl border-2 p-3 sm:p-4 bg-gray-900/95 shadow-2xl ${layoutDesktop ? 'p-4' : ''} ${getRarityColor(wonItem.rarity || '')}`}>
-                <div className="aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+                <div
+                  className={`relative aspect-square w-full rounded-lg overflow-hidden bg-black/40 mb-2 flex items-center justify-center ${
+                    showStrikeThrough ? 'opacity-50 grayscale' : ''
+                  }`}
+                >
                   <img
                     loading="lazy"
                     src={
@@ -967,6 +1023,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     alt={wonItem.name}
                     className="w-full h-full object-contain"
                   />
+                  {showStrikeThrough && <ItemStrikeThroughOverlay />}
                 </div>
                 <p
                   className={`text-white font-semibold text-center line-clamp-2 mb-1 ${layoutDesktop ? 'text-sm' : 'text-xs sm:text-sm'}`}
@@ -974,8 +1031,14 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                 >
                   {wonItem.name}
                 </p>
-                <p className={`text-green-400 font-bold text-center ${layoutDesktop ? 'text-sm' : 'text-xs'}`}>
-                  {t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
+                <p
+                  className={`font-bold text-center ${layoutDesktop ? 'text-sm' : 'text-xs'} ${
+                    showStrikeThrough ? 'text-red-400' : 'text-green-400'
+                  }`}
+                >
+                  {showStrikeThrough
+                    ? t('case_preview_modal.received')
+                    : t('case_preview_modal.you_won', { defaultValue: 'Вы выиграли!' })}
                 </p>
               </div>
             </div>
@@ -1226,6 +1289,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
           onClose={() => {
             setShowItemInfoModal(false);
             setSelectedItem(null);
+            setWinModalStrikeThrough(false);
           }}
           item={{
             name: selectedItem.name,
@@ -1236,6 +1300,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
             bonusApplied: selectedItem.bonusApplied,
           }}
           showDropChance={showDropChance}
+          showStrikeThrough={winModalStrikeThrough}
           getRarityColor={getRarityColor}
           t={t}
         />

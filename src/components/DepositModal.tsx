@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Wallet, Lock, Crown, History, CalendarClock, Hash } from 'lucide-react';
+import { X, Wallet, Lock, Crown, History, CalendarClock, Hash, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTopUpBalanceMutation, useApplyPromoCodeMutation, useGetPaymentHistoryQuery } from '../features/user/userApi';
 import { useGetSubscriptionTiersQuery, useBuySubscriptionMutation } from '../features/subscriptions/subscriptionsApi';
 import Monetary from './Monetary';
 import { ReceivedIcon } from './icons';
 import { getApiErrorMessage } from '../utils/config';
+import { PAYMENTS_TEMPORARILY_DISABLED } from '../config/payments';
 
 // Иконка банковской карты (Credit Card)
 const BankCardIcon = () => (
@@ -31,6 +32,25 @@ const BankCardIcon = () => (
 // URL логотипа СБП (logo-teka.com)
 const SBP_LOGO_URL = 'https://logo-teka.com/wp-content/uploads/2025/06/sbp-logo.svg';
 
+const PaymentsDisabledNotice: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center py-10 sm:py-14 px-2 sm:px-4">
+      <div className="max-w-lg w-full rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/[0.12] via-[#1a1f2e] to-orange-500/[0.08] p-6 sm:p-10 text-center shadow-lg shadow-amber-500/5">
+        <div className="mx-auto mb-5 w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+          <Sparkles className="w-8 h-8 text-amber-400" />
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">
+          {t('modals.payments_disabled_title')}
+        </h3>
+        <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+          {t('modals.payments_disabled_description')}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -50,7 +70,7 @@ type PaymentMethod = {
 };
 
 const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab = 'balance', initialSelectedSubscription }) => {
-  const { } = useTranslation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'balance' | 'subscription'>(initialTab);
   const [selectedMethod, setSelectedMethod] = useState<string>('unitpay_card');
@@ -66,12 +86,14 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   const [applyPromo] = useApplyPromoCodeMutation();
   const [buySubscription, { isLoading: isSubscriptionLoading }] = useBuySubscriptionMutation();
 
-  const { data: subscriptionTiersData } = useGetSubscriptionTiersQuery();
+  const { data: subscriptionTiersData } = useGetSubscriptionTiersQuery(undefined, {
+    skip: PAYMENTS_TEMPORARILY_DISABLED,
+  });
   const subscriptionTiers = subscriptionTiersData?.data || [];
 
   const { data: paymentHistoryData } = useGetPaymentHistoryQuery(
     { limit: 50 },
-    { skip: !isOpen }
+    { skip: !isOpen || PAYMENTS_TEMPORARILY_DISABLED }
   );
   const paymentHistory = paymentHistoryData?.success ? paymentHistoryData.data?.items ?? [] : [];
   const previewCount = 8;
@@ -206,6 +228,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   const minAmount = 10;
 
   const handleDeposit = async () => {
+    if (PAYMENTS_TEMPORARILY_DISABLED) {
+      toast.error(t('modals.payments_disabled_title'));
+      return;
+    }
     if (!agreedToTerms) {
       toast.error('Необходимо принять пользовательское соглашение');
       return;
@@ -273,6 +299,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
   };
 
   const handleSubscriptionPurchase = async (tierId: number) => {
+    if (PAYMENTS_TEMPORARILY_DISABLED) {
+      toast.error(t('modals.payments_disabled_title'));
+      return;
+    }
     try {
       const result = await buySubscription({
         tierId,
@@ -367,7 +397,9 @@ const DepositModal: React.FC<DepositModalProps> = ({ isOpen, onClose, initialTab
 
         {/* Content */}
         <div className="relative p-4 sm:p-6 max-h-[calc(95vh-200px)] overflow-y-auto">
-          {activeTab === 'balance' ? (
+          {PAYMENTS_TEMPORARILY_DISABLED ? (
+            <PaymentsDisabledNotice />
+          ) : activeTab === 'balance' ? (
             <>
               {/* Mobile/Tablet Version */}
               <div className="block lg:hidden space-y-6">
