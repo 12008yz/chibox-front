@@ -271,12 +271,19 @@ const Footer = () => {
       <div className="border-t border-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <img loading="lazy" src="/images/chiCoinFull.webp"
-              alt="ChiCoin"
-              width="192"
-              height="192"
-              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain object-center animate-spin-slow"
-            />
+            <div
+              className="footer-chi-coin-spin w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 flex-shrink-0"
+              aria-hidden
+            >
+              <img
+                loading="eager"
+                src="/images/chiCoinFull.webp"
+                alt=""
+                width="192"
+                height="192"
+                className="w-full h-full object-contain object-center pointer-events-none"
+              />
+            </div>
             <div className="text-center md:text-left">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-orange-400">
                 {t('footer.chi_coin_title')}

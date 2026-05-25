@@ -25,6 +25,13 @@
   animation: none !important;
 }
 
+.performance-low .footer-chi-coin-spin {
+  -webkit-animation: spin-slow 15s linear infinite !important;
+  animation: spin-slow 15s linear infinite !important;
+  animation-iteration-count: infinite !important;
+  animation-duration: 15s !important;
+}
+
 .performance-medium {
   --animation-duration: 0.2s;
   --enable-backdrop-filter: none;

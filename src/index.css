@@ -1471,6 +1471,17 @@ img.live-drop-item {
   will-change: transform;
 }
 
+/* Подвал: вращение на обёртке — Safari/iOS не крутит <img> с object-contain */
+.footer-chi-coin-spin {
+  -webkit-animation: spin-slow 15s linear infinite;
+  -moz-animation: spin-slow 15s linear infinite;
+  animation: spin-slow 15s linear infinite;
+  -webkit-transform-origin: center center;
+  transform-origin: center center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
 .animate-spin-fast {
   -webkit-animation: spin-slow 4s linear infinite;
   -moz-animation: spin-slow 4s linear infinite;
