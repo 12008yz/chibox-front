@@ -45,7 +45,11 @@ export const CaseItem = memo(({
     (animationPhase === 'wobbling' || animationPhase === 'falling') &&
     (isCurrentSliderPosition || isNextSliderPosition);
   const isWinningItem = showOpeningAnimation && openingResult && openingResult.item.id === item.id;
-  const isWinningItemStopped = animationPhase === 'stopped' && openingResult && openingResult.item.id === item.id;
+  const isWinningItemStopped =
+    animationPhase === 'stopped' &&
+    openingResult &&
+    openingResult.item.id === item.id &&
+    sliderPosition === animationIndex;
   const isDailyCase = caseData.id === DAILY_CASE_ID;
 
   // Оптимизированный обработчик ошибки изображения

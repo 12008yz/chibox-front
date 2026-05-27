@@ -23,6 +23,7 @@ import { soundManager } from '../../utils/soundManager';
 import { rouletteAudio } from '../../utils/rouletteAudio';
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
+import { injectNearMissIntoStrip } from './buildRouletteNearMiss';
 
 // Добавляем стили в head только один раз
 injectStyles();
@@ -539,7 +540,12 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const targetSlotIndex = cyclesBeforeTarget * L + wonItemIndex;
     const tailCycles = reduceMotion ? 1 : 2;
     const repeatCount = cyclesBeforeTarget + tailCycles + 1; // +1 чтобы точно покрыть target index
-    const longStrip = Array.from({ length: repeatCount }, () => baseStrip).flat();
+    let longStrip = Array.from({ length: repeatCount }, () => baseStrip).flat();
+
+    longStrip = injectNearMissIntoStrip(longStrip, targetSlotIndex, wonItem.id, baseStrip, {
+      casePrice: getCasePrice(caseData),
+      enabled: !reduceMotion,
+    });
 
     setMobileAnimationItems(longStrip);
     setSliderPosition(0);
@@ -687,7 +693,7 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       });
     }, startDelayMs);
     },
-    [itemsWithAdjustedChances, caseData.id, handleAnimationComplete, isIPhone]
+    [itemsWithAdjustedChances, caseData.id, caseData, getCasePrice, handleAnimationComplete, isIPhone]
   );
 
   // Горизонтальная рулетка: плавный translate3d (мобилка и десктоп), cubic-bezier(0.22, 0.2, 0.1, 0.985)
@@ -958,7 +964,11 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                     ) : (
                       (() => {
                         const winningItemId = openingResult?.item?.id;
-                        const isWinningStripItem = !!winningItemId && item.id === winningItemId;
+                        const isCenterWinSlot =
+                          animationPhase === 'stopped' &&
+                          index === sliderPosition &&
+                          !!winningItemId &&
+                          item.id === winningItemId;
                         return (
                       <CaseItem
                         item={item}
@@ -970,9 +980,9 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
                         openingResult={openingResult}
                         animationPhase={animationPhase}
                         caseData={caseData}
-                        showStrikeThrough={isWinningStripItem ? showStrikeThrough : false}
-                        showGoldenSparks={isWinningStripItem ? showGoldenSparks : false}
-                        showWinEffects={isWinningStripItem ? showWinEffects : false}
+                        showStrikeThrough={isCenterWinSlot ? showStrikeThrough : false}
+                        showGoldenSparks={isCenterWinSlot ? showGoldenSparks : false}
+                        showWinEffects={isCenterWinSlot ? showWinEffects : false}
                         getRarityColor={getRarityColor}
                         generateGoldenSparks={generateGoldenSparks}
                         t={t}
