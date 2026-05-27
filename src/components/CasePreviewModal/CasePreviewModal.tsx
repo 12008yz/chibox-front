@@ -24,29 +24,33 @@ import { rouletteAudio } from '../../utils/rouletteAudio';
 import { useAppDispatch } from '../../store/hooks';
 import { setShowAuthModal } from '../../store/slices/uiSlice';
 import { injectNearMissIntoStrip } from './buildRouletteNearMiss';
+import {
+  getCaseWinTier,
+  playCaseWinTierSound,
+  shouldShowGoldenSparks,
+  shouldShowWinEffects,
+} from '../../utils/caseOpenWinFeedback';
 
 // Добавляем стили в head только один раз
 injectStyles();
 
-/** Как у горизонтальной «рулетки»: easing близок к cubic-bezier(0.22, 0.2, 0.1, 0.985) — быстрый старт, длинное плавное торможение. */
-function cubicBezierYatX(t: number, x1: number, y1: number, x2: number, y2: number): number {
+/**
+ * Одна кривая на всё торможение: быстрый разгон → длинный ease-out → лёгкий откат к цели.
+ * Без отдельной фазы settle (она давала рывок в конце).
+ */
+function easeOutBack(t: number, overshoot = 0.55): number {
   if (t <= 0) return 0;
   if (t >= 1) return 1;
-  const sampleCurveX = (u: number) =>
-    3 * (1 - u) * (1 - u) * u * x1 + 3 * (1 - u) * u * u * x2 + u * u * u;
-  const sampleCurveY = (u: number) =>
-    3 * (1 - u) * (1 - u) * u * y1 + 3 * (1 - u) * u * u * y2 + u * u * u;
-  let low = 0;
-  let high = 1;
-  let u = t;
-  for (let i = 0; i < 14; i++) {
-    u = (low + high) / 2;
-    const x = sampleCurveX(u);
-    if (x < t) low = u;
-    else high = u;
-  }
-  u = (low + high) / 2;
-  return sampleCurveY(u);
+  const c1 = overshoot;
+  const c3 = c1 + 1;
+  return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
+}
+
+/** Мягкое торможение без отката (reduce-motion). */
+function easeOutQuint(t: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return 1 - (1 - t) ** 5;
 }
 
 // Портал в documentElement, чтобы подложка (fixed) не привязывалась к body с position:fixed — иначе чёрный фон только в нижней части экрана
@@ -217,6 +221,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
   const getCasePrice = useCallback((caseData: CaseTemplate): number => {
     if (statusData?.data != null && typeof statusData.data.price === 'number') {
       return statusData.data.price;
+    }
+    const templatePrice = parseFloat(caseData.price);
+    if (Number.isFinite(templatePrice) && templatePrice >= 0) {
+      return templatePrice;
     }
     return caseData.name.toLowerCase().includes('premium') || caseData.name.toLowerCase().includes('премиум') ? 499 : 99;
   }, [statusData]);
@@ -564,15 +572,47 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
     const durationMs = reduceMotion
       ? 700
       : isIPhone
-        ? 5700 + Math.random() * 850
-        : 5200 + Math.random() * 800;
-    const settleDurationMs = reduceMotion ? 120 : isIPhone ? 390 : 300;
-    const overshootSlots = reduceMotion ? 0 : isIPhone ? 0.22 : 0.24;
-    const firstPhaseTarget = targetSlotIndex + overshootSlots;
+        ? 5900 + Math.random() * 900
+        : 5600 + Math.random() * 900;
+    const spinEaseOvershoot = reduceMotion ? 0 : isIPhone ? 0.42 : 0.52;
     const startDelayMs = reduceMotion ? 120 : isIPhone ? 300 : 380;
     let lastTickSlot = -1;
     let lastSoundAt = 0;
     const SOUND_MIN_MS = isIPhone ? 56 : 38;
+
+    const winItemPrice = parseFloat(String((wonItem as { price?: string | number }).price)) || 0;
+    const winTier = getCaseWinTier(
+      winItemPrice,
+      getCasePrice(caseData),
+      (wonItem as { rarity?: string }).rarity
+    );
+
+    const scheduleWinReveal = (schedule: typeof trackTimeout) => {
+      schedule(() => {
+        if (useWebAudioForIPhone) {
+          rouletteAudio.playEnd();
+        } else {
+          soundManager.play('endProcess');
+        }
+        playCaseWinTierSound(winTier);
+        if (shouldShowWinEffects(winTier)) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setShowWinEffects(true));
+          });
+        }
+      }, 340);
+      schedule(() => {
+        if (shouldShowGoldenSparks(winTier)) {
+          setShowGoldenSparks(true);
+        }
+      }, 900);
+      schedule(() => {
+        if (caseData.id === DAILY_CASE_ID) {
+          setShowStrikeThrough(true);
+        }
+      }, 1400);
+      schedule(() => handleAnimationComplete(), caseData.id === DAILY_CASE_ID ? 5000 : 4000);
+    };
 
     const finishSpin = () => {
       if (useWebAudioForIPhone) {
@@ -584,69 +624,10 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       if (el) {
         el.style.removeProperty('transition');
       }
-
-      const settleStartPos = mobileAnimationRef.current.position + mobileAnimationRef.current.offset;
-      if (Math.abs(settleStartPos - targetSlotIndex) <= 0.001) {
-        applyMobileStripTransformFloat(targetSlotIndex, 0);
-        setSliderPosition(targetSlotIndex);
-        setAnimationPhase('stopped');
-        trackTimeout(() => {
-          if (useWebAudioForIPhone) {
-            rouletteAudio.playEnd();
-          } else {
-            soundManager.play('endProcess');
-          }
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => setShowWinEffects(true));
-          });
-        }, 220);
-        trackTimeout(() => setShowGoldenSparks(true), 900);
-        trackTimeout(() => {
-          if (caseData.id === DAILY_CASE_ID) {
-            setShowStrikeThrough(true);
-          }
-        }, 1400);
-        trackTimeout(() => handleAnimationComplete(), caseData.id === DAILY_CASE_ID ? 5000 : 4000);
-        return;
-      }
-
-      let settleStart: number | null = null;
-      const settle = (now: number) => {
-        if (settleStart === null) settleStart = now;
-        const settleElapsed = now - settleStart;
-        const tSettle = Math.min(1, settleElapsed / settleDurationMs);
-        const easedSettle = cubicBezierYatX(tSettle, 0.34, 1, 0.64, 1);
-        const pos = settleStartPos + (targetSlotIndex - settleStartPos) * easedSettle;
-        applyMobileStripTransformFloat(pos, 0);
-
-        if (tSettle < 1) {
-          animationFrameRef.current = requestAnimationFrame(settle);
-          return;
-        }
-
-        animationFrameRef.current = null;
-        applyMobileStripTransformFloat(targetSlotIndex, 0);
-        setSliderPosition(targetSlotIndex);
-        setAnimationPhase('stopped');
-        trackTimeout(() => {
-          if (useWebAudioForIPhone) {
-            rouletteAudio.playEnd();
-          } else {
-            soundManager.play('endProcess');
-          }
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => setShowWinEffects(true));
-          });
-        }, 220);
-        trackTimeout(() => setShowGoldenSparks(true), 900);
-        trackTimeout(() => {
-          if (caseData.id === DAILY_CASE_ID) {
-            setShowStrikeThrough(true);
-          }
-        }, 1400);
-        trackTimeout(() => handleAnimationComplete(), caseData.id === DAILY_CASE_ID ? 5000 : 4000);
-      };
-      animationFrameRef.current = requestAnimationFrame(settle);
+      applyMobileStripTransformFloat(targetSlotIndex, 0);
+      setSliderPosition(targetSlotIndex);
+      setAnimationPhase('stopped');
+      scheduleWinReveal(trackTimeout);
     };
 
     trackTimeout(() => {
@@ -659,15 +640,21 @@ const CasePreviewModal: React.FC<CasePreviewModalProps> = ({
       applyMobileStripTransformFloat(0, 0);
 
       let animStart: number | null = null;
+      let slowingPhaseSet = false;
       const tick = (now: number) => {
         if (animStart === null) animStart = now;
         const elapsed = now - animStart;
         const t = Math.min(1, elapsed / durationMs);
-        const eased = isIPhone
-          ? cubicBezierYatX(t, 0.2, 0.14, 0.18, 1)
-          : cubicBezierYatX(t, 0.22, 0.2, 0.1, 0.985);
-        const pos = eased * firstPhaseTarget;
+        const eased = reduceMotion
+          ? easeOutQuint(t)
+          : easeOutBack(t, spinEaseOvershoot);
+        const pos = eased * targetSlotIndex;
         applyMobileStripTransformFloat(pos, 0);
+
+        if (!reduceMotion && t >= 0.72 && !slowingPhaseSet) {
+          slowingPhaseSet = true;
+          setAnimationPhase('slowing');
+        }
 
         const slot = Math.min(targetSlotIndex, Math.max(0, Math.floor(pos + 1e-9)));
         if (slot > lastTickSlot) {

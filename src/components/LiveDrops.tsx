@@ -5,6 +5,7 @@ import LiveDropItem from './LiveDropItem';
 import { useTranslation } from 'react-i18next';
 import { Flame } from 'lucide-react';
 import { API_URL } from '../utils/config';
+import { getLiveDropEnterAnimation, getLiveDropTier } from '../utils/liveDropTier';
 
 const LiveDrops: React.FC = () => {
   const { t } = useTranslation();
@@ -156,9 +157,9 @@ const LiveDrops: React.FC = () => {
             {allDrops.map((drop, index) => (
               <div
                 key={drop.id}
-                className="flex-shrink-0 animate-slideInLeft"
+                className={`flex-shrink-0 ${getLiveDropEnterAnimation(getLiveDropTier(drop))}`}
                 style={{
-                  animationDelay: `${index * 0.1}s`,
+                  animationDelay: index < 3 ? `${index * 0.08}s` : '0s',
                   animationFillMode: 'backwards'
                 }}
               >
